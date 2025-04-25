@@ -1,0 +1,86 @@
+:root {
+    --kadjiv-orange: #FFA500;
+    --kadjiv-dark: #000000;
+}
+
+/* Ajustement des couleurs principales */
+.bg-primary {
+    background-color: var(--kadjiv-orange) !important;
+}
+
+.text-primary {
+    color: var(--kadjiv-orange) !important;
+}
+
+.bg-primary.bg-opacity-10 {
+    background-color: rgba(255, 165, 0, 0.1) !important;
+}
+
+/* Boutons */
+.btn-primary {
+    background-color: var(--kadjiv-orange);
+    border-color: var(--kadjiv-orange);
+}
+
+.btn-primary:hover {
+    background-color: #e69400;
+    border-color: #e69400;
+}
+
+.btn-light-primary {
+    color: var(--kadjiv-orange);
+    background-color: rgba(255, 165, 0, 0.1);
+}
+
+.btn-light-primary:hover {
+    background-color: rgba(255, 165, 0, 0.2);
+}
+
+/* Numéro de reçu */
+.numero-recu {
+    background-color: rgba(255, 165, 0, 0.1);
+    color: var(--kadjiv-orange);
+}
+
+/* Header icon animation */
+.header-icon .icon-wrapper {
+    background-color: rgba(255, 165, 0, 0.1) !important;
+}
+
+.header-icon:hover .icon-wrapper {
+    background-color: rgba(255, 165, 0, 0.2) !important;
+}
+
+/* Stats cards */
+.stats-icon.bg-primary {
+    background-color: rgba(255, 165, 0, 0.1) !important;
+}
+
+.stats-icon.text-primary {
+    color: var(--kadjiv-orange) !important;
+}
+
+/* Badge styling */
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+/* Card hover effects */
+.card:hover {
+    border-color: var(--kadjiv-orange);
+}
+
+/* Table header */
+.table thead {
+    background-color: rgba(255, 165, 0, 0.05) !important;
+}
+
+/* Avatar styling */
+.avatar-client {
+    background-color: rgba(255, 165, 0, 0.1);
+    color: var(--kadjiv-dark);
+}

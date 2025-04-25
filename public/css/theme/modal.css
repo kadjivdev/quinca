@@ -1,0 +1,171 @@
+/* Variables communes */
+:root {
+    --kadjiv-orange: #FFA500;
+    --kadjiv-orange-light: rgba(255, 165, 0, 0.1);
+    --kadjiv-text: #2c3e50;
+    --kadjiv-border: #e9ecef;
+}
+
+/* Styles communs pour les modales */
+.modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 1.25rem 1.5rem;
+    background: #fff !important;
+    border-bottom: 1px solid var(--kadjiv-border) !important;
+}
+
+.modal-header .bg-primary,
+.modal-header .bg-warning {
+    background-color: var(--kadjiv-orange-light) !important;
+}
+
+.modal-header .text-primary,
+.modal-header .text-warning {
+    color: var(--kadjiv-orange) !important;
+}
+
+.modal-header .rounded-circle {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    border-top: 1px solid var(--kadjiv-border) !important;
+}
+
+/* Form controls */
+.form-label {
+    color: var(--kadjiv-text);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-color: var(--kadjiv-border);
+    padding: 0.6rem 0.875rem;
+    font-size: 0.875rem;
+    border-radius: 6px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--kadjiv-orange);
+    box-shadow: 0 0 0 0.25rem rgba(255, 165, 0, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: var(--kadjiv-border);
+    color: #6c757d;
+}
+
+/* Cards dans les modales */
+.modal .card {
+    border-radius: 8px;
+    border: 1px solid var(--kadjiv-border);
+}
+
+.modal .card.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+/* Boutons */
+.modal .btn {
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    border-radius: 6px;
+}
+
+.modal .btn-primary {
+    background-color: var(--kadjiv-orange);
+    border-color: var(--kadjiv-orange);
+}
+
+.modal .btn-primary:hover {
+    background-color: #e69400;
+    border-color: #e69400;
+}
+
+.modal .btn-light {
+    background-color: #f8f9fa;
+    border-color: var(--kadjiv-border);
+}
+
+.modal .btn-warning {
+    background-color: var(--kadjiv-orange);
+    border-color: var(--kadjiv-orange);
+    color: white;
+}
+
+.modal .btn-warning:hover {
+    background-color: #e69400;
+    border-color: #e69400;
+    color: white;
+}
+
+/* Détails du règlement */
+.client-info .client-avatar {
+    background-color: var(--kadjiv-orange-light);
+    color: var(--kadjiv-orange);
+}
+
+.payment-details {
+    border-radius: 8px;
+}
+
+.payment-details h6 {
+    color: var(--kadjiv-text);
+}
+
+.status-info {
+    border-radius: 8px;
+}
+
+/* Loader */
+.spinner-pulse {
+    background-color: var(--kadjiv-orange);
+}
+
+/* Required fields */
+.required:after {
+    content: " *";
+    color: var(--kadjiv-orange);
+}
+
+/* Show modal specific */
+#showReglementModal .numero-recu {
+    background-color: var(--kadjiv-orange-light);
+    color: var(--kadjiv-orange);
+    font-weight: 600;
+}
+
+#showReglementModal .text-success {
+    color: var(--kadjiv-orange) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .modal-header {
+        padding: 1rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-footer {
+        padding: 0.75rem 1rem;
+    }
+}

@@ -1,0 +1,187 @@
+
+    /* Styles généraux de la table */
+    .table {
+        --kadjiv-orange: #FFA500;
+        --bs-table-hover-bg: rgba(255, 165, 0, 0.02);
+    }
+
+    /* En-tête de table */
+    .table thead {
+        background-color: #f8f9fa !important;
+    }
+
+    .table thead th {
+        color: #495057;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+
+    /* Corps de la table */
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* Numéro de reçu */
+    .numero-recu {
+        font-family: 'Monaco', 'Consolas', monospace;
+        color: var(--kadjiv-orange);
+        font-weight: 500;
+        padding: 0.4rem 0.8rem;
+        background-color: rgba(255, 165, 0, 0.1);
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+
+    /* Avatar client */
+    .avatar-client {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(255, 165, 0, 0.1);
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+
+    /* Styles des badges */
+    .badge {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        font-size: 0.75rem;
+        letter-spacing: 0.3px;
+        border-radius: 6px;
+    }
+
+    /* Badge de mode de paiement */
+    .badge.bg-light {
+        background-color: #f8f9fa !important;
+        border: 1px solid #e9ecef;
+        color: #495057 !important;
+    }
+
+    /* Badge de statut */
+    .badge.bg-warning {
+        background-color: #fff3cd !important;
+        color: #856404 !important;
+    }
+
+    .badge.bg-success {
+        background-color: #d4edda !important;
+        color: #155724 !important;
+    }
+
+    .badge.bg-danger {
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+    }
+
+    /* Boutons d'action */
+    .btn-group .btn {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 6px !important;
+        margin: 0 0.15rem;
+    }
+
+    .btn-light-primary {
+        color: var(--kadjiv-orange);
+        background-color: rgba(255, 165, 0, 0.1);
+        border: none;
+    }
+
+    .btn-light-primary:hover {
+        background-color: rgba(255, 165, 0, 0.2);
+    }
+
+    .btn-light-warning {
+        color: #856404;
+        background-color: #fff3cd;
+        border: none;
+    }
+
+    .btn-light-warning:hover {
+        background-color: #ffeeba;
+    }
+
+    .btn-light-success {
+        color: #155724;
+        background-color: #d4edda;
+        border: none;
+    }
+
+    .btn-light-success:hover {
+        background-color: #c3e6cb;
+    }
+
+    .btn-light-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border: none;
+    }
+
+    .btn-light-danger:hover {
+        background-color: #f5c6cb;
+    }
+
+    .btn-light-secondary {
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border: none;
+    }
+
+    .btn-light-secondary:hover {
+        background-color: #e9ecef;
+    }
+
+    /* État vide */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h6 {
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #adb5bd;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Liens */
+    .table a {
+        color: var(--kadjiv-orange);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .table a:hover {
+        color: #e69400;
+    }
+
+    /* Info client */
+    .client-info .fw-medium {
+        color: #2c3e50;
+        font-size: 0.875rem;
+    }
+
+    .client-info .text-muted {
+        font-size: 0.75rem;
+    }
