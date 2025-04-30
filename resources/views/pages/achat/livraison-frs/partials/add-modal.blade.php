@@ -39,7 +39,7 @@
                                             <label class="form-label small text-muted mb-2 required">Facture</label>
                                             <select class="form-select select2 rounded-pill" name="facture_id"
                                                 id="factureSelect" required>
-                                                <option value="">Sélectionner une facture</option>
+                                                <option value="">Sélectionner un bon de commande</option>
                                                 @foreach ($factures as $facture)
                                                     <option value="{{ $facture->id }}">{{ $facture->code }} -- <b class="text-success">({{$facture->bonCommande->code}})</b> </option>
                                                 @endforeach
