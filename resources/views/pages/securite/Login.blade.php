@@ -16,7 +16,7 @@
                         <div class="card-body p-4 p-md-5">
                             <!-- Logo ADJIV -->
                             <div class="text-center mb-4 logo-container">
-                                <img src="{{ asset('assets/img/logos/kadjiv.png') }}"
+                                <img src="{{ asset('assets/img/logos/logo.jpeg')}}"
                                 alt="ADJIV Logo"
                                 class="img-fluid mb-3 logo-image"
                                 style="max-width: 150px; height: auto;">
