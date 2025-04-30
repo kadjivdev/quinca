@@ -457,6 +457,8 @@ class BonLivraisonFournisseurController extends Controller
             // Traiter les entrées en stock
             $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
 
+            // dd($resultatStock);
+
             \Log::debug('Résultat traitement stock:', $resultatStock);
 
             if (!$resultatStock['succes']) {

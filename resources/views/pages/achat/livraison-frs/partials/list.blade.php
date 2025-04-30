@@ -101,7 +101,7 @@
                                             <i class="fas fa-edit"></i>
                                         </button>
 
-                                        <a target="_blank" href="{{route('livraisons.validate',$livraison->id)}}">Valider</a>
+                                        <!-- <a target="_blank" href="{{route('livraisons.validate',$livraison->id)}}">Valider</a> -->
 
                                         <button class="btn btn-link btn-sm text-success p-2"
                                             onclick="validateLivraisonFournisseur({{ $livraison->id }})"

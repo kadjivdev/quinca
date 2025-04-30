@@ -14,6 +14,7 @@
                                 <th class="border-bottom-0 text-center">Désignation</th>
                                 <th class="border-bottom-0">Famille</th>
                                 <th class="border-bottom-0">Stockable</th>
+                                <th class="border-bottom-0">Stock total</th>
                                 <th class="border-bottom-0" style="min-width: 150px;">Dépôts</th>
                                 <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                             </tr>
@@ -33,6 +34,10 @@
                                     @else
                                     <span class="badge bg-success">Stockable</span>
                                     @endif
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge bg-success">{{number_format($article->stocks->sum("quantite_reelle"),2," "," ")}}</span>
                                 </td>
 
                                 <td class="border p-0">

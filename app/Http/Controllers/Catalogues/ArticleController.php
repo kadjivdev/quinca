@@ -52,6 +52,8 @@ class ArticleController extends Controller
             ->orderBy('libelle_famille')
             ->get();
 
+        // dd($articles[0]->depots);
+
         $totalArticles = Article::count();
         $articlesEnStock = Article::where('stockable', true)
             ->where('stock_actuel', '>', 0)

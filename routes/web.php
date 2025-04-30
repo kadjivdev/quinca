@@ -256,7 +256,6 @@ Route::middleware('auth')->group(function () {
             // inventaires
             Route::patch('/inventaires/store', [ArticleController::class, 'storeMultipleInventaires'])->name('articles.storeMultipleInventaires');
 
-
             // Routes additionnelles pour les fonctionnalités spécifiques
             Route::get('/search', [ArticleController::class, 'search'])->name('articles.search');
             Route::get('/filter', [ArticleController::class, 'filter'])->name('articles.filter');
@@ -278,7 +277,6 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('achat')->middleware(['auth'])->group(function () {
-
         Route::prefix('fournisseurs')->group(function () {
             Route::get('/', [FournisseurController::class, 'index'])->name('fournisseur.index');
             Route::post('/', [FournisseurController::class, 'store'])->name('fournisseur.store');
