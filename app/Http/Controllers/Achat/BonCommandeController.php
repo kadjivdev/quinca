@@ -524,8 +524,8 @@ class BonCommandeController extends Controller
         // Définir la police à "DejaVu Sans" qui supporte les caractères UTF-8
         // $pdf->SetFont('DejaVu Sans', '', 12); // Ou 'dejavusans' pour une version UTF-8
 
-        $pdf->Image("assets/img/logos/logo.jpeg", 150, 10, 50, 30);
-        $pdf->Image("assets/img/logos/head_facture.jpg", 10, 10, 70, 30);
+        $pdf->Image("kadjiv.jpeg", 150, 10, 50, 30);
+        $pdf->Image("head_facture.jpg", 10, 10, 70, 30);
 
         $date = Carbon::now();
         $date->locale('fr');
