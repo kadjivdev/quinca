@@ -1,5 +1,5 @@
 <div class="modal fade" id="addLivraisonFournisseurModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl " >
+    <div class="modal-dialog modal-dialog-centered modal-xl ">
         <div class="modal-content border-0 shadow-lg rounded-4 modal-dialog-scrollable" style="overflow-y: scroll!important;">
             {{-- Header du modal --}}
             <div class="modal-header border-0 bg-gradient-light py-4">
@@ -36,12 +36,12 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small text-muted mb-2 required">Facture</label>
+                                            <label class="form-label small text-muted mb-2 required">Bon de commande</label>
                                             <select class="form-select select2 rounded-pill" name="facture_id"
                                                 id="factureSelect" required>
                                                 <option value="">Sélectionner un bon de commande</option>
                                                 @foreach ($factures as $facture)
-                                                    <option value="{{ $facture->id }}">{{ $facture->code }} -- <b class="text-success">({{$facture->bonCommande->code}})</b> </option>
+                                                <option value="{{ $facture->id }}">{{$facture->bonCommande->code}} -- <b class="text-success">({{ $facture->code }})</b> </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -56,8 +56,8 @@
                                             <select class="form-select rounded-pill select2" name="depot_id" required>
                                                 <option value="">Sélectionner un magasin</option>
                                                 @foreach ($depots as $depot)
-                                                    <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
-                                                    </option>
+                                                <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -74,7 +74,7 @@
                             <select class="form-select select2 rounded-pill" name="vehicule_id" required>
                                 <option value="">Sélectionner un véhicule</option>
                                 @foreach ($vehicules as $vehicule)
-                                    <option value="{{ $vehicule->id }}">{{ $vehicule->matricule }}</option>
+                                <option value="{{ $vehicule->id }}">{{ $vehicule->matricule }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -83,7 +83,7 @@
                             <select class="form-select select2 rounded-pill" name="chauffeur_id" required>
                                 <option value="">Sélectionner un chauffeur</option>
                                 @foreach ($chauffeurs as $chauffeur)
-                                    <option value="{{ $chauffeur->id }}">{{ $chauffeur->nom_chauf }}</option>
+                                <option value="{{ $chauffeur->id }}">{{ $chauffeur->nom_chauf }}</option>
                                 @endforeach
                             </select>
                         </div>
