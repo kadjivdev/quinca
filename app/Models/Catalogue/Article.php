@@ -159,8 +159,10 @@ class Article extends Model
     function qteVendu($depotId=null)
     {
         return $this->hasMany(LigneFacture::class, "article_id")->where("depot",$depotId)->get()->filter(function ($vente) {
-            if ($vente->factureClient->validated_by) {
-                return $vente; // facture validées
+            if ($vente->factureClient) {
+                if ($vente->factureClient->validated_by) {
+                    return $vente; // facture validées
+                }
             }
         });
     }
