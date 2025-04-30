@@ -95,20 +95,26 @@
                                         </button>
 
                                         @if (!$livraison->validated_at && !$livraison->rejected_at)
+
+                                        @can("livraisons.edit")
                                         <button class="btn btn-link btn-sm text-warning p-2"
                                             onclick="editLivraisonFournisseur({{ $livraison->id }})"
                                             data-bs-toggle="tooltip" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </button>
+                                        @endcan
 
                                         <!-- <a target="_blank" href="{{route('livraisons.validate',$livraison->id)}}">Valider</a> -->
 
+                                        @can("livraisons.validate")
                                         <button class="btn btn-link btn-sm text-success p-2"
                                             onclick="validateLivraisonFournisseur({{ $livraison->id }})"
                                             data-bs-toggle="tooltip" title="Valider">
                                             <i class="fas fa-check"></i>
                                         </button>
+                                        @endcan
 
+                                        @can("livraisons.delete")
                                         <button class="btn btn-link btn-sm text-danger p-2"
                                             onclick="initRejetLivraison({{ $livraison->id }})"
                                             data-bs-toggle="tooltip" title="Rejeter">
@@ -120,6 +126,8 @@
                                             title="Supprimer">
                                             <i class="fas fa-trash"></i>
                                         </button>
+                                        @endcan
+
                                         @endif
 
                                         <button class="btn btn-link btn-sm text-secondary p-2"
