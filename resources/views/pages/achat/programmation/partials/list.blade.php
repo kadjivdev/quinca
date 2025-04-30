@@ -10,7 +10,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date Programmation</th>
                             <th class="border-bottom-0">Point de Vente</th>
-                            <th class="border-bottom-0">Dépôt</th>
+                            <!-- <th class="border-bottom-0">Dépôt</th> -->
                             <th class="border-bottom-0">Fournisseur</th>
                             <th class="border-bottom-0 text-center">Statut</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
@@ -29,9 +29,9 @@
                             <td>
                                 <span class="badge bg-light text-dark">{{ $programmation->pointVente->nom_pv }}</span>
                             </td>
-                            <td class="text-center">
+                            <!-- <td class="text-center">
                                 <span class="badge bg-warning">{{ $programmation->_depot?$programmation->_depot->libelle_depot:"--" }}</span>
-                            </td>
+                            </td> -->
                             <td class="text-center">
                                 <span class="badge bg-light text-dark">{{ $programmation->fournisseur->raison_sociale }}
                                 </span>

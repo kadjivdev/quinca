@@ -1,5 +1,5 @@
 <div class="modal fade" id="editProgrammationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" >
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content border-0 shadow-lg">
             {{-- Header du modal --}}
             <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
@@ -61,13 +61,13 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-truck text-primary"></i>
                                                 </span>
-                                                <select class="form-select" name="fournisseur_id" id="fournisseurSelect"
+                                                <select class="form-select " name="fournisseur_id" id="fournisseurSelect"
                                                     required>
                                                     <option value="">Sélectionner un fournisseur</option>
                                                     @foreach ($fournisseurs as $fournisseur)
-                                                        <option value="{{ $fournisseur->id }}">
-                                                            {{ $fournisseur->raison_sociale }}
-                                                        </option>
+                                                    <option value="{{ $fournisseur->id }}">
+                                                        {{ $fournisseur->raison_sociale }}
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -178,124 +178,123 @@
 
 
 @push('scripts')
-    <script>
-        $(document).ready(function() {
-            // Générer le code au chargement
-            // generateCode();
-
-            // Initialize Select2 for fournisseur
-            $('#fournisseurSelect').select2({
-                theme: 'bootstrap-5',
-                width: '100%'
-            });
-
-            // Charger les articles quand le fournisseur change
-            $('#fournisseurSelect').on('change', function() {
-                const fournisseurId = $(this).val();
-                if (fournisseurId) {
-                    loadArticles(fournisseurId);
-                }
-            });
-
-            // Ajouter une nouvelle ligne
-            $('#btnAddLigneEdit').on('click', function() {
-                addNewLineMod();
-            });
-
-            // Supprimer une ligne
-            $(document).on('click', '.remove-ligne', function() {
-                $(this).closest('tr').remove();
-            });
-
-            // Soumission du formulaire
-            $('#editProgrammationForm').on('submit', function(e) {
-                e.preventDefault();
-                if (this.checkValidity()) {
-                    editProgrammationMod($(this), this.action);
-                }
-                $(this).addClass('was-validated');
-            });
+<script>
+    $(document).ready(function() {
+        
+        // Initialize Select2 for fournisseur
+        $('#fournisseurSelect').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('#editProgrammationModal')
         });
 
-        function generateCode() {
-            $.ajax({
-                url: '/achat/programmation/generate-code',
-                method: 'GET',
-                success: function(response) {
-                    if (response.success) {
-                        $('#code').val(response.code);
-                    }
-                }
-            });
-        }
+        // Charger les articles quand le fournisseur change
+        $('#fournisseurSelect').on('change', function() {
+            const fournisseurId = $(this).val();
+            if (fournisseurId) {
+                loadArticles(fournisseurId);
+            }
+        });
 
-        function loadArticles(fournisseurId) {
-            $.ajax({
-                url: `/achat/programmation/articles/${fournisseurId}`,
-                method: 'GET',
-                success: function(response) {
-                    const articles = response;
-                    updateArticlesOptions(articles);
-                }
-            });
-        }
+        // Ajouter une nouvelle ligne
+        $('#btnAddLigneEdit').on('click', function() {
+            addNewLineMod();
+        });
 
-        function updateArticlesOptions(articles) {
-            let options = '<option value="">Sélectionner un article</option>';
-            articles.forEach(article => {
-                options += `<option value="${article.id}" data-unites='${JSON.stringify(article.unites)}'>
+        // Supprimer une ligne
+        $(document).on('click', '.remove-ligne', function() {
+            $(this).closest('tr').remove();
+        });
+
+        // Soumission du formulaire
+        $('#editProgrammationForm').on('submit', function(e) {
+            e.preventDefault();
+            if (this.checkValidity()) {
+                editProgrammationMod($(this), this.action);
+            }
+            $(this).addClass('was-validated');
+        });
+    });
+
+    function generateCode() {
+        $.ajax({
+            url: '/achat/programmation/generate-code',
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    $('#code').val(response.code);
+                }
+            }
+        });
+    }
+
+    function loadArticles(fournisseurId) {
+        $.ajax({
+            url: `/achat/programmation/articles/${fournisseurId}`,
+            method: 'GET',
+            success: function(response) {
+                const articles = response;
+                updateArticlesOptions(articles);
+            }
+        });
+    }
+
+    function updateArticlesOptions(articles) {
+        let options = '<option value="">Sélectionner un article</option>';
+        articles.forEach(article => {
+            options += `<option value="${article.id}" data-unites='${JSON.stringify(article.unites)}'>
                     ${article.designation}
                 </option>`;
-            });
-            $('.select2-articles').html(options);
-        }
+        });
+        $('.select2-articles').html(options);
+    }
 
-        function addNewLineMod() {
-            const template = document.getElementById('ligneProgrammationTemplate');
-            const clone = template.content.cloneNode(true);
-            $('#lignesContainerMod').append(clone);
+    function addNewLineMod() {
+        const template = document.getElementById('ligneProgrammationTemplate');
+        const clone = template.content.cloneNode(true);
+        $('#lignesContainerMod').append(clone);
 
-            const newLine = $('#lignesContainerMod tr:last');
+        const newLine = $('#lignesContainerMod tr:last');
 
-            // Initialize Select2 for the new line
-            newLine.find('.select2-articles').select2({
-                theme: 'bootstrap-5',
-                width: '100%'
-            });
-        }
+        // Initialize Select2 for the new line
+        newLine.find('.select2-articles').select2({
+            theme: 'bootstrap-5',
+            width: '100%'
+        });
+    }
 
-        function editProgrammationMod($form, action) {
-            const formData = $form.serialize();
-            console.log(action);
+    function editProgrammationMod($form, action) {
+        const formData = $form.serialize();
+        console.log(action);
 
-            $.ajax({
-                url: action,
-                method: 'PUT',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        // Fermer le modal
-                        $('#editProgrammationForm').modal('hide');
+        $.ajax({
+            url: action,
+            method: 'PUT',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    // Fermer le modal
+                    $('#editProgrammationForm').modal('hide');
 
-                        // Afficher le message de succès
-                        Toast.fire({
-                            icon: 'success',
-                            title: response.message
-                        });
-
-                        // Recharger la page après un court délai
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    }
-                },
-                error: function(xhr) {
+                    // Afficher le message de succès
                     Toast.fire({
-                        icon: 'error',
-                        title: 'Erreur lors de l\'enregistrement'
+                        icon: 'success',
+                        title: response.message
                     });
+
+                    // Recharger la page après un court délai
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 }
-            });
-        }
-    </script>
+            },
+            error: function(xhr) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Erreur lors de l\'enregistrement'
+                });
+            }
+        });
+    }
+</script>
 @endpush
