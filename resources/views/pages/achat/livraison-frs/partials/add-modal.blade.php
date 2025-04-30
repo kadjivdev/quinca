@@ -24,7 +24,7 @@
                             <div class="card bg-light border-0 rounded-3">
                                 <div class="card-body p-4">
                                     <div class="row g-4">
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             <div class="d-flex align-items-center">
                                                 <div class="rounded-3 bg-warning bg-opacity-10 p-3 me-3">
                                                     <i class="fas fa-building text-warning"></i>
@@ -35,23 +35,23 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             <label class="form-label small text-muted mb-2 required">Facture</label>
                                             <select class="form-select select2 rounded-pill" name="facture_id"
                                                 id="factureSelect" required>
                                                 <option value="">Sélectionner une facture</option>
                                                 @foreach ($factures as $facture)
-                                                    <option value="{{ $facture->id }}">{{ $facture->code }}</option>
+                                                    <option value="{{ $facture->id }}">{{ $facture->code }} -- <b class="text-success">({{$facture->bonCommande->code}})</b> </option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             <label class="form-label small text-muted mb-2 required">Date de
                                                 livraison</label>
                                             <input type="date" class="form-control rounded-pill"
                                                 name="date_livraison" required>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             <label class="form-label small text-muted mb-2 required">Magasin</label>
                                             <select class="form-select rounded-pill select2" name="depot_id" required>
                                                 <option value="">Sélectionner un magasin</option>

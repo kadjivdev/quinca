@@ -139,7 +139,7 @@
 </div>
 
 {{-- Template pour une nouvelle ligne --}}
-<!-- <template id="ligneProgrammationTemplate">
+<template id="ligneProgrammationTemplate">
     <tr class="ligne-programmation hover:bg-gray-50 transition-colors duration-200">
         <td class="p-2">
             <select class="form-select select2-articles" name="articles[]" required>
@@ -174,7 +174,7 @@
             </button>
         </td>
     </tr>
-</template> -->
+</template>
 
 
 @push('scripts')
