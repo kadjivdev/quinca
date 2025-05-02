@@ -187,9 +187,11 @@
                 </a>
                 <ul class="dropdown-menu navbar-dropdown-caret">
                     @can('vente.clients.view')
-                    <li><a class="dropdown-item" href="{{ route('vente.clients.index') }}">
+                    <li>
+                        <a class="dropdown-item" href="{{ route('vente.clients.index') }}">
                             <div class="dropdown-item-wrapper">Liste des Clients</div>
-                        </a></li>
+                        </a>
+                    </li>
 
                     <!-- recouvrements -->
                     <li><a class="dropdown-item" href="{{ route('recouvrement.index') }}">
@@ -235,6 +237,14 @@
                             <div class="dropdown-item-wrapper">Bons de Livraison</div>
                         </a></li>
                     @endcan
+
+                    <hr>
+                    <li><a class="dropdown-item" href="{{ route('requetes.index') }}">
+                            <div class="dropdown-item-wrapper">Réquêtes</div>
+                        </a></li>
+                    <li><a class="dropdown-item" href="#">
+                            <div class="dropdown-item-wrapper">Transports</div>
+                        </a></li>
                 </ul>
             </li>
             @endcanany

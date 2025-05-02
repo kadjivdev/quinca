@@ -7,7 +7,6 @@ use App\Models\Parametre\UniteMesure;
 use App\Models\Achat\ProgrammationAchat;
 use App\Models\Achat\LigneProgrammationAchat;
 use App\Http\Controllers\Controller;
-use App\Models\Stock\StockDepot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -21,6 +20,7 @@ class ProgrammationAchatController extends Controller
     /**
      * Affiche la liste des programmations
      */
+
     public function index()
     {
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');

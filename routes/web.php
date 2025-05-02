@@ -13,7 +13,7 @@ use App\Http\Controllers\Parametre\ConversionUniteController;
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
 use App\Http\Controllers\Achat\{FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
-use App\Http\Controllers\Vente\{AcompteClientController, ClientController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController};
+use App\Http\Controllers\Vente\{AcompteClientController, ClientController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, RequeteController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
@@ -822,6 +822,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/pdf/a5/bon-livrasion/{facture}', [LivraisonClientController::class, 'generateBonA5'])
                 ->name('vente.livraisons.pdf.bon-livraison');
         });
+
+        // REQUTES
+        Route::resource("requetes", RequeteController::class);
+        Route::post('/valider-requete/{id}', [RequeteController::class, 'validateRequete'])->name('valider-requete');
     });
 
     Route::prefix('revendeurs')->group(function () {

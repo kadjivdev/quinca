@@ -62,6 +62,7 @@ class ProgrammationAchat extends Model
      *
      * @var array<string, string>
      */
+    
     public static $rules = [
         'code' => 'required|unique:programmation_achats,code',
         'date_programmation' => 'required|date',
