@@ -13,7 +13,7 @@ use App\Http\Controllers\Parametre\ConversionUniteController;
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
 use App\Http\Controllers\Achat\{FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
-use App\Http\Controllers\Vente\{AcompteClientController, ClientController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, RequeteController};
+use App\Http\Controllers\Vente\{AcompteClientController, ClientController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, RequeteController, TransportController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
@@ -826,6 +826,10 @@ Route::middleware('auth')->group(function () {
         // REQUTES
         Route::resource("requetes", RequeteController::class);
         Route::post('/valider-requete/{id}', [RequeteController::class, 'validateRequete'])->name('valider-requete');
+
+        // TRANSPORTS
+        Route::resource('transports', TransportController::class);
+        Route::post('/valider-transport/{id}', [TransportController::class, 'validateRequete'])->name('valider-transport');
     });
 
     Route::prefix('revendeurs')->group(function () {

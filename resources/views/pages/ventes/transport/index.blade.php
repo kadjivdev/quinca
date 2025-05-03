@@ -49,19 +49,18 @@
 @section('content')
 
 <div class="content">
-    @include('pages.ventes.requete.partials.header')
+    @include('pages.ventes.transport.partials.header')
     <div class="row g-3 list mt-3" id="stockEntriesList">
-        @include('pages.ventes.requete.partials.list')
+        @include('pages.ventes.transport.partials.list')
     </div>
 </div>
 
-@include('pages.ventes.requete.partials.add-modal')
+@include('pages.ventes.transport.partials.add-modal')
 
 @endsection
 @push('scripts')
 
-@include('pages.ventes.requete.partials.js-add-modal')
-
+@include('pages.ventes.transport.partials.js-add-modal')
 <script>
     // Initialisation des filtres Select2
     $(document).ready(function() {

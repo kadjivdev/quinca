@@ -1,39 +1,29 @@
 <script>
     $(document).ready(function() {
         $(".select2").select2({
-            dropdownParent: $('#addRequeteModal .modal-content'),
+            dropdownParent: $('#addTransportModal .modal-content'),
             theme: 'bootstrap-5',
             placeholder: 'Sélectionner un client',
             width: '100%',
         })
 
-        function refreshList() {
-          return location.reload();
-        }
-
-        $("#motif").on("change", function(e) {
-            if (e.target.value=='Articles') {
-                $("#art_div").removeClass('d-none')
-            }else{
-                $("#art_div").addClass('d-none')
-            }
-        })
 
         // Soumission du formulaire
-        $('#addRequeteForm').on('submit', function(e) {
+        $('#addTransportForm').on('submit', function(e) {
             e.preventDefault();
-            
+
             if (!this.checkValidity()) {
                 e.stopPropagation();
                 $(this).addClass('was-validated');
                 return;
             }
 
-            const submitBtn = $('#btnSaveRequete');
+            const submitBtn = $('#btnSaveTransport');
             submitBtn.prop('disabled', true)
                 .html('<i class="fas fa-spinner fa-spin me-2"></i>Enregistrement...');
+
             $.ajax({
-                url: `${apiUrl}/vente/requetes`,
+                url: `${apiUrl}/vente/transports`,
                 type: 'POST',
                 data: new FormData(this),
                 processData: false,
@@ -41,7 +31,10 @@
                 success: function(response) {
                     if (response.success) {
 
-                        $('#addRequeteModal').modal('hide');
+                        $('#addTransportModal').modal('hide');
+                        
+                        window.location.href = "/vente/transports"
+
                         Toast.fire({
                             icon: 'success',
                             title: response.message
@@ -51,7 +44,6 @@
                         // Rafraîchir la liste
                         // window.reload()
 
-                        window.location.href = "/vente/requetes"
                     } else {
                         Toast.fire({
                             icon: 'error',

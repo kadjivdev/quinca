@@ -24,9 +24,9 @@
                 <button type="button"
                     class="btn btn-primary px-3 d-inline-flex align-items-center"
                     data-bs-toggle="modal"
-                    data-bs-target="#addRequeteModal">
+                    data-bs-target="#addTransportModal">
                     <i class="fas fa-plus me-2"></i>
-                    Nouvelle requête
+                    Nouveau transport
                 </button>
             </div>
         </div>

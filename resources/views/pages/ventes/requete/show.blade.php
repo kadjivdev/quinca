@@ -116,11 +116,13 @@
                                         {{-- Article (readonly) --}}
                                         <div class="col-md-6">
                                             <label class="form-label fw-medium">Articles</label>
-                                            <textarea rows="2" name="" id="" class="form-control">
+                                            <ul>
                                                 @foreach($requete->articles as $article)
-                                                {{$article->designation}};
+                                                <li>
+                                                    {{$article->designation}};
+                                                </li>
                                                 @endforeach
-                                            </textarea>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>

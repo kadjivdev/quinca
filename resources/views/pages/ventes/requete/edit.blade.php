@@ -53,6 +53,10 @@
     <div class="row g-3 list mt-3">
         <div class="col-12">
             <div class="card border-0 shadow-sm p-3">
+                <div class="">
+                    <a href="{{route('requetes.index')}}" class="btn btn-sm btn-primary float-right"><i class="bi bi-arrow-left-circle"></i> Retour</a>
+                </div>
+                <br>
                 <form action="{{route('requetes.update',$requete->id)}}" method="POST" id="editRequeteForm" class="needs-validation" novalidate>
                     @csrf
                     @method('PATCH')
@@ -126,7 +130,7 @@
                                                 <label class="form-label fw-medium">Articles</label>
                                                 <select name="article[]" multiple class="form-control form-select edit-select2">
                                                     @foreach($articles as $article)
-                                                    <option  @selected(in_array($client->id,$requete->articles->pluck('id')->toArray())) value="{{$article->id}}">{{$article->designation}}</option>
+                                                    <option @selected(in_array($client->id,$requete->articles->pluck('id')->toArray())) value="{{$article->id}}">{{$article->designation}}</option>
                                                     @endforeach
                                                 </select>
                                             </div>

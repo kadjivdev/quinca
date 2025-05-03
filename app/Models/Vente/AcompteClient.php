@@ -34,7 +34,8 @@ class AcompteClient extends Model
         'statut',
         'validated_at',
         'validated_by',
-        'requete_id'
+        'requete_id',
+        'transport_id'
     ];
 
     protected $casts = [

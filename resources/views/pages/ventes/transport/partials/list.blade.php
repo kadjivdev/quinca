@@ -7,61 +7,51 @@
         <div class="card border-0 shadow-sm p-3">
             <div class="table-responsive">
                 <table id="example1" class=" table table-hover align-middle mb-0">
-                    <thead class="bg-light">
+                    <thead>
                         <tr>
-                            <th class="border-bottom-0">N° demande</th>
-                            <th class="border-bottom-0">Client</th>
-                            <th class="border-bottom-0">Date</th>
-                            <th class="border-bottom-0">Mention</th>
-                            <th class="border-bottom-0">Articles</th>
-                            <th class="border-bottom-0">Montant</th>
-                            <th class="border-bottom-0">Action</th>
+                            <th>N°</th>
+                            <th>Client</th>
+                            <th>Date</th>
+                            <th>Montant</th>
+                            <th>Observation</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($requetes as $requete)
+                        @foreach ($transports as $transport)
                         <tr>
-                            <td>{{ $requete->num_demande }} </td>
-                            <td>{{ $requete->client->nom_client }}</td>
-                            <td>{{ $requete->date_demande }}</td>
-                            <td>{{ $requete->mention }}</td>
-
+                            <td>{{ $loop->iteration }} </td>
+                            <td>{{ $transport->client->nom_client }} </td>
+                            <td>{{ Carbon\Carbon::parse($transport->date_op)->format('d-m-Y') }} </td>
+                            <td>{{ $transport->montant }} </td>
+                            <td>{{ $transport->observation }} </td>
                             <td>
-                                @if ($requete->motif == 'Articles')
-                                <ul>
-                                    @foreach ($requete->articles as $article)
-                                    <li>{{ $article->designation }}</li>
-                                    @endforeach
-                                </ul>
-                                @elseif ($requete->motif == 'Autres')
-                                {{$requete->motif_content}}
-                                @endif
-                            </td>
-                            <td>{{ $requete->montant }}</td>
-                            <td>
-                                @if (is_null($requete->validate_at))
+                                @if (is_null($transport->validate_at))
                                 <div class="dropdown">
                                     <button class="w-100 btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-gear"></i>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <li>
-                                            <a href="{{route('requetes.show', $requete->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Détail"> Détail </a>
+                                            <a href="{{route('transports.show', $transport->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Détail"> Détail </a>
                                         </li>
                                         <li>
-                                            <a href="{{route('requetes.edit', $requete->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Editer"> Modifier </a>
+                                            <a href="{{route('transports.edit', $transport->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Editer"> Modifier </a>
                                         </li>
                                         <li>
-                                            <form action="{{route('valider-requete',$requete->id)}}" method="post">
+                                            <form action="{{ route('valider-transport', $transport->id) }}"
+                                                method="POST">
                                                 @csrf
-                                                <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Valider la requête" onclick="return confirm('Voulez-vous vraiment valider cette requete??')">Valider </button>
+                                                @method('POST')
+                                                <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Valider la requête" onclick="return confirm('Voulez vous vraiment valider cette requête ? Cette opération est irréversible')">Valider </button>
                                             </form>
                                         </li>
                                         <li>
-                                            <form action="{{route('requetes.destroy',$requete->id)}}" method="post">
+                                            <form action="{{ route('transports.destroy', $transport->id) }}"
+                                                method="POST">
                                                 @csrf
-                                                @method("DELETE")
-                                                <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Supprimer la requête" onclick="return confirm('Voulez-vous vraiment supprimer cette requete??')">Supprimer</button>
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Supprimer la requête" onclick="return confirm('Voulez vous vraiment supprimer cette requête? Cette opération est irréversible')">Supprimer</button>
                                             </form>
                                         </li>
                                     </ul>
@@ -107,10 +97,8 @@
         padding: 2rem;
     }
 </style>
-</div>
 
 @push("scripts")
-
 <script type="text/javascript">
     $("#example1").DataTable({
         "responsive": true,
