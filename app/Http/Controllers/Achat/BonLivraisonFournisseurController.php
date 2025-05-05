@@ -391,6 +391,7 @@ class BonLivraisonFournisseurController extends Controller
                 if ($ligneBonLivraison) {
                     $QteTotal += $ligneBonLivraison->getQuantiteTotale();
                 }
+                
                 $ligneFact->update([
                     'quantite_livree' => $ligneFact->quantite_livree + $QteTotal,
                 ]);

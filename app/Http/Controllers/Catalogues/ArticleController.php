@@ -7,6 +7,7 @@ use App\Models\Catalogue\Article;
 use App\Models\Catalogue\DetailInventaire;
 use App\Models\Catalogue\FamilleArticle;
 use App\Models\Catalogue\Inventaire;
+use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Stock\StockDepot;
@@ -29,7 +30,7 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Article::orderBy('designation');
+        $query = Article::with("stocks")->orderBy('designation');
 
         // filtre par depots
         if ($request->depot && $request->depot != 'tous') {
@@ -44,7 +45,18 @@ class ArticleController extends Controller
             $articles = $query->get();
         }
 
+        $articles->map(function ($article) {
+            $article->stocks->map(function ($stock) {
+                $stock->qantiteBaseToQuantiteSource = $stock->convertirQuantiteBaseToQuantiteSource(
+                    $stock->quantite_reelle,
+                    $stock->article->unite_mesure_id,
+                    $stock->unite_mesure_id
+                );
+            });
+        });
+
         $articlesIds = $articles->pluck("id");
+
         // les depot liés à ces articles
         $depotIds = StockDepot::whereIn("article_id", $articlesIds)->distinct()->pluck("depot_id");
 

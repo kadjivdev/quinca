@@ -9,12 +9,12 @@
                     <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
                         <thead class="bg-light">
                             <tr>
-                                <th class="border-bottom-0 text-nowrap py-3">N°</th>
+                                <!-- <th class="border-bottom-0 text-nowrap py-3">N°</th> -->
                                 <th class="border-bottom-0">Code</th>
                                 <th class="border-bottom-0 text-center">Désignation</th>
                                 <th class="border-bottom-0">Famille</th>
                                 <th class="border-bottom-0">Unité de mesure</th>
-                                <th class="border-bottom-0">Stockable</th>
+                                <!-- <th class="border-bottom-0">Stockable</th> -->
                                 <th class="border-bottom-0">Stock total</th>
                                 <th class="border-bottom-0" style="min-width: 150px;">Dépôts</th>
                                 <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
@@ -23,33 +23,34 @@
                         <tbody>
                             @foreach($articles as $article)
                             <tr>
-                                <td class="text-nowrap py-3">
+                                <!-- <td class="text-nowrap py-3">
                                     <span class="badge bg-light text-dark numero-bl me-2">{{ $loop->iteration }}</span>
-                                </td>
+                                </td> -->
                                 <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
                                 <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
                                 <td><span class="badge bg-light text-dark">{{$article->famille?$article->famille->libelle_famille:'---'}}</span></td>
                                 <td><span class="badge bg-light text-dark">{{$article->uniteMesure->libelle_unite}}</span></td>
-                                <td>
+                                <!-- <td>
                                     @if(!$article->stockable)
                                     <span class="badge bg-secondary">Non stockable</span>
                                     @else
                                     <span class="badge bg-success">Stockable</span>
                                     @endif
-                                </td>
+                                </td> -->
 
                                 <td class="text-center">
                                     <span class="badge bg-success">{{number_format($article->stocks->sum("quantite_reelle"),2," "," ")}}</span>
                                 </td>
 
-                                <td class="border p-0">
-                                    <ul class="m-0" style="width:100%;height:100px!important;overflow-y:scroll;">
+                                <td class="border p-0 m-0">
+                                    <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
                                         @forelse($article->stocks as $stock)
                                         <li class="bg-warning rounded p-2" style="list-style-type: none">
-                                            <span class="badge d-block text-dark">Dépôt: {{$stock->depot->libelle_depot}}</span>
-                                            <span class="badge d-block d-flex align-items-center">Qte : <input type="number" name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}"></span>
-                                            <span class="badge d-block text-dark">Qte vendue: {{number_format($article->qteVendu($stock->depot_id)->sum('quantite'),2,'.','')}}</span>
-                                            <span class="badge d-block text-dark">Qte restante: {{number_format($article->reste($stock->depot_id),2,'.','')}}</span>
+                                            <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
+                                            <span class="badge d-block d-flex text-dark">Qte base : {{$stock->qantiteBaseToQuantiteSource}} ({{$article->uniteMesure->libelle_unite}}) </span>
+                                            <span class="badge d-block d-flex align-items-center text-dark">Qte : <input type="number" name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}"></span>
+                                            <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($article->qteVendu($stock->depot_id)->sum('quantite'),2,'.','')}}</span>
+                                            <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($article->reste($stock->depot_id),2,'.','')}}</span>
                                         </li>
                                         <hr>
                                         @empty

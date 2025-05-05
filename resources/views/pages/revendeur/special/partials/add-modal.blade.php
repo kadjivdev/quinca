@@ -48,13 +48,13 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-user text-primary"></i>
                                                 </span>
-                                                <select class="form-select" name="client_id" required>
+                                                <select class="form-select _client-select2" name="client_id" required>
                                                     <option value="">Sélectionner un client</option>
                                                     @foreach ($clients as $client)
-                                                        <option value="{{ $client->id }}"
-                                                            data-taux-aib="{{ $client->taux_aib }}">
-                                                            {{ $client->raison_sociale }}
-                                                        </option>
+                                                    <option value="{{ $client->id }}"
+                                                        data-taux-aib="{{ $client->taux_aib }}">
+                                                        {{ $client->raison_sociale }}
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -307,4 +307,18 @@
     </tr>
 </template>
 
+
+@push("scripts")
+<script type="text/javascript">
+    $(document).ready(function() {
+        alert('gogo')
+
+        $('._client-select2').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#addFactureModal'),
+            width: '100%'
+        });
+    })
 </script>
+
+@endscripts

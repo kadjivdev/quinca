@@ -4,100 +4,100 @@
 
 // Configuration centralisée
 const FactureConfig = {
-selectors: {
-modal: '#addFactureModal',
-form: '#addFactureForm',
-ligneContainer: '#lignesContainer',
-template: '#ligneFactureTemplate',
-addButton: '#btnAddLigne',
-totalHT: '#totalHT',
-totalTVA: '#totalTVA',
-totalTTC: '#totalTTC',
-totalAIB: '#totalAIB',
-clientSelect: '.select2-clients'
-},
-classes: {
-ligne: 'ligne-facture',
-quantiteInput: 'quantite-input',
-tarifSelect: 'select2-tarifs',
-uniteSelect: 'unite-select',
-remiseInput: 'remise-input',
-totalLigne: 'total-ligne'
-},
-routes: {
-articlesSearch: 'ventes-speciales/factures/api/articles/search',
-getTarifs: (id) => `ventes-speciales/factures/articles/${id}/tarifs`,
-getUnites: (id) => `ventes-speciales/factures/articles/${id}/unites`,
-store: 'ventes-speciales/factures/store'
-},
-select2Options: {
-theme: 'bootstrap-5',
-width: '100%',
-language: 'fr',
-dropdownParent: '#addFactureModal'
-},
-TVA: {
-rate: 18 // Taux fixe de 18%
-}
+    selectors: {
+        modal: '#addFactureModal',
+        form: '#addFactureForm',
+        ligneContainer: '#lignesContainer',
+        template: '#ligneFactureTemplate',
+        addButton: '#btnAddLigne',
+        totalHT: '#totalHT',
+        totalTVA: '#totalTVA',
+        totalTTC: '#totalTTC',
+        totalAIB: '#totalAIB',
+        clientSelect: '.select2-clients'
+    },
+    classes: {
+        ligne: 'ligne-facture',
+        quantiteInput: 'quantite-input',
+        tarifSelect: 'select2-tarifs',
+        uniteSelect: 'unite-select',
+        remiseInput: 'remise-input',
+        totalLigne: 'total-ligne'
+    },
+    routes: {
+        articlesSearch: 'ventes-speciales/factures/api/articles/search',
+        getTarifs: (id) => `ventes-speciales/factures/articles/${id}/tarifs`,
+        getUnites: (id) => `ventes-speciales/factures/articles/${id}/unites`,
+        store: 'ventes-speciales/factures/store'
+    },
+    select2Options: {
+        theme: 'bootstrap-5',
+        width: '100%',
+        language: 'fr',
+        dropdownParent: '#addFactureModal'
+    },
+    TVA: {
+        rate: 18 // Taux fixe de 18%
+    }
 };
 
 // Messages et configurations
 const FactureMessages = {
-errors: {
-articleLoad: "Impossible de charger les détails de l'article",
-tarifLoad: "Impossible de charger les tarifs",
-uniteLoad: "Impossible de charger les unités de mesure",
-submission: "Erreur lors de l'enregistrement de la facture",
-validation: "Veuillez vérifier les champs du formulaire",
-network: "Erreur de connexion au serveur"
-},
-success: {
-created: "Facture créée avec succès",
-updated: "Facture mise à jour avec succès"
-},
-confirmations: {
-delete: "Êtes-vous sûr de vouloir supprimer cette ligne ?",
-cancel: "Êtes-vous sûr de vouloir annuler la saisie ?"
-}
+    errors: {
+        articleLoad: "Impossible de charger les détails de l'article",
+        tarifLoad: "Impossible de charger les tarifs",
+        uniteLoad: "Impossible de charger les unités de mesure",
+        submission: "Erreur lors de l'enregistrement de la facture",
+        validation: "Veuillez vérifier les champs du formulaire",
+        network: "Erreur de connexion au serveur"
+    },
+    success: {
+        created: "Facture créée avec succès",
+        updated: "Facture mise à jour avec succès"
+    },
+    confirmations: {
+        delete: "Êtes-vous sûr de vouloir supprimer cette ligne ?",
+        cancel: "Êtes-vous sûr de vouloir annuler la saisie ?"
+    }
 };
 
 // Cache pour les données
 const ArticleCache = {
-_cache: new Map(),
+    _cache: new Map(),
 
-async get(type, id) {
-const key = `${type}_${id}`;
-return this._cache.get(key) || null;
-},
+    async get(type, id) {
+        const key = `${type}_${id}`;
+        return this._cache.get(key) || null;
+    },
 
-set(type, id, data) {
-const key = `${type}_${id}`;
-this._cache.set(key, data);
-},
+    set(type, id, data) {
+        const key = `${type}_${id}`;
+        this._cache.set(key, data);
+    },
 
-clear() {
-this._cache.clear();
-}
+    clear() {
+        this._cache.clear();
+    }
 };
 
 // Utilitaires pour la facture
 const FactureUtils = {
-roundNumber(number, decimals = 2) {
-return Number(Math.round(number + 'e' + decimals) + 'e-' + decimals);
-},
+    roundNumber(number, decimals = 2) {
+        return Number(Math.round(number + 'e' + decimals) + 'e-' + decimals);
+    },
 
-parseNumber(value) {
-if (!value) return 0;
-const cleanValue = value.toString().replace(/\s/g, '').replace(',', '.');
-return parseFloat(cleanValue) || 0;
-},
+    parseNumber(value) {
+        if (!value) return 0;
+        const cleanValue = value.toString().replace(/\s/g, '').replace(',', '.');
+        return parseFloat(cleanValue) || 0;
+    },
 
-formatMoney(amount) {
-return new Intl.NumberFormat('fr-FR', {
-minimumFractionDigits: 2,
-maximumFractionDigits: 2
-}).format(amount);
-}
+    formatMoney(amount) {
+        return new Intl.NumberFormat('fr-FR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+    }
 };
 
 // Style supplémentaires pour l'UI
@@ -179,7 +179,7 @@ $('<style>
     ').text(styles).appendTo(' head');
 
     // Export des constantes et utilitaires
-    window.FactureConfig=FactureConfig;
-    window.FactureMessages=FactureMessages;
-    window.ArticleCache=ArticleCache;
-    window.FactureUtils=FactureUtils;
+    window.FactureConfig = FactureConfig;
+window.FactureMessages = FactureMessages;
+window.ArticleCache = ArticleCache;
+window.FactureUtils = FactureUtils;
