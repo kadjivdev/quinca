@@ -56,8 +56,8 @@
                             @foreach ($stocks as $stock)
                                 <tr @if ($stock['statut'] === 'Alerte') class="table-danger" @endif>
                                     <td>{{ $stock['article']['code'] }}</td>
-                                    <td>{{ $stock['article']['designation'] }}</td>
-                                    <td>{{ $stock['article']['unite'] }}</td>
+                                    <td>{{ $stock['article']['designation'] }} ({{ $stock['article']['unite'] }})</td>
+                                    <td>{{$stock["unite_stock"]}} </td>
                                     <td class="text-end">{{ number_format($stock['quantite_reelle'], 2, ',', ' ') }}</td>
                                     <td class="text-end">{{ number_format($stock['quantite_reservee'], 2, ',', ' ') }}</td>
                                     <td class="text-end">{{ number_format($stock['quantite_disponible'], 2, ',', ' ') }}</td>

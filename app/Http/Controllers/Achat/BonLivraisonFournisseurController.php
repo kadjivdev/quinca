@@ -179,8 +179,8 @@ class BonLivraisonFournisseurController extends Controller
             }
 
             // Mise à jour du statut de la facture
-            $totalQuantiteFacture = $facture->lignes->sum('quantite');
-            $totalQuantiteLivree = collect($validated['lignes'])->sum('quantite');
+            // $totalQuantiteFacture = $facture->lignes->sum('quantite');
+            // $totalQuantiteLivree = collect($validated['lignes'])->sum('quantite');
 
             // if ($totalQuantiteLivree >= $totalQuantiteFacture) {
             //     $facture->statut_livraison = 'LIVRE';

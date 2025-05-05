@@ -302,8 +302,9 @@ public function rapportStockDisponible(Request $request)
                 'article' => [
                     'code' => $stock->article->code_article,
                     'designation' => $stock->article->designation,
-                    'unite' => $stock->article->uniteMesure?->libelle_unite
+                    'unite' => $stock->article->uniteMesure?->libelle_unite,
                 ],
+                'unite_stock' => $stock->uniteMesure->libelle_unite,
                 'depot' => $stock->depot->libelle_depot,
                 'quantite_reelle' => $stock->quantite_reelle,
                 'quantite_disponible' => $stock->quantite_disponible,

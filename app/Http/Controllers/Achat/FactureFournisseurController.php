@@ -196,6 +196,10 @@ class FactureFournisseurController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
+
+            Log::error("Erreur lors de la création de la facture",[
+                "message"=>$e->getMessage()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création de la facture',

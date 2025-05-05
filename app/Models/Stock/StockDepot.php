@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Catalogue\Article;
 use App\Models\Parametre\Depot;
+use App\Models\Parametre\UniteMesure;
 use App\Models\Securite\User;
 use Exception;
 
@@ -65,6 +66,11 @@ class StockDepot extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function uniteMesure(): BelongsTo
+    {
+        return $this->belongsTo(UniteMesure::class, "unite_mesure_id");
     }
 
     // Accesseurs
@@ -128,7 +134,7 @@ class StockDepot extends Model
 
         // Calcul du nouveau CUMP
         $this->prix_moyen = (($ancien_stock * $ancien_prix) + ($nouvelle_quantite * $nouveau_prix))
-                           / ($ancien_stock + $nouvelle_quantite);
+            / ($ancien_stock + $nouvelle_quantite);
         $this->quantite_reelle += $nouvelle_quantite;
     }
 

@@ -13,6 +13,7 @@
                                 <th class="border-bottom-0">Code</th>
                                 <th class="border-bottom-0 text-center">Désignation</th>
                                 <th class="border-bottom-0">Famille</th>
+                                <th class="border-bottom-0">Unité de mesure</th>
                                 <th class="border-bottom-0">Stockable</th>
                                 <th class="border-bottom-0">Stock total</th>
                                 <th class="border-bottom-0" style="min-width: 150px;">Dépôts</th>
@@ -28,6 +29,7 @@
                                 <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
                                 <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
                                 <td><span class="badge bg-light text-dark">{{$article->famille?$article->famille->libelle_famille:'---'}}</span></td>
+                                <td><span class="badge bg-light text-dark">{{$article->uniteMesure->libelle_unite}}</span></td>
                                 <td>
                                     @if(!$article->stockable)
                                     <span class="badge bg-secondary">Non stockable</span>
