@@ -7,7 +7,6 @@ use App\Models\Catalogue\Article;
 use App\Models\Catalogue\DetailInventaire;
 use App\Models\Catalogue\FamilleArticle;
 use App\Models\Catalogue\Inventaire;
-use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Stock\StockDepot;
@@ -22,9 +21,18 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
+use App\Services\ServiceStockEntree;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class ArticleController extends Controller
 {
+    private $serviceStockEntree;
+
+    public function __construct(ServiceStockEntree $serviceStockEntree)
+    {
+        $this->serviceStockEntree = $serviceStockEntree;
+    }
     /**
      * Afficher la liste des articles
      */
@@ -133,21 +141,62 @@ class ArticleController extends Controller
 
     function articleAffect(Request $request, Article $article)
     {
-        $request->validate([
-            "depots" => "required",
-            "quantite_reelle" => "required",
-        ], [
-            'depots.required' => "Choisissez un dépôt",
-            'quantite_reelle.required' => "La quantité est réquise!"
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $article->depots()->attach($request->depots, [
-            'quantite_reelle' => $request->quantite_reelle,
-            'user_id' => auth()->user()->id,
-            'unite_mesure_id' => $article->unite_mesure_id,
-        ]);
+            $request->validate([
+                "depots" => "required",
+                "quantite_reelle" => "required",
+                "unite_mesure_id" => "required|exists:unite_mesures,id",
+            ], [
+                'depots.required' => "Choisissez un dépôt",
+                'quantite_reelle.required' => "La quantité est réquise!",
+                'unite_mesure_id.required' => "L'unité de mesure est réquise!"
+            ]);
 
-        return back()->with("success", "Affectation éffectuée avec succès!");
+            $article->depots()->attach($request->depots, [
+                'quantite_reelle' => $request->quantite_reelle,
+                'user_id' => auth()->user()->id,
+                'unite_mesure_id' => $request->unite_mesure_id,
+            ]);
+
+            // 
+            foreach ($request->depots as $depotId) {
+                $entrees[] = [
+                    'depot_id' => $depotId,
+                    'article_id' => $article->id,
+                    'unite_mesure_id' => $request->unite_mesure_id,
+                    'quantite' => $request->quantite_reelle,
+                    'prix_unitaire' => 0,
+                    'date_mouvement' => now(),
+                    // 'reference_mouvement' => $bonLivraison->code,
+                    // 'document_type' => 'BON_LIVRAISON_FOURNISSEUR',
+                    // 'document_id' => $bonLivraison->id,
+                    'notes' => "Entrée en stock via attachement direct aux dépôts",
+                    'user_id' => Auth::id()
+                ];
+
+                // Traiter les entrées en stock
+                $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
+
+                // dd($resultatStock);
+
+                Log::debug('Résultat traitement stock:', $resultatStock);
+
+                if (!$resultatStock['succes']) {
+                    throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
+                }
+            }
+
+            DB::commit();
+
+            return back()->with("success", "Affectation éffectuée avec succès!");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::debug("Une erreure est survenue au cours de l'enregistrement " . $e->getMessage());
+
+            return back()->with("error", "Opération échouée : " . $e->getMessage());
+        }
     }
 
     public function searchArticles(Request $request)

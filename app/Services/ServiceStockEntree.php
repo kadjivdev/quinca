@@ -16,6 +16,7 @@ class ServiceStockEntree
      * - Convertit si nécessaire
      * - Applique le CUMP
      */
+
     public function traiterEntreeStock(array $donnees): array
     {
         try {
@@ -78,11 +79,13 @@ class ServiceStockEntree
             // 5. Récupération ou création du stock
             $stock = StockDepot::firstOrNew([
                 'depot_id' => $donnees['depot_id'],
-                'article_id' => $article->id
+                'article_id' => $article->id,
+                // 'unite_mesure_id' => $donnees["unite_mesure_id"]
             ]);
 
             $ancien_stock = $stock->quantite_reelle ?? 0;
             $ancien_cump = $stock->prix_moyen ?? 0;
+
 
             // 6. Calcul du nouveau CUMP
             $nouveau_cump = $this->calculerCUMP(
@@ -104,7 +107,7 @@ class ServiceStockEntree
                 'unite_mesure_id' => $article->unite_mesure_id,
                 'unite_mesure_origine_id' => $unite_origine_id,
                 'prix_unitaire' => $donnees['prix_unitaire'],
-                'reference_mouvement' => $donnees['reference_mouvement'],
+                'reference_mouvement' => $donnees['reference_mouvement']??null,
                 'document_type' => $donnees['document_type'] ?? null,
                 'document_id' => $donnees['document_id'] ?? null,
                 'notes' => $donnees['notes'] ?? null,
@@ -114,7 +117,7 @@ class ServiceStockEntree
             // 8. Mise à jour du stock
             $stock->fill([
                 'quantite_reelle' => $ancien_stock + $quantite_base,
-                'prix_moyen' => $nouveau_cump,
+                'prix_moyen' => $nouveau_cump ?? 0.00,
                 'date_dernier_mouvement' => $donnees['date_mouvement'],
                 'user_id' => $donnees['user_id']
             ]);
@@ -147,7 +150,6 @@ class ServiceStockEntree
                     'nouveau_cump' => $nouveau_cump
                 ]
             ];
-
         } catch (Exception $e) {
             DB::rollBack();
             \Log::error("Erreur traitement entrée stock", [
@@ -219,7 +221,7 @@ class ServiceStockEntree
             DB::rollBack();
             return [
                 'succes' => false,
-                'message' => 'Certaines entrées n\'ont pas pu être traitées',
+                'message' => 'Certaines entrées n\'ont pas pu être traitées. Vérifiez si la conversion existe',
                 'erreurs' => $erreurs
             ];
         } catch (Exception $e) {
@@ -283,9 +285,14 @@ class ServiceStockEntree
     private function validerDonneesEntree(array $donnees): void
     {
         $required = [
-            'depot_id', 'article_id', 'unite_mesure_id',
-            'quantite', 'prix_unitaire', 'date_mouvement',
-            'reference_mouvement', 'user_id'
+            'depot_id',
+            'article_id',
+            'unite_mesure_id',
+            'quantite',
+            // 'prix_unitaire', 
+            'date_mouvement',
+            // 'reference_mouvement',
+            'user_id'
         ];
 
         foreach ($required as $field) {
