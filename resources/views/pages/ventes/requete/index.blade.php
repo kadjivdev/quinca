@@ -55,7 +55,9 @@
     </div>
 </div>
 
-@include('pages.ventes.requete.partials.add-modal')
+@can("requetes.create")
+    @include('pages.ventes.requete.partials.add-modal')
+@endcan
 
 @endsection
 @push('scripts')

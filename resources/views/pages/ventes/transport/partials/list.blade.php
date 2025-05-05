@@ -32,12 +32,19 @@
                                         <i class="bi bi-gear"></i>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        @can("transports.view")
                                         <li>
                                             <a href="{{route('transports.show', $transport->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Détail"> Détail </a>
                                         </li>
+                                        @endcan
+
+                                        @can("transports.edit")
                                         <li>
                                             <a href="{{route('transports.edit', $transport->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Editer"> Modifier </a>
                                         </li>
+                                        @endcan
+
+                                        @can("transports.validate")
                                         <li>
                                             <form action="{{ route('valider-transport', $transport->id) }}"
                                                 method="POST">
@@ -46,6 +53,9 @@
                                                 <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Valider la requête" onclick="return confirm('Voulez vous vraiment valider cette requête ? Cette opération est irréversible')">Valider </button>
                                             </form>
                                         </li>
+                                        @endcan
+
+                                        @can("transports.delete")
                                         <li>
                                             <form action="{{ route('transports.destroy', $transport->id) }}"
                                                 method="POST">
@@ -54,6 +64,7 @@
                                                 <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Supprimer la requête" onclick="return confirm('Voulez vous vraiment supprimer cette requête? Cette opération est irréversible')">Supprimer</button>
                                             </form>
                                         </li>
+                                        @endcan
                                     </ul>
                                 </div>
                                 @endif

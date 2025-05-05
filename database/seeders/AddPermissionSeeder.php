@@ -26,31 +26,27 @@ class AddPermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions_groups = [
-            'Ventes' => [
-                // 'Associer Proforma' => 'associer.proforma',
-                'Account Client' => 'accompte.client',
-            ],
+            'Requêtes' => array_merge(
+                $this->createCrudValidatePermissions('requetes', 'requetes', 'Ventes'),
+            ),
             
-            'Revendeur' => array_merge(
-                $this->createCrudValidatePermissions('clients dans panel revendeur', 'revendeur.clients', 'Ventes'),
+            'Transports' => array_merge(
+                $this->createCrudValidatePermissions('transports', 'transports', 'Ventes'),
             ),
         ];
 
-        $permissions = [];
-
         foreach ($permissions_groups as $group => $permissions) {
             foreach ($permissions as $description => $permission) {
-                $createdPermission = Permission::firstOrCreate(
+                Permission::firstOrCreate(
                     ['name' => $permission, 'guard_name' => 'web'],
                     ['name' => $permission, 'group_name' => $group, 'description' => $description]
                 );
 
-                $permissions[] = $createdPermission;
             }
         }
 
         // Attribution de toutes les permissions au super-admin
         $superAdmin = Role::findByName('Super Administrateur');
-        $superAdmin->syncPermissions($permissions);
+        $superAdmin->syncPermissions(Permission::all());
     }
 }

@@ -55,7 +55,9 @@
     </div>
 </div>
 
+@can("transports.create")
 @include('pages.ventes.transport.partials.add-modal')
+@endcan
 
 @endsection
 @push('scripts')

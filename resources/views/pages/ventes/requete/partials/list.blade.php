@@ -45,18 +45,28 @@
                                         <i class="bi bi-gear"></i>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        @can("requetes.view")
                                         <li>
                                             <a href="{{route('requetes.show', $requete->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Détail"> Détail </a>
                                         </li>
+                                        @endcan
+
+                                        @can("requetes.edit")
                                         <li>
                                             <a href="{{route('requetes.edit', $requete->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Editer"> Modifier </a>
                                         </li>
+                                        @endcan
+
+                                        @can("requetes.validate")
                                         <li>
                                             <form action="{{route('valider-requete',$requete->id)}}" method="post">
                                                 @csrf
                                                 <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Valider la requête" onclick="return confirm('Voulez-vous vraiment valider cette requete??')">Valider </button>
                                             </form>
                                         </li>
+                                        @endcan
+
+                                        @can("requetes.delete")
                                         <li>
                                             <form action="{{route('requetes.destroy',$requete->id)}}" method="post">
                                                 @csrf
@@ -64,6 +74,7 @@
                                                 <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Supprimer la requête" onclick="return confirm('Voulez-vous vraiment supprimer cette requete??')">Supprimer</button>
                                             </form>
                                         </li>
+                                        @endcan
                                     </ul>
                                 </div>
                                 @endif

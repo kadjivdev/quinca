@@ -21,6 +21,7 @@
                     Actualiser
                 </button>
 
+                @can("requetes.create")
                 <button type="button"
                     class="btn btn-primary px-3 d-inline-flex align-items-center"
                     data-bs-toggle="modal"
@@ -28,6 +29,7 @@
                     <i class="fas fa-plus me-2"></i>
                     Nouvelle requête
                 </button>
+                @endcan
             </div>
         </div>
 

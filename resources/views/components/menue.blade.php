@@ -238,13 +238,23 @@
                         </a></li>
                     @endcan
 
+                    @can(["requetes.view","transports.view"])
                     <hr>
+                    <!-- requetes -->
+                    @can("requetes.view")
                     <li><a class="dropdown-item" href="{{ route('requetes.index') }}">
                             <div class="dropdown-item-wrapper">Réquêtes</div>
                         </a></li>
+                    @endcan
+
+                    <!-- transports -->
+                    @can("transports.view")
                     <li><a class="dropdown-item" href="{{route('transports.index')}}">
                             <div class="dropdown-item-wrapper">Transports</div>
                         </a></li>
+                    @endcan
+
+                    @endcan
                 </ul>
             </li>
             @endcanany

@@ -64,7 +64,8 @@ class RoleAndPermissionSeeder extends Seeder
                 $this->createCrudValidatePermissions('factures proforma', 'facture.proformas', 'Ventes'),
                 [
                     "Voir les détails" => "facture.proformas.details",
-                ]
+                    'Account Client' => 'accompte.client',
+                ],
             ),
 
             'Revendeur' => array_merge(
@@ -73,7 +74,8 @@ class RoleAndPermissionSeeder extends Seeder
                 [
                     'Voir les validations vente' => 'revendeur.normale.rapport.view',
                     'Voir les validations spéciales' => 'revendeur.speciale.rapport.view'
-                ]
+                ],
+                $this->createCrudValidatePermissions('clients dans panel revendeur', 'revendeur.clients', 'Ventes'),
             ),
 
             'Rapports Achats' => [
