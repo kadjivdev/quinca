@@ -78,11 +78,13 @@
                                     <div class="tarif-value d-flex align-items-center justify-content-between">
                                         <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA</span>
                                         <div class="btn-group btn-group-sm ms-3 action-buttons">
+                                            @can("tarification.edit")
                                             <button class="btn btn-link p-0 text-warning btn-animated"
                                                 onclick="editTarification({{ $tarification->id }})"
                                                 title="Modifier ce tarif">
                                                 <i class="far fa-edit"></i>
                                             </button>
+                                            @endcan
                                             <button class="btn btn-link p-0 text-danger ms-2 btn-animated"
                                                 onclick="toggleTarificationStatus({{ $tarification->id }})"
                                                 title="{{ $tarification->statut ? 'Désactiver' : 'Activer' }} ce tarif">
@@ -91,11 +93,13 @@
                                         </div>
                                     </div>
                                     @else
+                                    @can("tarification.create")
                                     <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
                                         onclick="showAddTarificationModal({{ $article->id }}, {{ $typeTarif->id }})"
                                         title="Ajouter un tarif">
                                         <i class="fas fa-plus"></i>
                                     </button>
+                                    @endcan
                                     @endif
                                 </div>
                             </td>
@@ -108,12 +112,14 @@
                                         <i class="fas fa-eye me-1"></i>
                                         <span class="d-none d-md-inline">Voir tout</span>
                                     </button>
+                                    @can("tarification.edit")
                                     <button class="btn btn-sm btn-light-warning btn-animated ms-1"
                                         onclick="showEditAllTarificationsModal({{ $article->id }})"
                                         title="Modifier tous les tarifs">
                                         <i class="fas fa-pencil-alt"></i>
                                         <span class="d-none d-md-inline">Modifier</span>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
