@@ -36,12 +36,22 @@ class ClientController extends Controller
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
         // Récupération des données avec pagination
-        $clients = Client::with([
-            'facturesClient',
-            'departement',
-            'agent',
-            'facturesClient.reglements' // Chargement des règlements via les factures
-        ])->where('point_de_vente_id', Auth()->user()->point_de_vente_id)->latest();
+        $user = auth()->user();
+        if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
+            $clients = Client::with([
+                'facturesClient',
+                'departement',
+                'agent',
+                'facturesClient.reglements' // Chargement des règlements via les factures
+            ])->latest();
+        } else {
+            $clients = Client::with([
+                'facturesClient',
+                'departement',
+                'agent',
+                'facturesClient.reglements' // Chargement des règlements via les factures
+            ])->where('point_de_vente_id', Auth()->user()->point_de_vente_id)->latest();
+        }
 
         // Application des filtres si présents dans la requête
         if ($request->filled('categorie')) {
