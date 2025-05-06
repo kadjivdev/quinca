@@ -45,18 +45,21 @@
                                         <div class="col-md-3">
                                             <label class="form-label fw-medium required">Client</label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white">
+                                                <!-- <span class="input-group-text bg-white">
                                                     <i class="fas fa-user text-primary"></i>
-                                                </span>
-                                                <select class="form-select _client-select2" name="client_id" required>
-                                                    <option value="">Sélectionner un client</option>
-                                                    @foreach ($clients as $client)
-                                                    <option value="{{ $client->id }}"
-                                                        data-taux-aib="{{ $client->taux_aib }}">
-                                                        {{ $client->raison_sociale }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
+                                                </span> -->
+                                                <div class="">
+                                                    <input type="search" class="form-control" id="input-search">
+                                                    <select class="form-select _client-select2" id="content-block" name="client_id" required>
+                                                        <option class="first" value="">Selectionnez un client</option>
+                                                        @foreach ($clients as $client)
+                                                        <option class="items" value="{{ $client->id }}"
+                                                            data-taux-aib="{{ $client->taux_aib }}">
+                                                            {{ $client->raison_sociale }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
                                             <div class="invalid-feedback">Le client est requis</div>
                                         </div>
@@ -308,17 +311,20 @@
 </template>
 
 
-@push("scripts")
-<script type="text/javascript">
-    $(document).ready(function() {
-        alert('gogo')
 
-        $('._client-select2').select2({
-            theme: 'bootstrap-5',
-            dropdownParent: $('#addFactureModal'),
-            width: '100%'
-        });
+@push("scripts")
+<script>
+    const searchInput = document.getElementById("input-search");
+    const resultsList = document.getElementById("content-block");
+    const items = resultsList.getElementsByClassName("items");
+    const first = resultsList.getElementsByClassName("first");
+
+    searchInput.addEventListener("input", function(e) {
+        const filter = searchInput.value.toLowerCase();
+        for (let i = 0; i < items.length; i++) {
+            const text = items[i].textContent.toLowerCase();
+            items[i].style.display = text.includes(filter) ?"" : "none";
+        }
     })
 </script>
-
-@endscripts
+@endpush

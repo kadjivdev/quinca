@@ -97,6 +97,7 @@
                                             </button>
 
                                             {{-- Valider --}}
+                                            <!-- <a target="_blank" href="{{route('revendeur.facture.validate',$facture->id)}}" class="">Valider</a> -->
                                             <button class="btn btn-sm btn-light-success btn-icon ms-1"
                                                 onclick="validateFacture({{ $facture->id }})" data-bs-toggle="tooltip"
                                                 title="Valider">

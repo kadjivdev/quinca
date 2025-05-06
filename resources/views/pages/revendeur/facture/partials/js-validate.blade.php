@@ -14,7 +14,7 @@
         Swal.fire({
             title: 'Validation de facture',
             // text: `Êtes-vous sûr de vouloir valider la facture ${numero} ?`,
-            text: `Êtes-vous sûr de vouloir valider la facture ?`,
+            text: `Êtes-vous sûr de vouloir valider cette facture ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -43,6 +43,7 @@
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+
                         if (response.status === 'success') {
                             Swal.fire({
                                 title: 'Validée !',
@@ -62,17 +63,21 @@
                         }
                     },
                     error: function(xhr) {
-                        let message = 'Une erreur est survenue lors de la validation';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            message = xhr.responseJSON.message;
-                        }
+                        alert(xhr.responseJSON.message)
 
-                        Swal.fire({
-                            title: 'Erreur',
-                            text: message,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
+                        // alert(xhr.responseJSON.message)
+                        let message = xhr.responseJSON.message
+                        //  'Une erreur est survenue lors de la validation';
+                        // if (xhr.responseJSON && xhr.responseJSON.message) {
+                        //     message = xhr.responseJSON.message;
+                        // }
+
+                        // Swal.fire({
+                        //     title: 'Erreur',
+                        //     text: xhr.responseJSON.message,
+                        //     icon: 'error',
+                        //     confirmButtonText: 'OK'
+                        // });
                     }
                 });
             }
