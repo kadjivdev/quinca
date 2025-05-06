@@ -30,18 +30,44 @@
                         </div>
                     </div>
 
+                    {{-- Informations de dépôt --}}
+                    <div class="article-info mb-4 p-3 bg-light rounded">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="form-label text-muted small">Dépôt</label>
+                                <div class="fw-medium" id="editDepot"></div>
+                            </div>
+
+                            <br>
+                            <!-- {{-- LES DEPOTS --}}
+                            <div class="col-12">
+                                <select class="form-select select2" name="depot_id" required>
+                                    <option value="">Sélectionner un dépôt</option>
+                                    @foreach($depots as $depot)
+                                    <option value="{{ $depot->id }}">
+                                        {{ $depot->libelle_depot }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Veuillez sélectionner un dépôt
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+
                     <div class="row g-3">
                         {{-- Prix --}}
                         <div class="col-12">
                             <label class="form-label fw-medium required">Prix</label>
                             <div class="input-group">
                                 <input type="number"
-                                       class="form-control"
-                                       name="prix"
-                                       step="0.01"
-                                       min="0"
-                                       required
-                                       placeholder="0.00">
+                                    class="form-control"
+                                    name="prix"
+                                    step="0.01"
+                                    min="0"
+                                    required
+                                    placeholder="0.00">
                                 <span class="input-group-text">FCFA</span>
                                 <div class="invalid-feedback">
                                     Le prix est requis et doit être supérieur à 0
@@ -53,10 +79,10 @@
                         <div class="col-12">
                             <div class="form-check">
                                 <input type="checkbox"
-                                       class="form-check-input"
-                                       name="statut"
-                                       id="editStatutTarif"
-                                       value="1">
+                                    class="form-check-input"
+                                    name="statut"
+                                    id="editStatutTarif"
+                                    value="1">
                                 <label class="form-check-label" for="editStatutTarif">
                                     Tarification active
                                 </label>

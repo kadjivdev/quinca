@@ -22,13 +22,29 @@
                             <select class="form-select" name="article_id" required>
                                 <option value="">Sélectionner un article</option>
                                 @foreach($articles as $article)
-                                    <option value="{{ $article->id }}">
-                                        {{ $article->code_article }} - {{ $article->libelle_article }}
-                                    </option>
+                                <option value="{{ $article->id }}" >
+                                    {{ $article->code_article }} - {{ $article->designation }}
+                                </option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback">
                                 Veuillez sélectionner un article
+                            </div>
+                        </div>
+
+                        {{-- LES DEPOTS --}}
+                        <div class="col-12">
+                            <label class="form-label fw-medium required">Dépôts</label>
+                            <select class="form-select select2" name="depot_id" required>
+                                <option value="">Sélectionner un dépôt</option>
+                                @foreach($depots as $depot)
+                                <option value="{{ $depot->id }}">
+                                    {{ $depot->libelle_depot }}
+                                </option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner un dépôt
                             </div>
                         </div>
 
@@ -38,7 +54,7 @@
                             <select class="form-select" name="type_tarif_id" required>
                                 <option value="">Sélectionner un type</option>
                                 @foreach($typesTarifs as $type)
-                                    <option value="{{ $type->id }}">{{ $type->libelle_type_tarif }}</option>
+                                <option value="{{ $type->id }}">{{ $type->libelle_type_tarif }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback">
@@ -51,12 +67,12 @@
                             <label class="form-label fw-medium required">Prix</label>
                             <div class="input-group">
                                 <input type="number"
-                                       class="form-control"
-                                       name="prix"
-                                       step="0.01"
-                                       min="0"
-                                       required
-                                       placeholder="0.00">
+                                    class="form-control"
+                                    name="prix"
+                                    step="0.01"
+                                    min="0"
+                                    required
+                                    placeholder="0.00">
                                 <span class="input-group-text">FCFA</span>
                                 <div class="invalid-feedback">
                                     Le prix est requis et doit être supérieur à 0
@@ -68,11 +84,11 @@
                         <div class="col-12">
                             <div class="form-check">
                                 <input type="checkbox"
-                                       class="form-check-input"
-                                       name="statut"
-                                       id="addStatutTarif"
-                                       value="1"
-                                       checked>
+                                    class="form-check-input"
+                                    name="statut"
+                                    id="addStatutTarif"
+                                    value="1"
+                                    checked>
                                 <label class="form-check-label" for="addStatutTarif">
                                     Tarification active
                                 </label>

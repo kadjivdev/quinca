@@ -147,11 +147,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
+            // console.log(response)
+
             if (!response.ok) {
                 throw new Error('Erreur lors du chargement des données');
             }
 
             const result = await response.json();
+
+            // console.log(result)
 
             if (result.success) {
                 // Mise à jour du formulaire
@@ -161,6 +165,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mise à jour des informations de l'article
                 document.getElementById('editCodeArticle').textContent = result.data.article.code_article;
                 document.getElementById('editTypeTarif').textContent = result.data.type_tarif.libelle_type_tarif;
+
+                // document.getElementById('editDepot').textContent = result.data.depot_tarif.libelle_depot_tarif;
+
 
                 // Mise à jour des champs du formulaire
                 editForm.querySelector('input[name="prix"]').value = result.data.prix;

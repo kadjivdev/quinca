@@ -1,4 +1,4 @@
-@extends('layouts.app.catalogue.tarification')
+@extends('layouts.achat.livraison-frs')
 @push('styles')
     @include('pages.catalogues.tarification.partials.styles')
 @endpush

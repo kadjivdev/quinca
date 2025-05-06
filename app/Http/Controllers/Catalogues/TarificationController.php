@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Catalogue\Tarification;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\FamilleArticle;
-use App\Models\Parametres\TypeTarif;
+use App\Models\Parametre\Depot;
+use App\Models\Parametre\TypeTarif;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -21,10 +22,12 @@ class TarificationController extends Controller
     public function index()
     {
         try {
+
             $tarifications = Tarification::with(['article', 'typeTarif'])->get();
             $articles = Article::where('statut', 'actif')->get();
             $typesTarifs = TypeTarif::where('statut', true)->get();
             $familles = FamilleArticle::where('statut', true)->get();
+            $depots = Depot::get();
 
             // Statistiques
             $stats = [
@@ -39,6 +42,7 @@ class TarificationController extends Controller
             return view('pages.catalogues.tarification.index', compact(
                 'tarifications',
                 'articles',
+                'depots',
                 'typesTarifs',
                 'familles',
                 'stats',
@@ -63,6 +67,7 @@ class TarificationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'article_id' => 'required|exists:articles,id',
+            'depot_id' => 'required|exists:depots,id',
             'type_tarif_id' => [
                 'required',
                 'exists:type_tarifs,id',
@@ -105,7 +110,6 @@ class TarificationController extends Controller
                 'message' => 'Tarification créée avec succès',
                 'data' => $tarification
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur création tarification:', [
@@ -127,7 +131,7 @@ class TarificationController extends Controller
     public function edit($id)
     {
         try {
-            $tarification = Tarification::with(['article', 'typeTarif'])
+            $tarification = Tarification::with(['article', 'typeTarif','depotTarif'])
                 ->findOrFail($id);
 
             return response()->json([
@@ -183,7 +187,6 @@ class TarificationController extends Controller
                 'message' => 'Tarification mise à jour avec succès',
                 'data' => $tarification
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -195,34 +198,34 @@ class TarificationController extends Controller
     }
 
     public function updateAll(Request $request, $articleId)
-{
-    try {
-        DB::beginTransaction();
+    {
+        try {
+            DB::beginTransaction();
 
-        foreach ($request->prix as $tarificationId => $nouveauPrix) {
-            $tarification = Tarification::findOrFail($tarificationId);
-            $tarification->update(['prix' => $nouveauPrix]);
+            foreach ($request->prix as $tarificationId => $nouveauPrix) {
+                $tarification = Tarification::findOrFail($tarificationId);
+                $tarification->update(['prix' => $nouveauPrix]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tarifs mis à jour avec succès'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erreur lors de la mise à jour des tarifs:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour des tarifs'
+            ], 500);
         }
-
-        DB::commit();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Tarifs mis à jour avec succès'
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Erreur lors de la mise à jour des tarifs:', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Erreur lors de la mise à jour des tarifs'
-        ], 500);
     }
-}
 
 
     /**
@@ -238,7 +241,6 @@ class TarificationController extends Controller
                 'success' => true,
                 'message' => 'Tarification supprimée avec succès'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -275,47 +277,51 @@ class TarificationController extends Controller
     /**
      * Récupérer les tarifications d'un article
      */
-   /**
- * Récupérer les tarifications d'un article
- */
-public function getByArticle($articleId)
-{
-    try {
-        $article = Article::with(['tarifications' => function($query) {
-            $query->with('typeTarif'); // Charger la relation typeTarif
-        }])->findOrFail($articleId);
+    /**
+     * Récupérer les tarifications d'un article
+     */
+    public function getByArticle($articleId)
+    {
+        try {
+            $article = Article::with(['tarifications' => function ($query) {
+                $query->with('typeTarif'); // Charger la relation typeTarif
+            }])->findOrFail($articleId);
 
-        return response()->json([
-            'success' => true,
-            'article' => [
-                'id' => $article->id,
-                'code_article' => $article->code_article,
-                'libelle_article' => $article->libelle_article
-            ],
-            'data' => $article->tarifications->map(function($tarif) {
-                return [
-                    'id' => $tarif->id,
-                    'prix' => $tarif->prix,
-                    'statut' => $tarif->statut,
-                    'type_tarif' => [
-                        'id' => $tarif->typeTarif->id,
-                        'libelle_type_tarif' => $tarif->typeTarif->libelle_type_tarif
-                    ]
-                ];
-            })
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Erreur lors de la récupération des tarifications:', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
+            return response()->json([
+                'success' => true,
+                'article' => [
+                    'id' => $article->id,
+                    'code_article' => $article->code_article,
+                    'libelle_article' => $article->libelle_article
+                ],
+                'data' => $article->tarifications->map(function ($tarif) {
+                    return [
+                        'id' => $tarif->id,
+                        'prix' => $tarif->prix,
+                        'statut' => $tarif->statut,
+                        'type_tarif' => [
+                            'id' => $tarif->typeTarif->id,
+                            'libelle_type_tarif' => $tarif->typeTarif->libelle_type_tarif
+                        ],
+                        'depot_tarif' => [
+                            'id' => $tarif->depotTarif->id,
+                            'libelle_depot_tarif' => $tarif->depotTarif->libelle_depot
+                        ]
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la récupération des tarifications:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Erreur lors du chargement des tarifications'
-        ], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du chargement des tarifications'
+            ], 500);
+        }
     }
-}
     /**
      * Récupérer le prix d'un article pour un type de tarif
      */

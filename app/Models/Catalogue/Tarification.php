@@ -2,6 +2,7 @@
 
 namespace App\Models\Catalogue;
 
+use App\Models\Parametre\Depot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,6 +14,7 @@ class Tarification extends Model
 
     protected $fillable = [
         'article_id',
+        'depot_id',
         'type_tarif_id',
         'prix',
         'statut'
@@ -34,6 +36,11 @@ class Tarification extends Model
     public function article()
     {
         return $this->belongsTo(Article::class);
+    }
+
+    public function depotTarif()
+    {
+        return $this->belongsTo(Depot::class);
     }
 
     public function typeTarif()

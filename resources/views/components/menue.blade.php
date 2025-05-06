@@ -116,7 +116,7 @@
                     @endcan
 
                     @can('tarification.view')
-                    <li><a class="dropdown-item" href="#">
+                    <li><a class="dropdown-item" href="{{route('tarification.index')}}">
                             <div class="dropdown-item-wrapper">Tarification</div>
                         </a></li>
                     @endcan
