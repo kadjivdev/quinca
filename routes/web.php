@@ -26,17 +26,24 @@ use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\FournisseurApprovisionnement;
 use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\LigneBonLivraisonFournisseur;
+use App\Models\Achat\LigneProgrammationAchat;
 use App\Models\Achat\ProgrammationAchat;
 use App\Models\Achat\ReglementFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\Inventaire;
+use App\Models\Parametre\Caisse;
+use App\Models\Parametre\ConversionUnite;
 use App\Models\Stock\StockDepot;
+use App\Models\Stock\StockMouvement;
+use App\Models\Tarification;
 use App\Models\Vente\Devis;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneLivraisonClient;
 use App\Models\Vente\LivraisonClient;
 use App\Models\Vente\Recouvrement;
 use App\Models\Vente\ReglementClient;
+use App\Models\Vente\Requete;
+use App\Models\Vente\SessionCaisse;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,8 +74,11 @@ Route::get("/debug", function () {
     ReglementClient::query()->delete();
 
     StockDepot::query()->delete();
+    StockMouvement::query()->delete();
 
     ProgrammationAchat::query()->delete();
+    LigneProgrammationAchat::query()->delete();
+
     BonCommande::query()->delete();
     BonCommande::query()->delete();
     LigneBonCommande::query()->delete();
@@ -76,8 +86,18 @@ Route::get("/debug", function () {
     FactureFournisseur::query()->delete();
     BonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
     LigneBonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
+    ReglementFournisseur::query()->update(["deleted_at" => now()]);
+
 
     Article::query()->delete();
+
+    Requete::query()->delete();
+
+    Tarification::query()->delete();
+    ConversionUnite::query()->delete();
+
+    SessionCaisse::query()->delete();
+
 
     return "Opération éffectuée avec succès!!";
 });
