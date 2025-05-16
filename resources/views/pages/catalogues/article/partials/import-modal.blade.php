@@ -18,7 +18,7 @@
                 @csrf
                 <div class="modal-body p-4">
                     <div class="text-center mb-4">
-                        <a href="{{ route('catalogue.article.template.download') }}" class="btn btn-light btn-sm">
+                        <a target="_blank" href="{{ asset('model.xlsx')}}" class="btn btn-light btn-sm">
                             <i class="fas fa-download me-2"></i>Télécharger le modèle
                         </a>
                     </div>
