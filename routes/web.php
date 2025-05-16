@@ -86,6 +86,9 @@ Route::get("/debug", function () {
     FactureFournisseur::query()->delete();
     BonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
     LigneBonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
+    
+    Article::query()->delete();
+
     ReglementFournisseur::query()->update(["deleted_at" => now()]);
 
 
