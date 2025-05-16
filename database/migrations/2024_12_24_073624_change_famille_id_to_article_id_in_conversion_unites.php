@@ -26,10 +26,10 @@ return new class extends Migration
             // Ajouter la nouvelle colonne article_id avec sa clé étrangère
             $table->unsignedBigInteger('article_id')->nullable()->after('unite_dest_id');
             $table->foreign('article_id')
-                  ->references('id')
-                  ->on('articles')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('articles')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
         });
     }
 
@@ -46,10 +46,10 @@ return new class extends Migration
             // Restaurer l'ancienne colonne famille_id
             $table->unsignedBigInteger('famille_id')->nullable()->after('unite_dest_id');
             $table->foreign('famille_id')
-                  ->references('id')
-                  ->on('famille_articles')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('famille_articles')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
         });
     }
 };

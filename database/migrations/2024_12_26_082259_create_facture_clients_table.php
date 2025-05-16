@@ -38,13 +38,10 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-
-
     }
 
     public function down()
     {
-        // Schema::dropIfExists('ligne_facture_clients');
         Schema::dropIfExists('facture_clients');
     }
 };

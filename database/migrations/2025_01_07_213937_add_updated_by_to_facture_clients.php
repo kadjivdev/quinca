@@ -22,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('facture_clients', function (Blueprint $table) {
-            //
+            $table->dropForeign("updated_by");
+            $table->dropColumn("updated_by");
         });
     }
 };

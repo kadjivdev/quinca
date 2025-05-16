@@ -22,6 +22,8 @@ class Kernel extends ConsoleKernel
     {
         $this->load(__DIR__.'/Commands');
 
+        \App\Console\Commands\RefreshCommandException::class;
+
         require base_path('routes/console.php');
     }
 }

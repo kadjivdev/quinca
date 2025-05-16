@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('stock_mouvements', function (Blueprint $table) {
-            //
+            $table->dropColumn("prix_unitaire");
         });
     }
 };

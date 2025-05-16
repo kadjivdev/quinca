@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('facture_clients', function (Blueprint $table) {
-            $table->removeColumn('reference_recu');
+            $table->dropColumn('reference_recu');
         });
     }
 };

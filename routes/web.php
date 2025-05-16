@@ -28,6 +28,7 @@ use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\LigneBonLivraisonFournisseur;
 use App\Models\Achat\ProgrammationAchat;
 use App\Models\Achat\ReglementFournisseur;
+use App\Models\Catalogue\Article;
 use App\Models\Catalogue\Inventaire;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\Devis;
@@ -50,6 +51,7 @@ use App\Models\Vente\ReglementClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
+    
     Recouvrement::query()->delete();
     FactureClient::query()->delete();
     Devis::query()->delete();
@@ -74,6 +76,9 @@ Route::get("/debug", function () {
     FactureFournisseur::query()->delete();
     BonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
     LigneBonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
+
+    Article::query()->delete();
+
     return "Opération éffectuée avec succès!!";
 });
 

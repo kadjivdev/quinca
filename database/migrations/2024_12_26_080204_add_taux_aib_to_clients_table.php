@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::table('clients', function (Blueprint $table) {
             $table->decimal('taux_aib', 5, 2)
-                  ->default(0)
-                  ->nullable()
-                  ->after('solde_courant')
-                  ->comment('Taux AIB en pourcentage');
+                ->default(0)
+                ->nullable()
+                ->after('solde_courant')
+                ->comment('Taux AIB en pourcentage');
         });
     }
 

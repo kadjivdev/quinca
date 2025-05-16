@@ -40,6 +40,7 @@ class ArticleController extends Controller
     {
         $query = Article::with("stocks")->orderBy('designation');
 
+        // dd($query->get()->first());
         // filtre par depots
         if ($request->depot && $request->depot != 'tous') {
             $articles = $query->get()->filter(function ($article) use ($request) {
@@ -71,8 +72,6 @@ class ArticleController extends Controller
         $familles = FamilleArticle::where('statut', true)
             ->orderBy('libelle_famille')
             ->get();
-
-        // dd($articles[0]->depots);
 
         $totalArticles = Article::count();
         $articlesEnStock = Article::where('stockable', true)
@@ -179,8 +178,6 @@ class ArticleController extends Controller
                 // Traiter les entrées en stock
                 $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
 
-                // dd($resultatStock);
-
                 Log::debug('Résultat traitement stock:', $resultatStock);
 
                 if (!$resultatStock['succes']) {
@@ -191,6 +188,11 @@ class ArticleController extends Controller
             DB::commit();
 
             return back()->with("success", "Affectation éffectuée avec succès!");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->withErrors($e->errors());
         } catch (\Exception $e) {
             DB::rollBack();
             Log::debug("Une erreure est survenue au cours de l'enregistrement " . $e->getMessage());
@@ -375,7 +377,7 @@ class ArticleController extends Controller
             DB::beginTransaction();
 
             $data = $request->all();
-            // dd($data);
+
             $data['stockable'] = filter_var($request->input('stockable'), FILTER_VALIDATE_BOOLEAN);
 
             $validator = Validator::make($data, [
@@ -857,7 +859,9 @@ class ArticleController extends Controller
             ]);
 
             $file = $request->file('file');
+
             $reader = IOFactory::createReaderForFile($file->getPathname());
+            // dd($reader);
             $reader->setReadDataOnly(true);
             $spreadsheet = $reader->load($file->getPathname());
             $worksheet = $spreadsheet->getActiveSheet();

@@ -17,10 +17,10 @@ class AddValidationFieldsToBonCommandesTable extends Migration
             $table->timestamp('validated_at')->nullable();
             $table->unsignedBigInteger('validated_by')->nullable();
             $table->foreign('validated_by')
-                  ->nullable()
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('set null');
+                ->nullable()
+                ->references('id')
+                ->on('users')
+                ->onDelete('set null');
         });
     }
 

@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::table('livraison_clients', function (Blueprint $table) {
             $table->unsignedBigInteger('depot_dest_id')->nullable()->after('depot_id');
             $table->foreign('depot_dest_id')
-                  ->references('id')
-                  ->on('depots')
-                  ->onDelete('restrict');
+                ->references('id')
+                ->on('depots')
+                ->onDelete('restrict');
         });
     }
 

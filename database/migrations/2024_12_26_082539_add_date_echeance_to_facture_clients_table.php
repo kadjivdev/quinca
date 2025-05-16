@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::table('facture_clients', function (Blueprint $table) {
             $table->date('date_echeance')
-                  ->nullable()
-                  ->after('date_facture')
-                  ->comment('Date d\'échéance de la facture');
+                ->nullable()
+                ->after('date_facture')
+                ->comment('Date d\'échéance de la facture');
         });
     }
 

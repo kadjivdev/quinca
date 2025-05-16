@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::table('depots', function (Blueprint $table) {
             // Ajout de la colonne type_depot_id après la colonne actif
             $table->foreignId('type_depot_id')
-                  ->nullable()
-                  ->after('actif')
-                  ->constrained('type_depots')
-                  ->onDelete('set null')
-                  ->onUpdate('cascade');
+                ->nullable()
+                ->after('actif')
+                ->constrained('type_depots')
+                ->onDelete('set null')
+                ->onUpdate('cascade');
         });
     }
 

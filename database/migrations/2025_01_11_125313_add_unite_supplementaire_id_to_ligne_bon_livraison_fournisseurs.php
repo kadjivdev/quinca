@@ -22,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ligne_bon_livraison_fournisseurs', function (Blueprint $table) {
-            //
+            $table->dropForeign("unite_supplementaire_id");
+            $table->dropColumn("unite_supplementaire_id");
         });
     }
 };

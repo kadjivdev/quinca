@@ -12,13 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('facture_revendeurs', function (Blueprint $table) {
-            $table->foreignId('point_de_vente_id')->nullable()->constrained()->onDelete('cascade')->after('type_vente');
+            $table->foreignId('point_de_vente_id')
+                ->nullable()
+                ->constrained()
+                ->onDelete('cascade')
+                ->after('type_vente');
         });
     }
 
     /**
      * Reverse the migrations.
      */
+
     public function down(): void
     {
         Schema::table('facture_revendeurs', function (Blueprint $table) {

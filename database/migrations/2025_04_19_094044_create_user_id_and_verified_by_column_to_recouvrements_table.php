@@ -36,7 +36,8 @@ class CreateUserIdAndVerifiedByColumnToRecouvrementsTable extends Migration
     public function down()
     {
         Schema::table('recouvrements', function (Blueprint $table) {
-            //
+            $table->dropForeign(["user_id", "verified_by",]);
+            $table->dropColumn(["user_id", "verified_by", "verified_at"]);
         });
     }
 }

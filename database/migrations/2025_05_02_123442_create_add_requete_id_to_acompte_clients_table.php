@@ -26,7 +26,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('acompte_clients', function (Blueprint $table) {
-            //
+            $table->dropForeign("requete_id");
+            $table->dropColumn("requete_id");
         });
     }
 };

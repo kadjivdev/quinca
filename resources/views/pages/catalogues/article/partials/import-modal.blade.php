@@ -14,7 +14,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="{{ route('catalogue.article.import') }}" method="POST" id="importArticleForm" enctype="multipart/form-data">
+            <form action="{{ route('catalogue.article.import') }}" method="POST" id="_importArticleForm" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body p-4">
                     <div class="text-center mb-4">

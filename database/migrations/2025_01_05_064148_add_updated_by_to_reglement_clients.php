@@ -24,10 +24,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('reglement_clients', function (Blueprint $table) {
-            $table->dropForeign('reglement_clients_updated_by_foreign');
+            $table->dropForeign('updated_by');
             $table->dropColumn('updated_by');
-            $table->dropForeign('reglement_clients_annule_par_foreign');
+
+            $table->dropForeign('annule_par');
             $table->dropColumn('annule_par');
+            
             $table->dropColumn('date_annulation');
         });
     }

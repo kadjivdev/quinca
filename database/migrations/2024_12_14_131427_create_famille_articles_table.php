@@ -24,10 +24,10 @@ return new class extends Migration
             // Clé étrangère pour la relation parent-enfant
             $table->unsignedBigInteger('famille_parent_id')->nullable();
             $table->foreign('famille_parent_id')
-                  ->references('id')
-                  ->on('famille_articles')
-                  ->onDelete('restrict')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('famille_articles')
+                ->onDelete('restrict')
+                ->onUpdate('cascade');
 
             // Timestamps standards + soft delete
             $table->timestamps();

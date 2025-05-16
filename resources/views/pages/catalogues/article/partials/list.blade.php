@@ -29,7 +29,7 @@
                             <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
                             <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
                             <td><span class="badge bg-light text-dark">{{$article->famille?$article->famille->libelle_famille:'---'}}</span></td>
-                            <td><span class="badge bg-light text-dark">{{$article->uniteMesure->libelle_unite}}</span></td>
+                            <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
                             <!-- <td>
                                 @if(!$article->stockable)
                                 <span class="badge bg-secondary">Non stockable</span>

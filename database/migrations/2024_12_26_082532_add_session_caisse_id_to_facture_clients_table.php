@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::table('facture_clients', function (Blueprint $table) {
             $table->foreignId('session_caisse_id')
-                  ->nullable()
-                  ->after('id')
-                  ->constrained('session_caisses')
-                  ->onDelete('set null');
+                ->nullable()
+                ->after('id')
+                ->constrained('session_caisses')
+                ->onDelete('set null');
         });
     }
 

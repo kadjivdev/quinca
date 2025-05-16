@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::table('societes', function (Blueprint $table) {
             $table->decimal('taux_tva', 5, 2)
-                  ->default(18)
-                  ->after('pays')
-                  ->comment('Taux TVA en pourcentage');
+                ->default(18)
+                ->after('pays')
+                ->comment('Taux TVA en pourcentage');
         });
     }
 

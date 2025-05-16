@@ -23,11 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('programmation', function (Blueprint $table) {
-            $table->dropColumn('motif_rejet');
+        Schema::table('programmation_achats', function (Blueprint $table) {
+            $table->dropColumn(['motif_rejet','rejected_at']);
             $table->dropForeign(['rejected_by']);
-            $table->dropColumn('rejected_by');
-            $table->dropColumn('rejected_at');
         });
     }
 

@@ -11,9 +11,9 @@ class AddUniteMesureIdToStockDepotsTable extends Migration
         Schema::table('stock_depots', function (Blueprint $table) {
             $table->unsignedBigInteger('unite_mesure_id')->after('article_id');
             $table->foreign('unite_mesure_id')
-                  ->references('id')
-                  ->on('unite_mesures')
-                  ->onDelete('restrict');
+                ->references('id')
+                ->on('unite_mesures')
+                ->onDelete('restrict');
         });
     }
 
