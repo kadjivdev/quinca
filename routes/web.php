@@ -44,6 +44,7 @@ use App\Models\Vente\Recouvrement;
 use App\Models\Vente\ReglementClient;
 use App\Models\Vente\Requete;
 use App\Models\Vente\SessionCaisse;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,7 +59,9 @@ use App\Models\Vente\SessionCaisse;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    
+    // Disable foreign key checks
+    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
     Recouvrement::query()->delete();
     FactureClient::query()->delete();
     Devis::query()->delete();
@@ -86,7 +89,7 @@ Route::get("/debug", function () {
     FactureFournisseur::query()->delete();
     BonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
     LigneBonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
-    
+
     Article::query()->delete();
 
     ReglementFournisseur::query()->update(["deleted_at" => now()]);
@@ -101,6 +104,8 @@ Route::get("/debug", function () {
 
     SessionCaisse::query()->delete();
 
+    // Re-enable foreign key checks
+    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
     return "Opération éffectuée avec succès!!";
 });
