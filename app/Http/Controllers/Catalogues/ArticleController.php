@@ -803,8 +803,9 @@ class ArticleController extends Controller
                 ['Instructions d\'import des articles'],
                 [''],
                 ['1. Champs obligatoires :'],
-                ['   - Famille (Code)* : Code de la famille existante'],
+                ['   - Code Article* : Code de l\'article'],
                 ['   - Désignation* : Nom de l\'article'],
+                ['   - Famille* : Nom de l\'article'],
                 [''],
                 ['2. Champs numériques :'],
                 ['   - Stock Minimum : Nombre décimal'],
@@ -904,7 +905,7 @@ class ArticleController extends Controller
 
                     // Conversion des valeurs numériques avec validation
                     try {
-                        $stockMin = !empty($row[3]) ? floatval($row[3]) : 5;
+                        $stockMin = !empty($row[4]) ? floatval($row[4]) : 5;
                         if ($stockMin < 0) {
                             throw new \Exception("Le stock minimum doit être positif");
                         }
@@ -915,7 +916,7 @@ class ArticleController extends Controller
                     }
 
                     try {
-                        $stockMax = !empty($row[4]) ? floatval($row[4]) : 5000;
+                        $stockMax = !empty($row[5]) ? floatval($row[5]) : 5000;
                         if ($stockMax < $stockMin) {
                             throw new \Exception("Le stock maximum doit être supérieur au stock minimum");
                         }
@@ -926,7 +927,7 @@ class ArticleController extends Controller
                     }
 
                     try {
-                        $stockSecurite = !empty($row[5]) ? floatval($row[5]) : 20;
+                        $stockSecurite = !empty($row[6]) ? floatval($row[6]) : 20;
                         if ($stockSecurite < 0) {
                             throw new \Exception("Le stock de sécurité doit être positif");
                         }
@@ -946,9 +947,9 @@ class ArticleController extends Controller
                             'stock_minimum' => $stockMin,
                             'stock_maximum' => $stockMax,
                             'stock_securite' => $stockSecurite,
-                            'code_barre' => $row[6] ?? null,
-                            'stockable' => strtoupper($row[7] ?? '') === 'OUI',
-                            'emplacement_stock' => $row[8] ?? null,
+                            'code_barre' => $row[7] ?? null,
+                            'stockable' => strtoupper($row[8] ?? '') === 'OUI',
+                            'emplacement_stock' => $row[9] ?? null,
                         ]
                     ]);
 
@@ -957,15 +958,15 @@ class ArticleController extends Controller
                         Article::create([
                             'code_article' => $row[0],
                             'designation' => $row[1],
-                            'description' => $row[2] ?? null,
+                            'description' => $row[3] ?? null,
                             'famille_id' => $famille->id,
                             'stock_minimum' => $stockMin,
                             'stock_maximum' => $stockMax,
                             'stock_securite' => $stockSecurite,
                             'stock_actuel' => 0,
-                            'code_barre' => $row[6] ?? null,
+                            'code_barre' => $row[7] ?? null,
                             'stockable' => 1,
-                            'emplacement_stock' => $row[8] ?? null,
+                            'emplacement_stock' => $row[9] ?? null,
                             'statut' => Article::STATUT_ACTIF
                         ]);
                     } catch (\Exception $e) {
