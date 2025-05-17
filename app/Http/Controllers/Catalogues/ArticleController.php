@@ -902,7 +902,7 @@ class ArticleController extends Controller
                     }
 
                     // Vérifier l'existence de l'unité de mesure par son libellé
-                    $uniteMesure = UniteMesure::where('libelle_unite', $row[2])->first();
+                    $uniteMesure = UniteMesure::where('libelle_unite', $row[10])->first();
                     if (!$uniteMesure) {
                         $errors[] = "Ligne $rowNumber : L\'unité d emesure avec le libellé '{$row[10]}' n'existe pas";
                         $skipped++;
