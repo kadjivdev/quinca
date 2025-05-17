@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Parametre;
 use App\Http\Controllers\Controller;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\UniteMesure;
-use App\Models\Catalogue\{FamilleArticle,Article};
+use App\Models\Catalogue\{FamilleArticle, Article};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -20,77 +20,77 @@ class ConversionUniteController extends Controller
      * Afficher la liste des conversions
      */
 
-     public function index()
-     {
-         try {
-             // Chargement des conversions avec leurs relations
-             $conversions = ConversionUnite::with(['uniteSource', 'uniteDest', 'article'])
-                                         ->get();
+    public function index()
+    {
+        try {
+            // Chargement des conversions avec leurs relations
+            $conversions = ConversionUnite::with(['uniteSource', 'uniteDest', 'article'])
+                ->get();
 
-             // Chargement des unités de mesure actives
-             $unitesMesure = UniteMesure::where('statut', true)
-                                       ->orderBy('code_unite')
-                                       ->get();
+            // Chargement des unités de mesure actives
+            $unitesMesure = UniteMesure::where('statut', true)
+                ->orderBy('code_unite')
+                ->get();
 
-             // Chargement des familles avec leurs articles actifs
-             $familles = FamilleArticle::with(['articles' => function($query) {
-                             $query->where('statut', Article::STATUT_ACTIF)
-                                  ->orderBy('code_article');
-                         }])
-                         ->where('statut', true)
-                         ->orderBy('libelle_famille')
-                         ->get();
+            // Chargement des familles avec leurs articles actifs
+            $familles = FamilleArticle::with(['articles' => function ($query) {
+                $query->where('statut', Article::STATUT_ACTIF)
+                    ->orderBy('code_article');
+            }])
+                ->where('statut', true)
+                ->orderBy('libelle_famille')
+                ->get();
 
-             // Chargement des articles actifs avec leurs familles
-             $articles = Article::with('famille')
-                              ->where('statut', Article::STATUT_ACTIF)
-                              ->orderBy('code_article')
-                              ->get();
+            // Chargement des articles actifs avec leurs familles
+            $articles = Article::with('famille')
+                ->where('statut', Article::STATUT_ACTIF)
+                ->orderBy('code_article')
+                ->get();
 
-             // Calcul des statistiques
-             $conversionsActives = $conversions->where('statut', true)->count();
-             $conversionsParArticle = $conversions->whereNotNull('article_id')->count();
-             $conversionsGenerales = $conversions->whereNull('article_id')->count();
+            // Calcul des statistiques
+            $conversionsActives = $conversions->where('statut', true)->count();
+            $conversionsParArticle = $conversions->whereNotNull('article_id')->count();
+            $conversionsGenerales = $conversions->whereNull('article_id')->count();
 
-             // Date formatée en français
-             $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+            // Date formatée en français
+            $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
-             // Log pour debug
-             Log::info('Chargement des données de conversion:', [
-                 'nb_unites' => $unitesMesure->count(),
-                 'nb_familles' => $familles->count(),
-                 'nb_articles' => $articles->count(),
-                 'details_familles' => $familles->map(function($famille) {
-                     return [
-                         'id' => $famille->id,
-                         'libelle' => $famille->libelle_famille,
-                         'nb_articles' => $famille->articles->count()
-                     ];
-                 })
-             ]);
+            // Log pour debug
+            Log::info('Chargement des données de conversion:', [
+                'nb_unites' => $unitesMesure->count(),
+                'nb_familles' => $familles->count(),
+                'nb_articles' => $articles->count(),
+                'details_familles' => $familles->map(function ($famille) {
+                    return [
+                        'id' => $famille->id,
+                        'libelle' => $famille->libelle_famille,
+                        'nb_articles' => $famille->articles->count()
+                    ];
+                })
+            ]);
 
-             return view('pages.parametre.conversion_unite.index', compact(
-                 'conversions',
-                 'unitesMesure',
-                 'articles',
-                 'familles',
-                 'conversionsActives',
-                 'conversionsParArticle',
-                 'conversionsGenerales',
-                 'date'
-             ));
+            return view('pages.parametre.conversion_unite.index', compact(
+                'conversions',
+                'unitesMesure',
+                'articles',
+                'familles',
+                'conversionsActives',
+                'conversionsParArticle',
+                'conversionsGenerales',
+                'date'
+            ));
+        } catch (\Exception $e) {
+            Log::error('Erreur dans l\'affichage des conversions:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-         } catch (\Exception $e) {
-             Log::error('Erreur dans l\'affichage des conversions:', [
-                 'message' => $e->getMessage(),
-                 'trace' => $e->getTraceAsString()
-             ]);
-
-             return redirect()->back()->with('error',
-                 'Une erreur est survenue lors du chargement des données.'
-             );
-         }
-     }
+            return redirect()->back()->with(
+                'error',
+                'Une erreur est survenue lors du chargement des données.'
+            );
+        }
+    }
 
     public function store(Request $request)
     {
@@ -130,9 +130,9 @@ class ConversionUniteController extends Controller
                 case 'famille':
                     // Récupérer tous les articles de la famille
                     $articleIds = Article::where('famille_id', $request->famille_id)
-                                      ->where('statut', true)
-                                      ->pluck('id')
-                                      ->toArray();
+                        ->where('statut', true)
+                        ->pluck('id')
+                        ->toArray();
                     break;
 
                 case 'articles':
@@ -184,7 +184,6 @@ class ConversionUniteController extends Controller
                 'message' => $message,
                 'data' => $createdConversions
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur création conversion:', [
@@ -221,8 +220,8 @@ class ConversionUniteController extends Controller
     {
         try {
             $articles = Article::where('famille_id', $familleId)
-                             ->where('statut', true)
-                             ->get(['id', 'code_article', 'designation']);
+                ->where('statut', true)
+                ->get(['id', 'code_article', 'designation']);
 
             return response()->json([
                 'success' => true,
@@ -261,22 +260,22 @@ class ConversionUniteController extends Controller
             $conversion = ConversionUnite::findOrFail($id);
 
             // Vérifier si une conversion similaire existe déjà
-            $existingConversion = ConversionUnite::where(function($query) use ($request) {
+            $existingConversion = ConversionUnite::where(function ($query) use ($request) {
                 $query->where([
                     'unite_source_id' => $request->unite_source_id,
                     'unite_dest_id' => $request->unite_dest_id,
                     'article_id' => $request->article_id
                 ])
-                ->orWhere(function($query) use ($request) {
-                    $query->where([
-                        'unite_source_id' => $request->unite_dest_id,
-                        'unite_dest_id' => $request->unite_source_id,
-                        'article_id' => $request->article_id
-                    ]);
-                });
+                    ->orWhere(function ($query) use ($request) {
+                        $query->where([
+                            'unite_source_id' => $request->unite_dest_id,
+                            'unite_dest_id' => $request->unite_source_id,
+                            'article_id' => $request->article_id
+                        ]);
+                    });
             })
-            ->where('id', '!=', $id)
-            ->exists();
+                ->where('id', '!=', $id)
+                ->exists();
 
             if ($existingConversion) {
                 return response()->json([
@@ -295,7 +294,6 @@ class ConversionUniteController extends Controller
                 'message' => 'Conversion mise à jour avec succès',
                 'data' => $conversion
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -463,7 +461,6 @@ class ConversionUniteController extends Controller
                 'message' => count($results) . ' conversion(s) créée(s) avec succès',
                 'data' => $results
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -472,6 +469,4 @@ class ConversionUniteController extends Controller
             ], 500);
         }
     }
-
-
 }

@@ -154,7 +154,7 @@ class ArticleController extends Controller
             ]);
 
             $article->depots()->attach($request->depots, [
-                'quantite_reelle' => $request->quantite_reelle,
+                // 'quantite_reelle' => $request->quantite_reelle,
                 'user_id' => auth()->user()->id,
                 'unite_mesure_id' => $request->unite_mesure_id,
             ]);
