@@ -30,14 +30,6 @@
                             <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
                             <td><span class="badge bg-light text-dark">{{$article->famille?$article->famille->libelle_famille:'---'}}</span></td>
                             <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
-                            <!-- <td>
-                                @if(!$article->stockable)
-                                <span class="badge bg-secondary">Non stockable</span>
-                                @else
-                                <span class="badge bg-success">Stockable</span>
-                                @endif
-                            </td> -->
-
                             <td class="text-center">
                                 <span class="badge bg-success">{{number_format($article->stocks->sum("quantite_reelle"),2," "," ")}}</span>
                             </td>
@@ -48,7 +40,7 @@
                                     <li class="bg-warning rounded p-2" style="list-style-type: none">
                                         <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
                                         <span class="badge d-block d-flex text-dark">Qte base : {{$stock->qantiteBaseToQuantiteSource}} ({{$article->uniteMesure->libelle_unite}}) </span>
-                                        <span class="badge d-block d-flex align-items-center text-dark">Qte : <input type="number" name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}"></span>
+                                        <span class="badge d-block d-flex align-items-center text-dark">Qte ($stock->uniteMesure->libelle_unite) : <input type="number" name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}"></span>
                                         <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($article->qteVendu($stock->depot_id)->sum('quantite'),2,'.','')}}</span>
                                         <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($article->reste($stock->depot_id),2,'.','')}}</span>
                                     </li>
