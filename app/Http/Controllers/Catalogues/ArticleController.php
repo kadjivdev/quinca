@@ -862,7 +862,7 @@ class ArticleController extends Controller
             $file = $request->file('file');
 
             $reader = IOFactory::createReaderForFile($file->getPathname());
-            // dd($reader);
+
             $reader->setReadDataOnly(true);
             $spreadsheet = $reader->load($file->getPathname());
             $worksheet = $spreadsheet->getActiveSheet();
@@ -897,6 +897,14 @@ class ArticleController extends Controller
                     $famille = FamilleArticle::where('libelle_famille', $row[2])->first();
                     if (!$famille) {
                         $errors[] = "Ligne $rowNumber : La famille avec le libellé '{$row[2]}' n'existe pas";
+                        $skipped++;
+                        continue;
+                    }
+
+                    // Vérifier l'existence de l'unité de mesure par son libellé
+                    $uniteMesure = UniteMesure::where('libelle_unite', $row[2])->first();
+                    if (!$uniteMesure) {
+                        $errors[] = "Ligne $rowNumber : L\'unité d emesure avec le libellé '{$row[10]}' n'existe pas";
                         $skipped++;
                         continue;
                     }
@@ -967,7 +975,8 @@ class ArticleController extends Controller
                             'code_barre' => $row[7] ?? null,
                             'stockable' => 1,
                             'emplacement_stock' => $row[9] ?? null,
-                            'statut' => Article::STATUT_ACTIF
+                            'statut' => Article::STATUT_ACTIF,
+                            'unite_mesure_id' => $uniteMesure->id,
                         ]);
                     } catch (\Exception $e) {
                         throw new \Exception("Erreur lors de la création de l'article : " . $e->getMessage());
