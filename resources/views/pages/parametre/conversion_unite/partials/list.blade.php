@@ -30,11 +30,11 @@
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
+                            <!-- <li>
                                 <a class="dropdown-item" href="javascript:void(0)" onclick="editConversion({{ $conversion->id }})">
                                     <i class="far fa-edit me-2 text-warning"></i>Modifier
                                 </a>
-                            </li>
+                            </li> -->
                             <li>
                                 <a class="dropdown-item" href="javascript:void(0)" onclick="toggleStatutConversion({{ $conversion->id }})">
                                     <i class="fas {{ $conversion->statut ? 'fa-ban text-warning' : 'fa-check text-success' }} me-2"></i>
