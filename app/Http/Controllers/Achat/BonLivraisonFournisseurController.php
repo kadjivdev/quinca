@@ -291,7 +291,7 @@ class BonLivraisonFournisseurController extends Controller
             $validated = $request->validate([
                 'date_livraison' => 'required|date',
                 'point_de_vente_id' => 'required|exists:point_de_ventes,id',
-                'depot_id' => 'required|exists:point_de_ventes,id',
+                'depot_id' => 'required|exists:depots,id',
                 'vehicule_id' => 'nullable|exists:vehicules,id',
                 'chauffeur_id' => 'nullable|exists:chauffeurs,id',
                 'commentaire' => 'nullable|string',
@@ -438,18 +438,6 @@ class BonLivraisonFournisseurController extends Controller
                     'notes' => $bonLivraison->commentaire,
                     'user_id' => Auth::id()
                 ];
-
-                // attachement de l'article au dépot
-                StockDepot::create([
-                    'depot_id' => $bonLivraison->depot_id,
-                    'article_id' => $ligne->article_id,
-                    'quantite_reelle' => $ligne->quantite,
-                    'stock_minimum' => $ligne->article->stock_minimum,
-                    'stock_maximum' => $ligne->article->stock_maximum,
-                    'emplacement' => $ligne->article->emplacement_stock,
-                    'user_id' => auth()->user()->id,
-                    'unite_mesure_id' => $ligne->unite_mesure_id,
-                ]);
             }
 
             // Log des entrées préparées

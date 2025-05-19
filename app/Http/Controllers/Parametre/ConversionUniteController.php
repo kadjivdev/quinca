@@ -165,8 +165,10 @@ class ConversionUniteController extends Controller
                         $conversion = $this->createConversion($data);
                         $createdConversions[] = $conversion;
                     } else {
-                        // Mettre à jour l'existant si nécessaire
-                        $existingConversion->update($data);
+                        throw new \Exception("Cette conversion existe déjà");
+
+                        // // Mettre à jour l'existant si nécessaire
+                        // $existingConversion->update($data);
                     }
                 }
             }
@@ -208,7 +210,25 @@ class ConversionUniteController extends Controller
         // S'assurer que le statut est un booléen
         $data['statut'] = isset($data['statut']) ? (bool)$data['statut'] : true;
 
-        return ConversionUnite::create($data);
+        /**
+         * La conversion directe
+         */
+
+        $conversion = ConversionUnite::create($data);
+
+        /**
+         * La conversion indirecte
+         */
+
+        $inVerseConversion = ConversionUnite::create([
+            'unite_source_id' => $data['unite_dest_id'],
+            'unite_dest_id' => $data['unite_source_id'],
+            'article_id' => $data['article_id'],
+            'coefficient' => 1 / $data['coefficient'],
+            'statut' => $data['statut']
+        ]);
+
+        return $conversion;
     }
 
     // ... [Les autres méthodes restent inchangées] ...

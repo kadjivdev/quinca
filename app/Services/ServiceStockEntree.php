@@ -68,6 +68,7 @@ class ServiceStockEntree
                     $unite_origine_id
                 );
 
+
                 \Log::debug("Conversion effectuée", [
                     'quantite_origine' => $donnees['quantite'],
                     'unite_origine' => $uniteSource->libelle_unite,
@@ -80,8 +81,9 @@ class ServiceStockEntree
             $stock = StockDepot::firstOrNew([
                 'depot_id' => $donnees['depot_id'],
                 'article_id' => $article->id,
-                // 'unite_mesure_id' => $donnees["unite_mesure_id"]
+                'unite_mesure_id' => $donnees["unite_mesure_id"]
             ]);
+
 
             $ancien_stock = $stock->quantite_reelle ?? 0;
             $ancien_cump = $stock->prix_moyen ?? 0;
@@ -102,12 +104,12 @@ class ServiceStockEntree
                 'article_id' => $article->id,
                 'date_mouvement' => $donnees['date_mouvement'],
                 'type_mouvement' => StockMouvement::TYPE_ENTREE,
-                'quantite' => $quantite_base,
+                'quantite' => $donnees['quantite'], //old $quantite_base,
                 'quantite_origine' => $donnees['quantite'],
-                'unite_mesure_id' => $article->unite_mesure_id,
+                'unite_mesure_id' => $donnees["unite_mesure_id"],
                 'unite_mesure_origine_id' => $unite_origine_id,
                 'prix_unitaire' => $donnees['prix_unitaire'],
-                'reference_mouvement' => $donnees['reference_mouvement']??null,
+                'reference_mouvement' => $donnees['reference_mouvement'] ?? null,
                 'document_type' => $donnees['document_type'] ?? null,
                 'document_id' => $donnees['document_id'] ?? null,
                 'notes' => $donnees['notes'] ?? null,
@@ -116,15 +118,15 @@ class ServiceStockEntree
 
             // 8. Mise à jour du stock
             $stock->fill([
-                'quantite_reelle' => $ancien_stock + $quantite_base,
+                'quantite_reelle' => $ancien_stock + $donnees['quantite'], //old $quantite_base,
                 'prix_moyen' => $nouveau_cump ?? 0.00,
                 'date_dernier_mouvement' => $donnees['date_mouvement'],
                 'user_id' => $donnees['user_id']
             ]);
 
-            if (!$stock->exists) {
-                $stock->unite_mesure_id = $article->unite_mesure_id;
-            }
+            // if (!$stock->exists) {
+            //     $stock->unite_mesure_id = $article->unite_mesure_id;
+            // }
 
             $stock->save();
 
@@ -237,16 +239,24 @@ class ServiceStockEntree
     /**
      * Recherche une conversion entre deux unités
      */
-    private function rechercherConversion(int $unite_source_id, int $unite_base_id, int $article_id): ?ConversionUnite
+    private function rechercherConversion(int $current_unite_id, int $unite_base_id, int $article_id): ?ConversionUnite
     {
-        return ConversionUnite::where(function ($query) use ($unite_source_id, $unite_base_id) {
+        return ConversionUnite::with(["uniteSource", "uniteDest", "article.uniteMesure"])->where(function ($query) use ($current_unite_id, $unite_base_id) {
+            /** quand l'unité entrante est l'unité de 
+             * destination dans la conversion 
+             * */
             $query->where([
-                'unite_source_id' => $unite_source_id,
-                'unite_dest_id' => $unite_base_id
-            ])->orWhere([
                 'unite_source_id' => $unite_base_id,
-                'unite_dest_id' => $unite_source_id
-            ]);
+                'unite_dest_id' =>  $current_unite_id
+            ])
+            // ->orWhere([
+            //     /** quand l'unité entrante est l'unité de 
+            //      * source dans la conversion 
+            //      * */
+            //     'unite_source_id' => $current_unite_id,
+            //     'unite_dest_id' => $unite_base_id
+            // ])
+            ;
         })
             ->where(function ($query) use ($article_id) {
                 $query->where('article_id', $article_id)
@@ -258,12 +268,15 @@ class ServiceStockEntree
 
     /**
      * Convertit une quantité selon le sens de la conversion
+     * @param $current_unite_id l'unité actuelle (ou entrante)
      */
-    private function convertirQuantite(float $quantite, ConversionUnite $conversion, int $unite_source_id): float
+    private function convertirQuantite(float $quantite, ConversionUnite $conversion, int $current_unite_id): float
     {
-        return $conversion->unite_source_id === $unite_source_id
-            ? $conversion->convertir($quantite)
-            : $conversion->convertirInverse($quantite);
+        return $conversion->convertToBase($quantite);
+
+        // return $conversion->unite_source_id === $current_unite_id
+        //     ? $conversion->convertir($quantite)
+        //     : $conversion->convertirInverse($quantite);
     }
 
     /**

@@ -47,14 +47,14 @@
                                     <div class="col-6">
                                         <div class="form-group mb-3">
                                             <div class="">
-                                                <h5 class="text">Article : <span class="badge bg-warning">{{$article->code_article}} {{$article->designation}}</span> </h5>
+                                                <h5 class="text">Article : <span class="badge bg-warning">{{$article->code_article}} {{$article->designation}} ({{$article->uniteMesure->libelle_unite}}) </span> </h5>
                                             </div>
                                         </div>
 
                                         <div class="form-group mb-3">
                                             <h5 class="">Les dépôts déjà associés :</h5>
                                             @forelse($article->stocks as $stock)
-                                            <span class="badge bg-warning"> {{$stock->depot->libelle_depot}} <strong class="text-dark"> Stock : {{number_format($stock->quantite_reelle,2,"."," ")}} </strong> </span>;
+                                            <span class="badge bg-warning"> {{$stock->depot->libelle_depot}} <strong class="text-dark"> Stock : {{number_format($stock->quantite_reelle,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> </span>;
                                             @empty
                                             <span class="badge bg-light text-dark">Aucun dépôt</span>
                                             @endforelse
@@ -89,15 +89,9 @@
                                             <select multiple required id="update_depots" class="form-control select2" name="depots[]">
                                                 <option>***Tous les dépôts***</option>
                                                 @foreach($depots as $depot)
-                                                <option @class(["bg-secondary text-white"=>in_array($depot->id,$attached_depotIds)]) value="{{$depot->id}}">{{$depot->libelle_depot}}</option>
+                                                <option value="{{$depot->id}}">{{$depot->libelle_depot}}</option>
                                                 @endforeach
                                             </select>
-                                            <!-- <select multiple required id="update_depots" class="form-control select2" name="depots[]">
-                                                <option>***Tous les dépôts***</option>
-                                                @foreach($depots as $depot)
-                                                <option @class(["bg-secondary text-white"=>in_array($depot->id,$attached_depotIds)]) @disabled(in_array($depot->id,$attached_depotIds)) value="{{$depot->id}}">{{$depot->libelle_depot}}</option>
-                                                @endforeach
-                                            </select> -->
                                         </div>
                                     </div>
                                 </div>

@@ -33,6 +33,7 @@ class ArticleController extends Controller
     {
         $this->serviceStockEntree = $serviceStockEntree;
     }
+
     /**
      * Afficher la liste des articles
      */
@@ -153,11 +154,10 @@ class ArticleController extends Controller
                 'unite_mesure_id.required' => "L'unité de mesure est réquise!"
             ]);
 
-            $article->depots()->attach($request->depots, [
-                // 'quantite_reelle' => $request->quantite_reelle,
-                'user_id' => auth()->user()->id,
-                'unite_mesure_id' => $request->unite_mesure_id,
-            ]);
+            // $article->depots()->attach($request->depots, [
+            //     'user_id' => auth()->user()->id,
+            //     'unite_mesure_id' => $request->unite_mesure_id,
+            // ]);
 
             // 
             foreach ($request->depots as $depotId) {
@@ -168,9 +168,6 @@ class ArticleController extends Controller
                     'quantite' => $request->quantite_reelle,
                     'prix_unitaire' => 0,
                     'date_mouvement' => now(),
-                    // 'reference_mouvement' => $bonLivraison->code,
-                    // 'document_type' => 'BON_LIVRAISON_FOURNISSEUR',
-                    // 'document_id' => $bonLivraison->id,
                     'notes' => "Entrée en stock via attachement direct aux dépôts",
                     'user_id' => Auth::id()
                 ];

@@ -96,6 +96,17 @@ class ConversionUnite extends Model
         return $valeur * $this->coefficient;
     }
 
+    /**
+     * Conversion standard
+     */
+    public function convertToBase(float $valeur): float
+    {
+        if ($this->coefficient <= 0) {
+            throw new Exception("Le coefficient de conversion doit être positif");
+        }
+        return $valeur / $this->coefficient;
+    }
+
     public function convertirInverse(float $valeur): float
     {
         if ($this->coefficient <= 0) {

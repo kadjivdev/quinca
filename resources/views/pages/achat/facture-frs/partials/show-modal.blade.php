@@ -1,6 +1,6 @@
 {{-- add-modal.blade.php --}}
 <div class="modal fade" id="showFactureModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" >
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" >
         <div class="modal-content border-0 shadow-lg">
             {{-- Header du modal --}}
             <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
