@@ -154,11 +154,6 @@ class ArticleController extends Controller
                 'unite_mesure_id.required' => "L'unité de mesure est réquise!"
             ]);
 
-            // $article->depots()->attach($request->depots, [
-            //     'user_id' => auth()->user()->id,
-            //     'unite_mesure_id' => $request->unite_mesure_id,
-            // ]);
-
             // 
             foreach ($request->depots as $depotId) {
                 $entrees[] = [
@@ -530,62 +525,122 @@ class ArticleController extends Controller
      */
     public function storeMultipleInventaires(Request $request)
     {
-        if (auth()->user()->can("inventaires.create")) {
-            # code...
+        if (!auth()->user()->can("inventaires.create")) {
+            return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé pour enregistrer un inventaire');
+        }
+
+        $idsToArray = explode(",",str_replace(["[","]"], '', $request->depotIds));
+
+        // dd($request->depotIds);
+        // dd(implode($request->depotIds));
+        try {
+            // Validation des données
             $validator = Validator::make($request->all(), [
-                'articles.*' => 'required',
-                'depotIds' => 'required',
+                'articles' => 'required|array',
+                'articles.*' => 'required|array',
+                'articles.*.*' => 'required|numeric|min:0',
+                // 'depotIds' => 'required|array',
+                'depotIds.*' => 'required|exists:depots,id'
             ], [
-                "depotIds.required" => "Veuillez selectionner le depôt concerné"
+                'depotIds.required' => "Veuillez selectionner le(s) dépôt(s) concerné(s)",
+                'articles.required' => "Aucun article n'a été sélectionné",
+                'articles.*.required' => "Les quantités sont requises",
+                'articles.*.*.numeric' => "Les quantités doivent être des nombres",
+                'articles.*.*.min' => "Les quantités ne peuvent pas être négatives"
             ]);
 
             if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
             }
 
             DB::beginTransaction();
 
-            try {
+            // Création de l'inventaire
+            $inventaire = Inventaire::create([
+                'date_inventaire' => now(),
+                'user_id' => Auth::id(),
+                'depot_ids' => $request->depotIds,
+            ]);
 
-                // 
-                $inventaire = Inventaire::create([
-                    'date_inventaire' => now(),
-                    'user_id' => Auth::user()->id,
-                    'depot_ids' => $request->depotIds,
-                ]);
+            // Récupération de tous les articles concernés en une seule requête
+            $articles = Article::whereIn('id', array_keys($request->articles))->get();
 
+            // Récupération de tous les stocks concernés en une seule requête
+            $stockDepots = StockDepot::whereIn('article_id', $articles->pluck('id'))
+                ->whereIn('depot_id',  $idsToArray)
+                ->get()
+                ->keyBy(function ($stock) {
+                    return $stock->article_id . '_' . $stock->depot_id;
+                });
 
-                foreach ($request->articles as $articleId => $depots) {
-                    $article = Article::findOrFail($articleId);
+            $detailsInventaire = [];
+            $stockUpdates = [];
 
-                    foreach ($depots as $depotId => $qteStock) {
-                        // 
-                        $stock_depot = StockDepot::where('depot_id', $depotId)
-                            ->where('article_id', $articleId)
-                            ->first();
+            foreach ($request->articles as $articleId => $depots) {
+                $article = $articles->firstWhere('id', $articleId);
 
-
-                        DetailInventaire::updateOrCreate([
-                            'qte_stock' => $article->stock_actuel,
-                            'qte_reel' => $qteStock,
-                            'stock_depot_id' => $stock_depot->id,
-                            'inventaire_id' => $inventaire->id,
-                        ]);
-
-                        // actualisation du stock de l'article dans le dépôt
-                        $stock_depot->update(["quantite_reelle" => $qteStock]);
-                    }
+                if (!$article) {
+                    throw new \Exception("Article ID $articleId non trouvé");
                 }
 
-                DB::commit();
-                return redirect()->back()->with('success', 'Inventaire enregistré avec succès.');
-            } catch (\Exception $e) {
-                DB::rollback();
-                // dd($e);
-                return redirect()->back()->with('error', 'Erreur enregistrement de inventaire.');
+                foreach ($depots as $depotId => $qteReel) {
+                    $stockKey = $articleId . '_' . $depotId;
+                    $stockDepot = $stockDepots->get($stockKey);
+
+                    if (!$stockDepot) {
+                        throw new \Exception("Stock non trouvé pour l'article $articleId dans le dépôt $depotId");
+                    }
+
+                    // Préparation des détails d'inventaire
+                    $detailsInventaire[] = [
+                        'qte_stock' => $article->stock_actuel,
+                        'qte_reel' => $qteReel,
+                        'stock_depot_id' => $stockDepot->id,
+                        'inventaire_id' => $inventaire->id,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+
+                    // Préparation des mises à jour de stock
+                    $stockUpdates[] = [
+                        'id' => $stockDepot->id,
+                        'quantite_reelle' => $qteReel
+                    ];
+                }
             }
-        } else {
-            return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé pour enregistrer un inventaire');
+
+            // Insertion en masse des détails d'inventaire
+            DetailInventaire::insert($detailsInventaire);
+
+            // Mise à jour en masse des stocks
+            foreach ($stockUpdates as $update) {
+                StockDepot::where('id', $update['id'])
+                    ->update(['quantite_reelle' => $update['quantite_reelle']]);
+            }
+
+            DB::commit();
+
+            Log::info('Inventaire créé avec succès', [
+                'inventaire_id' => $inventaire->id,
+                'user_id' => Auth::id(),
+                'nombre_articles' => count($request->articles)
+            ]);
+
+            return redirect()->back()->with('success', 'Inventaire enregistré avec succès.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Erreur lors de l\'enregistrement de l\'inventaire', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Erreur lors de l\'enregistrement de l\'inventaire: ' . $e->getMessage())
+                ->withInput();
         }
     }
 

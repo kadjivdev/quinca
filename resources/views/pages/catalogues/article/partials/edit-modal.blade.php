@@ -85,7 +85,7 @@
                                         placeholder="Ex: Allée A, Rayon 3, Position 12">
                                 </div>
 
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <label class="form-label fw-semibold required">Unité de mésure</label>
                                     <select class="form-select" name="unite_mesure_id" required>
                                         <option value="">Sélectionner une unité</option>
@@ -96,7 +96,7 @@
                                     <div class="invalid-feedback">
                                         Veuillez sélectionner une unité de mésure
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
 

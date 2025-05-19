@@ -260,7 +260,8 @@ class ServiceStockEntree
         })
             ->where(function ($query) use ($article_id) {
                 $query->where('article_id', $article_id)
-                    ->orWhereNull('article_id');
+                    // ->orWhereNull('article_id')
+                    ;
             })
             ->where('statut', true)
             ->first();

@@ -274,6 +274,6 @@ class StockDepot extends Model
     public function convertirQuantiteBaseToQuantiteSource(float $quantite, int $unite_source_id, int $unite_destination)
     {
         $convertion = $this->rechercherConversion($unite_destination, $unite_source_id);
-        return $convertion ? $convertion->convertirInverse($quantite) : "null";
+        return $convertion ? $convertion->coefficient*$quantite : 00;
     }
 }

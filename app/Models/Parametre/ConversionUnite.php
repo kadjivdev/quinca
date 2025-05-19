@@ -104,7 +104,7 @@ class ConversionUnite extends Model
         if ($this->coefficient <= 0) {
             throw new Exception("Le coefficient de conversion doit être positif");
         }
-        return $valeur / $this->coefficient;
+        return $valeur * $this->coefficient;
     }
 
     public function convertirInverse(float $valeur): float
@@ -124,10 +124,6 @@ class ConversionUnite extends Model
 
     public static function trouverConversion($uniteSourceId, $uniteDestId, $articleId = null)
     {
-        // Si même unité, retourner null pour autoriser la création
-        // if ($uniteSourceId === $uniteDestId) {
-        //     return null;
-        // }
 
         $conversion =  static::withTrashed()
             ->where(function ($query) use ($uniteSourceId, $uniteDestId) {
@@ -135,11 +131,6 @@ class ConversionUnite extends Model
                     'unite_source_id' => $uniteSourceId,
                     'unite_dest_id' => $uniteDestId,
                 ]);
-                
-                // ->orWhere([
-                //     'unite_source_id' => $uniteDestId,
-                //     'unite_dest_id' => $uniteSourceId,
-                // ]);
             })
             ->when($articleId, function ($query) use ($articleId) {
                 return $query->where('article_id', $articleId);

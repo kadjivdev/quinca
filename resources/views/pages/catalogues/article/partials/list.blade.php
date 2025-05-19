@@ -4,7 +4,7 @@
             @csrf
             @method("PATCH")
             <!-- depots ids -->
-            <input type="text" name="depotIds" hidden class="form-control" value="{{$depotIds}}">
+            <input type="text" name="depotIds" multiple hidden class="form-control" value="{{$depotIds}}">
             <div class="table-responsive">
                 <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
                     <thead class="bg-light">
