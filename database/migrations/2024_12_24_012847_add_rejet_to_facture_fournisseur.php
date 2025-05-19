@@ -25,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('facture_fournisseurs', function (Blueprint $table) {
-            $table->dropForeign('rejected_by');
+            $table->dropForeign(['rejected_by']);
             $table->dropColumn(['motif_rejet','rejected_at','rejected_by']);
         });
     }

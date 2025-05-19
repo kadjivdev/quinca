@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('facture_revendeurs', function (Blueprint $table) {
-            $table->dropColumn('enciassed_at');
+            $table->dropColumn('encaissed_at');
         });
     }
 };

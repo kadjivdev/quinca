@@ -13,7 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ligne_facture_revendeurs', function (Blueprint $table) {
-            $table->foreignId('mouvement_stock_id')->nullable()->onDelete('cascade');
+            $table->foreignId('mouvement_stock_id')
+                ->nullable()
+                ->onDelete('cascade');
         });
     }
 
@@ -23,9 +25,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ligne_facture_revendeurs', function (Blueprint $table) {
-
-            $table->dropForeign('mouvement_stock_id');
-            $table->dropColumn('mouvement_stock_id');
+            // $table->dropForeign(['mouvement_stock_id']);
+            // $table->dropColumn('mouvement_stock_id');
         });
     }
 };

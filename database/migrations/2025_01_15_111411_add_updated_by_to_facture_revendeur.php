@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('facture_revendeur', function (Blueprint $table) {
-            $table->dropForeign("updated_by");
+        Schema::table('facture_revendeurs', function (Blueprint $table) {
+            $table->dropForeign(["updated_by"]);
             $table->dropColumn("updated_by");
         });
     }
