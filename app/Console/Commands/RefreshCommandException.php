@@ -31,6 +31,7 @@ class RefreshCommandException extends Command
         "point_de_ventes",
         "societes",
         "caisses",
+        "articles",
         "famille_articles",
         "type_depots",
         "depots",

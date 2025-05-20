@@ -220,13 +220,13 @@ class ConversionUniteController extends Controller
          * La conversion indirecte
          */
 
-        $inVerseConversion = ConversionUnite::create([
-            'unite_source_id' => $data['unite_dest_id'],
-            'unite_dest_id' => $data['unite_source_id'],
-            'article_id' => $data['article_id'],
-            'coefficient' => 1 / $data['coefficient'],
-            'statut' => $data['statut']
-        ]);
+        // $inVerseConversion = ConversionUnite::create([
+        //     'unite_source_id' => $data['unite_dest_id'],
+        //     'unite_dest_id' => $data['unite_source_id'],
+        //     'article_id' => $data['article_id'],
+        //     'coefficient' => 1 / $data['coefficient'],
+        //     'statut' => $data['statut']
+        // ]);
 
         return $conversion;
     }
