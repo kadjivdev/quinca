@@ -68,7 +68,6 @@ class ServiceStockEntree
                     $unite_origine_id
                 );
 
-
                 \Log::debug("Conversion effectuée", [
                     'quantite_origine' => $donnees['quantite'],
                     'unite_origine' => $uniteSource->libelle_unite,
@@ -238,46 +237,54 @@ class ServiceStockEntree
 
     /**
      * Recherche une conversion entre deux unités
+     * @param $current_unite_id unité entrante
+     * @param $unite_base_id unité de l'aricle(unité de base)
+     * @param $article_id l'id de l'article en question
      */
-    private function rechercherConversion(int $current_unite_id, int $unite_base_id, int $article_id): ?ConversionUnite
+    public function rechercherConversion(int $current_unite_id, int $unite_base_id, int $article_id): ?ConversionUnite
     {
-        return ConversionUnite::with(["uniteSource", "uniteDest", "article.uniteMesure"])->where(function ($query) use ($current_unite_id, $unite_base_id) {
+        $baseUniteToCurrentUnite =  ConversionUnite::with(["uniteSource", "uniteDest", "article.uniteMesure"])->where(function ($query) use ($current_unite_id, $unite_base_id) {
             /** quand l'unité entrante est l'unité de 
              * destination dans la conversion 
              * */
             $query->where([
                 'unite_source_id' => $unite_base_id,
                 'unite_dest_id' =>  $current_unite_id
-            ])
-            // ->orWhere([
-            //     /** quand l'unité entrante est l'unité de 
-            //      * source dans la conversion 
-            //      * */
-            //     'unite_source_id' => $current_unite_id,
-            //     'unite_dest_id' => $unite_base_id
-            // ])
-            ;
+            ]);
         })
             ->where(function ($query) use ($article_id) {
-                $query->where('article_id', $article_id)
-                    // ->orWhereNull('article_id')
-                    ;
-            })
-            ->where('statut', true)
-            ->first();
+                $query->where('article_id', $article_id);
+            })->where('statut', true)->first();
+
+        $currentUniteToBaseUnite =  ConversionUnite::with(["uniteSource", "uniteDest", "article.uniteMesure"])->where(function ($query) use ($current_unite_id, $unite_base_id) {
+            /** quand l'unité entrante est l'unité de 
+             * source dans la conversion 
+             * */
+            $query->where([
+                'unite_source_id' => $current_unite_id,
+                'unite_dest_id' =>  $unite_base_id
+            ]);
+        })
+            ->where(function ($query) use ($article_id) {
+                $query->where('article_id', $article_id);
+            })->where('statut', true)->first();
+
+        return $baseUniteToCurrentUnite ?
+            $baseUniteToCurrentUnite :
+            $currentUniteToBaseUnite;
     }
 
     /**
      * Convertit une quantité selon le sens de la conversion
      * @param $current_unite_id l'unité actuelle (ou entrante)
      */
-    private function convertirQuantite(float $quantite, ConversionUnite $conversion, int $current_unite_id): float
+    public function convertirQuantite(float $quantite, ConversionUnite $conversion, int $current_unite_id): float
     {
-        return $conversion->convertToBase($quantite);
+        // return $conversion->convertToBase($quantite);
 
-        // return $conversion->unite_source_id === $current_unite_id
-        //     ? $conversion->convertir($quantite)
-        //     : $conversion->convertirInverse($quantite);
+        return $conversion->unite_dest_id === $current_unite_id //$conversion->unite_source_id === $current_unite_id
+            ? $conversion->convertirInverse($quantite)
+            : $conversion->convertir($quantite);
     }
 
     /**

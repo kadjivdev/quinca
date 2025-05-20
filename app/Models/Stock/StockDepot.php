@@ -239,41 +239,4 @@ class StockDepot extends Model
     {
         return $this->stock_maximum && $this->quantite_reelle >= $this->stock_maximum;
     }
-
-
-    // 
-    /**
-     * Recherche une conversion entre deux unités
-     */
-    private function rechercherConversion(int $unite_source_id, int $unite_destination): ?ConversionUnite
-    {
-        return ConversionUnite::where(function ($query) use ($unite_source_id, $unite_destination) {
-            $query->where([
-                'unite_source_id' => $unite_source_id,
-                'unite_dest_id' => $this->unite_mesure_id
-            ])->orWhere([
-                'unite_source_id' => $unite_destination,
-                'unite_dest_id' => $this->unite_mesure_id
-            ]);
-        })
-            ->where(function ($query) {
-                $query->where('article_id', $this->article_id)
-                    ->orWhereNull('article_id');
-            })
-            ->where('statut', true)
-            ->first();
-    }
-
-    /**
-     * Convertir une quantité de base(quantité de destination) en quantité de source(base unité de mesure de l'article)
-     * $quantite quantité destination(base)
-     * $unite_source_id unité source(unité de l'article lors de son insertion dans la base)
-     * $unite_destination
-     */
-
-    public function convertirQuantiteBaseToQuantiteSource(float $quantite, int $unite_source_id, int $unite_destination)
-    {
-        $convertion = $this->rechercherConversion($unite_destination, $unite_source_id);
-        return $convertion ? $convertion->coefficient*$quantite : 00;
-    }
 }

@@ -103,7 +103,7 @@ class ConversionUniteController extends Controller
             'coefficient' => 'required|numeric|gt:0',
             'conversion_type' => 'required|in:generale,famille,articles',
             'famille_id' => 'required_if:conversion_type,famille|exists:famille_articles,id',
-            'article_ids' => 'required_if:conversion_type,articles|array',
+            'article_ids' => 'required|array',
             'article_ids.*' => 'exists:articles,id',
             'statut' => 'boolean'
         ]);

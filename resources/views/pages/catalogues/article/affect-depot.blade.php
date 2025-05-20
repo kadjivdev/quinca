@@ -54,7 +54,7 @@
                                         <div class="form-group mb-3">
                                             <h5 class="">Les dépôts déjà associés :</h5>
                                             @forelse($article->stocks as $stock)
-                                            <span class="badge bg-warning"> {{$stock->depot->libelle_depot}} <strong class="text-dark"> Stock : {{number_format($stock->quantite_reelle,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> </span>;
+                                            <span class="badge bg-warning"> {{$stock->depot->libelle_depot}} <strong class="text-dark"> Stock : {{number_format($stock->quantite_reelle,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> </span>
                                             @empty
                                             <span class="badge bg-light text-dark">Aucun dépôt</span>
                                             @endforelse

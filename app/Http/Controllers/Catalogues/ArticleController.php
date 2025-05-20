@@ -57,11 +57,17 @@ class ArticleController extends Controller
 
         $articles->map(function ($article) {
             $article->stocks->map(function ($stock) {
-                $stock->qantiteBaseToQuantiteSource = $stock->convertirQuantiteBaseToQuantiteSource(
-                    $stock->quantite_reelle,
-                    $stock->article->unite_mesure_id,
-                    $stock->unite_mesure_id
-                );
+                $conversion = $this->serviceStockEntree
+                    ->rechercherConversion(
+                        $stock->unite_mesure_id,
+                        $stock->article->unite_mesure_id,$stock->article_id);
+
+                $stock->qantiteBase = $this->serviceStockEntree
+                    ->convertirQuantite(
+                        $stock->quantite_reelle,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    );
             });
         });
 
@@ -529,10 +535,8 @@ class ArticleController extends Controller
             return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé pour enregistrer un inventaire');
         }
 
-        $idsToArray = explode(",",str_replace(["[","]"], '', $request->depotIds));
+        $idsToArray = explode(",", str_replace(["[", "]"], '', $request->depotIds));
 
-        // dd($request->depotIds);
-        // dd(implode($request->depotIds));
         try {
             // Validation des données
             $validator = Validator::make($request->all(), [
