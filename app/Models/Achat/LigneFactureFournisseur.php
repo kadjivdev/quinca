@@ -138,15 +138,6 @@ class LigneFactureFournisseur extends Model
     ];
 
     /**
-     * Reste à livrer
-     */
-    function resteALivrer()
-    {
-        return $this->quantite - $this->bonLivraison
-            ->lignes->sum("quantite");
-    } 
-
-    /**
      * Relation avec la facture
      */
     public function facture()
