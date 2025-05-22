@@ -41,8 +41,6 @@ class ArticleController extends Controller
     {
         $query = Article::with("stocks")->orderBy('designation');
 
-        // dd($query->get()->first());
-        // filtre par depots
         if ($request->depot && $request->depot != 'tous') {
             $articles = $query->get()->filter(function ($article) use ($request) {
                 $depotIds = $article->stocks->pluck("depot_id");
@@ -60,14 +58,16 @@ class ArticleController extends Controller
                 $conversion = $this->serviceStockEntree
                     ->rechercherConversion(
                         $stock->unite_mesure_id,
-                        $stock->article->unite_mesure_id,$stock->article_id);
+                        $stock->article->unite_mesure_id,
+                        $stock->article_id
+                    );
 
-                $stock->qantiteBase = $this->serviceStockEntree
+                $stock->qantiteBase = $conversion ? $this->serviceStockEntree
                     ->convertirQuantite(
                         $stock->quantite_reelle,
                         $conversion,
                         $stock->unite_mesure_id
-                    );
+                    ) : 00;
             });
         });
 

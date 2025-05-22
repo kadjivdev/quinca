@@ -15,7 +15,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="#" method="POST" id="addLivraisonFournisseurForm" class="needs-validation" novalidate>
+            <form action="{{route('livraisons.store')}}" method="POST" id="addLivraisonFournisseurForm" class="needs-validation" novalidate>
                 @csrf
                 <div class="modal-body p-4">
                     {{-- Informations de la facture --}}
@@ -78,6 +78,7 @@
                                 @endforeach
                             </select>
                         </div>
+                        
                         <div class="col-md-6">
                             <label class="form-label small text-muted mb-2 required">Chauffeur</label>
                             <select class="form-select select2 rounded-pill" name="chauffeur_id" required>

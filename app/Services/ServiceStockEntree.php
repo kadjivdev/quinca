@@ -43,38 +43,39 @@ class ServiceStockEntree
             $unite_origine_id = $donnees['unite_mesure_id'];
 
             // 4. Conversion si nécessaire
-            if ($unite_origine_id !== $article->unite_mesure_id) {
-                $uniteSource = UniteMesure::findOrFail($unite_origine_id);
-                $uniteBase = $article->uniteMesure;
+            // dd($unite_origine_id !== $article->unite_mesure_id);
+            // if ($unite_origine_id !== $article->unite_mesure_id) {
+            $uniteSource = UniteMesure::findOrFail($unite_origine_id);
+            $uniteBase = $article->uniteMesure;
 
-                $conversion = $this->rechercherConversion(
-                    $unite_origine_id,
-                    $article->unite_mesure_id,
-                    $article->id
-                );
+            $conversion = $this->rechercherConversion(
+                $unite_origine_id,
+                $article->unite_mesure_id,
+                $article->id
+            );
 
-                if (!$conversion) {
-                    throw new Exception(sprintf(
-                        "Aucune conversion trouvée de l'unité %s vers %s pour l'article %s",
-                        $uniteSource->code_unite,
-                        $uniteBase->code_unite,
-                        $article->code_article
-                    ));
-                }
-
-                $quantite_base = $this->convertirQuantite(
-                    $donnees['quantite'],
-                    $conversion,
-                    $unite_origine_id
-                );
-
-                \Log::debug("Conversion effectuée", [
-                    'quantite_origine' => $donnees['quantite'],
-                    'unite_origine' => $uniteSource->libelle_unite,
-                    'quantite_base' => $quantite_base,
-                    'unite_base' => $uniteBase->code_unite
-                ]);
+            if (!$conversion) {
+                throw new Exception(sprintf(
+                    "Aucune conversion trouvée de l'unité %s vers %s pour l'article %s",
+                    $uniteSource->code_unite,
+                    $uniteBase->code_unite,
+                    $article->code_article
+                ));
             }
+
+            $quantite_base = $this->convertirQuantite(
+                $donnees['quantite'],
+                $conversion,
+                $unite_origine_id
+            );
+
+            \Log::debug("Conversion effectuée", [
+                'quantite_origine' => $donnees['quantite'],
+                'unite_origine' => $uniteSource->libelle_unite,
+                'quantite_base' => $quantite_base,
+                'unite_base' => $uniteBase->code_unite
+            ]);
+            // }
 
             // 5. Récupération ou création du stock
             $stock = StockDepot::firstOrNew([

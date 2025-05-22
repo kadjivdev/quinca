@@ -197,8 +197,8 @@ class FactureFournisseurController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
 
-            Log::error("Erreur lors de la création de la facture",[
-                "message"=>$e->getMessage()
+            Log::error("Erreur lors de la création de la facture", [
+                "message" => $e->getMessage()
             ]);
             return response()->json([
                 'success' => false,
@@ -209,11 +209,41 @@ class FactureFournisseurController extends Controller
     }
 
     /**
-     * Affiche les détails d'une facture
+     * Affiche les détails avec filtre d'une facture
      */
+    public function details(FactureFournisseur $facture)
+    {
+        $facture->load([
+            'bonCommande',
+            'pointVente',
+            'fournisseur',
+            'lignes' => function ($query) {
+                /**on recupere seulement les lignes qui disposent encore de stocks */
+                $query->where('quantite', '>', DB::raw('quantite_livree_simple'));
+            },
+            'lignes.article',
+            'lignes.uniteMesure'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $facture
+        ]);
+    }
+
+     /**
+     * Affiche les détails sans filtre d'une facture
+     */
+    
     public function show(FactureFournisseur $facture)
     {
-        $facture->load(['bonCommande', 'pointVente', 'fournisseur', 'lignes.article', 'lignes.uniteMesure']);
+        $facture->load([
+            'bonCommande',
+            'pointVente',
+            'fournisseur',
+            'lignes.article',
+            'lignes.uniteMesure'
+        ]);
 
         return response()->json([
             'success' => true,

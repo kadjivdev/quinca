@@ -56,6 +56,7 @@ class LigneFactureFournisseur extends Model
         'unite_mesure_id',
         'quantite',
         'quantite_livree',
+        'quantite_livree_simple',
         'prix_unitaire',
         'taux_tva',
         'taux_aib',
@@ -135,6 +136,15 @@ class LigneFactureFournisseur extends Model
         'validated_at',
         'deleted_at'
     ];
+
+    /**
+     * Reste à livrer
+     */
+    function resteALivrer()
+    {
+        return $this->quantite - $this->bonLivraison
+            ->lignes->sum("quantite");
+    } 
 
     /**
      * Relation avec la facture

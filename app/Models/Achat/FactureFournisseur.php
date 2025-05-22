@@ -113,6 +113,7 @@ class FactureFournisseur extends Model
         'deleted_at'
     ];
 
+   
     public function facture_amont()
     {
         $regleUnique = $this->reglements->whereNotNull("validated_by"); ## reglement par selection unique

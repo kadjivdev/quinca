@@ -436,6 +436,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/', [FactureFournisseurController::class, 'store'])->name('factures.store');
             Route::get('/create', [FactureFournisseurController::class, 'create'])->name('factures.create');
             Route::get('/{facture}', [FactureFournisseurController::class, 'show'])->name('factures.show');
+            Route::get('/details/{facture}', [FactureFournisseurController::class, 'details'])->name('factures.details');
             Route::put('/{facture}', [FactureFournisseurController::class, 'update'])->name('factures.update');
             Route::delete('/{facture}', [FactureFournisseurController::class, 'destroy'])->name('factures.destroy');
             Route::get('/{facture}/edit', [FactureFournisseurController::class, 'edit'])->name('factures.edit');

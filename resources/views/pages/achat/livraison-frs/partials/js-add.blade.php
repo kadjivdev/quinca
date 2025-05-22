@@ -73,7 +73,7 @@
             </tr>
         `);
 
-            $.get(`${apiUrl}/achat/factures/${factureId}`, this.handleFactureData.bind(this))
+            $.get(`${apiUrl}/achat/factures/details/${factureId}`, this.handleFactureData.bind(this))
                 .fail(this.handleAjaxError.bind(this));
         },
 
@@ -238,11 +238,12 @@
 
         // Génération du HTML des lignes
         generateLignesHtml: function(lignes, unites) {
-            if (!lignes || lignes.length === 0) return '';
+            if (!lignes || lignes.length === 0) return '<p class="text-center">Aucun élement disponible!</p>';
 
             return lignes.map(ligne => {
+                console.log(ligne)
                 // S'assurer que la quantité livrée est un nombre
-                const quantiteLivree = parseFloat(ligne.quantite_livree) || 0;
+                const quantiteLivree = parseFloat(ligne.quantite_livree_simple) || 0;
                 const quantiteTotale = parseFloat(ligne.quantite) || 0;
                 const resteALivrer = Math.max(0, quantiteTotale - quantiteLivree);
 
@@ -256,11 +257,12 @@
                         <td>
                             <div class="fw-medium">${ligne.article.designation}</div>
                             <div class="small text-muted">${ligne.article.code_article}</div>
-                            <input type="hidden" name="lignes[${ligne.article_id}][article_id]" value="${ligne.article_id}">
+                            <input type="hidden" name="lignes[${ligne.id}][article_id]" value="${ligne.article_id}">
+                            <input type="hidden" name="lignes[${ligne.id}][ligne_id]" value="${ligne.id}">
                         </td>
                         <td class="text-center">
                             <span>${ligne.unite_mesure.libelle_unite}</span>
-                            <input type="hidden" name="lignes[${ligne.article_id}][unite_mesure_id]" value="${ligne.unite_mesure.id}">
+                            <input type="hidden" name="lignes[${ligne.id}][unite_mesure_id]" value="${ligne.unite_mesure.id}">
                         </td>
                         <td class="text-center">${quantiteTotaleFormatted}</td>
                         <td class="text-center">${quantiteLivreeFormatted}</td>
@@ -268,7 +270,7 @@
                         <td class="text-center">
                             <input type="number"
                                 class="form-control form-control-sm quantite-input text-end"
-                                name="lignes[${ligne.article_id}][quantite]"
+                                name="lignes[${ligne.id}][quantite]"
                                 value="0"
                                 min="0"
                                 step="0.01"
@@ -279,11 +281,11 @@
                         <td class="text-center">
                             <input type="number"
                                 class="form-control form-control-sm quantite-supp-input text-end"
-                                name="lignes[${ligne.article_id}][quantite_supplementaire]"
+                                name="lignes[${ligne.id}][quantite_supplementaire]"
                                 value="0"
                                 min="0"
                                 ${resteALivrer <= 0 ? 'readonly' : ''}>
-                            <select class="form-select" name="lignes[${ligne.article_id}][unite_id]">
+                            <select class="form-select" name="lignes[${ligne.id}][unite_id]">
                                 <option value="">Sélectionner...</option>
                                 ${unites}
                             </select>

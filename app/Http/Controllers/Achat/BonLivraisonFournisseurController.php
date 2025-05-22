@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Achat;
 
 use App\Models\Achat\BonLivraisonFournisseur;
-use App\Models\Achat\{FactureFournisseur, LigneBonLivraisonFournisseur};
+use App\Models\Achat\{FactureFournisseur, LigneBonLivraisonFournisseur, LigneFactureFournisseur};
 use App\Models\Parametre\{PointDeVente, Vehicule, Chauffeur, Depot};
 use App\Http\Controllers\Controller;
-use App\Models\Stock\StockDepot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -127,6 +126,7 @@ class BonLivraisonFournisseurController extends Controller
                 'commentaire' => 'nullable|string',
                 'lignes' => 'required|array',
                 'lignes.*.article_id' => 'required|exists:articles,id',
+                'lignes.*.ligne_id' => 'required|exists:ligne_facture_fournisseurs,id',
                 'lignes.*.unite_mesure_id' => 'required|exists:unite_mesures,id',
                 'lignes.*.quantite' => 'required|numeric|min:0',
                 'lignes.*.quantite_supplementaire' => 'nullable|numeric|min:0',
@@ -145,7 +145,6 @@ class BonLivraisonFournisseurController extends Controller
                 ], 422);
             }
 
-
             DB::beginTransaction();
 
             // Création du bon de livraison avec le point de vente et le fournisseur automatiques
@@ -162,8 +161,8 @@ class BonLivraisonFournisseurController extends Controller
                 'created_by' => Auth::id()
             ]);
 
-
             // Création des lignes du bon de livraison
+
             foreach ($validated['lignes'] as $ligne) {
                 if (($ligne['quantite'] + ($ligne['quantite_supplementaire'] ?? 0)) > 0) {
                     LigneBonLivraisonFournisseur::create([
@@ -176,17 +175,13 @@ class BonLivraisonFournisseurController extends Controller
                         'created_by' => Auth::id()
                     ]);
                 }
+
+                $ligneFacture = LigneFactureFournisseur::find($ligne['ligne_id']);
+                if (!$ligneFacture) {
+                    throw new Exception(sprintf("Le détail d'ID %s de la facture concernée n'existe pas", $ligne['ligne_id']));
+                }
+                $ligneFacture->update(["quantite_livree_simple" => $ligneFacture->quantite_livree_simple + $ligne['quantite']]);
             }
-
-            // Mise à jour du statut de la facture
-            // $totalQuantiteFacture = $facture->lignes->sum('quantite');
-            // $totalQuantiteLivree = collect($validated['lignes'])->sum('quantite');
-
-            // if ($totalQuantiteLivree >= $totalQuantiteFacture) {
-            //     $facture->statut_livraison = 'LIVRE';
-            // } else {
-            //     $facture->statut_livraison = 'PARTIELLEMENT_LIVRE';
-            // }
 
             $facture->save();
 
@@ -376,8 +371,6 @@ class BonLivraisonFournisseurController extends Controller
                 'lignes' => $bonLivraison->lignes->toArray()
             ]);
 
-            // return response()->json($bonLivraison->lignes[0]->quantite);
-
             // Récupérer les prix unitaires de la facture
             $prixUnitaires = [];
             foreach ($bonLivraison->facture->lignes as $ligneFact) {
@@ -446,7 +439,7 @@ class BonLivraisonFournisseurController extends Controller
             // Traiter les entrées en stock
             $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
 
-            // dd($resultatStock);
+            // return $resultatStock;
 
             \Log::debug('Résultat traitement stock:', $resultatStock);
 
