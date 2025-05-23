@@ -67,10 +67,10 @@
             <div class="row my-2">
                 <div class="col-12">
                     @if($errors->any())
-                    <div class="alert bg-light shadow">
+                    <div class="alert bg-warning shadow">
                         <button type="button" class="btn btn-sm text-red float-right" data-bs-dismiss="alert"><i class="bi bi-x-circle"></i></button>
                         @foreach($errors->all() as $error)
-                        <li class="text-danger">{{$error}}</li>
+                        <li class="text-white">{{$error}}</li>
                         @endforeach
                     </div>
                     @endif

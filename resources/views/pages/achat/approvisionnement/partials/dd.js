@@ -54,6 +54,7 @@ $(document).ready(function () {
 
     // Soumission du formulaire
     $("#addBonCommandeForm").on("submit", function (e) {
+        $("#btnSave").hide();
         e.preventDefault();
         if (this.checkValidity()) {
             saveBonCommande($(this));

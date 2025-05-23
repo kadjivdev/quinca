@@ -18,6 +18,7 @@ use App\Models\Vente\DevisDetail;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Services\ServiceStockEntree;
 
 /**
  * Class Article
@@ -156,15 +157,16 @@ class Article extends Model
     /**
      * Qte vendue dans un depot
      */
-    function qteVendu($depotId=null)
+    function facturesVente($depotId = null)
     {
-        return $this->hasMany(LigneFacture::class, "article_id")->where("depot",$depotId)->get()->filter(function ($vente) {
-            if ($vente->factureClient) {
-                if ($vente->factureClient->validated_by) {
-                    return $vente; // facture validées
+        return $this->hasMany(LigneFacture::class, "article_id")->where("depot", $depotId)
+            ->get()->filter(function ($vente) {
+                if ($vente->factureClient) {
+                    if ($vente->factureClient->validated_by) {
+                        return $vente; // facture validées
+                    }
                 }
-            }
-        });
+            });
     }
 
     /**
@@ -174,25 +176,36 @@ class Article extends Model
     function reste($depotId = null)
     {
         // on recupere le stock de cet article dans ce dépot
-        $stock = $this->stocks->where("depot_id", $depotId)->first();
-        $qteReelle = $stock ? $stock->quantite_reelle : 0;
+        $stock = $this->stocks->firstWhere("depot_id", $depotId);
 
-        $qteVendu = $this->qteVendu($depotId);
-        return $qteReelle - $qteVendu->sum("quantite");
+        $serviceStockEntree = new ServiceStockEntree();
+
+        $factureVente = $this->facturesVente($depotId)
+            ->first();
+
+        if (!$factureVente) {
+            return $stock->quantite_reelle;
+        }
+
+        /**Conversion qteVendu */
+        $conversion = $serviceStockEntree
+            ->rechercherConversion(
+                $factureVente->unite_vente_id,
+                $stock->unite_mesure_id,
+                $stock->article_id
+            );
+
+        $qteVenteConvertie = $serviceStockEntree
+            ->convertirQuantite($factureVente->sum("quantite"), $conversion, $stock->unite_mesure_id);
+
+        // return $qteVenteConvertie;
+        return $stock->quantite_reelle - $qteVenteConvertie;
     }
-
-    /**
-     * Obtient les stocks en points de vente
-     */
-
-    // public function stockPointsVente(): HasMany
-    // {
-    //     return $this->hasMany(StockPointVente::class);
-    // }
 
     /**
      * Filtre les articles actifs
      */
+
     public function scopeActif(Builder $query): Builder
     {
         return $query->where('statut', self::STATUT_ACTIF);

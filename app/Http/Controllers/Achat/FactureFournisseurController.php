@@ -112,7 +112,6 @@ class FactureFournisseurController extends Controller
             ->with(['pointVente', 'fournisseur'])
             ->get();
 
-
         // Retour de la vue avec toutes les données nécessaires
         return view('pages.achat.facture-frs.index', [
             // Données principales
@@ -139,6 +138,7 @@ class FactureFournisseurController extends Controller
     /**
      * Enregistre une nouvelle facture
      */
+
     public function store(Request $request)
     {
         try {
@@ -218,8 +218,14 @@ class FactureFournisseurController extends Controller
             'pointVente',
             'fournisseur',
             'lignes' => function ($query) {
-                /**on recupere seulement les lignes qui disposent encore de stocks */
-                $query->where('quantite', '>', DB::raw('quantite_livree_simple'));
+                /**on recupere seulement les lignes qui disposent encore de quantité */
+                $query->where(function($q) {
+                    $q->whereNull('quantite_livree_simple')
+                      ->orWhere(function($subQ) {
+                          $subQ->whereNotNull('quantite_livree_simple')
+                               ->where('quantite', '>', DB::raw('quantite_livree_simple'));
+                      });
+                });
             },
             'lignes.article',
             'lignes.uniteMesure'

@@ -74,6 +74,18 @@
                                     <div class="card-body">
                                         <div class="row g-3">
                                             <div class="col-md-6">
+                                                <label class="form-label">Mode de Règlement</label>
+                                                <select class="form-select" name="mode_reglement" id="modeReglement" required>
+                                                    <option value="">Sélectionner un mode</option>
+                                                    <option value="ESPECE">Espèces</option>
+                                                    <option value="CHEQUE">Chèque</option>
+                                                    <option value="VIREMENT">Virement</option>
+                                                    <option value="DECHARGE">Décharge</option>
+                                                    <option value="AUTRES">Autres</option>
+                                                </select>
+                                                <div class="invalid-feedback">Le mode de règlement est requis</div>
+                                            </div>
+                                            <div class="col-md-6">
                                                 <label class="form-label">Code Règlement</label>
                                                 <input type="text" class="form-control" id="codeReglement"
                                                     name="code" readonly required>
@@ -93,18 +105,6 @@
                                                 <label class="form-label">Date de Règlement</label>
                                                 <input type="date" class="form-control" name="date_reglement" required>
                                                 <div class="invalid-feedback">La date de règlement est requise</div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Mode de Règlement</label>
-                                                <select class="form-select" name="mode_reglement" id="modeReglement" required>
-                                                    <option value="">Sélectionner un mode</option>
-                                                    <option value="ESPECE">Espèces</option>
-                                                    <option value="CHEQUE">Chèque</option>
-                                                    <option value="VIREMENT">Virement</option>
-                                                    <option value="DECHARGE">Décharge</option>
-                                                    <option value="AUTRES">Autres</option>
-                                                </select>
-                                                <div class="invalid-feedback">Le mode de règlement est requis</div>
                                             </div>
                                             <div class="col-md-6" id="referenceField" style="display: none;">
                                                 <label class="form-label">Référence</label>

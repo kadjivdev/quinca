@@ -235,10 +235,9 @@
             }
         },
 
-
         // Génération du HTML des lignes
         generateLignesHtml: function(lignes, unites) {
-            if (!lignes || lignes.length === 0) return '<p class="text-center">Aucun élement disponible!</p>';
+            if (!lignes || lignes.length === 0) return '<p class="text-center">Aucun élement disponible! Les articles concernés sont déjà livrés</p>';
 
             return lignes.map(ligne => {
                 console.log(ligne)

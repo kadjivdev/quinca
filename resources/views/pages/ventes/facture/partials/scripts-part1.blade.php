@@ -380,9 +380,12 @@ class FactureManager {
 
         <!-- gestion des depots -->
         const depotSelect = document.querySelector(`input[name="lignes[${index}][depot_id]"]`);
+        const depotQuantite = document.querySelector(`input[name="lignes[${index}][quantite]"]`);
         const depotLibelle = document.querySelector(`input[name="lignes[${index}][depot_libelle]"]`);
         depotSelect.value = e.params.data.depot.id;
-        depotLibelle.value = e.params.data.depot.libelle_depot +' | stock: ('+e.params.data.stock+')';
+        depotLibelle.value =`${e.params.data.depot.libelle_depot} | stock: ${e.params.data.stock} ${e.params.data.unite_mesure_labele} `;
+        depotQuantite.max = e.params.data.stock
+        depotQuantite.min = 0
         <!-- fin -->
 
         try {

@@ -43,7 +43,6 @@ class ServiceStockEntree
             $unite_origine_id = $donnees['unite_mesure_id'];
 
             // 4. Conversion si nécessaire
-            // dd($unite_origine_id !== $article->unite_mesure_id);
             // if ($unite_origine_id !== $article->unite_mesure_id) {
             $uniteSource = UniteMesure::findOrFail($unite_origine_id);
             $uniteBase = $article->uniteMesure;
@@ -56,9 +55,9 @@ class ServiceStockEntree
 
             if (!$conversion) {
                 throw new Exception(sprintf(
-                    "Aucune conversion trouvée de l'unité %s vers %s pour l'article %s",
-                    $uniteSource->code_unite,
-                    $uniteBase->code_unite,
+                    "Aucune conversion trouvée de l'unité (%s) vers (%s) pour l'article %s ni l'inverse! Veuillez créer la conversion avant de continuer",
+                    $uniteSource->libelle_unite,
+                    $uniteBase->libelle_unite,
                     $article->code_article
                 ));
             }
@@ -205,6 +204,9 @@ class ServiceStockEntree
                         'article_id' => $entree['article_id'] ?? null,
                         'reference' => $entree['reference_mouvement'] ?? null
                     ];
+
+                    throw new Exception($resultat['message']);
+                    
                     continue;
                 }
 

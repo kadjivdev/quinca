@@ -16,7 +16,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <!-- route('vente.facture.store') -->
-            <form action="#" method="POST" id="addFactureForm" class="needs-validation" novalidate>
+            <form action="{{route('vente.facture.store')}}" method="POST" id="addFactureForm" class="needs-validation" novalidate>
                 @csrf
                 <div class="modal-body p-4">
                     <div class="row g-4">
@@ -315,20 +315,6 @@
 
 @push("scripts")
 <script>
-    //  gestion des articles
-    // $("#depot_select").on('change', function() {
-    //     if ($(this).val()) {
-    //         $("#articles-bloc").removeClass("d-none");
-
-    //         let depot = JSON.parse($(this).val());
-
-    //         $("#depot_id").val(depot.id)
-
-    //     } else {
-    //         $("#articles-bloc").addClass("d-none")
-    //     }
-    // })
-
     // gestion des selects
     $(".select2").select2({
         theme: 'bootstrap-5',

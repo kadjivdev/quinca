@@ -10,6 +10,7 @@ use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
 use App\Models\Vente\{FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
+use App\Models\Parametre\UniteMesure;
 use App\Models\Stock\StockDepot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Validator;
 use Exception;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\ServiceStockEntree;
+
 
 class FactureClientController extends Controller
 {
@@ -25,21 +28,16 @@ class FactureClientController extends Controller
      * Affiche la liste des factures
      */
 
+    private $serviceStockEntree;
 
+    public function __construct(ServiceStockEntree $serviceStockEntree)
+    {
+        $this->serviceStockEntree = $serviceStockEntree;
+    }
     public function index(Request $request)
     {
         try {
             $pointsVentes = PointVente::all();
-
-            // les dépôts de ce user
-            $depots = auth()->user()->pointDeVente->depot->map(function ($depot) {
-                $depot->articles = $depot->articles->transform(function ($article) use ($depot) {
-                    $article->reste = $article->reste($depot->id);
-                    $article->qteVendue = $article->ventes()->sum("quantite");
-                    return $article;
-                });
-                return $depot;
-            });
 
             Log::info('Début du chargement de la liste des factures');
             $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
@@ -68,7 +66,6 @@ class FactureClientController extends Controller
 
             // Chargement des factures avec les relations nécessaires
             if ($request->pointVente) {
-                // dd($request->pointVente);
                 $factures = $query->get()
                     ->filter(function ($facture) use ($request) {
                         return $facture->createdBy->pointDeVente->id == $request->pointVente;
@@ -150,7 +147,7 @@ class FactureClientController extends Controller
             // Charger la liste des clients pour le filtre
             $clients = Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
 
-            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'depots'));
+            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes'));
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement de la liste des factures', [
                 'error' => $e->getMessage(),
@@ -195,7 +192,13 @@ class FactureClientController extends Controller
                 'date_echeance' => 'date',
                 'montant_regle' => 'required|numeric|min:0',
                 'moyen_reglement' => 'required|string',
+
                 'lignes' => 'required|array|min:1',
+                'lignes*article_id' => 'required|exists,articles',
+                'lignes*depot_id' => 'required|exits,depots',
+                'lignes*quantite' => 'required',
+                'lignes*tarification_id' => 'required',
+
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
                 // 'depot' => 'required',
@@ -210,8 +213,6 @@ class FactureClientController extends Controller
 
             $userPv = auth()->user()->pointDeVente;
             $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
-
-            // $depotIds = collect($request->lignes)->pluck("depot_id");
 
             // on verifie si les articles selectionnés sont tous dans son depôts
             foreach ($request->lignes as $ligne) {
@@ -230,25 +231,46 @@ class FactureClientController extends Controller
             foreach ($request->lignes as $ligne) {
                 $depot = Depot::find($ligne["depot_id"]);
                 // 
-                $stock_depot = StockDepot::where('depot_id', $ligne["depot_id"])
+                $stock = StockDepot::where('depot_id', $ligne["depot_id"])
                     ->where('article_id', $ligne['article_id'])
                     ->first();
 
-                // on verifie si l'article existe dans le depot choisi
-                $article = Article::find($ligne['article_id']);
-                if (!$stock_depot) {
+                /**
+                 * Recherche de la conversion
+                 */
+                $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
+                $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
+                $article = Article::findOrFail($ligne['article_id']);
+
+                $conversion = $this->serviceStockEntree
+                    ->rechercherConversion(
+                        $ligne['unite_vente_id'],
+                        $stock->unite_mesure_id,
+                        $stock->article_id
+                    );
+                if (!$conversion) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Le dépôt ($depot->libelle_depot) ne dispose pas de l'article ($article->designation) "
+                        'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ($stockUnite->libelle_unite) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
                     ], 500);
                 }
 
+                /**
+                 * Obtention de la quantité convertie
+                 */
+
+                $QteConvertie = $this->serviceStockEntree
+                    ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
+
+                $QteStockConvertie = $this->serviceStockEntree
+                    ->convertirQuantite($stock->quantite_reelle, $conversion, $ligne['unite_vente_id']);
+
                 // on verifie la quantité restante de l'article dans le depot est suffisante
-                $qteReste = $article->reste($ligne["depot_id"]);
-                if ($qteReste < $ligne['quantite']) {
+
+                if ($stock->quantite_reelle < $QteConvertie) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Le reste du stock de l'article ($article->designation) est insuffisant par rapport à la quantité saisie"
+                        'message' => "Le reste du stock de l'article ($article->designation) est de $QteStockConvertie $venteUnite->libelle_unite dans le depôt ({$stock->depot->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
                     ], 500);
                 }
             }
@@ -275,6 +297,7 @@ class FactureClientController extends Controller
                     'taux_tva' => $request->type_facture === 'simple' ? 0 : $configuration->taux_tva,
                     'taux_aib' => $request->type_facture === 'simple' ? 0 : $client->taux_aib,
                 ]);
+
                 $facture->save();
 
                 $totalHT = 0;
@@ -525,19 +548,26 @@ class FactureClientController extends Controller
         $stocks = StockDepot::with('article')
             ->get()
             ->filter(function ($stock) use ($search) {
-                // return (str_contains($stock->article->code_article, $search) || str_contains($stock->article->designation, $search));
                 return $stock->article->where('code_article', 'like', "%{$search}%")
                     ->orWhere('designation', 'like', "%{$search}%");
             });
 
         return response()->json([
             'results' => $stocks->map(function ($stock) {
+                /**
+                 * @param $resteStock Reste du stock dans le depot
+                 */
+
+                $resteStock = $stock->article
+                    ->reste($stock->depot_id);
+
                 return [
                     'id' => $stock->article->id,
                     'text' => $stock->article->designation,
                     'code_article' => $stock->article->code_article,
                     'depot' => $stock->depot,
-                    'stock' => $stock->quantite_reelle ? number_format($stock->quantite_reelle, 0, " ", " ") : 00,
+                    'unite_mesure_labele' => $stock->uniteMesure->libelle_unite,
+                    'stock' => $resteStock ? number_format($resteStock, 0, " ", " ") : 00,
                 ];
             })
         ]);

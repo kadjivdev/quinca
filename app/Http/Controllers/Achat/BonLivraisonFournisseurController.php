@@ -483,7 +483,7 @@ class BonLivraisonFournisseurController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Une erreur est survenue lors de la validation: ' . $e->getMessage(),
+                'message' => $e->getMessage(),
                 'debug' => config('app.debug') ? [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()

@@ -30,7 +30,7 @@
                                 <div class="card-body">
                                     <div class="form-group mb-3">
                                         <select class="form-select select2" name="fournisseur_id">
-                                            <option value="">Sélectionner un fournisseur</option>
+                                            <option required value="">Sélectionner un fournisseur</option>
                                             @foreach ($fournisseurs as $fournisseur)
                                             <option value="{{ $fournisseur->id }}">
                                                 {{ $fournisseur->raison_sociale }}
@@ -42,12 +42,12 @@
 
                                     <div class="form-group mb-3">
                                         <label for="">Montant</label>
-                                        <input type="number" name="montant" class="form-control" min="1" id="" placeholder="Example: 100000">
+                                        <input type="number" required name="montant" class="form-control" min="1" id="" placeholder="Example: 100000">
                                         <div class="invalid-feedback">Veuillez sélectionner un founisseur</div>
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <select class="form-select select2" name="source">
+                                        <select class="form-select select2" required name="source">
                                             <option value="">Une source( Qui a effectué le paiement?? )</option>
                                             <option value="DIRECTION">DIRECTION</option>
                                             <option value="AGENT">AGENT</option>
@@ -56,12 +56,12 @@
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <input type="date" name="date" class="form-control" id="">
+                                        <input type="date"  required name="date" class="form-control" id="">
                                         <div class="invalid-feedback">Veuillez choisir une date</div>
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <input type="file" name="document" class="form-control" id="">
+                                        <input type="file" required name="document" class="form-control" id="">
                                         <div class="invalid-feedback">Veuillez sélectionner une preuve</div>
                                     </div>
                                 </div>

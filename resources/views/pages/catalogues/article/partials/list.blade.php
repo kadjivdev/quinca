@@ -31,7 +31,7 @@
                             <td><span class="badge bg-light text-dark">{{$article->famille?$article->famille->libelle_famille:'---'}}</span></td>
                             <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
                             <td class="text-center">
-                                <span class="badge bg-success">{{number_format($article->stocks->sum("qantiteBase"),2," "," ")}}</span>
+                                <span class="badge bg-success">{{number_format($article->stocks->sum("qantiteBase"),3,","," ")}}</span>
                             </td>
 
                             <td class="border p-0 m-0">
