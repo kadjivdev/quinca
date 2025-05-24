@@ -27,6 +27,7 @@ class LigneFacture extends Model
         'quantite',          // Quantité dans l'unité de vente
         'quantite_base',     // Quantité convertie en unité de base
         'quantite_livree',   // Quantité livrée en unité de base
+        'quantite_livree_simple', // Quantité livrée à chaque achat avant validation de livraion
         'prix_unitaire_ht',  // Prix unitaire de la tarification
         'taux_remise',
         'montant_remise',

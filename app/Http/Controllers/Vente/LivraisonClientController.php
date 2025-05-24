@@ -179,6 +179,9 @@ class LivraisonClientController extends Controller
                 if ($data['quantite'] > 0) {
                     $ligneFacture = LigneFacture::find($data['ligne_facture_id']);
 
+                    /**Update du ligne facture */
+                    $ligneFacture->update(["quantite_livree_simple"=>$data['quantite']]);
+
                     // Vérifier les quantités par rapport à la facture
                     $quantiteLivree = $ligneFacture->lignesLivraison()
                         ->whereHas('livraison', function ($query) {
@@ -212,7 +215,6 @@ class LivraisonClientController extends Controller
                         }
 
                         $quantiteBase = $conversion->convertir($data['quantite']);
-                        // dd($data['quantite'], $quantiteBase);
                     }
 
                     $ligneLivraison = new LigneLivraisonClient();
@@ -405,7 +407,6 @@ class LivraisonClientController extends Controller
             ), 0)')
             ->get()
             ->map(function ($ligne) use ($request) {
-                // dd($ligne);
                 // Calculer la quantité déjà livrée
                 $quantiteLivree = DB::table('ligne_livraison_clients')
                     ->join('livraison_clients', 'livraison_clients.id', '=', 'ligne_livraison_clients.livraison_client_id')
@@ -428,7 +429,7 @@ class LivraisonClientController extends Controller
                     'article' => [
                         'id' => $ligne->article->id,
                         'designation' => $ligne->article->designation,
-                        'reference' => $ligne->article->reference
+                        'reference' => $ligne->article->code_article
                     ],
                     'unite_vente' => [
                         'id' => $ligne->uniteVente->id,

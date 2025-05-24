@@ -3,7 +3,6 @@
 namespace App\Models\Catalogue;
 
 use App\Models\Achat\LigneProgrammationAchat;
-use App\Models\Achat\ProgrammationAchat;
 use App\Models\Parametre\Depot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +14,6 @@ use Illuminate\Support\Carbon;
 use App\Models\Stock\StockDepot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Vente\DevisDetail;
-use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Services\ServiceStockEntree;
@@ -196,9 +194,8 @@ class Article extends Model
             );
 
         $qteVenteConvertie = $serviceStockEntree
-            ->convertirQuantite($factureVente->sum("quantite"), $conversion, $stock->unite_mesure_id);
+            ->convertirQuantite($factureVente->quantite, $conversion, $stock->unite_mesure_id);
 
-        // return $qteVenteConvertie;
         return $stock->quantite_reelle - $qteVenteConvertie;
     }
 

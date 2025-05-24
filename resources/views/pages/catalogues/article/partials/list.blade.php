@@ -41,7 +41,7 @@
                                         <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
                                         <span class="badge d-block d-flex text-dark">Qte base : {{$stock->qantiteBase}} ({{$article->uniteMesure->libelle_unite}}) </span>
                                         <span class="badge d-block d-flex align-items-center text-dark">Qte ({{$stock->uniteMesure->libelle_unite}}) : <input type="number" name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}"></span>
-                                        <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($article->qteVendu($stock->depot_id)->sum('quantite'),2,'.','')}}</span>
+                                        <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($article->facturesVente($stock->depot_id)->first()?->quantite,2,'.','')}}</span>
                                         <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($article->reste($stock->depot_id),2,'.','')}}</span>
                                     </li>
                                     <hr>

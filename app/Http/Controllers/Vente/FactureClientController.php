@@ -211,19 +211,24 @@ class FactureClientController extends Controller
                 ], 422);
             }
 
-            $userPv = auth()->user()->pointDeVente;
-            $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+            /**
+             * on verifie si les articles selectionnés
+             * sont tous dans son depôts pour les non admins
+             */
+            if (!auth()->user()->hasRole("Super Administrateur")) {
+                $userPv = auth()->user()->pointDeVente;
+                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
-            // on verifie si les articles selectionnés sont tous dans son depôts
-            foreach ($request->lignes as $ligne) {
-                $depot = Depot::find($ligne["depot_id"]);
-                $article = Article::find($ligne['article_id']);
+                foreach ($request->lignes as $ligne) {
+                    $depot = Depot::find($ligne["depot_id"]);
+                    $article = Article::find($ligne['article_id']);
 
-                if (!in_array($ligne["depot_id"], $userPv_depotIds)) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => "Le dépôt ($depot->libelle_depot) ne vous appartient pas! Vous ne pouvez pas y passer une ecriture "
-                    ], 500);
+                    if (!in_array($ligne["depot_id"], $userPv_depotIds)) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Le dépôt ($depot->libelle_depot) ne vous appartient pas! Vous ne pouvez pas y passer une ecriture "
+                        ], 500);
+                    }
                 }
             }
 
@@ -263,11 +268,10 @@ class FactureClientController extends Controller
                     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
                 $QteStockConvertie = $this->serviceStockEntree
-                    ->convertirQuantite($stock->quantite_reelle, $conversion, $ligne['unite_vente_id']);
+                    ->convertirQuantite($stock->article->reste($stock->depot_id), $conversion, $ligne['unite_vente_id']);
 
                 // on verifie la quantité restante de l'article dans le depot est suffisante
-
-                if ($stock->quantite_reelle < $QteConvertie) {
+                if ($QteStockConvertie < $QteConvertie) {
                     return response()->json([
                         'status' => false,
                         'message' => "Le reste du stock de l'article ($article->designation) est de $QteStockConvertie $venteUnite->libelle_unite dans le depôt ({$stock->depot->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
@@ -561,12 +565,14 @@ class FactureClientController extends Controller
                 $resteStock = $stock->article
                     ->reste($stock->depot_id);
 
+                // return $resteStock;
+
                 return [
                     'id' => $stock->article->id,
                     'text' => $stock->article->designation,
                     'code_article' => $stock->article->code_article,
                     'depot' => $stock->depot,
-                    'unite_mesure_labele' => $stock->uniteMesure->libelle_unite,
+                    'unite_mesure' => $stock->uniteMesure, //->libelle_unite,
                     'stock' => $resteStock ? number_format($resteStock, 0, " ", " ") : 00,
                 ];
             })

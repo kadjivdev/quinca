@@ -43,13 +43,17 @@
                         $('#clientName').text(response.facture.client.raison_sociale);
                         $('#factureInfo').text(
                             `Facture ${response.facture.numero} du ${response.facture.date_facture}`
-                            );
+                        );
 
                         // Génération des lignes
                         let html = '';
+                        // console.log(response.lignes)
                         response.lignes.forEach(function(ligne) {
+
                             const stockClass = ligne.stock_disponible < ligne
                                 .reste_a_livrer ? 'stock-danger' : '';
+
+                            const uniteVenteLibelle = ligne.unite_vente.libelle
 
                             html += `
                             <tr>
@@ -59,15 +63,15 @@
                                 </td>
                                 <td class="text-center">
                                     ${ligne.quantite_facturee}
-                                    <small class="text-muted">${ligne.unite_vente.libelle}</small>
+                                    <small class="text-muted">${uniteVenteLibelle}</small>
                                 </td>
                                 <td class="text-center">
                                     ${ligne.quantite_livree}
-                                    <small class="text-muted">${ligne.unite_vente.libelle}</small>
+                                    <small class="text-muted">${uniteVenteLibelle}</small>
                                 </td>
                                 <td class="text-center">
                                     ${ligne.reste_a_livrer}
-                                    <small class="text-muted">${ligne.unite_vente.libelle}</small>
+                                    <small class="text-muted">${uniteVenteLibelle}</small>
                                 </td>
                                 <td>
                                     <input type="hidden" name="lignes[${ligne.id}][ligne_facture_id]" value="${ligne.id}">
@@ -82,13 +86,13 @@
                                             max="${ligne.reste_a_livrer}"
                                             step="0.001"
                                             value="0">
-                                        <span class="input-group-text">${ligne.unite_vente.libelle}</span>
+                                        <span class="input-group-text">${uniteVenteLibelle}</span>
                                     </div>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge bg-light text-dark stock-badge ${stockClass}">
                                         ${ligne.stock_disponible}
-                                        <small>${ligne.unite_vente.libelle}</small>
+                                        <small>${uniteVenteLibelle}</small>
                                     </span>
                                 </td>
                                 // <td class="text-center">
