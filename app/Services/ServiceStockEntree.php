@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Stock\{StockMouvement, StockDepot};
 use App\Models\Catalogue\Article;
-use App\Models\Parametre\{UniteMesure, ConversionUnite};
+use App\Models\Parametre\{UniteMesure, ConversionUnite, Depot};
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -197,6 +197,7 @@ class ServiceStockEntree
             foreach ($entrees as $index => $entree) {
                 $resultat = $this->traiterEntreeStock($entree);
 
+                $depots[] = Depot::find($entree["depot_id"]);
                 if (!$resultat['succes']) {
                     $erreurs[] = [
                         'ligne' => $index + 1,
@@ -206,7 +207,7 @@ class ServiceStockEntree
                     ];
 
                     throw new Exception($resultat['message']);
-                    
+
                     continue;
                 }
 

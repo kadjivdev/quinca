@@ -172,15 +172,13 @@ class ArticleController extends Controller
                     'notes' => "Entrée en stock via attachement direct aux dépôts",
                     'user_id' => Auth::id()
                 ];
+            }
 
-                // Traiter les entrées en stock
-                $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
-
-                Log::debug('Résultat traitement stock:', $resultatStock);
-
-                if (!$resultatStock['succes']) {
-                    throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
-                }
+            // Traiter les entrées en stock
+            $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
+            Log::debug('Résultat traitement stock:', $resultatStock);
+            if (!$resultatStock['succes']) {
+                throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
             }
 
             DB::commit();
