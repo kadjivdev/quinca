@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\{DB, Log};
 use Exception;
 use Illuminate\Validation\ValidationException;
+use Psr\Http\Message\ResponseInterface;
 
 class LivraisonClientController extends Controller
 {
@@ -180,7 +181,7 @@ class LivraisonClientController extends Controller
                     $ligneFacture = LigneFacture::find($data['ligne_facture_id']);
 
                     /**Update du ligne facture */
-                    $ligneFacture->update(["quantite_livree_simple"=>$data['quantite']]);
+                    $ligneFacture->update(["quantite_livree_simple" => $ligneFacture->quantite_livree_simple + $data['quantite']]);
 
                     // Vérifier les quantités par rapport à la facture
                     $quantiteLivree = $ligneFacture->lignesLivraison()
@@ -196,26 +197,26 @@ class LivraisonClientController extends Controller
                         );
                     }
 
-                    // Conversion en unité de base si nécessaire
-                    $article = Article::findOrFail($data['article_id']);
-                    $quantiteBase = $data['quantite'];
+                    // // Conversion en unité de base si nécessaire
+                    // $article = Article::findOrFail($data['article_id']);
+                    // $quantiteBase = $data['quantite'];
 
-                    if ($data['unite_vente_id'] != $article->unite_mesure_id) {
-                        $conversion = ConversionUnite::where([
-                            'unite_source_id' => $data['unite_vente_id'],
-                            'unite_dest_id' => $article->unite_mesure_id,
-                            'article_id' => $article->id,
-                            'statut' => true
-                        ])->first();
+                    // if ($data['unite_vente_id'] != $article->unite_mesure_id) {
+                    //     $conversion = ConversionUnite::where([
+                    //         'unite_source_id' => $data['unite_vente_id'],
+                    //         'unite_dest_id' => $article->unite_mesure_id,
+                    //         'article_id' => $article->id,
+                    //         'statut' => true
+                    //     ])->first();
 
-                        if (!$conversion) {
-                            throw new Exception(
-                                "Pas de conversion trouvée pour l'article " . $article->designation
-                            );
-                        }
+                    //     if (!$conversion) {
+                    //         throw new Exception(
+                    //             "Pas de conversion trouvée pour l'article " . $article->designation
+                    //         );
+                    //     }
 
-                        $quantiteBase = $conversion->convertir($data['quantite']);
-                    }
+                    //     $quantiteBase = $conversion->convertir($data['quantite']);
+                    // }
 
                     $ligneLivraison = new LigneLivraisonClient();
                     $ligneLivraison->livraison_client_id = $livraison->id;
@@ -223,7 +224,7 @@ class LivraisonClientController extends Controller
                     $ligneLivraison->article_id = $data['article_id'];
                     $ligneLivraison->unite_vente_id = $data['unite_vente_id'];
                     $ligneLivraison->quantite = $data['quantite'];
-                    $ligneLivraison->quantite_base = $quantiteBase;
+                    // $ligneLivraison->quantite_base = $quantiteBase;
                     $ligneLivraison->prix_unitaire = $data['prix_unitaire'];
                     $ligneLivraison->montant_total = $data['quantite'] * $data['prix_unitaire'];
                     $ligneLivraison->save();
@@ -269,6 +270,7 @@ class LivraisonClientController extends Controller
     /**
      * Valide une livraison
      */
+
     public function validateLivraison(Request $request, LivraisonClient $livraisonClient)
     {
         if (!$request->ajax()) {
@@ -286,76 +288,91 @@ class LivraisonClientController extends Controller
             // Charger les relations nécessaires
             $livraisonClient->load(['lignes.article', 'lignes.uniteVente']);
 
+            /** */
+            foreach ($livraisonClient->lignes as $livraisonLigne) {
+                /**Ligne Facture client associée */
+                $ligneFactureClient = $livraisonLigne
+                    ->ligneFactureClient;
+
+                /**MAJ de la ligne facture client */
+                $ligneFactureClient
+                    ->update([
+                        "quantite_livree" => $ligneFactureClient->quantite_livree + $livraisonLigne->quantite
+                    ]);
+            }
+
             // Traiter chaque ligne
-            foreach ($livraisonClient->lignes as $ligne) {
-                // Vérifier le stock disponible
-                $stock = StockDepot::where([
-                    'article_id' => $ligne->article_id,
-                    'depot_id' => $livraisonClient->depot_id
-                ])->first();
+            // foreach ($livraisonClient->lignes as $ligne) {
+            // Vérifier le stock disponible
+            // $stock = StockDepot::where([
+            //     'article_id' => $ligne->article_id,
+            //     'depot_id' => $livraisonClient->depot_id
+            // ])->first();
 
-                if (!$stock || $stock->quantite_reelle < $ligne->quantite_base) {
-                    throw new Exception(
-                        "Stock insuffisant pour l'article {$ligne->article->designation} " .
-                            "(Demandé: {$ligne->quantite_base}, Disponible: " .
-                            ($stock ? $stock->quantite_reelle : 0) . ")"
-                    );
-                }
+            // if (!$stock || $stock->quantite_reelle < $ligne->quantite_base) {
+            //     throw new Exception(
+            //         "Stock insuffisant pour l'article {$ligne->article->designation} " .
+            //             "(Demandé: {$ligne->quantite_base}, Disponible: " .
+            //             ($stock ? $stock->quantite_reelle : 0) . ")"
+            //     );
+            // }
 
-                // Créer le mouvement de sortie
-                $mouvementSortie = $this->serviceStockSortie->traiterSortieStock([
-                    'date_mouvement' => $livraisonClient->date_livraison,
-                    'depot_id' => $livraisonClient->depot_id,
-                    'article_id' => $ligne->article_id,
-                    'unite_mesure_id' => $ligne->article->unite_mesure_id,
-                    'quantite' => $ligne->quantite_base,
-                    'reference_mouvement' => $livraisonClient->numero,
-                    'document_type' => 'LIVRAISON_CLIENT',
-                    'document_id' => $livraisonClient->id,
-                    'user_id' => auth()->id(),
-                    'notes' => "Livraison client #{$livraisonClient->numero}"
-                ]);
+            // Créer le mouvement de sortie
+            // $mouvementSortie = $this->serviceStockSortie->traiterSortieStock([
+            //     'date_mouvement' => $livraisonClient->date_livraison,
+            //     'depot_id' => $livraisonClient->depot_id,
+            //     'article_id' => $ligne->article_id,
+            //     'unite_mesure_id' => $ligne->article->unite_mesure_id,
+            //     'quantite' => $ligne->quantite_base,
+            //     'reference_mouvement' => $livraisonClient->numero,
+            //     'document_type' => 'LIVRAISON_CLIENT',
+            //     'document_id' => $livraisonClient->id,
+            //     'user_id' => auth()->id(),
+            //     'notes' => "Livraison client #{$livraisonClient->numero}"
+            // ]);
 
-                if (!$mouvementSortie['succes']) {
-                    throw new Exception($mouvementSortie['message']);
-                }
+            // if (!$mouvementSortie['succes']) {
+            //     throw new Exception($mouvementSortie['message']);
+            // }
 
-                // Associer le mouvement à la ligne
-                $ligne->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
-                $ligne->save();
+            // // Associer le mouvement à la ligne
+            // $ligne->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
 
-                if ($livraisonClient->depot_dest_id !== null) {
-                    $entrees[] = [
-                        'depot_id' => $livraisonClient->depot_dest_id,
-                        'article_id' => $ligne->article_id,
-                        'unite_mesure_id' => $ligne->article->unite_mesure_id,
-                        'quantite' => $ligne->quantite_base,
-                        'prix_unitaire' => $ligne->prix_unitaire,
-                        'date_mouvement' => $livraisonClient->date_livraison,
-                        'reference_mouvement' => $livraisonClient->numero,
-                        'document_type' => 'BON_LIVRAISON_FOURNISSEUR',
-                        'document_id' => $livraisonClient->id,
-                        'notes' => "Livraison client #{$livraisonClient->numero}",
-                        'user_id' => auth()->id()
-                    ];
-                }
-            }
+            // $ligne->update([""]) save();
 
-            if ($livraisonClient->depot_dest_id !== null) {
-                // Traiter les entrées en stock
-                $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
+            // if ($livraisonClient->depot_dest_id !== null) {
+            //     $entrees[] = [
+            //         'depot_id' => $livraisonClient->depot_dest_id,
+            //         'article_id' => $ligne->article_id,
+            //         'unite_mesure_id' => $ligne->article->unite_mesure_id,
+            //         'quantite' => $ligne->quantite_base,
+            //         'prix_unitaire' => $ligne->prix_unitaire,
+            //         'date_mouvement' => $livraisonClient->date_livraison,
+            //         'reference_mouvement' => $livraisonClient->numero,
+            //         'document_type' => 'BON_LIVRAISON_FOURNISSEUR',
+            //         'document_id' => $livraisonClient->id,
+            //         'notes' => "Livraison client #{$livraisonClient->numero}",
+            //         'user_id' => auth()->id()
+            //     ];
+            // }
+            // }
 
-                \Log::debug('Résultat traitement stock:', $resultatStock);
+            // if ($livraisonClient->depot_dest_id !== null) {
+            //     // Traiter les entrées en stock
+            //     $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
 
-                if (!$resultatStock['succes']) {
-                    throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
-                }
-            }
+            //     \Log::debug('Résultat traitement stock:', $resultatStock);
+
+            //     if (!$resultatStock['succes']) {
+            //         throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
+            //     }
+            // }
 
             // Valider la livraison
             $livraisonClient->update([
                 'statut' => 'valide',
                 'date_validation' => now(),
+                'validated_at' => now(),
                 'validated_by' => auth()->id()
             ]);
 
@@ -398,31 +415,46 @@ class LivraisonClientController extends Controller
         // Charger les lignes avec leurs quantités déjà livrées
         $lignes = $factureClient->lignes()
             ->with(['article', 'uniteVente'])
-            ->whereRaw('quantite_base > IFNULL((
-                SELECT SUM(llc.quantite_base)
-                FROM ligne_livraison_clients llc
-                JOIN livraison_clients lc ON llc.livraison_client_id = lc.id
-                WHERE llc.ligne_facture_id = ligne_facture_clients.id
-                AND lc.statut = "valide"
-            ), 0)')
+            ->where(function ($query) {
+                /**on recupere seulement les lignes qui disposent encore de quantité */
+                $query->where(function ($q) {
+                    $q->whereNull('quantite_livree_simple')
+                        ->orWhere(function ($subQ) {
+                            $subQ->whereNotNull('quantite_livree_simple')
+                                ->where('quantite', '>', DB::raw('quantite_livree_simple'));
+                        });
+                });
+            })
+            // ->whereRaw('quantite > IFNULL((
+            //     SELECT SUM(llc.quantite)
+            //     FROM ligne_livraison_clients llc
+            //     JOIN livraison_clients lc ON llc.livraison_client_id = lc.id
+            //     WHERE llc.ligne_facture_id = ligne_facture_clients.id
+            //     AND lc.statut = "valide"
+            // ), 0)')
             ->get()
             ->map(function ($ligne) use ($request) {
                 // Calculer la quantité déjà livrée
-                $quantiteLivree = DB::table('ligne_livraison_clients')
+                $_quantiteLivree = DB::table('ligne_livraison_clients')
                     ->join('livraison_clients', 'livraison_clients.id', '=', 'ligne_livraison_clients.livraison_client_id')
                     ->where('ligne_livraison_clients.ligne_facture_id', $ligne->id)
                     ->where('livraison_clients.statut', 'valide')
                     ->sum('ligne_livraison_clients.quantite');
 
+                /**
+                 * Qte livrée
+                 */
+                $quantiteLivree = $ligne->quantite_livree_simple ?? $ligne->quantite_livree;
+
                 // Récupérer le stock disponible
-                $stockDisponible = 0;
-                if ($request->filled('depot_id')) {
-                    $stock = StockDepot::where([
-                        'article_id' => $ligne->article_id,
-                        'depot_id' => $request->depot_id
-                    ])->first();
-                    $stockDisponible = $stock ? $stock->quantite_reelle : 0;
-                }
+                $stockDisponible = $ligne->quantite - $quantiteLivree;
+                // if ($request->filled('depot_id')) {
+                //     $stock = StockDepot::where([
+                //         'article_id' => $ligne->article_id,
+                //         'depot_id' => $request->depot_id
+                //     ])->first();
+                //     $stockDisponible = $stock ? $stock->quantite_reelle : 0;
+                // }
 
                 return [
                     'id' => $ligne->id,
@@ -438,6 +470,8 @@ class LivraisonClientController extends Controller
                     'quantite_facturee' => $ligne->quantite,
                     'quantite_base' => $ligne->quantite_base,
                     'quantite_livree' => $quantiteLivree,
+                    'quantite_livree_simple' => $ligne->quantite_livree_simple,
+                    'depot' => $ligne->facturedepot->libelle_depot,
                     'reste_a_livrer' => $ligne->quantite - $quantiteLivree,
                     'stock_disponible' => $stockDisponible,
                     'prix_unitaire' => $ligne->prix_unitaire_ht
@@ -445,6 +479,7 @@ class LivraisonClientController extends Controller
             });
 
         return response()->json([
+            'success' => true,
             'lignes' => $lignes,
             'facture' => [
                 'numero' => $factureClient->numero,
@@ -579,21 +614,14 @@ class LivraisonClientController extends Controller
 
             // Préparer les données des lignes
             $lignes = $livraisonClient->lignes->map(function ($ligne) use ($livraisonClient) {
-                // Calculer la quantité déjà livrée pour cette ligne de facture
-                $quantiteLivree = DB::table('ligne_livraison_clients')
-                    ->join('livraison_clients', 'livraison_clients.id', '=', 'ligne_livraison_clients.livraison_client_id')
-                    ->where('ligne_livraison_clients.ligne_facture_id', $ligne->ligne_facture_id)
-                    ->where('livraison_clients.statut', 'valide')
-                    ->where('ligne_livraison_clients.id', '!=', $ligne->id) // Exclure la ligne courante
-                    ->sum('ligne_livraison_clients.quantite_base');
 
-                // Récupérer le stock disponible depuis StockDepot
-                $stockDepot = StockDepot::where('article_id', $ligne->article_id)
-                    ->where('depot_id', $livraisonClient->depot_id)
-                    ->first();
+                /**
+                 * Qte livrée
+                 */
+                $quantiteLivree = $ligne->quantite_livree_simple ?? $ligne->quantite_livree;
 
-                $stockDisponible = $stockDepot ? $stockDepot->getQuantiteDisponibleAttribute() : 0;
-                $prixUnitaire = $stockDepot ? $stockDepot->prix_moyen : 0;
+                // Récupérer le stock disponible
+                $stockDisponible = $ligne->quantite - $quantiteLivree;
 
                 return [
                     'id' => $ligne->id,
@@ -604,14 +632,14 @@ class LivraisonClientController extends Controller
                         'reference' => $ligne->article->code_article
                     ],
                     'unite_mesure' => [
-                        'id' => $ligne->article->uniteMesure->id,
-                        'libelle' => $ligne->article->uniteMesure->libelle_unite
+                        'id' => $ligne->unite_vente_id,
+                        'libelle' => $ligne->uniteVente->libelle_unite
                     ],
                     'quantite' => $ligne->quantite,
                     'quantite_facturee' => $ligne->ligneFacture->quantite,
                     'quantite_livree' => $quantiteLivree,
-                    'reste_a_livrer' => $ligne->ligneFacture->quantite - $quantiteLivree,
-                    'prix_unitaire' => $prixUnitaire,
+                    'reste_a_livrer' => $ligne->quantite - $quantiteLivree,
+                    'prix_unitaire' => $ligne->prix_unitaire,
                     'montant_total' => $ligne->montant_total,
                     'stock_disponible' => $stockDisponible
                 ];
@@ -665,9 +693,12 @@ class LivraisonClientController extends Controller
                 ], 422);
             }
 
+
             $validated = $request->validate([
                 'depot_id' => 'required|exists:depots,id',
                 'lignes' => 'required|array',
+                // 'lignes.*.unite_vente_id' => 'required|exists:unite_mesures,id',
+                'lignes.*.prix_unitaire' => 'required',
                 'lignes.*.ligne_facture_id' => 'required|exists:ligne_facture_clients,id',
                 'lignes.*.article_id' => 'required|exists:articles,id',
                 'lignes.*.quantite' => 'required|numeric|min:0',
@@ -682,19 +713,25 @@ class LivraisonClientController extends Controller
                 'notes' => $validated['notes']
             ]);
 
+            $uniteVenteId = $livraisonClient->lignes[0]?->unite_vente_id;
+
             // Supprimer les anciennes lignes
             $livraisonClient->lignes()->delete();
 
-            // Créer les nouvelles lignes
+
+            // Création des lignes
             foreach ($validated['lignes'] as $data) {
+
                 if ($data['quantite'] > 0) {
                     $ligneFacture = LigneFacture::find($data['ligne_facture_id']);
 
+                    /**Update du ligne facture */
+                    $ligneFacture->update(["quantite_livree_simple" => $data['quantite']]);
+
                     // Vérifier les quantités par rapport à la facture
                     $quantiteLivree = $ligneFacture->lignesLivraison()
-                        ->whereHas('livraison', function ($query) use ($livraisonClient) {
-                            $query->where('statut', 'valide')
-                                ->where('id', '!=', $livraisonClient->id);
+                        ->whereHas('livraison', function ($query) {
+                            $query->where('statut', 'valide');
                         })
                         ->sum('quantite');
 
@@ -705,36 +742,20 @@ class LivraisonClientController extends Controller
                         );
                     }
 
-                    // Récupérer l'article avec son unité de mesure
-                    $article = Article::with('uniteMesure')->findOrFail($data['article_id']);
-
-                    if (!$article->unite_mesure_id) {
-                        throw new Exception("L'article {$article->designation} n'a pas d'unité de mesure définie");
-                    }
-
-                    // Vérifier le stock disponible
-                    $stockDepot = StockDepot::where([
-                        'depot_id' => $validated['depot_id'],
-                        'article_id' => $article->id
-                    ])->first();
-
-                    if (!$stockDepot || $stockDepot->getQuantiteDisponibleAttribute() < $data['quantite']) {
-                        throw new \Exception("Stock insuffisant pour l'article {$article->designation}");
-                    }
-
-                    // Créer la ligne de livraison
                     $ligneLivraison = new LigneLivraisonClient();
                     $ligneLivraison->livraison_client_id = $livraisonClient->id;
                     $ligneLivraison->ligne_facture_id = $data['ligne_facture_id'];
                     $ligneLivraison->article_id = $data['article_id'];
-                    $ligneLivraison->unite_vente_id = $article->unite_mesure_id; // Utiliser l'unité de l'article
+                    $ligneLivraison->unite_vente_id = $uniteVenteId;//(int) $data['unite_vente_id'];
                     $ligneLivraison->quantite = $data['quantite'];
-                    $ligneLivraison->quantite_base = $data['quantite']; // Car unité liée à l'article
-                    $ligneLivraison->prix_unitaire = $stockDepot->prix_moyen;
-                    $ligneLivraison->montant_total = $data['quantite'] * $stockDepot->prix_moyen;
+                    // $ligneLivraison->quantite_base = $quantiteBase;
+                    $ligneLivraison->prix_unitaire = $data['prix_unitaire'];
+                    $ligneLivraison->montant_total = $data['quantite'] * $data['prix_unitaire'];
                     $ligneLivraison->save();
                 }
             }
+
+
 
             DB::commit();
 
@@ -820,7 +841,7 @@ class LivraisonClientController extends Controller
             'lignes' => $livraisonClient->lignes->map(function ($ligne) {
                 return [
                     'article' => [
-                        'reference' => $ligne->article->reference,
+                        'reference' => $ligne->article->code_article,
                         'designation' => $ligne->article->designation
                     ],
                     'quantite' => $ligne->quantite,

@@ -26,7 +26,9 @@
                             icon: 'success',
                             title: response.message
                         });
-                        refreshList(); // Rafraîchir la liste
+
+                        window.location.href = `${apiUrl}/vente/livraisons`
+                        // refreshList(); // Rafraîchir la liste
                     } else {
                         Toast.fire({
                             icon: 'error',

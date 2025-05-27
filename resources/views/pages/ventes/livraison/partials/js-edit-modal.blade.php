@@ -24,7 +24,8 @@
                         $('#editNotes').val(response.livraison.notes);
 
                         // Remplir le select des dépôts
-                        const depotSelect = $('#editDepotId');
+                        // $("#currentDepot").html()
+                        const depotSelect = $('#depot_id');
                         depotSelect.empty();
                         depotSelect.append('<option value="">Sélectionner un magasin</option>');
                         if (Array.isArray(response.depots)) {
@@ -57,6 +58,8 @@
                                     <td>
                                         <div class="fw-medium">${ligne.article.designation}</div>
                                         <small class="text-muted">${ligne.article.reference}</small>
+                                        <input type="hidden" required name="lignes[${ligne.id}][unite_vente_id]" value="${ligne.unite_mesure.id}">
+                                        <input type="hidden" required name="lignes[${ligne.id}][prix_unitaire]" value="${ligne.prix_unitaire}">
                                     </td>
                                     <td class="text-center">${ligne.unite_mesure.libelle}</td>
                                     <td class="text-center">
@@ -100,7 +103,7 @@
 
                         $('#editLignesFacture').html(html ||
                             '<tr><td colspan="8" class="text-center">Aucune ligne trouvée</td></tr>'
-                            );
+                        );
 
                         // Initialiser les composants
                         initializeEditComponents();
@@ -120,7 +123,7 @@
                     });
                     $('#editLignesFacture').html(
                         '<tr><td colspan="8" class="text-center text-danger">Erreur lors du chargement des données</td></tr>'
-                        );
+                    );
                 }
             });
         }
@@ -174,7 +177,7 @@
                 return;
             }
 
-            const depotId = $('#editDepotId').val();
+            const depotId = $('#depot_id').val();
             if (!depotId) {
                 Toast.fire({
                     icon: 'warning',
@@ -211,6 +214,7 @@
                 return;
             }
 
+
             const submitBtn = $('#btnUpdateLivraison');
             submitBtn.prop('disabled', true)
                 .html('<i class="fas fa-spinner fa-spin me-2"></i>Enregistrement...');
@@ -237,8 +241,9 @@
                             title: response.message ||
                                 'Livraison modifiée avec succès'
                         });
+                        window.location.reload()
                         // refreshLivraisonsList();
-                        refreshList();
+                        // refreshList();
                     } else {
                         Toast.fire({
                             icon: 'error',

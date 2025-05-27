@@ -16,7 +16,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="#" method="POST" id="_addLivraisonForm" class="needs-validation" novalidate>
+            <form action="#" method="POST" id="addLivraisonForm" class="needs-validation" novalidate>
                 @csrf
                 <input type="hidden" name="facture_client_id" id="factureClientId">
 
@@ -90,7 +90,7 @@
                                 <table class="table table-hover align-middle mb-0" id="articlesTable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th style="width: 30%">Article</th>
+                                            <th style="width: 20%">Article</th>
                                             <th class="text-center">Quantité facturée</th>
                                             <th class="text-center">Déjà livrée</th>
                                             <th class="text-center">Reste à livrer</th>

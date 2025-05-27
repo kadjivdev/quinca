@@ -52,10 +52,16 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label fw-medium required">Magasin source</label>
-                                            <select class="form-select" name="depot_id" id="editDepotId" required>
+                                            <select class="form-select" id="depot_id" name="depot_id" required>
                                                 <option value="">Sélectionner un magasin</option>
+                                                @foreach ($depots as $depot)
+                                                <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
+                                                </option>
+                                                @endforeach
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner un magasin</div>
+                                            
+                                            <!-- <span class="badge bg-info">Dépôt actuel: <strong id="currentDepot"></strong> </span> -->
                                         </div>
                                     </div>
                                 </div>

@@ -55,24 +55,6 @@ class LivraisonClient extends Model
         return sprintf('%s-%s-%s', $prefix, $date, $random);
     }
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($livraison) {
-            if (empty($livraison->numero)) {
-                $livraison->numero = self::generateNumero();
-            }
-
-            if (empty($livraison->date_livraison)) {
-                $livraison->date_livraison = Carbon::now();
-            }
-
-            if (empty($livraison->created_by)) {
-                $livraison->created_by = auth()->id();
-            }
-        });
-    }
 
     public function facture(): BelongsTo
     {
@@ -147,5 +129,25 @@ class LivraisonClient extends Model
             DB::rollback();
             throw $e;
         }
+    }
+
+    
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($livraison) {
+            if (empty($livraison->numero)) {
+                $livraison->numero = self::generateNumero();
+            }
+
+            if (empty($livraison->date_livraison)) {
+                $livraison->date_livraison = Carbon::now();
+            }
+
+            if (empty($livraison->created_by)) {
+                $livraison->created_by = auth()->id();
+            }
+        });
     }
 }

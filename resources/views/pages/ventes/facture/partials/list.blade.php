@@ -32,6 +32,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date facture</th>
                             <th class="border-bottom-0">Client</th>
+                            <th class="border-bottom-0">Etat</th>
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
                             <th class="border-bottom-0 text-end">Montant TTC</th>
@@ -80,6 +81,23 @@
                                         <div class="text-muted small">{{ $facture->client->telephone }}</div>
                                     </div>
                                 </div>
+                            </td>
+                            @php
+                            $qte = $facture->lignes()->sum("quantite");
+                            $qteLivre = $facture->lignes()->sum("quantite_livree")
+                            @endphp
+                            <td>
+                                @if($qte==$qteLivre)
+                                <span class="badge bg-primary"> Livrée </span>
+                                @else
+
+                                    @if($qteLivre < 0 || $qteLivre==0)
+                                    <span class="badge bg-danger">Non Livrée </span>
+                                    @else
+                                    <span class="badge bg-info bg-opacity-10 text-info">Livré partiellement({{$qteLivre}})</span>
+                                    @endif
+
+                                @endif
                             </td>
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
                             <td class="text-end fw-medium">

@@ -3,10 +3,10 @@
         // Gestion du changement de facture
         $('#factureSelect').on('change', function() {
             const factureId = $(this).val();
-            const depotId = $('select[name="depot_id"]').val();
+            // const depotId = $('select[name="depot_id"]').val();
 
-            if (factureId && depotId) {
-                chargerLignesFacture(factureId, depotId);
+            if (factureId) {
+                chargerLignesFacture(factureId);
             } else {
                 $('#lignesFacture').html(`
                 <tr>
@@ -21,12 +21,6 @@
 
         // Gestion du changement de magasin
         $('select[name="depot_id"]').on('change', function() {
-            const factureId = $('#factureSelect').val();
-            const depotId = $(this).val();
-
-            if (factureId && depotId) {
-                chargerLignesFacture(factureId, depotId);
-            }
             updateSaveButton();
         });
 
@@ -34,9 +28,9 @@
         function chargerLignesFacture(factureId, depotId) {
             $.ajax({
                 url: `${apiUrl}/vente/livraisons/facture/${factureId}/lignes-disponibles`,
-                data: {
-                    depot_id: depotId
-                },
+                // data: {
+                //     depot_id: depotId
+                // },
                 success: function(response) {
                     if (response.success) {
                         // Mise à jour des informations client et facture
@@ -47,7 +41,7 @@
 
                         // Génération des lignes
                         let html = '';
-                        // console.log(response.lignes)
+
                         response.lignes.forEach(function(ligne) {
 
                             const stockClass = ligne.stock_disponible < ligne
@@ -56,8 +50,8 @@
                             const uniteVenteLibelle = ligne.unite_vente.libelle
 
                             html += `
-                            <tr>
-                                <td>
+                            <tr class='px-2'>
+                                <td >
                                     <div class="fw-medium">${ligne.article.designation}</div>
                                     <small class="text-muted">${ligne.article.reference}</small>
                                 </td>
@@ -82,11 +76,10 @@
                                         <input type="number"
                                             class="form-control quantite-input"
                                             name="lignes[${ligne.id}][quantite]"
-                                            min="0"
+                                            min="1"
                                             max="${ligne.reste_a_livrer}"
                                             step="0.001"
                                             value="0">
-                                        <span class="input-group-text">${uniteVenteLibelle}</span>
                                     </div>
                                 </td>
                                 <td class="text-center">
@@ -95,11 +88,6 @@
                                         <small>${uniteVenteLibelle}</small>
                                     </span>
                                 </td>
-                                // <td class="text-center">
-                                //     <span class="prix-moyen">
-                                //         ${ligne.prix_moyen} FCFA
-                                //     </span>
-                                // </td>
                             </tr>
                         `;
                         });
@@ -109,10 +97,10 @@
                         // Initialisation des gestionnaires d'événements sur les inputs
                         initQuantiteInputs();
                     } else {
-                        // Toast.fire({
-                        //     icon: 'error',
-                        //     title: response.message
-                        // });
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Erreur lors du chargement des lignes'
+                        });
                     }
                 },
                 error: function() {
@@ -207,7 +195,8 @@
                         $('#factureSelect').val('').trigger('change');
 
                         // Rafraîchissement de la liste
-                        refreshList();
+                        window.location.href = `${apiUrl}/vente/livraisons`
+                        // refreshList();
                     } else {
                         Toast.fire({
                             icon: response.type || 'warning',

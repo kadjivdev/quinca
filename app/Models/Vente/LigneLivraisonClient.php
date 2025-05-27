@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Stock\{StockMouvement, StockDepot, StockValorisation};
 use App\Models\Vente\{FactureClient, LigneFacture, LivraisonClient};
 use App\Models\Catalogue\{Article};
-use App\Models\Parametre\{Depot, UniteMesure, ConversionUnite,} ;
+use App\Models\Parametre\{Depot, UniteMesure, ConversionUnite,};
 use Exception;
 use Carbon\Carbon;
 
@@ -39,7 +39,11 @@ class LigneLivraisonClient extends Model
         'montant_total' => 'decimal:3'
     ];
 
-
+    function ligneFactureClient(): BelongsTo
+    {
+        return $this->belongsTo(LigneFacture::class, 'ligne_facture_id');
+    }
+    
     public function uniteVente(): BelongsTo
     {
         return $this->belongsTo(UniteMesure::class, 'unite_vente_id');
@@ -60,58 +64,58 @@ class LigneLivraisonClient extends Model
             }
 
             // Conversion en unité de base si nécessaire
-            if (empty($ligneLivraison->quantite_base)) {
-                $article = $ligneLivraison->article->load('famille.uniteBase');
-                $familleId = $article->famille_id;
-                $uniteBaseId = $article->famille->unite_base_id;
-                $uniteVenteId = $ligneLivraison->unite_vente_id;
+            // if (empty($ligneLivraison->quantite_base)) {
+            //     $article = $ligneLivraison->article;
+            //     $familleId = $article->famille_id;
+            //     $uniteBaseId = $article->famille->unite_base_id;
+            //     $uniteVenteId = $ligneLivraison->unite_vente_id;
 
-                // Si les unités sont différentes, conversion nécessaire
-                if ($uniteVenteId != $uniteBaseId) {
-                    $conversion = ConversionUnite::where(function($query) use ($familleId, $uniteBaseId, $uniteVenteId) {
-                        $query->where('unite_source_id', $uniteVenteId)
-                              ->where('unite_dest_id', $uniteBaseId)
-                              ->where('famille_id', $familleId)
-                              ->where('statut', true);
-                    })->orWhere(function($query) use ($familleId, $uniteBaseId, $uniteVenteId) {
-                        $query->where('unite_source_id', $uniteBaseId)
-                              ->where('unite_dest_id', $uniteVenteId)
-                              ->where('famille_id', $familleId)
-                              ->where('statut', true);
-                    })->first();
+            //     // Si les unités sont différentes, conversion nécessaire
+            //     if ($uniteVenteId != $uniteBaseId) {
+            //         $conversion = ConversionUnite::where(function($query) use ($familleId, $uniteBaseId, $uniteVenteId) {
+            //             $query->where('unite_source_id', $uniteVenteId)
+            //                   ->where('unite_dest_id', $uniteBaseId)
+            //                   ->where('famille_id', $familleId)
+            //                   ->where('statut', true);
+            //         })->orWhere(function($query) use ($familleId, $uniteBaseId, $uniteVenteId) {
+            //             $query->where('unite_source_id', $uniteBaseId)
+            //                   ->where('unite_dest_id', $uniteVenteId)
+            //                   ->where('famille_id', $familleId)
+            //                   ->where('statut', true);
+            //         })->first();
 
-                    if (!$conversion) {
-                        throw new Exception(
-                            "Aucune conversion trouvée entre les unités pour l'article '" .
-                            $article->designation . "'"
-                        );
-                    }
+            //         if (!$conversion) {
+            //             throw new Exception(
+            //                 "Aucune conversion trouvée entre les unités pour l'article '" .
+            //                 $article->designation . "'"
+            //             );
+            //         }
 
-                    // Conversion dans le bon sens
-                    $ligneLivraison->quantite_base = $conversion->unite_source_id == $uniteBaseId
-                        ? $conversion->convertirInverse($ligneLivraison->quantite)
-                        : $conversion->convertir($ligneLivraison->quantite);
-                } else {
-                    // Même unité, pas de conversion nécessaire
-                    $ligneLivraison->quantite_base = $ligneLivraison->quantite;
-                }
-            }
+            //         // Conversion dans le bon sens
+            //         $ligneLivraison->quantite_base = $conversion->unite_source_id == $uniteBaseId
+            //             ? $conversion->convertirInverse($ligneLivraison->quantite)
+            //             : $conversion->convertir($ligneLivraison->quantite);
+            //     } else {
+            //         // Même unité, pas de conversion nécessaire
+            //         $ligneLivraison->quantite_base = $ligneLivraison->quantite;
+            //     }
+            // }
 
             // Vérification des quantités par rapport à la facture
-            $ligneFacture = $ligneLivraison->ligneFacture;
-            $totalDejaLivre = $ligneFacture->lignesLivraison()
-                ->where('id', '!=', $ligneLivraison->id)
-                ->sum('quantite');
+            // $ligneFacture = $ligneLivraison->ligneFacture;
+            // $totalDejaLivre = $ligneFacture->lignesLivraison()
+            //     ->where('id', '!=', $ligneLivraison->id)
+            //     ->sum('quantite');
 
-            $quantiteTotaleLivraison = $totalDejaLivre + $ligneLivraison->quantite;
+            // $quantiteTotaleLivraison = $totalDejaLivre + $ligneLivraison->quantite;
 
-            if ($quantiteTotaleLivraison > $ligneFacture->quantite) {
-                throw new Exception(
-                    "La quantité totale livrée ({$quantiteTotaleLivraison}) ne peut pas dépasser " .
-                    "la quantité facturée ({$ligneFacture->quantite}) pour l'article " .
-                    $ligneLivraison->article->designation
-                );
-            }
+            // if ($quantiteTotaleLivraison > $ligneFacture->quantite) {
+            //     throw new Exception(
+            //         "La quantité totale livrée ({$quantiteTotaleLivraison}) ne peut pas dépasser " .
+            //             "la quantité facturée ({$ligneFacture->quantite}) pour l'article " .
+            //             $ligneLivraison->article->designation
+            //     );
+            // }
         });
     }
 
@@ -128,7 +132,7 @@ class LigneLivraisonClient extends Model
 
     public function getQuantiteLivreeEnUniteVenteAttribute(): float
     {
-        $article = $this->article->load('famille.uniteBase');
+        $article = $this->article;
         $uniteBaseId = $article->famille->unite_base_id;
         $uniteVenteId = $this->unite_vente_id;
 
@@ -138,16 +142,16 @@ class LigneLivraisonClient extends Model
         }
 
         // Sinon, convertir de l'unité de base vers l'unité de vente
-        $conversion = ConversionUnite::where(function($query) use ($article, $uniteBaseId, $uniteVenteId) {
+        $conversion = ConversionUnite::where(function ($query) use ($article, $uniteBaseId, $uniteVenteId) {
             $query->where('unite_source_id', $uniteBaseId)
-                  ->where('unite_dest_id', $uniteVenteId)
-                  ->where('famille_id', $article->famille_id)
-                  ->where('statut', true);
-        })->orWhere(function($query) use ($article, $uniteBaseId, $uniteVenteId) {
+                ->where('unite_dest_id', $uniteVenteId)
+                ->where('famille_id', $article->famille_id)
+                ->where('statut', true);
+        })->orWhere(function ($query) use ($article, $uniteBaseId, $uniteVenteId) {
             $query->where('unite_source_id', $uniteVenteId)
-                  ->where('unite_dest_id', $uniteBaseId)
-                  ->where('famille_id', $article->famille_id)
-                  ->where('statut', true);
+                ->where('unite_dest_id', $uniteBaseId)
+                ->where('famille_id', $article->famille_id)
+                ->where('statut', true);
         })->first();
 
         if (!$conversion) {
@@ -169,26 +173,26 @@ class LigneLivraisonClient extends Model
     }
 
     /**
- * Relation avec la livraison
- */
-public function livraison()
-{
-    return $this->belongsTo(LivraisonClient::class, 'livraison_client_id');
-}
+     * Relation avec la livraison
+     */
+    public function livraison()
+    {
+        return $this->belongsTo(LivraisonClient::class, 'livraison_client_id');
+    }
 
-/**
- * Relation avec la ligne de facture
- */
-public function ligneFacture()
-{
-    return $this->belongsTo(LigneFacture::class, 'ligne_facture_id');
-}
+    /**
+     * Relation avec la ligne de facture
+     */
+    public function ligneFacture()
+    {
+        return $this->belongsTo(LigneFacture::class, 'ligne_facture_id');
+    }
 
-/**
- * Relation avec l'article
- */
-public function article()
-{
-    return $this->belongsTo(Article::class);
-}
+    /**
+     * Relation avec l'article
+     */
+    public function article()
+    {
+        return $this->belongsTo(Article::class);
+    }
 }
