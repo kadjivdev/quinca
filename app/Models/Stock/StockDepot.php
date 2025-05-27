@@ -7,12 +7,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Catalogue\Article;
-use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Securite\User;
 use Exception;
-use PhpOption\None;
 
 class StockDepot extends Model
 {
@@ -63,7 +61,6 @@ class StockDepot extends Model
     {
         return $this->hasMany(StockMouvement::class, 'depot_id');
     }
-
 
     public function user(): BelongsTo
     {

@@ -62,8 +62,6 @@ class ProformaController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // dd($request->all());
-
         $nbr = Devis::max('id');
         $lettres = strtoupper(substr(StringHelper::removeAccents(Auth::user()->name), 0, 3));
         DB::beginTransaction();
@@ -106,7 +104,6 @@ class ProformaController extends Controller
         $devis = Devis::with(["details", "articles"])->find($id);
         return view('pages.ventes.facture.proforma.partials.show', compact('devis'));
 
-        // return response()->json($devis);
     }
 
     /**

@@ -56,7 +56,14 @@ class ReglementClientController extends Controller
         $reglements = $reglements->paginate(10);
 
         // Données pour les filtres et le modal d'ajout
-        $clients = Client::orderBy('raison_sociale')->with("facturesClient")->get();
+        $clients = Client::orderBy('raison_sociale')
+            ->with(["facturesClient" => function ($query) {
+                /**on renvoie la somme des montant des reglements */
+                $query->withSum('reglements', 'montant');
+            }])
+            ->get();
+
+        // dd($clients->where("id", 2)->facturesClient);
 
         // Statistiques pour le header
         $statsReglements = [
@@ -85,16 +92,12 @@ class ReglementClientController extends Controller
         ];
 
         // Récupérer les factures non soldées pour le modal d'ajout
-        // Récupérer les factures non soldées pour le modal d'ajout
-        $factures = FactureClient::where('statut', 'validee')
+        $factures = FactureClient::with(["reglements"])
+            ->where('statut', 'validee')
             ->whereRaw('IFNULL(montant_regle, 0) < montant_ttc')
             ->with('client')
             ->latest()
-            ->get()
-            ->filter(function ($facture) {
-                return !$facture->est_solde;
-            });
-
+            ->get();
 
         // Types de règlement disponibles
         $typesReglement = ReglementClient::getTypesReglement();
@@ -309,6 +312,19 @@ class ReglementClientController extends Controller
             DB::rollBack();
 
             Log::error('Erreur lors de la validation du règlement', [
+                'reglement_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        } catch (\InvalidArgumentException $e) {
+            DB::rollBack();
+
+            Log::error('Erreure liée au montant des règlements', [
                 'reglement_id' => $id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()

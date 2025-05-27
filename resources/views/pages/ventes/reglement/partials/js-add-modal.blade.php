@@ -72,17 +72,27 @@
             if (clientId) {
                 const factures = selectedOption.data('factures');
 
+                console.log(factures)
+
                 // Mettre à jour l'affichage
                 factures.forEach(facture => {
                     // console.log(facture)
                     $('#factureSelect').append(
-                        `
-                        <option value="${facture.id}"
+                        facture.montant_ttc > facture.reglements_sum_montant ?
+                        `<option value="${facture.id}"
                             data-client="${facture.client.raison_sociale}"
                             data-montant="${facture.montant_ttc}"
                             data-reste="${facture.montant_ttc - facture.montant_regle}">
                             ${facture.numero} - ${facture.client.raison_sociale}
-                            (Reste: ${facture.montant_ttc - facture.montant_regle} F)
+                            (Montant: ${facture.montant_ttc} | Reste: ${facture.montant_ttc - facture.montant_regle} F)
+                        </option>
+                        ` :
+                        `<option disabled value="${facture.id}"
+                            data-client="${facture.client.raison_sociale}"
+                            data-montant="${facture.montant_ttc}"
+                            data-reste="${facture.montant_ttc - facture.montant_regle}">
+                            ${facture.numero} - ${facture.client.raison_sociale}
+                            (Montant: ${facture.montant_ttc} | Reste: ${facture.montant_ttc - facture.montant_regle} F)
                         </option>
                         `
                     )
@@ -215,12 +225,15 @@
                         // Réinitialiser le formulaire
                         resetForm();
                         // Rafraîchir la liste
-                        refreshList();
+                        window.location.href = `${apiUrl}/vente/reglement/`
+
+                        // refreshList();
                     } else {
                         Toast.fire({
                             icon: 'error',
                             title: response.message
                         });
+                        window.location.href = `${apiUrl}/vente/reglement/`
                     }
                 },
                 error: function(xhr) {

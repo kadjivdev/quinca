@@ -548,12 +548,24 @@ class FactureClientController extends Controller
     public function searchArticles(Request $request)
     {
         $search = $request->get('q');
+        $user = auth()->user();
 
         $stocks = StockDepot::with('article')
             ->get()
-            ->filter(function ($stock) use ($search) {
-                return $stock->article->where('code_article', 'like', "%{$search}%")
-                    ->orWhere('designation', 'like', "%{$search}%");
+            ->filter(function ($stock) use ($search, $user) {
+                /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
+                if ($user->hasRole("Super Administrateur") || $user->hasRole("CHARGE DES STOCKS ET SUIVI DES ACHATS")) {
+                    return $stock->article->where('code_article', 'like', "%{$search}%")
+                        ->orWhere('designation', 'like', "%{$search}%");
+                }
+
+                /** ON FILTRE LES STOCKS SELON LES POINT DE VENTE DU USER */
+                $userPv = auth()->user()->pointDeVente;
+                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+                if (in_array($stock->depot_id, $userPv_depotIds)) {
+                    return $stock->article->where('code_article', 'like', "%{$search}%")
+                        ->orWhere('designation', 'like', "%{$search}%");
+                }
             });
 
         return response()->json([
