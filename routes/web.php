@@ -720,7 +720,10 @@ Route::middleware('auth')->group(function () {
 
             Route::post('/{id}/validate', [FactureClientController::class, 'validateFacture'])->name('vente.facture.validate');
             Route::delete('/{id}/delete', [FactureClientController::class, 'destroy'])->name('vente.facture.delete');
-            Route::get('/{facture}/print', [FactureClientController::class, 'print'])->name('vente.facture.print');
+
+            Route::post('/{facture}/print', [FactureClientController::class, 'print'])->name('vente.facture.print');
+            Route::post('/{facture}/bon-a-livrer', [FactureClientController::class, 'bonALivrer'])->name('vente.bonALivrer');
+            Route::post('/{facture}/bordereau-livraison', [FactureClientController::class, 'bordereauLivraison'])->name('vente.bordereauLivraison');
 
             Route::put('/{id}/update', [FactureClientController::class, 'update'])->name('vente.facture.update')->where('id', '[0-9]+');
 

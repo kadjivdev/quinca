@@ -868,7 +868,7 @@ class FactureClientController extends Controller
         ]);
     }
 
-    public function print(FactureClient $facture)
+    public function print(Request $request, FactureClient $facture)
     {
         // Chargement des relations nécessaires
         $facture->load([
@@ -879,11 +879,56 @@ class FactureClientController extends Controller
             'validatedBy'
         ]);
 
+        $logo = $request->get("logo");
 
-        $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture'));
+        $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture',"logo"));
         $pdf->setPaper('a4');
 
         return $pdf->stream("facture_{$facture->numero}.pdf");
+    }
+
+    /**
+     * Bon à livrer
+     */
+    public function bonALivrer(Request $request, FactureClient $facture)
+    {
+        // Chargement des relations nécessaires
+        $facture->load([
+            'client',
+            'lignes.article',
+            'lignes.uniteVente',
+            'createdBy',
+            'validatedBy'
+        ]);
+
+        $entete = $request->get("entete");
+
+        $pdf = PDF::loadView('pages.ventes.facture.partials.bon-a-livrer', compact('facture','entete'));
+        $pdf->setPaper('a4');
+
+        return $pdf->stream("bon_a_livrer_{$facture->numero}.pdf");
+    }
+
+    /**
+     * Bordereau de livraison
+     */
+    public function bordereauLivraison(Request $request, FactureClient $facture)
+    {
+        // Chargement des relations nécessaires
+        $facture->load([
+            'client',
+            'lignes.article',
+            'lignes.uniteVente',
+            'createdBy',
+            'validatedBy'
+        ]);
+
+        $entete = $request->get("entete");
+
+        $pdf = PDF::loadView('pages.ventes.facture.partials.bordereau-livraison', compact('facture','entete'));
+        $pdf->setPaper('a4');
+
+        return $pdf->stream("bordereau_{$facture->numero}.pdf");
     }
 
     /**
@@ -893,7 +938,7 @@ class FactureClientController extends Controller
      * @return JsonResponse
      */
 
-    public function getDetailsFacture(FactureClient $facture): JsonResponse
+    public function getDetailsFacture(FactureClient $facture)
     {
         // Changement dans le chargement des relations
         $facture->load([

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <style>
@@ -10,19 +11,23 @@
             margin: 0;
             padding: 20px;
         }
+
         .header {
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid #eee;
         }
+
         .company-info {
             float: left;
             width: 60%;
         }
+
         .company-info h2 {
             color: #2c3e50;
             margin-bottom: 10px;
         }
+
         .invoice-details {
             float: right;
             width: 35%;
@@ -30,52 +35,69 @@
             padding: 15px;
             border-radius: 5px;
         }
+
         .invoice-details h1 {
             color: #2c3e50;
             margin: 0 0 15px 0;
             font-size: 24px;
         }
+
         .client-info {
             background: #f8f9fa;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
         }
+
         th {
             background: #2c3e50;
             color: white;
             padding: 10px;
             font-size: 11px;
         }
+
         td {
             padding: 8px;
             font-size: 11px;
             border: 1px solid #ddd;
         }
+
         tr:nth-child(even) {
             background: #f9f9f9;
         }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
 
         .total-section {
             float: right;
             width: 350px;
             margin-top: 20px;
         }
+
         .total-section table {
             background: #f8f9fa;
         }
+
         .total-section table tr:last-child {
             background: #2c3e50;
             color: white;
         }
-        .clearfix { clear: both; }
+
+        .clearfix {
+            clear: both;
+        }
 
         .footer {
             position: fixed;
@@ -110,41 +132,43 @@
             border-top: 1px dashed #ddd;
             padding-top: 20px;
         }
-
-
     </style>
 
-<style>
-    .normalisation-info {
-        margin-top: 20px;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 5px;
-        text-align: center;
-    }
+    <style>
+        .normalisation-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            text-align: center;
+        }
 
-    .qr-container {
-        text-align: center;
-        margin-top: 15px;
-    }
+        .qr-container {
+            text-align: center;
+            margin-top: 15px;
+        }
 
-    .qr-container svg {
-        width: 100px;
-        height: 100px;
-        margin: 0 auto;
-    }
-</style>
-
-
+        .qr-container svg {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+    </style>
 </head>
+
 <body>
     <div class="header">
         <div class="company-info">
+            @if($logo)
+            <img src="{{public_path('kadjiv.jpeg')}}" width="100" height="70" class="form-control" alt="" srcset="">
+            @else
             <h2>QuincaKadjiv</h2>
+            @endif
+
             {{-- Ajoutez vos informations d'entreprise --}}
             <p>Cotonou - Benin<br>
-               Téléphone: +229 212 345 678<br>
-               Email: contact@QuincaKadjiv.org</p>
+                Téléphone: +229 212 345 678<br>
+                Email: contact@QuincaKadjiv.org</p>
         </div>
 
         <div class="invoice-details">
@@ -257,29 +281,30 @@
         </div>
 
         @if($facture->numero_normalise)
-<div class="normalisation-info">
-    <div style="display: inline-block; text-align: left;">
-        <p style="margin: 5px 0;">
-            <strong>Facture Normalisée</strong><br>
-            N° Compteur: {{ $facture->numero_normalise }}<br>
-            Code: {{ $facture->numero_compteur }}<br>
-            Date Normalisation: {{ $facture->date_normalisation->format('d/m/Y H:i') }}
-        </p>
-    </div>
+        <div class="normalisation-info">
+            <div style="display: inline-block; text-align: left;">
+                <p style="margin: 5px 0;">
+                    <strong>Facture Normalisée</strong><br>
+                    N° Compteur: {{ $facture->numero_normalise }}<br>
+                    Code: {{ $facture->numero_compteur }}<br>
+                    Date Normalisation: {{ $facture->date_normalisation->format('d/m/Y H:i') }}
+                </p>
+            </div>
 
-    <div class="qr-container">
-        {!! QrCode::size(100)
-            ->generate(json_encode([
+            <div class="qr-container">
+                {!! QrCode::size(100)
+                ->generate(json_encode([
                 'Numéro' => $facture->numero_normalise,
                 'UID' => $facture->uid_normalisation,
                 'Date' => $facture->date_normalisation->format('Y-m-d H:i:s'),
                 'Montant' => number_format($facture->montant_ttc, 2),
                 'Client' => $facture->client->raison_sociale
-            ]))
-        !!}
-    </div>
-</div>
-@endif
+                ]))
+                !!}
+            </div>
+        </div>
+        @endif
     </div>
 </body>
+
 </html>

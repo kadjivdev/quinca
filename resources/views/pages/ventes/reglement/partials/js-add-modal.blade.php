@@ -72,8 +72,6 @@
             if (clientId) {
                 const factures = selectedOption.data('factures');
 
-                console.log(factures)
-
                 // Mettre à jour l'affichage
                 factures.forEach(facture => {
                     // console.log(facture)

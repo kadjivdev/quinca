@@ -460,16 +460,6 @@ class BonCommandeController extends Controller
     public function validated(BonCommande $bonCommande)
     {
         try {
-
-            // foreach ($bonCommande->lignes as $ligne) {
-            //     // On ajoute les quantités saisies au stock des articles
-            //     $stock = StockDepot::where(["depot_id" => $bonCommande->programmation->depot, "article_id" => $ligne->article_id])->first();
-
-            //     if ($stock) {
-            //         $stock->update(["quantite_reelle" => $stock->quantite_reelle + $ligne->quantite]);
-            //     }
-            // }
-
             if ($bonCommande->validate()) {
                 return response()->json([
                     'success' => true,

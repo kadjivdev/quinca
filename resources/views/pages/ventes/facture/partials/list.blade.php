@@ -91,13 +91,13 @@
                                 <span class="badge bg-primary"> Livrée </span>
                                 @else
 
-                                    @if($qteLivre < 0 || $qteLivre==0)
+                                @if($qteLivre < 0 || $qteLivre==0)
                                     <span class="badge bg-danger">Non Livrée </span>
                                     @else
                                     <span class="badge bg-info bg-opacity-10 text-info">Livré partiellement({{$qteLivre}})</span>
                                     @endif
 
-                                @endif
+                                    @endif
                             </td>
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
                             <td class="text-end fw-medium">
@@ -189,15 +189,33 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
-                                                <a class="dropdown-item" target="blank"
-                                                    href="{{ route('vente.facture.print', $facture->id) }}">
-                                                    <i class="fas fa-file-invoice me-2"></i>Facture
+                                                <a class="dropdown-item generate-facture-btn" target="blank"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#factureModal"
+                                                    data-type="proforma"
+                                                    onclick="showProforma({{$facture->id}})"
+                                                    href="#">
+                                                    <i class="fas fa-file-alt me-2"></i>Proforma
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item" target="blank"
-                                                    href="{{ route('vente.facture.print', $facture->id) }}">
-                                                    <i class="fas fa-file-alt me-2"></i>Proforma
+                                                <a class="dropdown-item generate-facture-btn" target="blank"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#factureModal"
+                                                    data-type="bon-a-livrer"
+                                                    onclick="showBon({{$facture->id}})"
+                                                    href="#">
+                                                    <i class="fas fa-file-alt me-2"></i>Bon à livrer
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item generate-facture-btn" target="blank"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#factureModal"
+                                                    data-type="bordereau-livraison"
+                                                    onclick="showBordereau({{$facture->id}})"
+                                                    href="#">
+                                                    <i class="fas fa-file-alt me-2"></i>Bordereau de livraison
                                                 </a>
                                             </li>
                                         </ul>
@@ -228,8 +246,58 @@
     </div>
 </div>
 
+<!-- MODAL -->
+<div class="modal fade" id="factureModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="" method="post" id="modalForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-check" id="check-logo">
+                        <input class="form-check-input" name="logo" type="checkbox">
+                        <label class="form-check-label" for="checkIndeterminate">
+                            Voulez-vous afficher le <strong class="text-primary"> logo </strong> kadjiv sur la facture?
+                        </label>
+                    </div>
+                    <div class="form-check d-none" id="check-entete">
+                        <input class="form-check-input" name="entete" type="checkbox">
+                        <label class="form-check-label" for="checkIndeterminate">
+                            Voulez-vous afficher <strong class="text-primary"> l'entête </strong> de kadjiv sur la facture?
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary">Génerer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @push("scripts")
 <script>
+    // PROFORMA
+    async function showProforma(factureId) {
+        $("#check-logo").removeClass("d-none")
+        $("#check-entete").addClass("d-none")
+        $("#modalForm").attr("action", `/vente/factures/${factureId}/print`)
+    }
+
+    // BON DE LIVRAISON
+    async function showBon(factureId) {
+        $("#check-logo").addClass("d-none")
+        $("#check-entete").removeClass("d-none")
+        $("#modalForm").attr("action", `/vente/factures/${factureId}/bon-a-livrer`)
+    }
+
+    // BON DE LIVRAISON
+    async function showBordereau(factureId) {
+        $("#check-logo").addClass("d-none")
+        $("#check-entete").removeClass("d-none")
+        $("#modalForm").attr("action", `/vente/factures/${factureId}/bordereau-livraison`)
+    }
+
+    // 
     $(".__select2").select2({
         theme: 'bootstrap-5',
         width: '100%',
