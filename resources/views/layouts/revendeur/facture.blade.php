@@ -42,7 +42,7 @@
 
 
     <script>
-        var apiUrl = "{{ config('app.url_ajax') }}";
+        var apiUrl = "{{ env('APP_URL') }}";
     </script>
 
     <!-- Page Specific CSS -->

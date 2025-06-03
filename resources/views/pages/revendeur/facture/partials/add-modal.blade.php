@@ -51,10 +51,10 @@
                                                 <select class="form-select" name="client_id" required>
                                                     <option value="">Sélectionner un client</option>
                                                     @foreach ($clients as $client)
-                                                        <option value="{{ $client->id }}"
-                                                            data-taux-aib="{{ $client->taux_aib }}">
-                                                            {{ $client->raison_sociale }}
-                                                        </option>
+                                                    <option value="{{ $client->id }}"
+                                                        data-taux-aib="{{ $client->taux_aib }}">
+                                                        {{ $client->raison_sociale }}
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -109,12 +109,13 @@
                                         <table class="table table-bordered table-hover">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th style="width: 30%">Article</th>
-                                                    <th style="width: 15%">Quantité</th>
-                                                    <th style="width: 20%">Prix</th>
-                                                    <th style="width: 10%">Remise (%)</th>
-                                                    <th style="width: 25%">Total HT</th>
-                                                    <th style="width: 5%"></th>
+                                                    <th>Article</th>
+                                                    <th style="width: 30%">Dépôt</th>
+                                                    <th>Quantité</th>
+                                                    <th>Prix</th>
+                                                    <th>Remise (%)</th>
+                                                    <th>Total HT</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody id="lignesContainer">
@@ -122,46 +123,29 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
+                                                    <td colspan="5" class="text-end fw-bold">Total HT</td>
                                                     <td class="text-end fw-bold" id="totalHT">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">TVA
+                                                    <td colspan="5" class="text-end fw-bold">TVA
                                                         ({{ $tauxTva }}%)</td>
                                                     <td class="text-end fw-bold" id="totalTVA">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">AIB</td>
+                                                    <td colspan="5" class="text-end fw-bold">AIB</td>
                                                     <td class="text-end fw-bold" id="totalAIB">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr class="table-light">
-                                                    <td colspan="4" class="text-end fw-bold">Total TTC</td>
+                                                    <td colspan="5" class="text-end fw-bold">Montant TTC</td>
                                                     <td class="text-end fw-bold" id="totalTTC">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                             </tfoot>
                                         </table>
                                     </div>
-                                    {{-- <div class="col-md-3">
-                                        <label class="form-label fw-medium required">Magasin</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white">
-                                                <i class="fas fa-user text-primary"></i>
-                                            </span>
-                                            <select class="form-select" name="client_id" required>
-                                                <option value="">Sélectionner un magasin</option>
-                                                @foreach ($depots as $depot)
-                                                    <option value="{{ $depot->id }}">
-                                                        {{ $depot->libelle_depot }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="invalid-feedback">Le magasin est requis</div>
-                                    </div> --}}
                                 </div>
                             </div>
                         </div>
@@ -292,6 +276,11 @@
             <div class="invalid-feedback">L'article est requis</div>
         </td>
         <td>
+            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
+            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
+            <div class="invalid-feedback">Le depôt est requis</div>
+        </td>
+        <td>
             <div class="input-group">
                 <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
                     placeholder="0.00" required min="0.01" step="0.01">
@@ -302,8 +291,13 @@
             <div class="invalid-feedback">La quantité est requise</div>
         </td>
         <td>
-            <input type="number" class="form-control text-end select2-tarifs"
-                name="lignes[__INDEX__][tarification_id]" placeholder="0.00" required min="0.01" step="0.01">
+            <input type="number"
+                class="form-control text-end select2-tarifs"
+                name="lignes[__INDEX__][tarification_id]"
+                placeholder="0.00"
+                required
+                min="0.01"
+                step="0.01">
             <div class="invalid-feedback">Le prix est requis</div>
         </td>
         <td>

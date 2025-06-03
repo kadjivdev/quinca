@@ -32,7 +32,7 @@
 
         // Faire la requête AJAX
         $.ajax({
-            url: `${apiUrl}/revendeur/factures/${id}`,
+            url: `${apiUrl}/revendeurs/factures/${id}`,
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

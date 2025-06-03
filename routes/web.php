@@ -721,6 +721,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{id}/validate', [FactureClientController::class, 'validateFacture'])->name('vente.facture.validate');
             Route::delete('/{id}/delete', [FactureClientController::class, 'destroy'])->name('vente.facture.delete');
 
+            // GESTION DES FACTURES
             Route::post('/{facture}/print', [FactureClientController::class, 'print'])->name('vente.facture.print');
             Route::post('/{facture}/bon-a-livrer', [FactureClientController::class, 'bonALivrer'])->name('vente.bonALivrer');
             Route::post('/{facture}/bordereau-livraison', [FactureClientController::class, 'bordereauLivraison'])->name('vente.bordereauLivraison');
@@ -890,6 +891,11 @@ Route::middleware('auth')->group(function () {
                 Route::get('/{articleId}/tarifs', [FactureRevendeurController::class, 'getTarifs']);
                 Route::get('/{articleId}/unites', [FactureRevendeurController::class, 'getUnites']);
             });
+
+            // GESTION DES FACTURES
+            Route::post('/{facture}/print', [FactureRevendeurController::class, 'print'])->name('vente.facture.print');
+            Route::post('/{facture}/bon-a-livrer', [FactureRevendeurController::class, 'bonALivrer'])->name('vente.bonALivrer');
+            Route::post('/{facture}/bordereau-livraison', [FactureRevendeurController::class, 'bordereauLivraison'])->name('vente.bordereauLivraison');
 
             Route::post('/{id}/validate', [FactureRevendeurController::class, 'validateFacture'])->name('revendeur.facture.validate');
             Route::delete('/{id}/delete', [FactureRevendeurController::class, 'destroy'])->name('revendeur.facture.delete');

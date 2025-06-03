@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\parametre;
 
 use App\Http\Controllers\Controller;
-use App\Models\parametre\Depot;
+use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
 use App\Models\parametre\TypeDepot;
 use Illuminate\Http\Request;
@@ -20,10 +20,13 @@ class DepotController extends Controller
 
     public function index()
     {
-        $depots = Depot::with(['pointsVente', 'typeDepot'])->get()->map(function ($depot) {
-            $depot->inventaires = $depot->inventaires();
-            return $depot;
-        });
+        $depots = Depot::with(['pointsVente', 'typeDepot'])->get()
+            ->map(function ($depot) {
+                $depot->inventaires = $depot->inventaires();
+                return $depot;
+            });
+
+
         $typesDepot = TypeDepot::all();
 
         // Debug des types de magasin

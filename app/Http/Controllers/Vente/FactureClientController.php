@@ -34,6 +34,7 @@ class FactureClientController extends Controller
     {
         $this->serviceStockEntree = $serviceStockEntree;
     }
+    
     public function index(Request $request)
     {
         try {

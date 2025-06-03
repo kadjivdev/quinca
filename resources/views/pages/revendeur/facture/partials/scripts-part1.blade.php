@@ -1,3 +1,4 @@
+
 'use strict';
 
 // Configuration centralisée
@@ -12,12 +13,12 @@ const FactureConfig = {
         totalTVA: '#totalTVA',
         totalTTC: '#totalTTC',
         totalAIB: '#totalAIB',
-        montantRegle: '#montantRegle',
-        montantRestant: '#montantRestant',
-        messageRestant: '#messageRestant',
-        typeFacture: '#type_facture',
-        tvaRow: '#tvaRow',
-        aibRow: '#aibRow'
+    montantRegle: '#montantRegle',
+    montantRestant: '#montantRestant',
+    messageRestant: '#messageRestant',
+    typeFacture: '#type_facture',
+    tvaRow: '#tvaRow',
+    aibRow: '#aibRow'
     },
     classes: {
         ligne: 'ligne-facture',
@@ -29,10 +30,6 @@ const FactureConfig = {
         totalLigne: 'total-ligne'
     },
     routes: {
-        {{-- articlesSearch: 'ventes-speciales/api/articles/search',
-        getTarifs: (id) => `ventes-speciales/articles/${id}/tarifs`,
-        getUnites: (id) => `ventes-speciales/articles/${id}/unites`,
-        store: 'ventes-speciales/store' --}}
         articlesSearch: `${apiUrl}/revendeurs/factures/api/articles/search`,
         getTarifs: (id) => `${apiUrl}/revendeurs/factures/articles/${id}/tarifs`,
         getUnites: (id) => `${apiUrl}/revendeurs/factures/articles/${id}/unites`,
@@ -186,7 +183,7 @@ class FactureManager {
             montantRestantElement.removeClass('text-success text-warning').addClass('text-danger');
         } else if (montantRestant < 0) {
             messageRestant.text('Trop perçu à retourner');
-            messageRestant.removeClass('text-danger  text-warning').addClass('text-success');
+            messageRestant.removeClass('text-danger text-warning').addClass('text-success');
             montantRestantElement.removeClass('text-danger text-warning').addClass('text-success');
         } else {
             messageRestant.text('Intégralement réglé');
@@ -194,12 +191,15 @@ class FactureManager {
             montantRestantElement.removeClass('text-danger text-warning').addClass('text-success');
         }
     }
-    async
-    initTarifSelect(row, index) {
-        const tarifSelect = row.find(`select[name="lignes[${index}][tarification_id]" ]`);
+
+
+    async initTarifSelect(row, index) {
+        const tarifSelect = row.find(`select[name="lignes[${index}][tarification_id]"]`);
+
         if (tarifSelect.hasClass('select2-hidden-accessible')) {
             tarifSelect.select2('destroy');
         }
+
         tarifSelect.select2({
             theme: 'bootstrap-5',
             width: '100%',
@@ -208,20 +208,13 @@ class FactureManager {
             allowClear: true
         }).on('change', () => {
             // Utiliser handleCalculations au lieu de updateRowCalculations
-            this.handleCalculations({
-                target: tarifSelect[0]
-            });
+            this.handleCalculations({ target: tarifSelect[0] });
         });
     }
 
 
     initEvents() {
-        const {
-            addButton,
-            ligneContainer,
-            form,
-            modal
-        } = FactureConfig.selectors;
+        const {addButton, ligneContainer, form, modal} = FactureConfig.selectors;
 
         // Nettoyage et réinitialisation des événements
         $(document).off('click', addButton).on('click', addButton, () => this.addLigne());
@@ -292,60 +285,60 @@ class FactureManager {
 
     async initArticleSelect(row, index) {
         const articleSelect = row.find(`select[name="lignes[${index}][article_id]"]`);
-
+       
         if (articleSelect.hasClass('select2-hidden-accessible')) {
             articleSelect.select2('destroy');
         }
 
         articleSelect.select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                dropdownParent: $('#addFactureModal'),
-                placeholder: 'Rechercher un article...',
-                allowClear: true,
-                ajax: {
-                    url: FactureConfig.routes.articlesSearch,
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function(data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.results,
-                            pagination: {
-                                more: data.pagination?.more
-                            }
-                        };
-                    },
-                    cache: true
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('#addFactureModal'),
+            placeholder: 'Rechercher un article...',
+            allowClear: true,
+            ajax: {
+                url: FactureConfig.routes.articlesSearch,
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term,
+                        page: params.page || 1
+                    };
                 },
-                minimumInputLength: 1,
-                templateResult: this.formatArticle,
-                templateSelection: this.formatArticleSelection,
-                escapeMarkup: markup => markup
-            }).on('select2:select', (e) => this.loadArticleDetails(index, e.target.value))
-            .on('select2:open', function() {
-                document.querySelector('.select2-search__field').focus();
-            });
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination?.more
+                        }
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            templateResult: this.formatArticle,
+            templateSelection: this.formatArticleSelection,
+            escapeMarkup: markup => markup
+        }).on('select2:select', (e)=> this.loadArticleDetails(index, e))
+        .on('select2:open', function() {
+            document.querySelector('.select2-search__field').focus();
+        });
     }
 
     formatArticle(article) {
         if (article.loading) return article.text;
         return `<div class="select2-result-article">
-        <div class="select2-result-article__code">${article.code_article || ''}</div>
-        <div class="select2-result-article__title">${article.text || ''}</div>
-        <div class="select2-result-article__stock">Stock: ${article.stock || 0}</div>
-    </div>`;
+                    <div class="select2-result-article__code">${article.code_article || ''}</div>
+                    <div class="select2-result-article__title">${article.text || ''}</div>
+                    <div class="select2-result-article__stock">Stock: ${article.depot.libelle_depot} (${article.stock})</div>
+                </div>`;
     }
 
     formatArticleSelection(article) {
         if (!article.id) return article.text;
-        return `${article.code_article} - ${article.text}`;
+        return `${article.text}`;
     }
 
     async initTarifSelect(row, index) {
@@ -375,17 +368,25 @@ class FactureManager {
             theme: 'bootstrap-5',
             width: '100%',
             dropdownParent: $('#addFactureModal'),
-            {{-- {
-                {
-                    --placeholder: 'Sélectionner une unité', --
-                }
-            } --}}
+            {{-- placeholder: 'Sélectionner une unité', --}}
             allowClear: true
         });
     }
 
-    async loadArticleDetails(index, articleId) {
+    async loadArticleDetails(index, e) {
+        const articleId = e.target.value;
         const row = $(`select[name="lignes[${index}][article_id]"]`).closest('tr');
+
+        <!-- gestion des depots -->
+        const depotSelect = document.querySelector(`input[name="lignes[${index}][depot_id]"]`);
+        const depotQuantite = document.querySelector(`input[name="lignes[${index}][quantite]"]`);
+        const depotLibelle = document.querySelector(`input[name="lignes[${index}][depot_libelle]"]`);
+
+        const data = e.params.data
+        depotSelect.value = data.depot.id;
+        depotLibelle.value =`${data.depot.libelle_depot} | stock: ${data.stock} ${data.unite_mesure.libelle_unite} `;
+        depotQuantite.min = 0
+        <!-- fin -->
 
         try {
             this.showRowLoading(row);
@@ -438,13 +439,8 @@ class FactureManager {
         }
 
         // Mise à jour des unités
-        const uniteSelect = row.find(`select[name="lignes[${index}][unite_vente_id]"]`); 
-        {{-- {
-            {
-                --uniteSelect.empty().append('<option value="">Sélectionner une unité</option>');
-                --
-            }
-        } --}}
+        const uniteSelect = row.find(`select[name="lignes[${index}][unite_vente_id]"]`);
+        {{-- uniteSelect.empty().append('<option value="">Sélectionner une unité</option>'); --}}
 
         if (unitesData?.data?.unites) {
             unitesData.data.unites.forEach(unite => {
@@ -479,26 +475,35 @@ class FactureManager {
             if (quantite <= 0 || prix <= 0) {
                 row.find('.total-ligne').val(this.formatMoney(0));
                 return 0;
-            } // Calcul du total HT avec remise 
-            const montantBrut=quantite * prix; const montantRemise=(remise> 0 && remise <= 100) ? montantBrut * (remise / 100) : 0; 
+            }
+
+            // Calcul du total HT avec remise
+            const montantBrut = quantite * prix;
+            const montantRemise = (remise > 0 && remise <= 100) ? montantBrut * (remise / 100) : 0;
             const totalHT = FactureUtils.roundNumber(montantBrut - montantRemise);
+
             row.find('.total-ligne').val(this.formatMoney(totalHT));
             return totalHT;
+
         } catch (error) {
             console.error('Erreur calcul total:', error);
             row.find('.total-ligne').val(this.formatMoney(0));
             return 0;
         }
     }
+
+
+
     updateTotaux() {
         let totalHT = 0;
         let totalTVA = 0;
-        let totalAIB = 0; // Récupération du taux AIB du client sélectionné 
-        const clientSelect = $('select[name="client_id" ]');
-        const
-            selectedOption = clientSelect.find(':selected');
-        const tauxAib = selectedOption.length ?
-            FactureUtils.parseNumber(selectedOption.data('taux-aib')) : 0;
+        let totalAIB = 0;
+
+        // Récupération du taux AIB du client sélectionné
+        const clientSelect = $('select[name="client_id"]');
+        const selectedOption = clientSelect.find(':selected');
+        const tauxAib = selectedOption.length ? FactureUtils.parseNumber(selectedOption.data('taux-aib')) : 0;
+
         $(FactureConfig.selectors.ligneContainer).find('tr').each((_, row) => {
             const $row = $(row);
             const montantHT = FactureUtils.parseNumber($row.find('.total-ligne').val());
@@ -508,7 +513,9 @@ class FactureManager {
             // Ne calculer TVA et AIB que si la facture est normalisée
             if (this.isNormalized) {
                 totalTVA += FactureUtils.roundNumber(montantHT * (FactureConfig.TVA.rate / 100));
-                totalAIB += FactureUtils.roundNumber(montantHT * (tauxAib / 100));
+                <!-- l'ancienne façon de faire -->
+                <!-- totalAIB += FactureUtils.roundNumber(montantHT * (tauxAib / 100)); -->
+                totalAIB += FactureUtils.roundNumber(montantHT  / 100);
             }
         });
 
@@ -714,44 +721,51 @@ class FactureManager {
             errors.push("La quantité doit être supérieure à 0");
             isValid = false;
         }
+
         if (!tarif) {
             errors.push("Veuillez sélectionner un tarif");
             isValid = false;
         }
+
         if (!unite) {
             errors.push("Veuillez sélectionner une unité");
             isValid = false;
         }
-        return {
-            isValid,
-            errors
-        };
+
+        return { isValid, errors };
     }
+
     validateForm() {
         let isValid = true;
-        let errors = []; // Validation des champs obligatoires du header const
-        dateFacture = $(FactureConfig.selectors.form).find('input[name="date_facture" ]').val();
-        const
-            client = $(FactureConfig.selectors.form).find('select[name="client_id" ]').val();
-        const
-            dateEcheance = $(FactureConfig.selectors.form).find('input[name="date_echeance" ]').val();
+        let errors = [];
+
+        // Validation des champs obligatoires du header
+        const dateFacture = $(FactureConfig.selectors.form).find('input[name="date_facture"]').val();
+        const client = $(FactureConfig.selectors.form).find('select[name="client_id"]').val();
+        const dateEcheance = $(FactureConfig.selectors.form).find('input[name="date_echeance"]').val();
+
         if (!dateFacture) {
             errors.push("La date de facture est obligatoire");
             isValid = false;
         }
+
         if (!client) {
             errors.push("Le client est obligatoire");
             isValid = false;
         }
+
         if (!dateEcheance) {
             errors.push("La date d'échéance est obligatoire");
             isValid = false;
-        } //Validation des lignes const
-        rows = $(FactureConfig.selectors.ligneContainer).find('tr');
+        }
+
+        // Validation des lignes
+        const rows = $(FactureConfig.selectors.ligneContainer).find('tr');
         if (rows.length === 0) {
             errors.push("Ajoutez au moins une ligne à la facture");
             isValid = false;
         }
+
         rows.each((_, row) => {
             const rowValidation = this.validateRow($(row));
             if (!rowValidation.isValid) {
@@ -760,78 +774,73 @@ class FactureManager {
             }
         });
 
-        return {
-            isValid,
-            errors
-        };
+        return { isValid, errors };
     }
 }
 
 // Style supplémentaires pour l'UI
 const styles = `
-                .ligne-facture {
-                transition: all 0.3s ease;
-                }
+    .ligne-facture {
+        transition: all 0.3s ease;
+    }
 
-                .ligne-facture.loading {
-                opacity: 0.6;
-                pointer-events: none;
-                position: relative;
-                }
+    .ligne-facture.loading {
+        opacity: 0.6;
+        pointer-events: none;
+        position: relative;
+    }
 
-                .ligne-facture.loading::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(255, 255, 255, 0.7) url('data:image/svg+xml,...') center no-repeat;
-                background-size: 30px;
-                }
+    .ligne-facture.loading::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.7) url('data:image/svg+xml,...') center no-repeat;
+        background-size: 30px;
+    }
 
-                .select2-container--bootstrap-5 .select2-selection {
-                border-radius: 0.375rem;
-                border-color: #ced4da;
-                }
+    .select2-container--bootstrap-5 .select2-selection {
+        border-radius: 0.375rem;
+        border-color: #ced4da;
+    }
 
-                .was-validated .select2-container--bootstrap-5 .select2-selection--single {
-                border-color: #dc3545;
-                }
+    .was-validated .select2-container--bootstrap-5 .select2-selection--single {
+        border-color: #dc3545;
+    }
 
-                .was-validated .valid.select2-container--bootstrap-5 .select2-selection--single {
-                border-color: #198754;
-                }
+    .was-validated .valid.select2-container--bootstrap-5 .select2-selection--single {
+        border-color: #198754;
+    }
 
-                .select2-container--bootstrap-5 .select2-results__option--highlighted {
-                background-color: #e9ecef;
-                color: #1e2125;
-                }
+    .select2-container--bootstrap-5 .select2-results__option--highlighted {
+        background-color: #e9ecef;
+        color: #1e2125;
+    }
 
-                .select2-result-article {
-                padding: 8px;
-                }
+    .select2-result-article {
+        padding: 8px;
+    }
 
-                .select2-result-article__code {
-                font-size: 0.875rem;
-                color: #6c757d;
-                }
+    .select2-result-article__code {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
 
-                .select2-result-article__title {
-                font-weight: 500;
-                margin: 4px 0;
-                }
+    .select2-result-article__title {
+        font-weight: 500;
+        margin: 4px 0;
+    }
 
-                .select2-result-article__stock {
-                font-size: 0.875rem;
-                color: #198754;
-                }
-                `;
+    .select2-result-article__stock {
+        font-size: 0.875rem;
+        color: #198754;
+    }
+`;
 
 // Injection des styles
-$('<style>').text(styles).appendTo(' head');
-
-
+$('<style>').text(styles).appendTo('head');
 
 // Initialisation unique
 $(document).ready(() => {
@@ -840,61 +849,3 @@ $(document).ready(() => {
         window.factureManager.init();
     }
 });
-
-function deleteFacture(id) {
-    Swal.fire({
-        title: 'Êtes-vous sûr?',
-        text: "Cette action est irréversible!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui, supprimer!',
-        cancelButtonText: 'Annuler'
-
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Récupérer le token CSRF
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-
-            // Envoyer la requête de suppression
-            fetch(`${apiUrl}/revendeurs/factures/$ {
-                                        id
-                                    }
-
-                                    `, {
-
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': token,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-
-            }).then(response => response.json()).then(data => {
-                if (data.status === 'success') {
-                    Swal.fire('Supprimé!',
-                        data.message,
-                        'success'
-
-                    ).then(() => {
-                        // Recharger la page ou mettre à jour la liste
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire('Erreur!',
-                        data.message,
-                        'error'
-                    );
-                }
-
-            }).catch(error => {
-                Swal.fire('Erreur!',
-                    'Une erreur est survenue lors de la suppression',
-                    'error'
-                );
-                console.error('Erreur:', error);
-            });
-        }
-    });
-}

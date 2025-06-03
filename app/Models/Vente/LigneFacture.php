@@ -81,8 +81,6 @@ class LigneFacture extends Model
         return $this->belongsTo(Depot::class, "depot");
     }
 
-
-
     // Convertit la quantité de l'unité de vente vers l'unité de base
     public function convertirEnUniteBase(float $quantite): float
     {

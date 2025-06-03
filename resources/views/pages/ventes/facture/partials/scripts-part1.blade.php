@@ -31,7 +31,6 @@ const FactureConfig = {
     },
     routes: {
         articlesSearch: `${apiUrl}/vente/factures/api/articles/search`,
-        searchDepots: `${apiUrl}/vente/factures/api/articles/depots/search`,
         getTarifs: (id) => `${apiUrl}/vente/factures/articles/${id}/tarifs`,
         getUnites: (id) => `${apiUrl}/vente/factures/articles/${id}/unites`,
         store: `${apiUrl}/vente/factures/store`

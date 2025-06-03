@@ -52,8 +52,10 @@
     @include('pages.revendeur.facture.partials.add-reg-modal')
 @endsection
 
-@push('scripts')
 @include('pages.revendeur.facture.partials.js-validate')
+@include('pages.revendeur.facture.partials.js-show-modal')
+
+@push('scripts')
 
 <script type="text/javascript">
     // Attendre que jQuery soit chargé
