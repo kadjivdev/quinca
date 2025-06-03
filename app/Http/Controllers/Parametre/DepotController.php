@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\parametre;
+namespace App\Http\Controllers\Parametre;
 
 use App\Http\Controllers\Controller;
 use App\Models\Parametre\Depot;
