@@ -4,8 +4,8 @@ namespace App\Models\Parametre;
 
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\Inventaire;
-use App\Models\parametre\PointDeVente;
-use App\Models\parametre\TypeDepot;
+use App\Models\Parametre\PointDeVente;
+use App\Models\Parametre\TypeDepot;
 use App\Models\Stock\StockDepot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

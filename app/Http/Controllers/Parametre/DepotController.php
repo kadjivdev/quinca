@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Parametre;
 use App\Http\Controllers\Controller;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
-use App\Models\parametre\TypeDepot;
+use App\Models\Parametre\TypeDepot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
