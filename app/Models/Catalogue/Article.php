@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use App\Models\Stock\StockDepot;
 use App\Models\Parametre\UniteMesure;
+use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Vente\DevisDetail;
 use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -153,7 +154,7 @@ class Article extends Model
     }
 
     /**
-     * Qte vendue dans un depot
+     * Qte vendue client dans un depot
      */
     function facturesVente($depotId = null)
     {
@@ -168,41 +169,81 @@ class Article extends Model
     }
 
     /**
-     * Calcul du reste de stock de l'article dans un depot
+     * Qte vendue revendeur dans un depot
+     */
+    function facturesVenteRevendeur($depotId = null)
+    {
+        return $this->hasMany(LigneFactureRevendeur::class, "article_id")->where("depot", $depotId)
+            ->get()->filter(function ($vente) {
+                if ($vente->factureRevendeur) {
+                    if ($vente->factureRevendeur->validated_by) {
+                        return $vente; // facture validées
+                    }
+                }
+            });
+    }
+
+    /**
+     * Calcul de la quantité vendue (vente client, vente revendeurs, vente speciale) de l'article dans un depot
      */
 
-    function reste($depotId = null)
+    function qteVendu($depotId = null)
     {
         // on recupere le stock de cet article dans ce dépot
         $stock = $this->stocks->firstWhere("depot_id", $depotId);
 
         $serviceStockEntree = new ServiceStockEntree();
 
-        $factureVente = $this->facturesVente($depotId)
-            ->first();
+        $factureVente = $this->facturesVente($depotId);
+        $factureRevendeur = $this->facturesVenteRevendeur($depotId);
 
-        if (!$factureVente) {
-            return $stock->quantite_reelle;
+        $qteVenteConvertie = 0;
+        if ($factureVente->isEmpty() && $factureRevendeur->isEmpty()) {
+            $qteVenteConvertie = 0;
         }
 
-        /**Conversion qteVendu */
-        $conversion = $serviceStockEntree
-            ->rechercherConversion(
-                $factureVente->unite_vente_id,
-                $stock->unite_mesure_id,
-                $stock->article_id
-            );
+        /**Conversion qteVendu Client*/
+        if ($factureVente->isNotEmpty()) {
+            $conversion = $serviceStockEntree
+                ->rechercherConversion(
+                    $factureVente->first()->unite_vente_id,
+                    $stock->unite_mesure_id,
+                    $stock->article_id
+                );
 
-        $qteVenteConvertie = $serviceStockEntree
-            ->convertirQuantite($factureVente->quantite, $conversion, $stock->unite_mesure_id);
+            $qteVenteConvertie += $serviceStockEntree
+                ->convertirQuantite($factureVente->sum("quantite"), $conversion, $stock->unite_mesure_id);
+        }
 
-        return $stock->quantite_reelle - $qteVenteConvertie;
+        /**Conversion qteVendu Revendeur*/
+        if ($factureRevendeur->isNotEmpty()) {
+            $conversion = $serviceStockEntree
+                ->rechercherConversion(
+                    $factureRevendeur->first()->unite_vente_id,
+                    $stock->unite_mesure_id,
+                    $stock->article_id
+                );
+
+            $qteVenteConvertie += $serviceStockEntree
+                ->convertirQuantite($factureRevendeur->sum("quantite"), $conversion, $stock->unite_mesure_id);
+        }
+
+        return $qteVenteConvertie;
+    }
+
+    /**
+     * Calcul du reste de stock de l'article dans un depot
+     */
+    function reste($depotId = null)
+    {
+        // on recupere le stock de cet article dans ce dépot
+        $stock = $this->stocks->firstWhere("depot_id", $depotId);
+        return $stock->quantite_reelle - $this->qteVendu($depotId);
     }
 
     /**
      * Filtre les articles actifs
      */
-
     public function scopeActif(Builder $query): Builder
     {
         return $query->where('statut', self::STATUT_ACTIF);

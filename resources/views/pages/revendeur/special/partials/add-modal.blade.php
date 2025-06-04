@@ -113,6 +113,7 @@
                                             <thead class="table-light">
                                                 <tr>
                                                     <th style="width: 30%">Article</th>
+                                                    <th style="width: 15%">Dépôt</th>
                                                     <th style="width: 15%">Quantité</th>
                                                     <th style="width: 20%">Prix</th>
                                                     <th style="width: 10%">Remise (%)</th>
@@ -125,23 +126,23 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
+                                                    <td colspan="5" class="text-end fw-bold">Total HT</td>
                                                     <td class="text-end fw-bold" id="totalHT">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">TVA
+                                                    <td colspan="5" class="text-end fw-bold">TVA
                                                         ({{ $tauxTva }}%)</td>
                                                     <td class="text-end fw-bold" id="totalTVA">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">AIB</td>
+                                                    <td colspan="5" class="text-end fw-bold">AIB</td>
                                                     <td class="text-end fw-bold" id="totalAIB">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr class="table-light">
-                                                    <td colspan="4" class="text-end fw-bold">Total TTC</td>
+                                                    <td colspan="5" class="text-end fw-bold">Total TTC</td>
                                                     <td class="text-end fw-bold" id="totalTTC">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
@@ -163,7 +164,7 @@
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label fw-medium required">Montant réglé</label>
+                                            <!-- <label class="form-label fw-medium required">Montant réglé</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-money-bill text-primary"></i>
@@ -171,7 +172,7 @@
                                                 <input type="number" class="form-control" name="montant_regle"
                                                     id="montantRegle" required min="0" step="0.01">
                                                 <span class="input-group-text">FCFA</span>
-                                            </div>
+                                            </div> -->
 
                                             <div id="champsBancaires" class="row g-3 mt-0" style="display: none;">
                                                 <div class="col-md-12">
@@ -278,6 +279,11 @@
             <div class="invalid-feedback">L'article est requis</div>
         </td>
         <td>
+            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
+            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
+            <div class="invalid-feedback">Le depôt est requis</div>
+        </td>
+        <td>
             <div class="input-group">
                 <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
                     placeholder="0.00" required min="0.01" step="0.01">
@@ -288,8 +294,13 @@
             <div class="invalid-feedback">La quantité est requise</div>
         </td>
         <td>
-            <input type="number" class="form-control text-end select2-tarifs"
-                name="lignes[__INDEX__][tarification_id]" placeholder="0.00" required min="0.01" step="0.01">
+            <input type="number"
+                class="form-control text-end select2-tarifs"
+                name="lignes[__INDEX__][tarification_id]"
+                placeholder="0.00"
+                required
+                min="0.01"
+                step="0.01">
             <div class="invalid-feedback">Le prix est requis</div>
         </td>
         <td>
@@ -309,8 +320,6 @@
         </td>
     </tr>
 </template>
-
-
 
 @push("scripts")
 <script>

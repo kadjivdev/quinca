@@ -146,7 +146,7 @@ class FactureRevendeurController extends Controller
                 'date_facture' => 'required|date',
                 'client_id' => 'required|exists:clients,id',
                 'date_echeance' => 'date',
-                'montant_regle' => 'required|numeric|min:0',
+                // 'montant_regle' => 'required|numeric|min:0',
                 'moyen_reglement' => 'required|string',
 
                 'lignes' => 'required|array|min:1',
@@ -166,6 +166,8 @@ class FactureRevendeurController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
+
+            $request->montant_regle = 0;
 
             /**
              * on verifie si les articles selectionnés
@@ -235,12 +237,12 @@ class FactureRevendeurController extends Controller
                 }
             }
 
-
             DB::beginTransaction();
 
             try {
                 // Création de la facture
                 $facture = new FactureRevendeur();
+
                 $facture->fill([
                     'date_facture' => Carbon::parse($request->date_facture)->startOfDay(),
                     'client_id' => $request->client_id,
@@ -258,6 +260,7 @@ class FactureRevendeurController extends Controller
                     'taux_aib' => $request->type_facture === 'simple' ? 0 : $client->taux_aib,
                     'type_vente' => 'normale'
                 ]);
+
                 $facture->save();
 
                 $totalHT = 0;
@@ -687,89 +690,121 @@ class FactureRevendeurController extends Controller
         }
     }
 
+    // public function validateFacture($id)
+    // {
+    //     try {
+    //         DB::beginTransaction();
+
+    //         $facture = FactureRevendeur::with(['client', 'lignes.article'])
+    //             ->findOrFail($id);
+
+    //         if ($facture->statut === 'validee') {
+    //             throw new Exception('Facture déjà validée');
+    //         }
+
+    //         foreach ($facture->lignes as $data) {
+    //             if ($data['quantite'] > 0) {
+
+    //                 // Conversion en unité de base si nécessaire
+    //                 $article = Article::findOrFail($data->article_id);
+    //                 $quantiteBase = $data['quantite'];
+
+    //                 if ($data['unite_vente_id'] != $article->unite_mesure_id) {
+    //                     $conversion = ConversionUnite::where([
+    //                         'unite_source_id' => $data->unite_vente_id,
+    //                         'unite_dest_id' => $article->unite_mesure_id,
+    //                         'article_id' => $article->id,
+    //                         'statut' => true
+    //                     ])->first();
+
+    //                     if (!$conversion) {
+    //                         throw new Exception(
+    //                             "Pas de conversion trouvée pour l'article " . $article->designation
+    //                         );
+    //                     }
+
+    //                     $quantiteBase = $conversion->convertir($data['quantite']);
+    //                 }
+
+    //                 $depot = Depot::where('point_de_vente_id', auth()->user()->point_de_vente_id)->first();
+
+    //                 // Vérifier le stock disponible
+    //                 $stock = StockDepot::where([
+    //                     'article_id' => $data->article_id,
+    //                     'depot_id' => $depot->id
+    //                 ])->first();
+
+    //                 if (!$stock || $stock->quantite_reelle < $data->quantite_base) {
+    //                     throw new Exception(
+    //                         "Stock insuffisant pour l'article {$data->article->designation} " .
+    //                             "(Demandé: {$data->quantite_base}, Disponible: " .
+    //                             ($stock ? $stock->quantite_reelle : 0) . ")"
+    //                     );
+    //                 }
+
+    //                 // Créer le mouvement de sortie
+    //                 $mouvementSortie = $this->serviceStockSortie->traiterSortieStock([
+    //                     'date_mouvement' => $facture->date_facture,
+    //                     'depot_id' => $depot->id,
+    //                     'article_id' => $data->article_id,
+    //                     'unite_mesure_id' => $article->unite_mesure_id,
+    //                     'quantite' => $quantiteBase,
+    //                     'reference_mouvement' => ' ',
+    //                     'document_type' => 'LIVRAISON_CLIENT',
+    //                     'document_id' => $facture->id,
+    //                     'user_id' => auth()->id(),
+    //                     'notes' => "Facture client #{$facture->numero}"
+    //                 ]);
+
+    //                 if (!$mouvementSortie['succes']) {
+    //                     throw new Exception($mouvementSortie['message']);
+    //                 }
+
+    //                 // Associer le mouvement à la ligne
+    //                 $data->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
+    //                 $data->save();
+    //             }
+    //         }
+
+    //         $updateData = [
+    //             'date_validation' => now(),
+    //             'validated_by' => auth()->id(),
+    //             'statut' => 'validee'
+    //         ];
+
+    //         $facture->update($updateData);
+
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'message' => 'Facture validée',
+    //             'data' => ['facture' => $facture->fresh(['client', 'createdBy'])]
+    //         ]);
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Erreur validation facture', [
+    //             'facture_id' => $id,
+    //             'error' => $e->getMessage(),
+    //             'trace' => $e->getTraceAsString()
+    //         ]);
+
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function validateFacture($id)
     {
         try {
             DB::beginTransaction();
 
-            $facture = FactureRevendeur::with(['client', 'lignes.article'])
-                ->findOrFail($id);
+            $facture = FactureRevendeur::findOrFail($id);
 
             if ($facture->statut === 'validee') {
                 throw new Exception('Facture déjà validée');
-            }
-
-            // if (!$facture->peutEtreLivree()) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => $facture->statut !== 'validee'
-            //             ? 'Cette facture n\'est pas dans un état permettant la livraison'
-            //             : 'Cette facture est déjà totalement livrée'
-            //     ], 422);
-            // }
-
-            foreach ($facture->lignes as $data) {
-                if ($data['quantite'] > 0) {
-
-                    // Conversion en unité de base si nécessaire
-                    $article = Article::findOrFail($data->article_id);
-                    $quantiteBase = $data['quantite'];
-
-                    if ($data['unite_vente_id'] != $article->unite_mesure_id) {
-                        $conversion = ConversionUnite::where([
-                            'unite_source_id' => $data->unite_vente_id,
-                            'unite_dest_id' => $article->unite_mesure_id,
-                            'article_id' => $article->id,
-                            'statut' => true
-                        ])->first();
-
-                        if (!$conversion) {
-                            throw new Exception(
-                                "Pas de conversion trouvée pour l'article " . $article->designation
-                            );
-                        }
-
-                        $quantiteBase = $conversion->convertir($data['quantite']);
-                    }
-
-                    $depot = Depot::where('point_de_vente_id', auth()->user()->point_de_vente_id)->first();
-
-                    // Vérifier le stock disponible
-                    $stock = StockDepot::where([
-                        'article_id' => $data->article_id,
-                        'depot_id' => $depot->id
-                    ])->first();
-
-                    if (!$stock || $stock->quantite_reelle < $data->quantite_base) {
-                        throw new Exception(
-                            "Stock insuffisant pour l'article {$data->article->designation} " .
-                                "(Demandé: {$data->quantite_base}, Disponible: " .
-                                ($stock ? $stock->quantite_reelle : 0) . ")"
-                        );
-                    }
-
-                    // Créer le mouvement de sortie
-                    $mouvementSortie = $this->serviceStockSortie->traiterSortieStock([
-                        'date_mouvement' => $facture->date_facture,
-                        'depot_id' => $depot->id,
-                        'article_id' => $data->article_id,
-                        'unite_mesure_id' => $article->unite_mesure_id,
-                        'quantite' => $quantiteBase,
-                        'reference_mouvement' => ' ',
-                        'document_type' => 'LIVRAISON_CLIENT',
-                        'document_id' => $facture->id,
-                        'user_id' => auth()->id(),
-                        'notes' => "Facture client #{$facture->numero}"
-                    ]);
-
-                    if (!$mouvementSortie['succes']) {
-                        throw new Exception($mouvementSortie['message']);
-                    }
-
-                    // Associer le mouvement à la ligne
-                    $data->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
-                    $data->save();
-                }
             }
 
             $updateData = [
@@ -863,7 +898,9 @@ class FactureRevendeurController extends Controller
         ]);
     }
 
-
+    /**
+     * 
+     */
     public function print(Request $request, FactureRevendeur $facture)
     {
         // Chargement des relations nécessaires
@@ -926,7 +963,7 @@ class FactureRevendeurController extends Controller
 
         return $pdf->stream("bordereau_{$facture->numero}.pdf");
     }
-
+    
 
     public function MakevalidationDaily(Request $request)
     {

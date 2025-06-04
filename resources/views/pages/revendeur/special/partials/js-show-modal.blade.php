@@ -69,120 +69,120 @@
 
         // Contenu HTML
         let contenuHtml = `
-       <div class="row g-4">
-           <!-- Section Client -->
-           <div class="col-md-6">
-               <div class="card border-0 shadow-sm h-100">
-                   <div class="card-body">
-                       <h6 class="fw-bold mb-3">
-                           <i class="fas fa-user-circle text-primary me-2"></i>
-                           Information Client
-                       </h6>
-                       <div class="mb-3">
-                           <label class="text-muted small mb-1">Raison Sociale</label>
-                           <p class="fw-medium mb-0">${facture.client.raison_sociale}</p>
-                       </div>
-                       <div class="mb-3">
-                           <label class="text-muted small mb-1">Contact</label>
-                           <p class="fw-medium mb-0">${facture.client.telephone || 'Non renseigné'}</p>
-                       </div>
-                       <div class="mb-0">
-                           <label class="text-muted small mb-1">AIB Client</label>
-                           <p class="fw-medium mb-0">${data.tauxAIB || 0}%</p>
-                       </div>
-                   </div>
-               </div>
-           </div>
+            <div class="row g-4">
+                <!-- Section Client -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-user-circle text-primary me-2"></i>
+                                Information Client
+                            </h6>
+                            <div class="mb-3">
+                                <label class="text-muted small mb-1">Raison Sociale</label>
+                                <p class="fw-medium mb-0">${facture.client.raison_sociale}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-muted small mb-1">Contact</label>
+                                <p class="fw-medium mb-0">${facture.client.telephone || 'Non renseigné'}</p>
+                            </div>
+                            <div class="mb-0">
+                                <label class="text-muted small mb-1">AIB Client</label>
+                                <p class="fw-medium mb-0">${data.tauxAIB || 0}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-           <!-- Section Détails -->
-           <div class="col-md-6">
-               <div class="card border-0 shadow-sm h-100">
-                   <div class="card-body">
-                       <h6 class="fw-bold mb-3">
-                           <i class="fas fa-info-circle text-primary me-2"></i>
-                           Détails Facture
-                       </h6>
-                       <div class="row g-3">
-                           <div class="col-6">
-                               <label class="text-muted small mb-1">Statut</label>
-                               <div>${getStatusBadge(facture.statut)}</div>
-                           </div>
-                           <div class="col-6">
-                               <label class="text-muted small mb-1">Date Échéance</label>
-                               <p class="fw-medium mb-0">${data.dateEcheance}</p>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
+                <!-- Section Détails -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                Détails Facture
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="text-muted small mb-1">Statut</label>
+                                    <div>${getStatusBadge(facture.statut)}</div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="text-muted small mb-1">Date Échéance</label>
+                                    <p class="fw-medium mb-0">${data.dateEcheance}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-           <!-- Section Taux -->
-           <div class="col-12">
-               <div class="card border-0 shadow-sm">
-                   <div class="card-body">
-                       <h6 class="fw-bold mb-3">
-                           <i class="fas fa-percentage text-primary me-2"></i>
-                           Taux Appliqués
-                       </h6>
-                       <div class="row g-3">
-                           <div class="col-md-4">
-                               <div class="p-3 rounded bg-light">
-                                   <small class="text-muted d-block">TVA</small>
-                                   <span class="fw-bold">${data.tauxTVA}%</span>
-                               </div>
-                           </div>
-                           <div class="col-md-4">
-                               <div class="p-3 rounded bg-light">
-                                   <small class="text-muted d-block">AIB</small>
-                                   <span class="fw-bold">${data.tauxAIB}%</span>
-                                   <i class="fas fa-info-circle ms-2"
-                                      data-bs-toggle="tooltip"
-                                      title="Acompte sur Impôt sur les Bénéfices"></i>
-                               </div>
-                           </div>
-                           <div class="col-md-4">
-                               <div class="p-3 rounded bg-light">
-                                   <small class="text-muted d-block">Remise Moyenne</small>
-                                   <span class="fw-bold">${getMoyenneRemise(facture.lignes)}%</span>
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
+                <!-- Section Taux -->
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-percentage text-primary me-2"></i>
+                                Taux Appliqués
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="p-3 rounded bg-light">
+                                        <small class="text-muted d-block">TVA</small>
+                                        <span class="fw-bold">${data.tauxTVA}%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 rounded bg-light">
+                                        <small class="text-muted d-block">AIB</small>
+                                        <span class="fw-bold">${data.tauxAIB}%</span>
+                                        <i class="fas fa-info-circle ms-2"
+                                            data-bs-toggle="tooltip"
+                                            title="Acompte sur Impôt sur les Bénéfices"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 rounded bg-light">
+                                        <small class="text-muted d-block">Remise Moyenne</small>
+                                        <span class="fw-bold">${getMoyenneRemise(facture.lignes)}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-           <!-- Section Articles -->
-           <div class="col-12">
-               <div class="card border-0 shadow-sm">
-                   <div class="card-body">
-                       <h6 class="fw-bold mb-3">
-                           <i class="fas fa-shopping-cart text-primary me-2"></i>
-                           Articles
-                       </h6>
-                       <div class="table-responsive">
-                           <table class="table table-bordered table-hover mb-0">
-                               <thead class="bg-light">
-                                   <tr>
-                                       <th>Article</th>
-                                       <th class="text-end">Prix Unit. HT</th>
-                                       <th class="text-center">Quantité</th>
-                                       <th class="text-end">Remise</th>
-                                       <th class="text-end">Total HT</th>
-                                   </tr>
-                               </thead>
-                               <tbody>
-                                   ${generateLignesFacture(facture.lignes)}
-                               </tbody>
-                               <tfoot class="bg-light">
-                                   ${generateTotaux(data)}
-                               </tfoot>
-                           </table>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </div>
-   `;
+                <!-- Section Articles -->
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-shopping-cart text-primary me-2"></i>
+                                Articles
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Article</th>
+                                            <th class="text-end">Prix Unit. HT</th>
+                                            <th class="text-center">Quantité</th>
+                                            <th class="text-end">Remise</th>
+                                            <th class="text-end">Total HT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${generateLignesFacture(facture.lignes)}
+                                    </tbody>
+                                    <tfoot class="bg-light">
+                                        ${generateTotaux(data)}
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
 
         $('#factureDetails').html(contenuHtml);
         initTooltips();
@@ -266,13 +266,11 @@
    `;
     }
 
-
     function getMoyenneRemise(lignes) {
         if (!lignes?.length) return '0.00';
         const total = lignes.reduce((sum, l) => sum + (l.taux_remise || 0), 0);
         return formatTaux(total / lignes.length);
     }
-
 
     // Fonctions utilitaires
     function formatMontant(montant) {

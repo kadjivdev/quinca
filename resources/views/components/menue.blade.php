@@ -285,17 +285,17 @@
                         </a></li>
                     @endcan
 
-                    @can('revendeur.normale.rapport.view')
+                    <!-- @can('revendeur.normale.rapport.view')
                     <li><a class="dropdown-item" href="{{ route('revendeur.normale.rapport') }}">
                             <div class="dropdown-item-wrapper">Validation Vente</div>
                         </a></li>
-                    @endcan
+                    @endcan -->
 
-                    @can('revendeur.speciale.rapport.view')
+                    <!-- @can('revendeur.speciale.rapport.view')
                     <li><a class="dropdown-item" href="{{ route('revendeur.speciale.rapport') }}">
                             <div class="dropdown-item-wrapper">Validation Vente Spéciale</div>
                         </a></li>
-                    @endcan
+                    @endcan -->
                 </ul>
             </li>
             @endcanany

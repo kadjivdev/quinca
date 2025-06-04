@@ -10,6 +10,7 @@ use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
 use App\Models\Vente\{FactureClient, LigneFacture, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
+use App\Models\Parametre\UniteMesure;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Stock\StockDepot;
@@ -21,22 +22,29 @@ use Illuminate\Support\Facades\Validator;
 use Exception;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use Illuminate\Support\Facades\Auth;
+
+use App\Services\ServiceStockEntree;
+
+
+// use SimpleSoftwareIO\QrCode\Facades\QrCode;
+// use BaconQrCode\Renderer\ImageRenderer;
+// use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+// use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+// use BaconQrCode\Writer;
+// use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+// use Illuminate\Support\Facades\Auth;
 
 class SpecialController extends Controller
 {
-
     private $serviceStockSortie;
+    private $serviceStockEntree;
 
-    public function __construct(ServiceStockSortie $serviceStockSortie)
-    {
+    public function __construct(
+        ServiceStockSortie $serviceStockSortie,
+        ServiceStockEntree $serviceStockEntree
+    ) {
         $this->serviceStockSortie = $serviceStockSortie;
+        $this->serviceStockEntree = $serviceStockEntree;
     }
 
     /**
@@ -142,9 +150,15 @@ class SpecialController extends Controller
                 'date_facture' => 'required|date',
                 'client_id' => 'required|exists:clients,id',
                 'date_echeance' => 'date',
-                'montant_regle' => 'required|numeric|min:0',
+                // 'montant_regle' => 'required|numeric|min:0',
                 'moyen_reglement' => 'required|string',
+
                 'lignes' => 'required|array|min:1',
+                'lignes*article_id' => 'required|exists,articles',
+                'lignes*depot_id' => 'required|exits,depots',
+                'lignes*quantite' => 'required',
+                'lignes*tarification_id' => 'required',
+
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string'
             ]);
@@ -155,6 +169,77 @@ class SpecialController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
+
+            $request->montant_regle = 0;
+
+            /**
+             * on verifie si les articles selectionnés
+             * sont tous dans son depôts pour les non admins
+             */
+            if (!auth()->user()->hasRole("Super Administrateur")) {
+                $userPv = auth()->user()->pointDeVente;
+                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+
+                foreach ($request->lignes as $ligne) {
+                    $depot = Depot::find($ligne["depot_id"]);
+                    $article = Article::find($ligne['article_id']);
+
+                    if (!in_array($ligne["depot_id"], $userPv_depotIds)) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Le dépôt ($depot->libelle_depot) ne vous appartient pas! Vous ne pouvez pas y passer une ecriture "
+                        ], 500);
+                    }
+                }
+            }
+
+            // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
+            foreach ($request->lignes as $ligne) {
+                $depot = Depot::find($ligne["depot_id"]);
+                // 
+                $stock = StockDepot::where('depot_id', $ligne["depot_id"])
+                    ->where('article_id', $ligne['article_id'])
+                    ->first();
+
+                /**
+                 * Recherche de la conversion
+                 */
+                $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
+                $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
+                $article = Article::findOrFail($ligne['article_id']);
+
+                $conversion = $this->serviceStockEntree
+                    ->rechercherConversion(
+                        $ligne['unite_vente_id'],
+                        $stock->unite_mesure_id,
+                        $stock->article_id
+                    );
+                if (!$conversion) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ($stockUnite->libelle_unite) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
+                    ], 500);
+                }
+
+                /**
+                 * Obtention de la quantité convertie
+                 */
+
+                $QteConvertie = $this->serviceStockEntree
+                    ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
+
+                $QteStockConvertie = $this->serviceStockEntree
+                    ->convertirQuantite($stock->article->reste($stock->depot_id), $conversion, $ligne['unite_vente_id']);
+
+                // on verifie la quantité restante de l'article dans le depot est suffisante
+                if ($QteStockConvertie < $QteConvertie) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Le reste du stock de l'article ($article->designation) est de $QteStockConvertie $venteUnite->libelle_unite dans le depôt ({$stock->depot->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
+                    ], 500);
+                }
+            }
+
 
             DB::beginTransaction();
 
@@ -194,7 +279,8 @@ class SpecialController extends Controller
                         'prix_unitaire_ht' => $ligne['tarification_id'],
                         'taux_remise' => $ligne['taux_remise'] ?? 0,
                         'taux_tva' => $request->type_facture === 'simple' ? 0 : $configuration->taux_tva,
-                        'taux_aib' => $request->type_facture === 'simple' ? 0 : $client->taux_aib
+                        'taux_aib' => $request->type_facture === 'simple' ? 0 : $client->taux_aib,
+                        'depot' => $ligne["depot_id"],
                     ]);
 
                     $facture->lignes()->save($ligneFacture);
@@ -230,10 +316,12 @@ class SpecialController extends Controller
                     'status' => 'success',
                     'message' => 'Facture créée avec succès',
                     'data' => ['facture' => $facture->load([
-                        'client', 'lignes.article', 'lignes.uniteVente', 'createdBy',
+                        'client',
+                        'lignes.article',
+                        'lignes.uniteVente',
+                        'createdBy',
                     ])]
                 ]);
-
             } catch (Exception $e) {
                 DB::rollBack();
                 throw $e;
@@ -251,27 +339,71 @@ class SpecialController extends Controller
         }
     }
 
+    // public function searchArticles(Request $request)
+    // {
+    //     $search = $request->get('q');
+
+    //     $articles = Article::query()
+    //         ->where(function ($query) use ($search) {
+    //             $query->where('code_article', 'like', "%{$search}%")
+    //                 ->orWhere('designation', 'like', "%{$search}%");
+    //         })
+    //         ->where('statut', 'actif')
+    //         ->select(['id', 'code_article', 'designation', 'stock_actuel'])
+    //         ->limit(10)
+    //         ->get();  // Ceci retourne maintenant une Collection
+
+    //     return response()->json([
+    //         'results' => $articles->map(function ($article) {
+    //             return [
+    //                 'id' => $article->id,
+    //                 'text' => $article->designation,
+    //                 'code_article' => $article->code_article,
+    //                 'stock' => $article->stock_actuel
+    //             ];
+    //         })
+    //     ]);
+    // }
+
     public function searchArticles(Request $request)
     {
         $search = $request->get('q');
+        $user = auth()->user();
 
-        $articles = Article::query()
-            ->where(function ($query) use ($search) {
-                $query->where('code_article', 'like', "%{$search}%")
-                    ->orWhere('designation', 'like', "%{$search}%");
-            })
-            ->where('statut', 'actif')
-            ->select(['id', 'code_article', 'designation', 'stock_actuel'])
-            ->limit(10)
-            ->get();  // Ceci retourne maintenant une Collection
+        $stocks = StockDepot::with('article')
+            ->get()
+            ->filter(function ($stock) use ($search, $user) {
+                /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
+                if ($user->hasRole("Super Administrateur") || $user->hasRole("CHARGE DES STOCKS ET SUIVI DES ACHATS")) {
+                    return $stock->article->where('code_article', 'like', "%{$search}%")
+                        ->orWhere('designation', 'like', "%{$search}%");
+                }
+
+                /** ON FILTRE LES STOCKS SELON LES POINT DE VENTE DU USER */
+                $userPv = auth()->user()->pointDeVente;
+                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+                if (in_array($stock->depot_id, $userPv_depotIds)) {
+                    return $stock->article->where('code_article', 'like', "%{$search}%")
+                        ->orWhere('designation', 'like', "%{$search}%");
+                }
+            });
 
         return response()->json([
-            'results' => $articles->map(function ($article) {
+            'results' => $stocks->map(function ($stock) {
+                /**
+                 * @param $resteStock Reste du stock dans le depot
+                 */
+
+                $resteStock = $stock->article
+                    ->reste($stock->depot_id);
+
                 return [
-                    'id' => $article->id,
-                    'text' => $article->designation,
-                    'code_article' => $article->code_article,
-                    'stock' => $article->stock_actuel
+                    'id' => $stock->article->id,
+                    'text' => $stock->article->designation,
+                    'code_article' => $stock->article->code_article,
+                    'depot' => $stock->depot,
+                    'unite_mesure' => $stock->uniteMesure, //->libelle_unite,
+                    'stock' => $resteStock ? number_format($resteStock, 0, " ", " ") : 00,
                 ];
             })
         ]);
@@ -373,7 +505,6 @@ class SpecialController extends Controller
                     'unites' => $unites->values()->all()
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Erreur lors de la récupération des unités', [
                 'article_id' => $articleId,
@@ -436,84 +567,10 @@ class SpecialController extends Controller
         try {
             DB::beginTransaction();
 
-            $facture = FactureRevendeur::with(['client', 'lignes.article'])
-                ->findOrFail($id);
+            $facture = FactureRevendeur::findOrFail($id);
 
             if ($facture->statut === 'validee') {
                 throw new Exception('Facture déjà validée');
-            }
-
-            // if (!$facture->peutEtreLivree()) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => $facture->statut !== 'validee'
-            //             ? 'Cette facture n\'est pas dans un état permettant la livraison'
-            //             : 'Cette facture est déjà totalement livrée'
-            //     ], 422);
-            // }
-
-            foreach ($facture->lignes as $data) {
-                if ($data['quantite'] > 0) {
-
-                    // Conversion en unité de base si nécessaire
-                    $article = Article::findOrFail($data->article_id);
-                    $quantiteBase = $data['quantite'];
-
-                    if ($data['unite_vente_id'] != $article->unite_mesure_id) {
-                        $conversion = ConversionUnite::where([
-                            'unite_source_id' => $data->unite_vente_id,
-                            'unite_dest_id' => $article->unite_mesure_id,
-                            'article_id' => $article->id,
-                            'statut' => true
-                        ])->first();
-
-                        if (!$conversion) {
-                            throw new Exception(
-                                "Pas de conversion trouvée pour l'article " . $article->designation
-                            );
-                        }
-
-                        $quantiteBase = $conversion->convertir($data['quantite']);
-                    }
-
-                    $pointVenteConnected = PointDeVente::with('depot')->findOrFail(auth()->user()->point_de_vente_id);
-
-                    // Vérifier le stock disponible
-                    $stock = StockDepot::where([
-                        'article_id' => $data->article_id,
-                        'depot_id' => $pointVenteConnected->depot_id
-                    ])->first();
-
-                    if (!$stock || $stock->quantite_reelle < $data->quantite_base) {
-                        throw new Exception(
-                            "Stock insuffisant pour l'article {$data->article->designation} " .
-                            "(Demandé: {$data->quantite_base}, Disponible: " .
-                            ($stock ? $stock->quantite_reelle : 0) . ")"
-                        );
-                    }
-
-                    // Créer le mouvement de sortie
-                    $mouvementSortie = $this->serviceStockSortie->traiterSortieStock([
-                        'date_mouvement' => $facture->date_facture,
-                        'depot_id' => $pointVenteConnected->depot_id,
-                        'article_id' => $data->article_id,
-                        'unite_mesure_id' => $article->unite_mesure_id,
-                        'quantite' => $quantiteBase,
-                        'reference_mouvement' => ' ',
-                        'document_type' => 'LIVRAISON_CLIENT',
-                        'document_id' => $facture->id,
-                        'user_id' => auth()->id(),
-                        'notes' => "Facture client #{$facture->numero}"
-                    ]);
-
-                    if (!$mouvementSortie['succes']) {
-                        throw new Exception($mouvementSortie['message']);
-                    }
-    
-                    // Associer le mouvement à la ligne
-                    $data->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
-                    $data->save();
-                }
             }
 
             $updateData = [
@@ -531,7 +588,6 @@ class SpecialController extends Controller
                 'message' => 'Facture validée',
                 'data' => ['facture' => $facture->fresh(['client', 'createdBy'])]
             ]);
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Erreur validation facture', [
@@ -546,6 +602,7 @@ class SpecialController extends Controller
             ], 500);
         }
     }
+
 
     public function destroy($id)
     {
@@ -608,7 +665,10 @@ class SpecialController extends Controller
         ]);
     }
 
-    public function print(FactureRevendeur $facture)
+    /**
+     * Print
+     */
+    public function print(Request $request, FactureRevendeur $facture)
     {
         // Chargement des relations nécessaires
         $facture->load([
@@ -619,23 +679,69 @@ class SpecialController extends Controller
             'validatedBy'
         ]);
 
+        $logo = $request->get("logo");
 
-        $pdf = PDF::loadView('pages.revendeur.special.partials.print-facture', compact('facture'));
+        $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture', "logo"));
         $pdf->setPaper('a4');
 
         return $pdf->stream("facture_{$facture->numero}.pdf");
-    }    
+    }
 
-    public function specialeRapport(Request $request) {
+    /**
+     * Bon à livrer
+     */
+    public function bonALivrer(Request $request, FactureRevendeur $facture)
+    {
+        // Chargement des relations nécessaires
+        $facture->load([
+            'client',
+            'lignes.article',
+            'lignes.uniteVente',
+            'createdBy',
+            'validatedBy'
+        ]);
+
+        $entete = $request->get("entete");
+
+        $pdf = PDF::loadView('pages.ventes.facture.partials.bon-a-livrer', compact('facture', 'entete'));
+        $pdf->setPaper('a4');
+
+        return $pdf->stream("bon_a_livrer_{$facture->numero}.pdf");
+    }
+
+    /**
+     * Bordereau de livraison
+     */
+    public function bordereauLivraison(Request $request, FactureRevendeur $facture)
+    {
+        // Chargement des relations nécessaires
+        $facture->load([
+            'client',
+            'lignes.article',
+            'lignes.uniteVente',
+            'createdBy',
+            'validatedBy'
+        ]);
+
+        $entete = $request->get("entete");
+
+        $pdf = PDF::loadView('pages.ventes.facture.partials.bordereau-livraison', compact('facture', 'entete'));
+        $pdf->setPaper('a4');
+
+        return $pdf->stream("bordereau_{$facture->numero}.pdf");
+    }
+
+    public function specialeRapport(Request $request)
+    {
         $dateDebut = $request->get('date_debut', Carbon::now()->startOfMonth()->format('Y-m-d'));
 
         $ventes = FactureRevendeur::whereBetween('date_facture', [$dateDebut, $dateDebut])
-                                    ->where('type_vente', 'speciale')
-                                    ->where('encaisse', 'non')
-                                    ->where('statut', 'brouillon')
-                                    ->with('client')
-                                    ->with('lignes')
-                                    ->get();
+            ->where('type_vente', 'speciale')
+            ->where('encaisse', 'non')
+            ->where('statut', 'brouillon')
+            ->with('client')
+            ->with('lignes')
+            ->get();
 
         $totalLignes = $ventes->sum(function ($vente) {
             return $vente->lignes->count();
@@ -643,7 +749,7 @@ class SpecialController extends Controller
 
         $clients = Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->get();
 
-        return view('pages.revendeur.validation.special.index', compact(            
+        return view('pages.revendeur.validation.special.index', compact(
             'dateDebut',
             'ventes',
             'clients',
@@ -651,7 +757,8 @@ class SpecialController extends Controller
         ));
     }
 
-    public function MakeSellvalidation(Request $request, FactureRevendeur $facture) {
+    public function MakeSellvalidation(Request $request, FactureRevendeur $facture)
+    {
         $request->validate([
             'articles' => 'required|array',
             'articles.*.quantite' => 'required|numeric|min:0',
@@ -662,12 +769,12 @@ class SpecialController extends Controller
             'moyen_reglement' => 'required|string',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $sessionCaisse = SessionCaisse::ouverte()
-            ->where('utilisateur_id', auth()->id())
-            ->first();
+                ->where('utilisateur_id', auth()->id())
+                ->first();
 
             // Début écriture de facture pour le compte du client auquel on a vendu. Remarqu'ons que le client est pris depuis factureRevendeur
 
@@ -729,7 +836,7 @@ class SpecialController extends Controller
             if ($request->type_facture === 'normaliser') {
                 $montantTTC += $totalTVA + $totalAIB;
             }
-            
+
 
             // Mise à jour des totaux
             $factureClient->update([
@@ -767,17 +874,17 @@ class SpecialController extends Controller
             // Fin règlement dans le compte du client
 
             // Début règlement dans le compte du Nord
-                                    
+
             // Calcul de la somme des montants_ttc
             $sommeMontantTTCC = $facture->montant_ttc;
 
             $facturesNonReglees = FactureClient::where('statut', 'validee')
-                                    ->whereColumn('montant_regle', '<', 'montant_ttc') // montant réglé < montant total
-                                    ->where('client_id', $request->client_id)
-                                    ->orderBy('date_facture', 'asc') // Trier par date
-                                    ->get();
+                ->whereColumn('montant_regle', '<', 'montant_ttc') // montant réglé < montant total
+                ->where('client_id', $request->client_id)
+                ->orderBy('date_facture', 'asc') // Trier par date
+                ->get();
 
-            if(count($facturesNonReglees) == 0){
+            if (count($facturesNonReglees) == 0) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Aucune facture en attente de règlement',
@@ -813,7 +920,7 @@ class SpecialController extends Controller
                 // Mettre à jour la session caisse
                 if (method_exists($sessionCaisse, 'mettreAJourTotaux')) {
                     $sessionCaisse->mettreAJourTotaux();
-                }                
+                }
 
                 // Réduire la somme totale à régler
                 $sommeMontantTTCC -= $montantARegler;
@@ -860,8 +967,8 @@ class SpecialController extends Controller
                     if (!$stock || $stock->quantite_reelle < $data->quantite_base) {
                         throw new Exception(
                             "Stock insuffisant pour l'article {$data->article->designation} " .
-                            "(Demandé: {$data->quantite_base}, Disponible: " .
-                            ($stock ? $stock->quantite_reelle : 0) . ")"
+                                "(Demandé: {$data->quantite_base}, Disponible: " .
+                                ($stock ? $stock->quantite_reelle : 0) . ")"
                         );
                     }
 
@@ -882,7 +989,7 @@ class SpecialController extends Controller
                     if (!$mouvementSortie['succes']) {
                         throw new Exception($mouvementSortie['message']);
                     }
-    
+
                     // Associer le mouvement à la ligne
                     $data->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
                     $data->save();
@@ -904,8 +1011,6 @@ class SpecialController extends Controller
                 'success' => true,
                 'message' => 'Validation effectuée avec succès',
             ]);
-
-            
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -921,5 +1026,4 @@ class SpecialController extends Controller
             ], 500);
         }
     }
-
 }

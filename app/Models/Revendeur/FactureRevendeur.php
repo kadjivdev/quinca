@@ -138,8 +138,9 @@ class FactureRevendeur extends Model
 
     public function reglements(): HasMany
     {
-        return $this->hasMany(ReglementClient::class);
+        return $this->hasMany(ReglementClient::class,"facture_revendeur_id");
     }
+
 
     public function getResteAReglerAttribute(): float
     {

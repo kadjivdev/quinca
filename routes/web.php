@@ -932,6 +932,11 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/rapport/validation', [SpecialController::class, 'specialeRapport'])->name('revendeur.speciale.rapport');
             Route::put('/make-validation/{facture}', [SpecialController::class, 'MakeSellvalidation'])->name('revendeur.speciale.makevalidation');
+
+            // GESTION DES FACTURES
+            Route::post('/{facture}/print', [SpecialController::class, 'print'])->name('vente-speciale.facture.print');
+            Route::post('/{facture}/bon-a-livrer', [SpecialController::class, 'bonALivrer'])->name('vente-speciale.bonALivrer');
+            Route::post('/{facture}/bordereau-livraison', [SpecialController::class, 'bordereauLivraison'])->name('vente-speciale.bordereauLivraison');
         });
     });
 

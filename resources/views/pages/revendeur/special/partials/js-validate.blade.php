@@ -37,12 +37,13 @@
                 });
 
                 $.ajax({
-                    url: `${apiUrl}/ventes-speciales/factures/${id}/validate`,
+                    url: `${apiUrl}/revendeurs/ventes-speciales/${id}/validate`,
                     method: 'POST',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                        console.log(response)
                         if (response.status === 'success') {
                             Swal.fire({
                                 title: 'Validée !',

@@ -39,6 +39,7 @@ class ReglementClient extends Model
         'numero',
         'session_caisse_id',
         'facture_client_id',
+        'facture_revendeur_id',
         'date_reglement',
         'montant',
         'type_reglement',
@@ -144,8 +145,6 @@ class ReglementClient extends Model
 
         return sprintf('%s%s%04d', $prefix, $date, $lastNumber + 1);
     }
-
-
 
     /**
      * Vérifie si le montant du règlement est valide
@@ -309,19 +308,19 @@ class ReglementClient extends Model
             }
         });
 
-        static::saving(function ($reglement) {
-            if (!$reglement->verifierMontant()) {
-                throw new InvalidArgumentException(
-                    "Le montant du règlement est invalide ou dépasse le reste à régler de la facture"
-                );
-            }
+        // static::saving(function ($reglement) {
+        //     if (!$reglement->verifierMontant()) {
+        //         throw new InvalidArgumentException(
+        //             "Le montant du règlement est invalide ou dépasse le reste à régler de la facture"
+        //         );
+        //     }
 
-            if (!$reglement->verifierInformationsRequises()) {
-                throw new InvalidArgumentException(
-                    "Des informations requises sont manquantes pour ce type de règlement"
-                );
-            }
-        });
+        //     if (!$reglement->verifierInformationsRequises()) {
+        //         throw new InvalidArgumentException(
+        //             "Des informations requises sont manquantes pour ce type de règlement"
+        //         );
+        //     }
+        // });
     }
 
     public function isValidated()

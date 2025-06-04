@@ -161,7 +161,7 @@
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label fw-medium required">Montant réglé</label>
+                                            <!-- <label class="form-label fw-medium required">Montant réglé</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-money-bill text-primary"></i>
@@ -169,7 +169,7 @@
                                                 <input type="number" class="form-control" name="montant_regle"
                                                     id="montantRegle" required min="0" step="0.01">
                                                 <span class="input-group-text">FCFA</span>
-                                            </div>
+                                            </div> -->
 
                                             <div id="champsBancaires" class="row g-3 mt-0" style="display: none;">
                                                 <div class="col-md-12">

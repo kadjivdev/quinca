@@ -772,7 +772,6 @@ class FactureClientController extends Controller
                 'statut' => 'validee'
             ];
 
-
             $facture->update($updateData);
 
             if ($reglement = $facture->reglements->first()) {

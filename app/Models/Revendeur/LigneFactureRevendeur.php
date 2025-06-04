@@ -77,6 +77,15 @@ class LigneFactureRevendeur extends Model
         return $this->belongsTo(Depot::class, "depot");
     }
 
+    /**
+     * Facture revendeur
+     */
+
+    function factureRevendeur(): BelongsTo
+    {
+        return $this->belongsTo(FactureRevendeur::class, "facture_revendeur_id");
+    }
+
     // Convertit la quantité de l'unité de vente vers l'unité de base
     public function convertirEnUniteBase(float $quantite): float
     {
