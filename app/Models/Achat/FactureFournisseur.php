@@ -114,6 +114,7 @@ class FactureFournisseur extends Model
     ];
 
    
+    // RESTE DU MONTANT D'UNE FACTURE
     public function facture_amont()
     {
         $regleUnique = $this->reglements->whereNotNull("validated_by"); ## reglement par selection unique
@@ -126,6 +127,7 @@ class FactureFournisseur extends Model
         return $this->montant_ttc - $montant_reglement;
     }
 
+    // SOMME DE TOUS SES REGLEMENTS
     function facture_reglements_amount()
     {
         $regleUnique = $this->reglements->whereNotNull("validated_by"); ## reglement par selection unique

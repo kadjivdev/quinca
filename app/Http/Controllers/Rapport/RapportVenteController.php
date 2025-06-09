@@ -7,56 +7,53 @@ use App\Models\Catalogue\{Article, FamilleArticle};
 use App\Models\Vente\{AcompteClient, FactureClient, SessionCaisse, ReglementClient};
 use App\Models\Vente\Client;
 use App\Models\Parametre\PointDeVente;
-
+use App\Services\ServiceStockEntree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Validator;
-
 
 class RapportVenteController extends Controller
 {
+    private $serviceStockEntree;
+
+    function __construct(ServiceStockEntree $serviceStockEntree)
+    {
+        $this->serviceStockEntree = $serviceStockEntree;
+    }
+
     public function ventesParArticle(Request $request)
     {
         $dateDebut = $request->get('date_debut', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $dateFin = $request->get('date_fin', Carbon::now()->format('Y-m-d'));
         $articleId = $request->get('article_id');
 
-        $query = DB::table('ligne_facture_clients as lf')
-            ->join('facture_clients as f', 'f.id', '=', 'lf.facture_client_id')
-            ->join('articles as a', 'a.id', '=', 'lf.article_id')
-            ->whereBetween('f.date_facture', [$dateDebut, $dateFin])
-            ->where('f.statut', 'validee');
+        $query = Article::with(["stocks", "famille"])->orderBy('designation');
 
         if ($articleId) {
-            $query->where('a.id', $articleId);
+            $query->where('id', $articleId);
         }
 
-        $rapportVentes = $query->select([
-            'a.designation',
-            'a.code_article',
-            DB::raw('SUM(lf.quantite) as quantite_vendue'),
-            DB::raw('SUM(lf.montant_ht) as montant_ht'),
-            DB::raw('SUM(lf.montant_tva) as montant_tva'),
-            DB::raw('SUM(lf.montant_aib) as montant_aib'),
-            DB::raw('SUM(lf.montant_ttc) as montant_ttc')
-        ])
-            ->groupBy('a.id', 'a.designation', 'a.code_article')
-            ->orderBy('montant_ttc', 'desc')
-            ->get();
+        $articles = $query->whereHas("stocks") //articles existant au moins dans un stocks
+            ->get()->filter(function ($article) {
+                // Check if any stock for this article has qteVendu > 0
+                return $article->stocks->contains(function ($stock) use ($article) {
+                    return $article->qteVendu($stock->depot_id) > 0;
+                });
+            })->values(); // Use values() to re-index the collection after filtering
 
-        // Récupérer la liste des articles pour le filtre
-        $articles = DB::table('articles')
-            ->where('statut', 'actif')
-            ->select('id', 'designation', 'code_article')
-            ->orderBy('designation')
-            ->get();
+        $articles->map(function ($article) {
+            $article->qteTotalVendu = 0;
+            $article->stocks->map(function ($stock) use ($article) {
+                $article->qteTotalVendu += $article->qteVendu($stock->depot_id);
+                $stock->qteTotalVenduStock = $article->qteVendu($stock->depot_id);
+                $stock->montantTotalVendu = $article->montantTotalsVendu($stock->depot_id);
+            });
+        });
 
         return view('pages.rapports.ventes.vente-par-article', compact(
-            'rapportVentes',
+            'articles',
             'dateDebut',
             'dateFin',
-            'articles',
             'articleId'
         ));
     }

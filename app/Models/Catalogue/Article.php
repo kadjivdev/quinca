@@ -232,6 +232,34 @@ class Article extends Model
     }
 
     /**
+     * Calcul du montant vendu (vente client, vente revendeurs, vente speciale) de l'article dans un depot
+     */
+
+    function montantTotalsVendu($depotId = null)
+    {
+        $factureVente = $this->facturesVente($depotId);
+        $factureRevendeur = $this->facturesVenteRevendeur($depotId);
+
+        $totalAmount = 0;
+        if ($factureVente->isEmpty() && $factureRevendeur->isEmpty()) {
+            $totalAmount = 0;
+        }
+
+        /**Conversion qteVendu Client*/
+        if ($factureVente->isNotEmpty()) {
+            $totalAmount += $factureVente->sum("montant_ht");
+        }
+
+        /**Conversion qteVendu Revendeur*/
+        if ($factureRevendeur->isNotEmpty()) {
+            $totalAmount += $factureRevendeur->sum("montant_ht");
+        }
+
+        // dd($totalAmount);
+        return $totalAmount;
+    }
+
+    /**
      * Calcul du reste de stock de l'article dans un depot
      */
     function reste($depotId = null)

@@ -6,7 +6,7 @@
                 <table id="example1" class="table table-hover align-middle mb-0" id="bonCommandesTable">
                     <thead class="bg-light">
                         <tr>
-                            <th class="border-bottom-0 text-nowrap py-3">N°</th>
+                            <th class="border-bottom-0 text-nowrap py-3">COde</th>
                             <th class="border-bottom-0">Founisseur</th>
                             <th class="border-bottom-0">Montant</th>
                             <th class="border-bottom-0">Date de paiement</th>
@@ -22,7 +22,7 @@
                         <tr>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
-                                    <span class="code-commande me-2">{{ $loop->index + 1 }}</span>
+                                    <span class="code-commande me-2">{{ $appro->fournisseur->code_fournisseur }}</span>
                                 </div>
                             </td>
                             <td> <span class="badge bg-dark">{{$appro->fournisseur->raison_sociale }} </span> </td>

@@ -23,12 +23,15 @@ class FournisseurController extends Controller
         $fournisseurs->map(function ($fournisseur) {
             $fournisseur->totalAppro = $fournisseur->approvisionnements()->sum("montant");
             $fournisseur->reste_solde = $fournisseur->reste_solde();
+            
             $fournisseur->factureAchatAmount = $fournisseur->facture_fournisseurs->sum(function ($query) {
                 return $query->facture_amont();
             });
+
             $fournisseur->reglementsAmount = $fournisseur->facture_fournisseurs->sum(function ($query) {
                 return $query->facture_reglements_amount();
             });
+
             $fournisseur->articles = collect( $fournisseur->facture_fournisseurs->map(function ($factureFournisseur) {
                 foreach ($factureFournisseur->lignes as $ligne) {
                     return $ligne->article;
@@ -36,7 +39,6 @@ class FournisseurController extends Controller
             }));
         });
 
-        // dd($fournisseurs->where('id',1));
         // Statistiques globales
         $stats = [
             'total_fournisseurs' => $fournisseurs->count(),

@@ -413,177 +413,12 @@ class RapportAchatController extends Controller
         ]);
     }
 
-    // public function rapportCompteFournisseur(Request $request)
-    // {
-    //     $query = Fournisseur::query()
-    //         ->withSum(['factures as total_factures' => function($q) {
-    //             $q->whereNotNull('facture_fournisseurs.validated_at')
-    //               ->whereNull('facture_fournisseurs.deleted_at');
-    //         }], 'montant_ttc')
-    //         ->withSum(['factures as total_reglements' => function($q) {
-    //             $q->whereNotNull('facture_fournisseurs.validated_at')
-    //               ->whereNull('facture_fournisseurs.deleted_at')
-    //               ->whereHas('reglements', function($q) {
-    //                   $q->whereNotNull('reglement_fournisseurs.validated_at')
-    //                     ->whereNull('reglement_fournisseurs.deleted_at');
-    //               })
-    //               ->join('reglement_fournisseurs', 'facture_fournisseurs.id', '=', 'reglement_fournisseurs.facture_fournisseur_id')
-    //               ->select(\DB::raw('COALESCE(SUM(reglement_fournisseurs.montant_reglement), 0) as total_reglements'));
-    //         }], 'montant_ttc')
-    //         ->with(['soldeInitial' => function($q) {
-    //             $q->latest('date_solde');
-    //         }]);
-
-    //     if ($request->fournisseur_id) {
-    //         $query->where('id', $request->fournisseur_id);
-    //     }
-
-    //     if ($request->point_de_vente_id) {
-    //         $query->whereHas('factures', function($q) use ($request) {
-    //             $q->where('point_de_vente_id', $request->point_de_vente_id);
-    //         });
-    //     }
-
-    //     $fournisseurs = $query->get()
-    //         ->map(function ($fournisseur) {
-    //             $soldeInitial = $fournisseur->soldeInitial;
-    //             $montantInitial = $soldeInitial ? ($soldeInitial->type === 'CREDITEUR' ? $soldeInitial->montant : -$soldeInitial->montant) : 0;
-
-    //             $fournisseur->solde = $montantInitial + ($fournisseur->total_factures ?? 0) - ($fournisseur->total_reglements ?? 0);
-    //             return $fournisseur;
-    //         });
-
-    //     // Statistiques par mode de règlement pour un fournisseur spécifique
-    //     $statsParMode = [];
-    //     if ($request->fournisseur_id) {
-    //         $modes = [
-    //             ReglementFournisseur::MODE_ESPECE,
-    //             ReglementFournisseur::MODE_CHEQUE,
-    //             ReglementFournisseur::MODE_VIREMENT,
-    //             ReglementFournisseur::MODE_DECHARGE,
-    //             ReglementFournisseur::MODE_AUTRES
-    //         ];
-
-    //         foreach ($modes as $mode) {
-    //             $statsParMode[$mode] = ReglementFournisseur::whereHas('facture', function($q) use ($request) {
-    //                     $q->where('fournisseur_id', $request->fournisseur_id);
-    //                 })
-    //                 ->whereNotNull('validated_at')
-    //                 ->where('mode_reglement', $mode)
-    //                 ->sum('montant_reglement');
-    //         }
-    //     }
-
-    //     // Détail des mouvements
-    //     $mouvements = collect();
-    //     if ($request->fournisseur_id) {
-    //         $fournisseur = Fournisseur::with('soldeInitial')->find($request->fournisseur_id);
-    //         $soldeInitial = $fournisseur->soldeInitial;
-
-    //         if ($soldeInitial) {
-    //             $mouvements->push([
-    //                 'id' => $soldeInitial->id,
-    //                 'date' => $soldeInitial->date_solde,
-    //                 'type' => 'SOLDE_INITIAL',
-    //                 'reference' => 'SI-' . $soldeInitial->id,
-    //                 'debit' => $soldeInitial->type === 'CREDITEUR' ? $soldeInitial->montant : 0,
-    //                 'credit' => $soldeInitial->type === 'DEBITEUR' ? $soldeInitial->montant : 0,
-    //                 'commentaire' => $soldeInitial->commentaire
-    //             ]);
-    //         }
-
-    //         $factures = FactureFournisseur::with(['pointVente', 'bonCommande'])
-    //             ->where('fournisseur_id', $request->fournisseur_id)
-    //             ->whereNotNull('validated_at')
-    //             ->get()
-    //             ->map(function ($facture) {
-    //                 return [
-    //                     'id' => $facture->id,
-    //                     'date' => $facture->date_facture,
-    //                     'type' => 'FACTURE',
-    //                     'reference' => $facture->code,
-    //                     'bon_commande' => $facture->bonCommande?->code,
-    //                     'point_vente' => $facture->pointVente->libelle,
-    //                     'debit' => $facture->montant_ttc,
-    //                     'credit' => 0,
-    //                     'statut_paiement' => $facture->statut_paiement
-    //                 ];
-    //             });
-
-    //         $reglements = ReglementFournisseur::with('facture.pointVente')
-    //             ->whereHas('facture', function ($q) use ($request) {
-    //                 $q->where('fournisseur_id', $request->fournisseur_id);
-    //             })
-    //             ->whereNotNull('validated_at')
-    //             ->get()
-    //             ->map(function ($reglement) {
-    //                 return [
-    //                     'id' => $reglement->id,
-    //                     'date' => $reglement->date_reglement,
-    //                     'type' => 'REGLEMENT',
-    //                     'reference' => $reglement->code,
-    //                     'mode' => $reglement->mode_reglement,
-    //                     'reference_paiement' => $reglement->reference_reglement,
-    //                     'point_vente' => $reglement->facture->pointVente->libelle,
-    //                     'debit' => 0,
-    //                     'credit' => $reglement->montant_reglement
-    //                 ];
-    //             });
-
-    //         $mouvements = $mouvements->concat($factures)->concat($reglements)->sortByDesc('date');
-    //     }
-
-    //     return view('pages.rapports.achats.compte-fournisseur', [
-    //         'fournisseurs' => $fournisseurs,
-    //         'mouvements' => $mouvements,
-    //         'solde_initial' => $request->fournisseur_id ? $soldeInitial : null,
-    //         'statistiques' => [
-    //             'total_fournisseurs' => $fournisseurs->count(),
-    //             'total_factures' => $fournisseurs->sum('total_factures'),
-    //             'total_reglements' => $fournisseurs->sum('total_reglements'),
-    //             'solde_global' => $fournisseurs->sum('solde'),
-    //             'fournisseurs_debiteurs' => $fournisseurs->where('solde', '<', 0)->count(),
-    //             'fournisseurs_crediteurs' => $fournisseurs->where('solde', '>', 0)->count(),
-    //             'montant_debiteur' => $fournisseurs->where('solde', '<', 0)->sum('solde') * -1,
-    //             'montant_crediteur' => $fournisseurs->where('solde', '>', 0)->sum('solde'),
-    //             'par_mode' => $statsParMode
-    //         ],
-    //         'filtres' => [
-    //             'fournisseurs' => Fournisseur::select('id', 'raison_sociale as nom')
-    //                 ->orderBy('raison_sociale')
-    //                 ->get(),
-    //             'points_vente' => PointDeVente::select('id', 'nom_pv as libelle')
-    //                 ->orderBy('nom_pv')
-    //                 ->get()
-    //         ],
-    //         'params' => [
-    //             'fournisseur_id' => $request->fournisseur_id,
-    //             'point_de_vente_id' => $request->point_de_vente_id
-    //         ]
-    //     ]);
-    // }
-
     public function rapportCompteFournisseur(Request $request)
     {
+        $fournisseurs = Fournisseur::orderBy('created_at', 'desc');
+
         // Construction de la requête principale
-        $query = Fournisseur::query()
-            ->withSum(['factures as total_factures' => function ($q) {
-                $q->whereNotNull('facture_fournisseurs.validated_at')
-                    ->whereNull('facture_fournisseurs.deleted_at');
-            }], 'montant_ttc')
-            ->withSum(['factures as total_reglements' => function ($q) {
-                $q->whereNotNull('facture_fournisseurs.validated_at')
-                    ->whereNull('facture_fournisseurs.deleted_at')
-                    ->whereHas('reglements', function ($q) {
-                        $q->whereNotNull('reglement_fournisseurs.validated_at')
-                            ->whereNull('reglement_fournisseurs.deleted_at');
-                    })
-                    ->join('reglement_fournisseurs', 'facture_fournisseurs.id', '=', 'reglement_fournisseurs.facture_fournisseur_id')
-                    ->select(\DB::raw('COALESCE(SUM(reglement_fournisseurs.montant_reglement), 0) as total_reglements'));
-            }], 'montant_ttc')
-            ->with(['soldeInitial' => function ($q) {
-                $q->latest('date_solde');
-            }]);
+        $query = Fournisseur::query();
 
         // Filtre par fournisseur si spécifié
         if ($request->fournisseur_id) {
@@ -597,24 +432,20 @@ class RapportAchatController extends Controller
             });
         }
 
+        $fournisseurs = $query->get();
         // Récupération et calcul des soldes
-        $fournisseurs = $query->get()
-            ->map(function ($fournisseur) {
-                // Récupération du solde initial
-                $soldeInitial = $fournisseur->soldeInitial;
+        $fournisseurs->map(function ($fournisseur) {
+            $fournisseur->totalAppro = $fournisseur->approvisionnements->sum("montant");
+            $fournisseur->solde = $fournisseur->reste_solde();
 
-                // Calcul du solde initial en tenant compte du type (DEBITEUR/CREDITEUR)
-                $montantInitial = 0;
-                if ($soldeInitial) {
-                    // Si CREDITEUR, le montant est positif (nous devons au fournisseur)
-                    // Si DEBITEUR, le montant est négatif (le fournisseur nous doit)
-                    $montantInitial = $soldeInitial->type === 'CREDITEUR' ? $soldeInitial->montant : -$soldeInitial->montant;
-                }
+            $fournisseur->factureAchatAmount = $fournisseur->facture_fournisseurs->sum("montant_ttc");
 
-                // Calcul du solde : Solde Initial + Factures - Règlements
-                $fournisseur->solde = $montantInitial + ($fournisseur->total_factures ?? 0) - ($fournisseur->total_reglements ?? 0);
-                return $fournisseur;
+            $fournisseur->reglementsAmount = $fournisseur->facture_fournisseurs->sum(function ($query) {
+                return $query->facture_reglements_amount();
             });
+
+            $fournisseur->resteAsolder = $fournisseur->factureAchatAmount - $fournisseur->reglementsAmount;
+        });
 
         // Statistiques par mode de règlement pour un fournisseur spécifique
         $statsParMode = [];
@@ -637,74 +468,9 @@ class RapportAchatController extends Controller
             }
         }
 
-        // Détail des mouvements
-        $mouvements = collect();
-        if ($request->fournisseur_id) {
-            $fournisseur = Fournisseur::with('soldeInitial')->find($request->fournisseur_id);
-            $soldeInitial = $fournisseur->soldeInitial;
-
-            // Ajout du solde initial aux mouvements s'il existe
-            if ($soldeInitial) {
-                $mouvements->push([
-                    'id' => $soldeInitial->id,
-                    'date' => $soldeInitial->date_solde,
-                    'type' => 'SOLDE_INITIAL',
-                    'reference' => 'SI-' . $soldeInitial->id,
-                    'debit' => $soldeInitial->type === 'CREDITEUR' ? $soldeInitial->montant : 0,
-                    'credit' => $soldeInitial->type === 'DEBITEUR' ? $soldeInitial->montant : 0,
-                    'commentaire' => $soldeInitial->commentaire
-                ]);
-            }
-
-            // Récupération des factures avec leur point de vente et bon de commande
-            $factures = FactureFournisseur::with(['pointVente', 'bonCommande'])
-                ->where('fournisseur_id', $request->fournisseur_id)
-                ->whereNotNull('validated_at')
-                ->get()
-                ->map(function ($facture) {
-                    return [
-                        'id' => $facture->id,
-                        'date' => $facture->date_facture,
-                        'type' => 'FACTURE',
-                        'reference' => $facture->code,
-                        'bon_commande' => $facture->bonCommande?->code,
-                        'point_vente' => $facture->pointVente->libelle,
-                        'debit' => $facture->montant_ttc,
-                        'credit' => 0,
-                        'statut_paiement' => $facture->statut_paiement
-                    ];
-                });
-
-            // Récupération des règlements avec leur facture et point de vente
-            $reglements = ReglementFournisseur::with('facture.pointVente')
-                ->whereHas('facture', function ($q) use ($request) {
-                    $q->where('fournisseur_id', $request->fournisseur_id);
-                })
-                ->whereNotNull('validated_at')
-                ->get()
-                ->map(function ($reglement) {
-                    return [
-                        'id' => $reglement->id,
-                        'date' => $reglement->date_reglement,
-                        'type' => 'REGLEMENT',
-                        'reference' => $reglement->code,
-                        'mode' => $reglement->mode_reglement,
-                        'reference_paiement' => $reglement->reference_reglement,
-                        'point_vente' => $reglement->facture->pointVente->libelle,
-                        'debit' => 0,
-                        'credit' => $reglement->montant_reglement
-                    ];
-                });
-
-            // Fusion et tri des mouvements
-            $mouvements = $mouvements->concat($factures)->concat($reglements)->sortByDesc('date');
-        }
-
         // Retour de la vue avec toutes les données
         return view('pages.rapports.achats.compte-fournisseur', [
             'fournisseurs' => $fournisseurs,
-            'mouvements' => $mouvements,
-            'solde_initial' => $request->fournisseur_id ? $soldeInitial : null,
             'statistiques' => [
                 'total_fournisseurs' => $fournisseurs->count(),
                 'total_factures' => $fournisseurs->sum('total_factures'),

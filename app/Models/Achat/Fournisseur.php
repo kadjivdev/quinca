@@ -138,7 +138,7 @@ class Fournisseur extends Model
 
     function facture_fournisseurs()
     {
-        return $this->hasMany(FactureFournisseur::class, "fournisseur_id");
+        return $this->hasMany(FactureFournisseur::class, "fournisseur_id")->whereNotNull("validated_by");
     }
 
     public function approvisionnements(): HasMany

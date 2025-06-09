@@ -1,48 +1,29 @@
-{{-- pages/fournisseurs/partials/list.blade.php --}}
-<div class="row" id="fournisseursBlock">
-    @forelse($fournisseurs as $fournisseur)
-    <div class="col-12 col-xl-6 mb-4">
-        <div class="card h-100 border-0 shadow-sm hover-shadow">
-            <div class="card-body p-4">
-                {{-- En-tête de la carte --}}
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="d-flex align-items-center">
-                        <div class="fournisseur-icon me-3">
-                            <i class="fas fa-user-tie fa-lg text-primary"></i>
-                        </div>
-                        <div>
-                            <h5 class="text-center mb-1 fw-bold text-dark">{{ $fournisseur->raison_sociale }}</h5>
-                            <br>
-                            <div class="d-flex align-items-center">
-                                <span class="badge bg-soft-primary text-primary rounded-pill">
-                                    <i class="fas fa-hashtag fs-xs me-1"></i>
-                                    {{ $fournisseur->code_fournisseur }}
-                                </span>
-                                <span class="badge {{ $fournisseur->statut ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }} rounded-pill">
-                                    <i class="fas fa-circle fs-xs me-1"></i>
-                                    {{ $fournisseur->statut ? 'Active' : 'Inactive' }}
-                                </span>
-                                <span class="text-muted ms-2 small">
-                                    <i class="far fa-clock me-1"></i>
-                                    {{ $fournisseur->created_at->locale('fr')->isoFormat('D MMMM YYYY') }}
-                                </span>
-                                <span class="text-muted ms-2 small">
-                                    <i class="fas fa-phone text-muted me-2"></i>
-                                    <span>{{ $fournisseur->telephone }}</span>
-                                </span>
-                                <span class="text-muted ms-2 small">
-                                    <i class="fas fa-envelope text-muted me-2"></i>
-                                    <span>{{ $fournisseur->email }}</span>
-                                </span>
-                                <span class="text-muted ms-2 small">
-                                    <i class="fas fa-map-marker-alt text-muted me-2 mt-1"></i>
-                                    <p class="mb-0 text-muted">{{ $fournisseur->adresse }}</p>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-icon btn-light" type="button" data-bs-toggle="dropdown">
+<!-- TABLE -->
+<div class="table-responsive bg-white p-2 shadow-sm">
+    <table class="table table-hover" id="example1">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Raison sociale</th>
+                <th>Phone/Adresse</th>
+                <th class="text-center">Montant Appro</th>
+                <th class="text-center">Montant Réglé</th>
+                <th class="text-center">Reste Appro</th>
+                <th class="text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($fournisseurs as $fournisseur)
+            <tr>
+                <td><span class="badge bg-light text-dark"> {{ $fournisseur->code_fournisseur }}</span></td>
+                <td><span class="badge bg-light text-dark"> {{ $fournisseur->raison_sociale }}</span></td>
+                <td> <span class="badge bg-light text-dark"> {{ $fournisseur->telephone }}/{{ $fournisseur->adresse }}</span></td>
+                <td><span class="badge bg-light text-dark"> {{ number_format($fournisseur->totalAppro, 2, ',', ' ') }}</span></td>
+                <td><span class="badge bg-light text-warning"> {{ number_format($fournisseur->reglementsAmount, 2, ',', ' ') }}</span></td>
+                <td><span class="badge bg-success"> {{ number_format($fournisseur->reste_solde, 2, ',', ' ') }}</span></td>
+                <td class="border p-1 m-0">
+                    <div class="dropdown text-center">
+                        <button class="btn btn-icon w-100 btn-light" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
@@ -63,192 +44,226 @@
                             </li>
                         </ul>
                     </div>
-                </div>
-
-                {{-- Contenu de la carte --}}
-                <div class="card-content mb-4">
-                    <!-- SOLDES -->
-                    <div class="d-block shadow p-1 border text-left badge ms-2">
-                        <h6 class="text-center">Approvisionnement</h6>
-                        <span class="badge bg-success text-white">Solde : {{ number_format($fournisseur->totalAppro,2)  }} FCFA</span>
-                        <span class="badge bg-success text-white">Reste: {{ number_format($fournisseur->reste_solde(),2)  }} FCFA</span>
-                        <hr>
-                        <h6 class="text-center">Achats</h6>
-                        <span class="badge bg-success text-white">Solde : {{ number_format($fournisseur->factureAchatAmount,2)  }} FCFA</span>
-                        <span class="badge bg-success text-white">Reste: {{ number_format($fournisseur->factureAchatAmount-$fournisseur->reglementsAmount,2)  }} FCFA</span>
-                    </div>
-
-                    {{-- Statistiques futures --}}
-                    <div class="row g-3">
-                        <div class="col-auto">
-                            <div class="stat-item">
-                                <span class="stat-label text-muted small">Commandes</span>
-                                <h6 class="mb-0 mt-1">{{count($fournisseur->facture_fournisseurs)}}</h6>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <div class="stat-item">
-                                <span class="stat-label text-muted small">Articles</span>
-                                <h6 class="mb-0 mt-1">{{count($fournisseur->articles)}}</h6>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @empty
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-5 text-center">
-                <div class="empty-state">
-                    <div class="empty-state-icon mb-3">
-                        <i class="fas fa-users fa-2x text-muted"></i>
-                    </div>
-                    <h5 class="empty-state-title">Aucun fournisseur</h5>
-                    <p class="empty-state-description text-muted">
-                        Commencez par ajouter votre premier fournisseur en cliquant sur le bouton "Nouveau Fournisseur".
-                    </p>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFournisseurModal">
-                        <i class="fas fa-plus me-2"></i>Ajouter un fournisseur
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endforelse
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
 </div>
 
 @push('scripts')
 <script>
-    const formatter = new Intl.NumberFormat('en-US', {
-        style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 4
-    });
-
-    var fournisseursInitiales = <?php echo json_encode($fournisseurs); ?>;
-
-    const filtrage = (data) => {
-        let newContent = '';
-        data.forEach(fournisseur => {
-            newContent += `
-            <div class="col-12 col-xl-6 mb-4">
-                <div class="card h-100 border-0 shadow-sm hover-shadow">
-                    <div class="card-body p-4">
-                        {{-- En-tête de la carte --}}
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="fournisseur-icon me-3">
-                                    <i class="fas fa-user-tie fa-lg text-primary"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-1 fw-bold text-dark">${fournisseur.raison_sociale }</h5>
-                                    <div class="d-flex align-items-center">
-                                        <span class="badge bg-soft-primary text-primary rounded-pill">
-                                            <i class="fas fa-hashtag fs-xs me-1"></i>
-                                            ${fournisseur.code_fournisseur }
-                                        </span>
-                                        <span class="badge ${ fournisseur.statut ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' } rounded-pill">
-                                            <i class="fas fa-circle fs-xs me-1"></i>
-                                            ${fournisseur.statut ? 'Active' : 'Inactive' }
-                                        </span>
-                                        <span class="text-muted ms-2 small">
-                                            <i class="far fa-clock me-1"></i>
-                                            ${fournisseur.created_at}
-                                        </span>
-                                        <span class="text-muted ms-2 small">
-                                            <i class="fas fa-phone text-muted me-2"></i>
-                                            <span>${fournisseur.telephone}</span>
-                                        </span>
-                                        <span class="text-muted ms-2 small">
-                                            <i class="fas fa-envelope text-muted me-2"></i>
-                                            <span>${fournisseur.email}</span>
-                                        </span>
-                                        <span class="text-muted ms-2 small">
-                                            <i class="fas fa-map-marker-alt text-muted me-2 mt-1"></i>
-                                            <p class="mb-0 text-muted">${fournisseur.adresse}</p>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-icon btn-light" type="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item" href="javascript:void(0)" onclick="editFournisseur(${fournisseur.id })">
-                                            <i class="far fa-edit me-2 text-warning"></i>
-                                            Modifier
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteFournisseur(${fournisseur.id})">
-                                            <i class="far fa-trash-alt me-2"></i>
-                                            Supprimer
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-            
-                        {{-- Contenu de la carte --}}
-                        <div class="card-content mb-4">
-                            <!-- SOLDES -->
-                            <div class="d-block shadow p-1 border text-left badge ms-2">
-                                <h6 class="text-center">Approvisionnement</h6>
-                                <span class="badge bg-success text-white">Solde : ${ formatter.format(fournisseur.totalAppro) } FCFA</span>
-                                <span class="badge bg-success text-white">Reste: ${ formatter.format(fournisseur.reste_solde) } FCFA</span>
-                                <hr>
-                                <h6 class="text-center">Achats</h6>
-                                <span class="badge bg-success text-white">Solde : ${ formatter.format(fournisseur.factureAchatAmount) } FCFA</span>
-                                <span class="badge bg-success text-white">Reste: ${ formatter.format(fournisseur.factureAchatAmount - fournisseur.reglementsAmount) } FCFA</span>
-                            </div>
-                        </div>
-            
-                        {{-- Statistiques futures --}}
-                        <div class="row g-3">
-                            <div class="col-auto">
-                                <div class="stat-item">
-                                    <span class="stat-label text-muted small">Commandes</span>
-                                    <h6 class="mb-0 mt-1">${fournisseur.facture_fournisseurs.length}</h6>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <div class="stat-item">
-                                    <span class="stat-label text-muted small">Articles</span>
-                                    <h6 class="mb-0 mt-1">${fournisseur.articles.length}</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            `
-        });
-
-        $("#fournisseursBlock").append(newContent)
-    }
-
-    const HandleSearch = (text) => {
-        $("#fournisseursBlock").empty()
-        if (text.trim()) {
-            const results = fournisseursInitiales.filter((item) => Object.values(item.raison_sociale).join('').toLocaleLowerCase().includes(text.toLocaleLowerCase()))
-            // console.log(results[0].facture_fournisseurs.length)
-            // console.log(results[0].articles.length)
-            filtrage(results)
-        } else {
-            filtrage(fournisseursInitiales)
-        }
-    }
-
-    $('#searchFournisseur').on("change", function(e) {
-        console.log("searching ..")
-        HandleSearch(e.target.value)
-    })
+    // datatable
+    $("#example1").DataTable({
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "buttons": ["pdf", "print", "csv", "excel"],
+        "order": [
+            [0, 'asc']
+        ],
+        "pageLength": 15,
+        language: {
+            "emptyTable": "Aucune donnée disponible dans le tableau",
+            "lengthMenu": "Afficher _MENU_ éléments",
+            "loadingRecords": "Chargement...",
+            "processing": "Traitement...",
+            "zeroRecords": "Aucun élément correspondant trouvé",
+            "paginate": {
+                "first": "Premier",
+                "last": "Dernier",
+                "previous": "Précédent",
+                "next": "Suiv"
+            },
+            "aria": {
+                "sortAscending": ": activer pour trier la colonne par ordre croissant",
+                "sortDescending": ": activer pour trier la colonne par ordre décroissant"
+            },
+            "select": {
+                "rows": {
+                    "_": "%d lignes sélectionnées",
+                    "1": "1 ligne sélectionnée"
+                },
+                "cells": {
+                    "1": "1 cellule sélectionnée",
+                    "_": "%d cellules sélectionnées"
+                },
+                "columns": {
+                    "1": "1 colonne sélectionnée",
+                    "_": "%d colonnes sélectionnées"
+                }
+            },
+            "autoFill": {
+                "cancel": "Annuler",
+                "fill": "Remplir toutes les cellules avec <i>%d<\/i>",
+                "fillHorizontal": "Remplir les cellules horizontalement",
+                "fillVertical": "Remplir les cellules verticalement"
+            },
+            "searchBuilder": {
+                "conditions": {
+                    "date": {
+                        "after": "Après le",
+                        "before": "Avant le",
+                        "between": "Entre",
+                        "empty": "Vide",
+                        "equals": "Egal à",
+                        "not": "Différent de",
+                        "notBetween": "Pas entre",
+                        "notEmpty": "Non vide"
+                    },
+                    "number": {
+                        "between": "Entre",
+                        "empty": "Vide",
+                        "equals": "Egal à",
+                        "gt": "Supérieur à",
+                        "gte": "Supérieur ou égal à",
+                        "lt": "Inférieur à",
+                        "lte": "Inférieur ou égal à",
+                        "not": "Différent de",
+                        "notBetween": "Pas entre",
+                        "notEmpty": "Non vide"
+                    },
+                    "string": {
+                        "contains": "Contient",
+                        "empty": "Vide",
+                        "endsWith": "Se termine par",
+                        "equals": "Egal à",
+                        "not": "Différent de",
+                        "notEmpty": "Non vide",
+                        "startsWith": "Commence par"
+                    },
+                    "array": {
+                        "equals": "Egal à",
+                        "empty": "Vide",
+                        "contains": "Contient",
+                        "not": "Différent de",
+                        "notEmpty": "Non vide",
+                        "without": "Sans"
+                    }
+                },
+                "add": "Ajouter une condition",
+                "button": {
+                    "0": "Recherche avancée",
+                    "_": "Recherche avancée (%d)"
+                },
+                "clearAll": "Effacer tout",
+                "condition": "Condition",
+                "data": "Donnée",
+                "deleteTitle": "Supprimer la règle de filtrage",
+                "logicAnd": "Et",
+                "logicOr": "Ou",
+                "title": {
+                    "0": "Recherche avancée",
+                    "_": "Recherche avancée (%d)"
+                },
+                "value": "Valeur"
+            },
+            "searchPanes": {
+                "clearMessage": "Effacer tout",
+                "count": "{total}",
+                "title": "Filtres actifs - %d",
+                "collapse": {
+                    "0": "Volet de recherche",
+                    "_": "Volet de recherche (%d)"
+                },
+                "countFiltered": "{shown} ({total})",
+                "emptyPanes": "Pas de volet de recherche",
+                "loadMessage": "Chargement du volet de recherche..."
+            },
+            "buttons": {
+                "copyKeys": "Appuyer sur ctrl ou u2318 + C pour copier les données du tableau dans votre presse-papier.",
+                "collection": "Collection",
+                "colvis": "Visibilité colonnes",
+                "colvisRestore": "Rétablir visibilité",
+                "copy": "Copier",
+                "copySuccess": {
+                    "1": "1 ligne copiée dans le presse-papier",
+                    "_": "%ds lignes copiées dans le presse-papier"
+                },
+                "copyTitle": "Copier dans le presse-papier",
+                "csv": "CSV",
+                "excel": "Excel",
+                "pageLength": {
+                    "-1": "Afficher toutes les lignes",
+                    "_": "Afficher %d lignes"
+                },
+                "pdf": "PDF",
+                "print": "Imprimer"
+            },
+            "decimal": ",",
+            "info": "Affichage de _START_ à _END_ sur _TOTAL_ éléments",
+            "infoEmpty": "Affichage de 0 à 0 sur 0 éléments",
+            "infoThousands": ".",
+            "search": "Rechercher:",
+            "thousands": ".",
+            "infoFiltered": "(filtrés depuis un total de _MAX_ éléments)",
+            "datetime": {
+                "previous": "Précédent",
+                "next": "Suivant",
+                "hours": "Heures",
+                "minutes": "Minutes",
+                "seconds": "Secondes",
+                "unknown": "-",
+                "amPm": [
+                    "am",
+                    "pm"
+                ],
+                "months": [
+                    "Janvier",
+                    "Fevrier",
+                    "Mars",
+                    "Avril",
+                    "Mai",
+                    "Juin",
+                    "Juillet",
+                    "Aout",
+                    "Septembre",
+                    "Octobre",
+                    "Novembre",
+                    "Decembre"
+                ],
+                "weekdays": [
+                    "Dim",
+                    "Lun",
+                    "Mar",
+                    "Mer",
+                    "Jeu",
+                    "Ven",
+                    "Sam"
+                ]
+            },
+            "editor": {
+                "close": "Fermer",
+                "create": {
+                    "button": "Nouveaux",
+                    "title": "Créer une nouvelle entrée",
+                    "submit": "Envoyer"
+                },
+                "edit": {
+                    "button": "Editer",
+                    "title": "Editer Entrée",
+                    "submit": "Modifier"
+                },
+                "remove": {
+                    "button": "Supprimer",
+                    "title": "Supprimer",
+                    "submit": "Supprimer",
+                    "confirm": {
+                        "1": "etes-vous sure de vouloir supprimer 1 ligne?",
+                        "_": "etes-vous sure de vouloir supprimer %d lignes?"
+                    }
+                },
+                "error": {
+                    "system": "Une erreur système s'est produite"
+                },
+                "multi": {
+                    "title": "Valeurs Multiples",
+                    "restore": "Rétablir Modification",
+                    "noMulti": "Ce champ peut être édité individuellement, mais ne fait pas partie d'un groupe. ",
+                    "info": "Les éléments sélectionnés contiennent différentes valeurs pour ce champ. Pour  modifier et "
+                }
+            }
+        },
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 </script>
 @endpush

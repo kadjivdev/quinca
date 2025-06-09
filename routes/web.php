@@ -983,6 +983,7 @@ Route::middleware('auth')->group(function () {
         // Route pour une session spécifique
         Route::get('/rapports/sessions/{session?}/rapport', [RapportVenteController::class, 'sessionVente'])
             ->name('vente.sessions.rapport.show');
+
         Route::prefix('stock/valorisation')->group(function () {
             Route::get('/', [RapportValorisationController::class, 'index'])->name('stock.valorisation.index');
             Route::get('/export', [RapportValorisationController::class, 'export'])->name('stock.valorisation.export');
@@ -992,7 +993,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/fiche-stock/{article}/{depot}', [RapportValorisationController::class, 'printFicheStock'])
                 ->name('stock.valorisation.fiche');
         });
-
 
         Route::prefix('stock/rotation')->middleware(['auth'])->group(function () {
             // Page principale de la rotation des stocks
