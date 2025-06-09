@@ -84,10 +84,10 @@
                             <th class="border-bottom-0">Département</th>
                             <th class="border-bottom-0">Agent</th>
                             <th class="border-bottom-0">Contact</th>
-                            <th class="border-bottom-0">Catégorie</th>
-                            <th class="border-bottom-0">Crédit</th>
+                            <th class="border-bottom-0">Factures</th>
+                            <th class="border-bottom-0">Reglements</th>
+                            <th class="border-bottom-0">Accounts</th>
                             <th class="border-bottom-0">Solde</th>
-                            <th class="border-bottom-0 text-center">Statut</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
                     </thead>
@@ -134,58 +134,18 @@
                                 </div>
                             </td>
                             <td>
-                                @switch($client->categorie)
-                                @case('particulier')
-                                <span class="badge bg-info bg-opacity-10 text-info">
-                                    <i class="fas fa-user me-1"></i>Particulier
-                                </span>
-                                @break
-                                @case('professionnel')
-                                <span class="badge bg-primary bg-opacity-10 text-primary">
-                                    <i class="fas fa-briefcase me-1"></i>Professionnel
-                                </span>
-                                @break
-                                @case('comptoir')
-                                <span class="badge bg-primary bg-opacity-10 text-primary">
-                                    <i class="fas fa-briefcase me-1"></i>Comptoir
-                                </span>
-                                @break
-                                @case('societe')
-                                <span class="badge bg-success bg-opacity-10 text-success">
-                                    <i class="fas fa-building me-1"></i>Société
-                                </span>
-                                @break
-                                @endswitch
+                                <span class="badge bg-light text-dark">{{number_format($client->facturesAmount,2,',',' ')}}</span>
                             </td>
                             <td>
-                                @if($client->plafond_credit > 0)
-                                <div class="d-flex flex-column">
-                                    <span class="fw-medium">{{ number_format($client->plafond_credit, 0, ',', ' ') }} F</span>
-                                    <small class="text-muted">{{ $client->delai_paiement }} jours</small>
-                                </div>
-                                @else
-                                <span class="text-muted">—</span>
-                                @endif
+                                <span class="badge bg-light text-dark">{{number_format($client->reglementAmount,2,',',' ')}}</span>
                             </td>
                             <td>
-                                <div class="d-flex flex-column">
-                                    <span class="fw-medium {{ $client->solde_courant > $client->plafond_credit ? 'text-danger' : '' }}">
-                                        {{ number_format($client->solde_courant, 0, ',', ' ') }} F
-                                    </span>
-                                    @if($client->hasDepassementCredit())
-                                    <small class="text-danger">
-                                        +{{ number_format($client->depassement_credit, 0, ',', ' ') }} F
-                                    </small>
-                                    @endif
-                                </div>
+                                <span class="badge bg-warning bg-opacity-10 text-dark">{{number_format($client->clientAccomptesAmount,2,',',' ')}}</span>
                             </td>
-                            <td class="text-center">
-                                @if($client->statut)
-                                <span class="badge bg-success bg-opacity-10 text-success">Actif</span>
-                                @else
-                                <span class="badge bg-danger bg-opacity-10 text-danger">Inactif</span>
-                                @endif
+                            <td>
+                                <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->solde,2,',',' ')}}</span>
                             </td>
+                           
                             <td class="text-end">
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-light-primary btn-icon"

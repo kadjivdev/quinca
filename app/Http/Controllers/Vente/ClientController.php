@@ -75,7 +75,28 @@ class ClientController extends Controller
         }
 
         // $clients = $clients->paginate(10);
-        $clients = $clients->get();
+        $clients = $clients->get()
+            ->transform(function ($client) {
+                /**LES FACTURES */
+                $client->facturesAmount = $client->facturesClient->sum("montant_ttc");
+
+                /** LES REGLEMENTS */
+                $client->reglementAmount = $client->facturesClient->sum(function ($factureClient) { //sum des règlements de chaque factures
+                    return $factureClient->reglements
+                        ->whereNotNull('validated_at')
+                        ->sum("montant");
+                });
+
+                /** LES ACCOMPTES */
+                $client->clientAccomptesAmount = $client->acomptes
+                    ->whereNotNull("validated_by")
+                    ->sum("montant");
+
+                /** SOLDE */
+                $client->solde = $client->solde();
+
+                return $client;
+            });
 
         // Statistiques pour le header
         $stats = [
@@ -88,7 +109,6 @@ class ClientController extends Controller
                 ->where('reglement_clients.statut', ReglementClient::STATUT_VALIDE)
                 ->sum('reglement_clients.montant')
         ];
-
 
         // Liste des villes pour le filtre
         $villes = Client::distinct()->pluck('ville')->filter();

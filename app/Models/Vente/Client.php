@@ -58,17 +58,39 @@ class Client extends Model
         return $this->hasMany(FactureClient::class)->with("client");
     }
 
-    public function reglements(): HasManyThrough
+    /** SOLDE DU CLIENT */
+    public function solde()
     {
-        return $this->hasManyThrough(
-            ReglementClient::class,
-            FactureClient::class,
-            'client_id', // Clé étrangère sur facture_clients
-            'facture_client_id', // Clé étrangère sur reglement_clients
-            'id', // Clé primaire sur clients
-            'id' // Clé primaire sur facture_clients
-        );
+        $facturesAmount = $this->facturesClient()
+            ->whereNotNull('validated_by')
+            ->sum("montant_ttc");
+
+        //sum des règlements de chaque factures
+        $reglementsAmount = $this->facturesClient->sum(function ($factureClient) {
+            return $factureClient->reglements
+                ->whereNotNull('validated_at')
+                ->sum("montant");
+        });
+
+        /** Les accomptes */
+        $clientAccomptesAmount = $this->acomptes
+            ->whereNotNull("validated_by")
+            ->sum("montant");
+
+        return $facturesAmount - ($reglementsAmount + $clientAccomptesAmount);
     }
+
+    // public function reglements(): HasManyThrough
+    // {
+    //     return $this->hasManyThrough(
+    //         ReglementClient::class,
+    //         FactureClient::class,
+    //         'client_id', // Clé étrangère sur facture_clients
+    //         'facture_client_id', // Clé étrangère sur reglement_clients
+    //         'id', // Clé primaire sur clients
+    //         'id' // Clé primaire sur facture_clients
+    //     );
+    // }
 
     public function soldeInitial()
     {
