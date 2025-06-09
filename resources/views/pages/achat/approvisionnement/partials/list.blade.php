@@ -31,7 +31,13 @@
                             <td>{{ Carbon\Carbon::parse($appro->date)->format('d/m/Y H:i:s') }}</td>
                             <td>{{ $appro->actor->name }}</td>
                             <td>{{ $appro->source }}</td>
-                            <td> <a target="_blank" href="{{ $appro->document }}" class="btn btn-ms btn-success"> <i class="bi bi-file-pdf"></i></a></td>
+                            <td>
+                                @if($appro->document) 
+                                <a target="_blank" href="{{ $appro->document }}" class="btn btn-ms btn-success"> <i class="bi bi-file-pdf"></i></a>
+                                @else
+                                ---
+                                @endif
+                            </td>
 
                             <td class="text-center">
                                 @if ($appro->rejected_by)
