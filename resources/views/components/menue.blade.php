@@ -159,7 +159,7 @@
                     <!-- APPROVISIONNEMENTS -->
                     @can('approvisionnements.view')
                     <li><a class="dropdown-item" href="{{ route('approvisionnements.index') }}">
-                            <div class="dropdown-item-wrapper">Paiement Fournisseur</div>
+                            <div class="dropdown-item-wrapper">Approvisionnement Fournisseur</div>
                         </a></li>
                     @endcan
 

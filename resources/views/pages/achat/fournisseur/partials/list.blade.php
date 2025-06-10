@@ -6,7 +6,7 @@
                 <th>Code</th>
                 <th>Raison sociale</th>
                 <th>Phone/Adresse</th>
-                <th class="text-center">Payé au fournisseur </th>
+                <th class="text-center">Montant Appro</th>
                 <th class="text-center">Factures</th>
                 <th class="text-center">Règlement</th>
                 <th class="text-center">Solde fournisseur</th>
