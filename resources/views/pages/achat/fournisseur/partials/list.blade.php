@@ -6,9 +6,10 @@
                 <th>Code</th>
                 <th>Raison sociale</th>
                 <th>Phone/Adresse</th>
-                <th class="text-center">Montant Appro</th>
-                <th class="text-center">Montant Réglé</th>
-                <th class="text-center">Reste Appro</th>
+                <th class="text-center">Payé au fournisseur </th>
+                <th class="text-center">Factures</th>
+                <th class="text-center">Règlement</th>
+                <th class="text-center">Solde fournisseur</th>
                 <th class="text-center">Action</th>
             </tr>
         </thead>
@@ -18,9 +19,10 @@
                 <td><span class="badge bg-light text-dark"> {{ $fournisseur->code_fournisseur }}</span></td>
                 <td><span class="badge bg-light text-dark"> {{ $fournisseur->raison_sociale }}</span></td>
                 <td> <span class="badge bg-light text-dark"> {{ $fournisseur->telephone }}/{{ $fournisseur->adresse }}</span></td>
-                <td><span class="badge bg-light text-dark"> {{ number_format($fournisseur->totalAppro, 2, ',', ' ') }}</span></td>
-                <td><span class="badge bg-light text-warning"> {{ number_format($fournisseur->reglementsAmount, 2, ',', ' ') }}</span></td>
-                <td><span class="badge bg-success"> {{ number_format($fournisseur->reste_solde, 2, ',', ' ') }}</span></td>
+                <td><span class="badge bg-light text-dark text-center"> {{ number_format($fournisseur->totalAppro, 2, ',', ' ') }}</span></td>
+                <td><span class="badge bg-light text-dark text-center"> {{ number_format($fournisseur->factureAchatAmount, 2, ',', ' ') }}</span></td>
+                <td><span class="badge bg-light text-warning text-center"> {{ number_format($fournisseur->reglementsAmount, 2, ',', ' ') }}</span></td>
+                <td><span class="badge bg-success text-center"> {{ number_format($fournisseur->reste_solde, 2, ',', ' ') }}</span></td>
                 <td class="border p-1 m-0">
                     <div class="dropdown text-center">
                         <button class="btn btn-icon w-100 btn-light" type="button" data-bs-toggle="dropdown">

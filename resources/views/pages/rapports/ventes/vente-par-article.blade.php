@@ -153,6 +153,7 @@
                         <th>Article</th>
                         <th>Famille</th>
                         <th class="text-center">Quantité</th>
+                        <th class="text-center">Unité</th>
                         <th class="text-center">Détails</th>
                     </tr>
                 </thead>
@@ -162,13 +163,14 @@
                         <td>{{ $article->code_article }}</td>
                         <td>{{ $article->designation }}</td>
                         <td>{{ $article->famille->libelle_famille }}</td>
-                        <td class="text-end">{{ number_format($article->qteTotalVendu, 0, ',', ' ') }}</td>
+                        <td class="text-center">{{ number_format($article->qantiteBase,2,","," ") }}</td>
+                        <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td>
                         <td class="border p-1 m-0">
                             <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
                                 @forelse($article->stocks as $stock)
                                 <li class="bg-warning rounded p-2" style="list-style-type: none">
                                     <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
-                                    <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVenduStock,2,'.','')}}</span>
+                                    <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVenduStock,2,'.','')}} ({{$stock->uniteMesure?->libelle_unite}})</span>
                                 </li>
                                 <hr>
                                 @empty
@@ -179,15 +181,6 @@
                     </tr>
                     @endforeach
                 </tbody>
-                <tfoot class="table-light">
-                    <tr>
-                        <th>Code</th>
-                        <th>Article</th>
-                        <th>Famille</th>
-                        <th class="text-center">Quantité</th>
-                        <th class="text-center">Détails</th>
-                    </tr>
-                </tfoot>
             </table>
         </div>
     </div>
