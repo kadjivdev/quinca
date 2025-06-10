@@ -148,9 +148,9 @@
         <div class="card-header bg-white py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Détails par famille</h5>
-                <button type="button" class="btn btn-success" id="exportExcel">
+                <!-- <button type="button" class="btn btn-success" id="exportExcel">
                     <i class="fas fa-file-excel me-1"></i>Exporter
-                </button>
+                </button> -->
             </div>
         </div>
         <div class="card-body">
