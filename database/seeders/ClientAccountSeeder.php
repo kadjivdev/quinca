@@ -1415,7 +1415,6 @@ class ClientAccountSeeder extends Seeder
                 }
             }
 
-            dd($clientsNoExisted);
             DB::commit();
             echo "Mise à jour des account clients éffectué avec succes";
         } catch (\Exception $e) {
