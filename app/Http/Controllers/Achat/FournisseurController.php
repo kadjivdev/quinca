@@ -24,9 +24,7 @@ class FournisseurController extends Controller
             $fournisseur->totalAppro = $fournisseur->approvisionnements()->sum("montant");
             $fournisseur->reste_solde = $fournisseur->reste_solde();
             
-            $fournisseur->factureAchatAmount = $fournisseur->facture_fournisseurs->sum(function ($query) {
-                return $query->facture_amont();
-            });
+            $fournisseur->factureAchatAmount = $fournisseur->facture_fournisseurs->sum("montant_ttc");
 
             $fournisseur->reglementsAmount = $fournisseur->facture_fournisseurs->sum(function ($query) {
                 return $query->facture_reglements_amount();

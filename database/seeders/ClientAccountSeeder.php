@@ -1390,6 +1390,7 @@ class ClientAccountSeeder extends Seeder
             DB::beginTransaction();
 
             //vider les anciens
+            DB::table('acompte_clients')->truncate();
 
             $clientsNoExisted=[];
             foreach (($clientAccounts) as $name => $solde) {
