@@ -7,6 +7,7 @@ use App\Models\Catalogue\{Article, FamilleArticle};
 use App\Models\Vente\{AcompteClient, FactureClient, SessionCaisse, ReglementClient};
 use App\Models\Vente\Client;
 use App\Models\Parametre\PointDeVente;
+use App\Models\Revendeur\FactureRevendeur;
 use App\Services\ServiceStockEntree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -381,7 +382,7 @@ class RapportVenteController extends Controller
             $date = Carbon::parse($request->date ?? now());
 
             try {
-                $ventes = FactureClient::with([
+                $factureClients = FactureClient::with([
                     'client',
                     'createdBy',
                     'lignes.article', // Ajout des lignes et de l'article
@@ -390,6 +391,18 @@ class RapportVenteController extends Controller
                     }
                 ])
                     ->whereDate('date_facture', $date)
+                    ->where('statut', 'validee')
+                    ->get();
+
+
+                $factureRevendeurs = FactureRevendeur::with([
+                    'client',
+                    'createdBy',
+                    'lignes.article', // Ajout des lignes et de l'article
+                    'reglements' => function ($query) {
+                        $query->where('statut', ReglementClient::STATUT_VALIDE);
+                    }
+                ])->whereDate('date_facture', $date)
                     ->where('statut', 'validee')
                     ->get();
 

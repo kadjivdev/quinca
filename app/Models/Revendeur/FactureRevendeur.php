@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 use App\Models\Securite\User;
-use App\Models\Vente\{Client, ReglementClient};
+use App\Models\Vente\{Client, ReglementClient, ReglementRevendeur};
 
 
 class FactureRevendeur extends Model
@@ -138,7 +138,7 @@ class FactureRevendeur extends Model
 
     public function reglements(): HasMany
     {
-        return $this->hasMany(ReglementClient::class,"facture_revendeur_id");
+        return $this->hasMany(ReglementRevendeur::class,"facture_revendeur_id");
     }
 
 

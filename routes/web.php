@@ -13,7 +13,7 @@ use App\Http\Controllers\Parametre\ConversionUniteController;
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
 use App\Http\Controllers\Achat\{AccompteFournisseurController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
-use App\Http\Controllers\Vente\{AcompteClientController, ClientController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, RequeteController, TransportController};
+use App\Http\Controllers\Vente\{AcompteClientController, ClientController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, TransportController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
@@ -776,16 +776,17 @@ Route::middleware('auth')->group(function () {
         });
 
         // Routes pour les reglements
-        Route::prefix('reglement')->group(function () {
-            // Liste des factures
-            Route::get('/', [ReglementClientController::class, 'index'])->name('vente.reglement.index');
+        // Route::prefix('reglement')->group(function () {
+        //     // Liste des factures
+        //     Route::get('/', [ReglementClientController::class, 'index'])
+        //         ->name('vente.reglement.index');
 
-            // Créer une nouvelle facture
-            Route::post('/store', [ReglementClientController::class, 'store'])->name('vente.reglement.store');
+        //     // Créer une nouvelle facture
+        //     Route::post('/store', [ReglementClientController::class, 'store'])->name('vente.reglement.store');
 
-            // Voir les détails d'une facture
-            Route::get('/{id}', [ReglementClientController::class, 'show'])->name('vente.reglement.show');
-        });
+        //     // Voir les détails d'une facture
+        //     Route::get('/{id}', [ReglementClientController::class, 'show'])->name('vente.reglement.show');
+        // });
 
         Route::prefix('reglement')->group(function () {
             // Liste des règlements
@@ -978,6 +979,44 @@ Route::middleware('auth')->group(function () {
             Route::post('/{facture}/print', [SpecialController::class, 'print'])->name('vente-speciale.facture.print');
             Route::post('/{facture}/bon-a-livrer', [SpecialController::class, 'bonALivrer'])->name('vente-speciale.bonALivrer');
             Route::post('/{facture}/bordereau-livraison', [SpecialController::class, 'bordereauLivraison'])->name('vente-speciale.bordereauLivraison');
+        });
+
+        //Routes des règlements
+        Route::prefix('reglement-revendeurs')->group(function () {
+            // Liste des règlements
+            Route::get('/', [ReglementRevendeurController::class, 'index'])
+                ->name('vente.reglement-revendeurs.index');
+
+            // Créer un nouveau règlement
+            Route::post('/store', [ReglementRevendeurController::class, 'store'])
+                ->name('vente.reglement-revendeurs.store');
+
+            // Voir les détails d'un règlement
+            Route::get('/{id}/details', [ReglementRevendeurController::class, 'details'])
+                ->name('vente.reglement-revendeurs.details');
+
+            // Valider un règlement
+            Route::post('/{reglementClient}/validate', [ReglementRevendeurController::class, 'validate_reglement'])
+                ->name('vente.reglement-revendeurs.validate');
+
+            // Supprimer un règlement
+            Route::delete('/{reglement}', [ReglementRevendeurController::class, 'destroy'])
+                ->name('vente.reglement-revendeurs.destroy');
+
+            // Route pour rafraîchir la liste des règlements
+            Route::get('/refresh/list', [ReglementRevendeurController::class, 'refreshList'])
+                ->name('vente.reglement-revendeurs.refresh');
+
+            Route::put('/{id}/update', [ReglementRevendeurController::class, 'update'])
+                ->name('reglement-revendeurs.update')
+                ->where('id', '[0-9]+');
+
+            Route::post('/{id}/cancel', [ReglementRevendeurController::class, 'cancel'])
+                ->name('reglement-revendeurs.cancel')
+                ->where('id', '[0-9]+');
+
+            Route::get('/refresh', [ReglementRevendeurController::class, 'refreshList'])
+                ->name('refresh-revendeurs');
         });
     });
 

@@ -11,6 +11,7 @@ use App\Models\Parametre\PointDeVente;
 use App\Models\Vente\{FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
+use App\Models\Securite\User;
 use App\Models\Stock\StockDepot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,7 @@ class FactureClientController extends Controller
     {
         $this->serviceStockEntree = $serviceStockEntree;
     }
-    
+
     public function index(Request $request)
     {
         try {
@@ -555,18 +556,20 @@ class FactureClientController extends Controller
             ->get()
             ->filter(function ($stock) use ($search, $user) {
                 /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
-                if ($user->hasRole("Super Administrateur") || $user->hasRole("CHARGE DES STOCKS ET SUIVI DES ACHATS")) {
-                    return $stock->article->where('code_article', 'like', "%{$search}%")
-                        ->orWhere('designation', 'like', "%{$search}%");
-                }
+                // if ($user->hasRole("Super Administrateur") || $user->hasRole("CHARGE DES STOCKS ET SUIVI DES ACHATS")) {
+                //     return $stock->article->where('code_article', 'like', "%{$search}%")
+                //         ->orWhere('designation', 'like', "%{$search}%");
+                // }
 
                 /** ON FILTRE LES STOCKS SELON LES POINT DE VENTE DU USER */
-                $userPv = auth()->user()->pointDeVente;
-                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
-                if (in_array($stock->depot_id, $userPv_depotIds)) {
-                    return $stock->article->where('code_article', 'like', "%{$search}%")
-                        ->orWhere('designation', 'like', "%{$search}%");
-                }
+                // $userPv = auth()->user()->pointDeVente;
+                // $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+                // if (in_array($stock->depot_id, $userPv_depotIds)) {
+                //     return $stock->article->where('code_article', 'like', "%{$search}%")
+                //     ->orWhere('designation', 'like', "%{$search}%");
+                // }
+                return $stock->article->where('code_article', 'like', "%{$search}%")
+                    ->orWhere('designation', 'like', "%{$search}%");
             });
 
         return response()->json([
@@ -577,8 +580,6 @@ class FactureClientController extends Controller
 
                 $resteStock = $stock->article
                     ->reste($stock->depot_id);
-
-                // return $resteStock;
 
                 return [
                     'id' => $stock->article->id,
@@ -881,7 +882,7 @@ class FactureClientController extends Controller
 
         $logo = $request->get("logo");
 
-        $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture',"logo"));
+        $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture', "logo"));
         $pdf->setPaper('a4');
 
         return $pdf->stream("facture_{$facture->numero}.pdf");
@@ -903,7 +904,7 @@ class FactureClientController extends Controller
 
         $entete = $request->get("entete");
 
-        $pdf = PDF::loadView('pages.ventes.facture.partials.bon-a-livrer', compact('facture','entete'));
+        $pdf = PDF::loadView('pages.ventes.facture.partials.bon-a-livrer', compact('facture', 'entete'));
         $pdf->setPaper('a4');
 
         return $pdf->stream("bon_a_livrer_{$facture->numero}.pdf");
@@ -925,7 +926,7 @@ class FactureClientController extends Controller
 
         $entete = $request->get("entete");
 
-        $pdf = PDF::loadView('pages.ventes.facture.partials.bordereau-livraison', compact('facture','entete'));
+        $pdf = PDF::loadView('pages.ventes.facture.partials.bordereau-livraison', compact('facture', 'entete'));
         $pdf->setPaper('a4');
 
         return $pdf->stream("bordereau_{$facture->numero}.pdf");

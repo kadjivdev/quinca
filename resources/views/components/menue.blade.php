@@ -174,7 +174,7 @@
                             <div class="dropdown-item-wrapper">Livraison Fournisseur</div>
                         </a></li>
                     @endcan
-                    
+
                     <hr>
                     @can("accompte.client")
                     <li><a class="dropdown-item" href="{{ route('achat.acomptes.index') }}">
@@ -298,6 +298,10 @@
                             <div class="dropdown-item-wrapper">Vente Spéciale</div>
                         </a></li>
                     @endcan
+
+                    <li><a class="dropdown-item" href="{{ route('vente.reglement-revendeurs.index') }}">
+                            <div class="dropdown-item-wrapper">Reglement factures</div>
+                        </a></li>
 
                     <!-- @can('revendeur.normale.rapport.view')
                     <li><a class="dropdown-item" href="{{ route('revendeur.normale.rapport') }}">

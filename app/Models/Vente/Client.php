@@ -4,6 +4,7 @@ namespace App\Models\Vente;
 
 use App\Models\Parametre\Agent;
 use App\Models\Parametre\Departement;
+use App\Models\Revendeur\FactureRevendeur;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -58,9 +59,16 @@ class Client extends Model
         return $this->hasMany(FactureClient::class)->with("client");
     }
 
+    // Factures Revendeurs
+    public function facturesRevendeur(): HasMany
+    {
+        return $this->hasMany(FactureRevendeur::class)->with("client");
+    }
+
     /** SOLDE DU CLIENT */
     public function solde()
     {
+        // Factures clients
         $facturesAmount = $this->facturesClient()
             ->whereNotNull('validated_by')
             ->sum("montant_ttc");
@@ -80,17 +88,28 @@ class Client extends Model
         return $facturesAmount - ($reglementsAmount + $clientAccomptesAmount);
     }
 
-    // public function reglements(): HasManyThrough
-    // {
-    //     return $this->hasManyThrough(
-    //         ReglementClient::class,
-    //         FactureClient::class,
-    //         'client_id', // Clé étrangère sur facture_clients
-    //         'facture_client_id', // Clé étrangère sur reglement_clients
-    //         'id', // Clé primaire sur clients
-    //         'id' // Clé primaire sur facture_clients
-    //     );
-    // }
+    /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */
+    public function soldeRevendeur()
+    {
+        // Factures Revendeurs
+        $facturesRevendeurAmount = $this->facturesRevendeur()
+            ->whereNotNull('validated_by')
+            ->sum("montant_ttc");
+
+        //sum des règlements de chaque factures
+        $reglementsAmount = $this->facturesRevendeur->sum(function ($facturesRevendeur) {
+            return $facturesRevendeur->reglements
+                ->whereNotNull('validated_at')
+                ->sum("montant");
+        });
+
+        /** Les accomptes */
+        $clientAccomptesAmount = $this->acomptes
+            ->whereNotNull("validated_by")
+            ->sum("montant");
+
+        return $facturesRevendeurAmount - ($reglementsAmount + $clientAccomptesAmount);
+    }
 
     public function soldeInitial()
     {
