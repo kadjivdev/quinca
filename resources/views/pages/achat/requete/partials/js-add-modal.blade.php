@@ -60,11 +60,11 @@
                     }
                 },
                 error: function(xhr) {
-                    console.log(xhr.responseJSON.message)
-                    let message = 'Une erreur est survenue';
+                    let message = 'Une erreur est survenue | Ce numéro de requête existe déjà probablement!';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }
+
                     Toast.fire({
                         icon: 'error',
                         title: message

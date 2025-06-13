@@ -49,7 +49,7 @@ class RequeteFournisseurController extends Controller
     {
         try {
             $request->validate([
-                'num_demande' => 'required|integer',
+                'num_demande' => 'required|integer|unique:requete_fournisseurs,num_demande',
                 'montant' => 'required',
                 'date_demande' => 'required|date',
                 'nature' => 'required|string',

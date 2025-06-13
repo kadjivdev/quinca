@@ -19,7 +19,7 @@
                 @csrf
                 <div class="col-6 mb-3">
                     <label for="num_demande">N° demande</label>
-                    <input type="number" required class="form-control" name="num_demande" id="num_demande" value="{{ old('num_demande') }}">
+                    <input type="number" readonly required class="form-control" name="num_demande" id="num_demande" value="{{ $requetes->count()+1}}">
                 </div>
 
                 <div class="col-6 mb-3">
