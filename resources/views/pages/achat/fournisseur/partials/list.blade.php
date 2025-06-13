@@ -9,6 +9,7 @@
                 <th class="text-center">Payé au fournisseur</th>
                 <th class="text-center">Factures</th>
                 <th class="text-center">Règlement</th>
+                <th class="text-center">Accompte</th>
                 <th class="text-center">Solde fournisseur</th>
                 <th class="text-center">Action</th>
             </tr>
@@ -22,6 +23,7 @@
                 <td><span class="badge bg-light text-dark text-center"> {{ number_format($fournisseur->totalAppro, 2, ',', ' ') }}</span></td>
                 <td><span class="badge bg-light text-dark text-center"> {{ number_format($fournisseur->factureAchatAmount, 2, ',', ' ') }}</span></td>
                 <td><span class="badge bg-light text-warning text-center"> {{ number_format($fournisseur->reglementsAmount, 2, ',', ' ') }}</span></td>
+                <td><span class="badge bg-light text-warning text-center"> {{ number_format($fournisseur->accompteAmount, 2, ',', ' ') }}</span></td>
                 <td><span class="badge bg-success text-center"> {{ number_format($fournisseur->reste_solde, 2, ',', ' ') }}</span></td>
                 <td class="border p-1 m-0">
                     <div class="dropdown text-center">

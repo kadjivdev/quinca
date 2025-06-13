@@ -16,10 +16,10 @@
                                     <i class="fas fa-calendar"></i>
                                 </span>
                                 <input type="date"
-                                       name="date"
-                                       class="form-control"
-                                       value="{{ request('date', now()->format('Y-m-d')) }}"
-                                       required>
+                                    name="date"
+                                    class="form-control"
+                                    value="{{ request('date', now()->format('Y-m-d')) }}"
+                                    required>
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -50,13 +50,13 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Rapport des ventes du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }}</h5>
-                    <button class="btn btn-sm btn-outline-primary">
+                    <!-- <button class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-file-excel me-2"></i>Exporter
-                    </button>
+                    </button> -->
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0">
+                        <table id="example1" class="table table-hover table-striped mb-0">
                             <thead class="bg-light">
                                 <tr>
                                     <th>N°</th>
@@ -81,9 +81,9 @@
                                     </td>
                                     <td>
                                         @if($vente['type_vente'] === 'Comptant')
-                                            <span class="badge bg-success">Comptant</span>
+                                        <span class="badge bg-success">Comptant</span>
                                         @else
-                                            <span class="badge bg-danger">Crédit</span>
+                                        <span class="badge bg-danger">Crédit</span>
                                         @endif
                                     </td>
                                     <td>{{ $vente['categorie_vente'] }}</td>
@@ -93,9 +93,9 @@
                                     </td>
                                     <td>
                                         <button type="button"
-                                                class="btn btn-sm btn-info"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#detailsModal{{ $vente['id'] }}">
+                                            class="btn btn-sm btn-info"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#detailsModal{{ $vente['id'] }}">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </td>
@@ -154,12 +154,12 @@
                     </thead>
                     <tbody>
                         @foreach($vente['lignes'] as $ligne)
-                            <tr>
-                                <td>{{ $ligne['produit'] }}</td>
-                                <td class="text-end">{{ number_format($ligne['quantite'], 0, ',', ' ') }}</td>
-                                <td class="text-end">{{ number_format($ligne['prix_unitaire'], 0, ',', ' ') }} FCFA</td>
-                                <td class="text-end">{{ number_format($ligne['total'], 0, ',', ' ') }} FCFA</td>
-                            </tr>
+                        <tr>
+                            <td>{{ $ligne['produit'] }}</td>
+                            <td class="text-end">{{ number_format($ligne['quantite'], 0, ',', ' ') }}</td>
+                            <td class="text-end">{{ number_format($ligne['prix_unitaire'], 0, ',', ' ') }} FCFA</td>
+                            <td class="text-end">{{ number_format($ligne['total'], 0, ',', ' ') }} FCFA</td>
+                        </tr>
                         @endforeach
                     </tbody>
                     <tfoot class="fw-bold">
@@ -190,12 +190,12 @@
 
 @push('styles')
 <style>
-    .table > :not(caption) > * > * {
+    .table> :not(caption)>*>* {
         padding: 1rem 1rem;
         background-color: transparent;
     }
 
-    .table > thead {
+    .table>thead {
         background-color: #f8f9fa;
     }
 
@@ -210,21 +210,234 @@
 
     .card-header {
         background-color: transparent;
-        border-bottom: 1px solid rgba(0,0,0,.125);
+        border-bottom: 1px solid rgba(0, 0, 0, .125);
     }
 </style>
 @endpush
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const exportBtn = document.querySelector('.btn-outline-primary');
-    if (exportBtn) {
-        exportBtn.addEventListener('click', function() {
-            const date = document.querySelector('input[name="date"]').value;
-            window.location.href = `/rapports/ventes-journalier/export?date=${date}`;
-        });
-    }
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        const exportBtn = document.querySelector('.btn-outline-primary');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', function() {
+                const date = document.querySelector('input[name="date"]').value;
+                window.location.href = `/rapports/ventes-journalier/export?date=${date}`;
+            });
+        }
+    });
+
+    //datatable
+    $("#example1").DataTable({
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "buttons": ["pdf", "print", "csv", "excel"],
+        "order": [
+            [0, 'asc']
+        ],
+        "pageLength": 15,
+        language: {
+            "emptyTable": "Aucune donnée disponible dans le tableau",
+            "lengthMenu": "Afficher _MENU_ éléments",
+            "loadingRecords": "Chargement...",
+            "processing": "Traitement...",
+            "zeroRecords": "Aucun élément correspondant trouvé",
+            "paginate": {
+                "first": "Premier",
+                "last": "Dernier",
+                "previous": "Précédent",
+                "next": "Suiv"
+            },
+            "aria": {
+                "sortAscending": ": activer pour trier la colonne par ordre croissant",
+                "sortDescending": ": activer pour trier la colonne par ordre décroissant"
+            },
+            "select": {
+                "rows": {
+                    "_": "%d lignes sélectionnées",
+                    "1": "1 ligne sélectionnée"
+                },
+                "cells": {
+                    "1": "1 cellule sélectionnée",
+                    "_": "%d cellules sélectionnées"
+                },
+                "columns": {
+                    "1": "1 colonne sélectionnée",
+                    "_": "%d colonnes sélectionnées"
+                }
+            },
+            "autoFill": {
+                "cancel": "Annuler",
+                "fill": "Remplir toutes les cellules avec <i>%d<\/i>",
+                "fillHorizontal": "Remplir les cellules horizontalement",
+                "fillVertical": "Remplir les cellules verticalement"
+            },
+            "searchBuilder": {
+                "conditions": {
+                    "date": {
+                        "after": "Après le",
+                        "before": "Avant le",
+                        "between": "Entre",
+                        "empty": "Vide",
+                        "equals": "Egal à",
+                        "not": "Différent de",
+                        "notBetween": "Pas entre",
+                        "notEmpty": "Non vide"
+                    },
+                    "number": {
+                        "between": "Entre",
+                        "empty": "Vide",
+                        "equals": "Egal à",
+                        "gt": "Supérieur à",
+                        "gte": "Supérieur ou égal à",
+                        "lt": "Inférieur à",
+                        "lte": "Inférieur ou égal à",
+                        "not": "Différent de",
+                        "notBetween": "Pas entre",
+                        "notEmpty": "Non vide"
+                    },
+                    "string": {
+                        "contains": "Contient",
+                        "empty": "Vide",
+                        "endsWith": "Se termine par",
+                        "equals": "Egal à",
+                        "not": "Différent de",
+                        "notEmpty": "Non vide",
+                        "startsWith": "Commence par"
+                    },
+                    "array": {
+                        "equals": "Egal à",
+                        "empty": "Vide",
+                        "contains": "Contient",
+                        "not": "Différent de",
+                        "notEmpty": "Non vide",
+                        "without": "Sans"
+                    }
+                },
+                "add": "Ajouter une condition",
+                "button": {
+                    "0": "Recherche avancée",
+                    "_": "Recherche avancée (%d)"
+                },
+                "clearAll": "Effacer tout",
+                "condition": "Condition",
+                "data": "Donnée",
+                "deleteTitle": "Supprimer la règle de filtrage",
+                "logicAnd": "Et",
+                "logicOr": "Ou",
+                "title": {
+                    "0": "Recherche avancée",
+                    "_": "Recherche avancée (%d)"
+                },
+                "value": "Valeur"
+            },
+            "searchPanes": {
+                "clearMessage": "Effacer tout",
+                "count": "{total}",
+                "title": "Filtres actifs - %d",
+                "collapse": {
+                    "0": "Volet de recherche",
+                    "_": "Volet de recherche (%d)"
+                },
+                "countFiltered": "{shown} ({total})",
+                "emptyPanes": "Pas de volet de recherche",
+                "loadMessage": "Chargement du volet de recherche..."
+            },
+            "buttons": {
+                "copyKeys": "Appuyer sur ctrl ou u2318 + C pour copier les données du tableau dans votre presse-papier.",
+                "collection": "Collection",
+                "colvis": "Visibilité colonnes",
+                "colvisRestore": "Rétablir visibilité",
+                "copy": "Copier",
+                "copySuccess": {
+                    "1": "1 ligne copiée dans le presse-papier",
+                    "_": "%ds lignes copiées dans le presse-papier"
+                },
+                "copyTitle": "Copier dans le presse-papier",
+                "csv": "CSV",
+                "excel": "Excel",
+                "pageLength": {
+                    "-1": "Afficher toutes les lignes",
+                    "_": "Afficher %d lignes"
+                },
+                "pdf": "PDF",
+                "print": "Imprimer"
+            },
+            "decimal": ",",
+            "info": "Affichage de _START_ à _END_ sur _TOTAL_ éléments",
+            "infoEmpty": "Affichage de 0 à 0 sur 0 éléments",
+            "infoThousands": ".",
+            "search": "Rechercher:",
+            "thousands": ".",
+            "infoFiltered": "(filtrés depuis un total de _MAX_ éléments)",
+            "datetime": {
+                "previous": "Précédent",
+                "next": "Suivant",
+                "hours": "Heures",
+                "minutes": "Minutes",
+                "seconds": "Secondes",
+                "unknown": "-",
+                "amPm": [
+                    "am",
+                    "pm"
+                ],
+                "months": [
+                    "Janvier",
+                    "Fevrier",
+                    "Mars",
+                    "Avril",
+                    "Mai",
+                    "Juin",
+                    "Juillet",
+                    "Aout",
+                    "Septembre",
+                    "Octobre",
+                    "Novembre",
+                    "Decembre"
+                ],
+                "weekdays": [
+                    "Dim",
+                    "Lun",
+                    "Mar",
+                    "Mer",
+                    "Jeu",
+                    "Ven",
+                    "Sam"
+                ]
+            },
+            "editor": {
+                "close": "Fermer",
+                "create": {
+                    "button": "Nouveaux",
+                    "title": "Créer une nouvelle entrée",
+                    "submit": "Envoyer"
+                },
+                "edit": {
+                    "button": "Editer",
+                    "title": "Editer Entrée",
+                    "submit": "Modifier"
+                },
+                "remove": {
+                    "button": "Supprimer",
+                    "title": "Supprimer",
+                    "submit": "Supprimer",
+                    "confirm": {
+                        "1": "etes-vous sure de vouloir supprimer 1 ligne?",
+                        "_": "etes-vous sure de vouloir supprimer %d lignes?"
+                    }
+                },
+                "error": {
+                    "system": "Une erreur système s'est produite"
+                },
+                "multi": {
+                    "title": "Valeurs Multiples",
+                    "restore": "Rétablir Modification",
+                    "noMulti": "Ce champ peut être édité individuellement, mais ne fait pas partie d'un groupe. ",
+                    "info": "Les éléments sélectionnés contiennent différentes valeurs pour ce champ. Pour  modifier et "
+                }
+            }
+        },
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 </script>
 @endpush

@@ -30,6 +30,8 @@ class FournisseurController extends Controller
                 return $query->facture_reglements_amount();
             });
 
+            $fournisseur->accompteAmount = $fournisseur->accomptes->sum("montant");
+
             $fournisseur->articles = collect( $fournisseur->facture_fournisseurs->map(function ($factureFournisseur) {
                 foreach ($factureFournisseur->lignes as $ligne) {
                     return $ligne->article;

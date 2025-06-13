@@ -53,7 +53,7 @@
                                 <label class="form-label text-muted">
                                     <i class="fas fa-layer-group me-1"></i>Famille
                                 </label>
-                                <select name="famille_id" class="form-select select2">
+                                <select name="famille_id" class="form-control border select2">
                                     <option value="">Toutes les familles</option>
                                     @foreach($familles as $famille)
                                     <option value="{{ $famille->id }}" {{ $familleId == $famille->id ? 'selected' : '' }}>

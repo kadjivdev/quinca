@@ -218,104 +218,82 @@ class RapportVenteController extends Controller
     {
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
-        // Récupération des paramètres de filtrage
-        $clientId = $request->input('client_id');
-        $dateDebut = $request->input('date_debut') ? Carbon::parse($request->input('date_debut')) : Carbon::now()->startOfMonth();
-        $dateFin = $request->input('date_fin') ? Carbon::parse($request->input('date_fin')) : Carbon::now();
+        $dateDebut = $request->get('date_debut', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $dateFin = $request->get('date_fin', Carbon::now()->format('Y-m-d'));
+        $clientId = $request->get('client_id');
 
-        $clients = Client::orderBy('raison_sociale')->get();
+        $query = Article::with(["stocks", "famille"])->orderBy('designation');
 
-        // Construction de la requête de base
-        $query = FactureClient::with(['client', 'reglements'])
-            ->where('statut', 'validee')
-            ->when($clientId, function ($q) use ($clientId) {
-                return $q->where('client_id', $clientId);
-            })
-            ->when($dateDebut && $dateFin, function ($q) use ($dateDebut, $dateFin) {
-                return $q->whereBetween('date_facture', [
-                    $dateDebut->startOfDay(),
-                    $dateFin->endOfDay()
-                ]);
+        $articles = $query->whereHas("stocks") //articles existant au moins dans un stocks
+            ->get()->filter(function ($article) use ($clientId) {
+                // Check if any stock for this article has qteVendu > 0
+                return $article->stocks->contains(function ($stock) use ($article, $clientId) {
+                    /** Les clients concernés */
+                    if ($clientId) {
+                        $clientFactureIds = $article->ventes->map(function ($ligneFacture) {
+                            //seuls les factures validées
+                            if ($ligneFacture->factureClient->validated_by) {
+                                return $ligneFacture->factureClient
+                                    ->client_id; //on recupere les client_id
+                            }
+                        });
+
+                        $clientRevendeurIds = $article->venteRevendeurs->map(function ($ligneFactureRevendeur) {
+                            //seuls les factures validées
+                            if ($ligneFactureRevendeur->factureRevendeur->validated_by) {
+                                return $ligneFactureRevendeur->factureRevendeur
+                                    ->client_id; //on recupere les client_id
+                            }
+                        });
+
+                        $clientIds = $clientFactureIds
+                            ->concat($clientRevendeurIds)
+                            ->toArray();
+
+                        /** Si le client se trouve dans les ventes & qteVendu>0 */
+                        return in_array($clientId, $clientIds) &&
+                            $article->qteVendu($stock->depot_id) > 0;
+                    }
+
+                    /** Sans un client */
+                    return $article->qteVendu($stock->depot_id) > 0;
+                });
+            })->values(); // Use values() to re-index the collection after filtering
+
+        $articles->map(function ($article) use ($clientId) {
+            $article->qteTotalVendu = 0;
+            $article->qantiteBase = 0;
+            $article->client = Client::find($clientId);
+            $article->stocks->map(function ($stock) use ($article) {
+                $article->qteTotalVendu += $article->qteVendu($stock->depot_id);
+                $stock->qteTotalVenduStock = $article->qteVendu($stock->depot_id);
+                $stock->montantTotalVendu = $article->montantTotalsVendu($stock->depot_id);
+
+                /**STOCK DE BASE */
+                $conversion = $this->serviceStockEntree
+                    ->rechercherConversion(
+                        $stock->unite_mesure_id,
+                        $stock->article->unite_mesure_id,
+                        $stock->article_id
+                    );
+
+                $article->qantiteBase += $conversion ? $this->serviceStockEntree
+                    ->convertirQuantite(
+                        $stock->quantite_reelle,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    ) : 00;
             });
+        });
 
-        // Statistiques globales
-        $stats = [
-            'total_ventes' => $query->sum('montant_ttc') ?? 0,
-            'total_regle' => $query->sum('montant_regle') ?? 0,
-            'total_restant' => ($query->sum('montant_ttc') - $query->sum('montant_regle')) ?? 0,
-            'nombre_factures' => $query->count() ?? 0,
-            'moyenne_facture' => $query->count() > 0 ? $query->avg('montant_ttc') : 0
-        ];
-
-        // Evolution mensuelle avec filtres
-        $evolutionVentes = DB::table('facture_clients')
-            ->select([
-                DB::raw('DATE_FORMAT(date_facture, "%Y-%m") as mois_annee'),
-                DB::raw('DATE_FORMAT(date_facture, "%M %Y") as mois_format'),
-                DB::raw('SUM(montant_ttc) as total_ventes'),
-                DB::raw('SUM(montant_regle) as total_regle'),
-                DB::raw('COUNT(*) as nombre_factures')
-            ])
-            ->where('statut', 'validee')
-            ->when($clientId, function ($q) use ($clientId) {
-                return $q->where('client_id', $clientId);
-            })
-            ->when($dateDebut && $dateFin, function ($q) use ($dateDebut, $dateFin) {
-                return $q->whereBetween('date_facture', [
-                    $dateDebut->startOfDay(),
-                    $dateFin->endOfDay()
-                ]);
-            })
-            ->groupBy('mois_annee', 'mois_format')
-            ->orderBy('mois_annee', 'desc')
-            ->limit(12)
-            ->get();
-
-        // Détails des factures avec filtres
-        $factures = $query->select([
-            'id',
-            'numero',
-            'date_facture',
-            'client_id',
-            'montant_ttc',
-            'montant_regle',
-            DB::raw('(montant_regle / montant_ttc * 100) as pourcentage_paiement'),
-            DB::raw('montant_ttc - montant_regle as restant_a_payer')
-        ])
-            ->orderBy('date_facture', 'desc')
-            ->paginate(10)
-            ->withQueryString(); // Garde les paramètres de filtrage dans la pagination
-
-        // Top clients avec filtres
-        $topClients = FactureClient::with('client')
-            ->select(
-                'client_id',
-                DB::raw('SUM(montant_ttc) as total_achats'),
-                DB::raw('SUM(montant_regle) as total_regle'),
-                DB::raw('COUNT(*) as nombre_factures')
-            )
-            ->where('statut', 'validee')
-            ->when($dateDebut && $dateFin, function ($q) use ($dateDebut, $dateFin) {
-                return $q->whereBetween('date_facture', [
-                    $dateDebut->startOfDay(),
-                    $dateFin->endOfDay()
-                ]);
-            })
-            ->groupBy('client_id')
-            ->orderByDesc('total_achats')
-            ->limit(5)
-            ->get();
+        $clients = Client::get(["id", "raison_sociale", "code_client"]);
 
         return view('pages.rapports.ventes.vente-par-client', compact(
+            'articles',
             'clients',
-            'clientId',
-            'stats',
-            'evolutionVentes',
-            'factures',
-            'topClients',
-            'date',
             'dateDebut',
-            'dateFin'
+            'dateFin',
+            'clientId'
         ));
     }
 
@@ -606,7 +584,6 @@ class RapportVenteController extends Controller
             return 'Indéterminé';
         }
     }
-
 
     public function sessionVente(Request $request)
     {

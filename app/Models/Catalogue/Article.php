@@ -15,6 +15,7 @@ use App\Models\Stock\StockDepot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Vente\DevisDetail;
+use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Services\ServiceStockEntree;
@@ -154,7 +155,16 @@ class Article extends Model
     }
 
     /**
-     * Qte vendue client dans un depot
+     * Les ventes au niveau des revendeurs à cet article
+     */
+
+    function venteRevendeurs(): HasMany
+    {
+        return $this->hasMany(LigneFactureRevendeur::class, "article_id");
+    }
+
+    /**
+     * LES DETAILS DES FACTURES CLIENTS
      */
     function facturesVente($depotId = null)
     {
@@ -194,7 +204,10 @@ class Article extends Model
 
         $serviceStockEntree = new ServiceStockEntree();
 
+        //Vente à la directeur
         $factureVente = $this->facturesVente($depotId);
+
+        //Vente revendeur (ventes speciales et autres)
         $factureRevendeur = $this->facturesVenteRevendeur($depotId);
 
         $qteVenteConvertie = 0;

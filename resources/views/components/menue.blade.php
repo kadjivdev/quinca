@@ -174,6 +174,20 @@
                             <div class="dropdown-item-wrapper">Livraison Fournisseur</div>
                         </a></li>
                     @endcan
+                    
+                    <hr>
+                    @can("accompte.client")
+                    <li><a class="dropdown-item" href="{{ route('achat.acomptes.index') }}">
+                            <div class="dropdown-item-wrapper">Accomptes Fourniseurs</div>
+                        </a></li>
+                    @endcan
+
+                    @can("requetes.view")
+                    <!-- requetes -->
+                    <li><a class="dropdown-item" href="{{ route('requetes-frs.index') }}">
+                            <div class="dropdown-item-wrapper">Réquêtes fournisseurs</div>
+                        </a></li>
+                    @endcan
                 </ul>
             </li>
             @endcanany

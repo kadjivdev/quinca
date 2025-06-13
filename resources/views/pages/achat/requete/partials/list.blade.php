@@ -1,149 +1,81 @@
-@extends('layouts.rapport.facture')
+<div class="row g-3">
 
-@section('title', 'Rapport des ventes par client')
-
-@section('styles')
-<style>
-    .stats-card {
-        border: none;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        transition: transform 0.2s;
-    }
-
-    .stats-card:hover {
-        transform: translateY(-3px);
-    }
-
-    .stats-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
-@endsection
-
-@section('content')
-<div class="container-fluid px-4 py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="font-weight-bold">
-            <i class="fas fa-layer-group me-2"></i>Rapport des ventes par client
-        </h2>
-    </div>
-
-    <!-- Cartes statistiques -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="stats-card bg-white p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Total des ventes</h6>
-                        <h3 class="mb-0">{{ number_format($articles->sum('qteTotalVendu'), 0, ',', ' ') }} F</h3>
-                    </div>
-                    <div class="stats-icon bg-success bg-opacity-10 text-success">
-                        <i class="fas fa-money-bill-wave fa-lg"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stats-card bg-white p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Articles vendus</h6>
-                        <h3 class="mb-0">{{ number_format($articles->count(), 0, ',', ' ') }}</h3>
-                    </div>
-                    <div class="stats-icon bg-primary bg-opacity-10 text-primary">
-                        <i class="fas fa-box fa-lg"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Filtres -->
-    <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-body">
-            <form id="filterForm" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label text-muted">
-                        <i class="far fa-calendar-alt me-1"></i>Période
-                    </label>
-                    <div class="input-group">
-                        <input type="date" name="date_debut" class="form-control" value="{{ $dateDebut }}">
-                        <span class="input-group-text bg-light">au</span>
-                        <input type="date" name="date_fin" class="form-control" value="{{ $dateFin }}">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label text-muted">
-                        <i class="fas fa-layer-group me-1"></i>Client
-                    </label>
-                    <select name="client_id" class="form-control border select2">
-                        <option value="">Tous les Clients</option>
-                        @foreach($clients as $client)
-                        <option value="{{ $client->id }}" {{ $clientId == $client->id ? 'selected' : '' }}>
-                            {{ $client->code_client }} - {{ $client->raison_sociale }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-filter me-1"></i>Filtrer
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Tableau des résultats -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Détails par famille</h5>
-                <!-- <button type="button" class="btn btn-success" id="exportExcel">
-                    <i class="fas fa-file-excel me-1"></i>Exporter
-                </button> -->
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive bg-white p-2 shadow-sm">
-                <table class="table table-hover" id="example1">
-                    <thead>
+    {{-- Table des règlements --}}
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-3">
+            <div class="table-responsive">
+                <table id="example1" class=" table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <th>Code</th>
-                            <th>Article</th>
-                            <th>Client</th>
-                            <th class="text-center">Quantité</th>
-                            <th class="text-center">Unité</th>
-                            <th class="text-center">Détails</th>
+                            <th class="border-bottom-0">N° demande</th>
+                            <th class="border-bottom-0">Fournisseur</th>
+                            <th class="border-bottom-0">Date</th>
+                            <th class="border-bottom-0">Mention</th>
+                            <th class="border-bottom-0">Articles</th>
+                            <th class="border-bottom-0">Montant</th>
+                            <th class="border-bottom-0">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($articles as $article)
+                        @foreach ($requetes as $requete)
                         <tr>
-                            <td>{{ $article->code_article }}</td>
-                            <td>{{ $article->designation }}</td>
-                            <td>{{ $article->client?$article->client->raison_sociale:'---' }}</td>
-                            <td class="text-center">{{ number_format($article->qantiteBase,2,","," ") }}</td>
-                            <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td>
-                            <td class="border p-1 m-0">
-                                <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
-                                    @forelse($article->stocks as $stock)
-                                    <li class="bg-warning rounded p-2" style="list-style-type: none">
-                                        <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
-                                        <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVenduStock,2,'.','')}} ({{$stock->uniteMesure?->libelle_unite}})</span>
-                                    </li>
-                                    <hr>
-                                    @empty
-                                    <li class="text-center">Ce article n'est disponible dans aucun dépôt!</li>
-                                    @endforelse
+                            <td>{{ $requete->num_demande }} </td>
+                            <td>{{ $requete->fournisseur->raison_sociale }}</td>
+                            <td>{{ $requete->date_demande }}</td>
+                            <td>{{ $requete->mention }}</td>
+
+                            <td>
+                                @if ($requete->motif == 'Articles')
+                                <ul>
+                                    @foreach ($requete->articles as $article)
+                                    <li>{{ $article->designation }}</li>
+                                    @endforeach
                                 </ul>
+                                @elseif ($requete->motif == 'Autres')
+                                {{$requete->motif_content}}
+                                @endif
+                            </td>
+                            <td>{{ $requete->montant }}</td>
+                            <td>
+                                @if (is_null($requete->validate_at))
+                                <div class="dropdown">
+                                    <button class="w-100 btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-gear"></i>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        @can("requetes.view")
+                                        <li>
+                                            <a href="{{route('requetes-frs.show', $requete->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Détail"> Détail </a>
+                                        </li>
+                                        @endcan
+
+                                        @can("requetes.edit")
+                                        <li>
+                                            <a href="{{route('requetes-frs.edit', $requete->id)}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Editer"> Modifier </a>
+                                        </li>
+                                        @endcan
+
+                                        @can("requetes.validate")
+                                        <li>
+                                            <form action="{{route('valider-requete-frs',$requete->id)}}" method="post">
+                                                @csrf
+                                                <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Valider la requête" onclick="return confirm('Voulez-vous vraiment valider cette requete??')">Valider </button>
+                                            </form>
+                                        </li>
+                                        @endcan
+
+                                        @can("requetes.delete")
+                                        <li>
+                                            <form action="{{route('requetes-frs.destroy',$requete->id)}}" method="post">
+                                                @csrf
+                                                @method("DELETE")
+                                                <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Supprimer la requête" onclick="return confirm('Voulez-vous vraiment supprimer cette requete??')">Supprimer</button>
+                                            </form>
+                                        </li>
+                                        @endcan
+                                    </ul>
+                                </div>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -153,24 +85,41 @@
         </div>
     </div>
 </div>
-@endsection
+<link href="{{ asset('css/theme/table.css') }}" rel="stylesheet">
 
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        $('.select2').select2({
-            theme: 'bootstrap4',
-            width: '100%'
-        });
+<style>
+    .numero-recu {
+        font-family: 'Monaco', 'Consolas', monospace;
+        color: var(--bs-primary);
+        font-weight: 500;
+        padding: 0.3rem 0.6rem;
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+    }
 
-        $('#filterForm').on('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            window.location.href = `{{ route('rapports.ventes-clients') }}?${new URLSearchParams(formData)}`;
-        });
-    });
+    .avatar-client {
+        width: 40px;
+        height: 40px;
+        background-color: var(--bs-light);
+        color: var(--bs-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
 
-    // datatable
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+    }
+</style>
+</div>
+
+@push("scripts")
+<script type="text/javascript">
     $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,

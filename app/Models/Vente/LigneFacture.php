@@ -151,8 +151,6 @@ class LigneFacture extends Model
         }
     }
 
-
-
     // Calcul des montants
     protected function calculerMontants()
     {
