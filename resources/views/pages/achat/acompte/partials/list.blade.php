@@ -1,6 +1,6 @@
 <div class="row g-3">
     {{-- Section Filtres --}}
-    <div class="col-12">
+    <!-- <div class="col-12">
         <div class="card border-0 shadow-sm">
             <div class="card-body p-3">
                 <div class="row g-3">
@@ -61,7 +61,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     {{-- Table des acomptes --}}
     <div class="col-12">
@@ -262,13 +262,14 @@
 
         // Récupérer les valeurs des filtres
         const filters = {
-            client_id: $('#clientFilter').val(),
+            fournisseur_id: $('#clientFilter').val(),
             type_paiement: $('#typePaiementFilter').val(),
             date_debut: $('#dateDebut').val(),
             date_fin: $('#dateFin').val(),
             search: $('#searchFilter').val()
         };
 
+        // console.log(filters)
         // Faire la requête AJAX avec les filtres
         $.ajax({
             url: `${apiUrl}/achat/acomptes-frs/refresh-list`,

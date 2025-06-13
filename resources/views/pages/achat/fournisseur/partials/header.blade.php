@@ -15,13 +15,13 @@
 
             {{-- Section droite --}}
             <div class="d-flex gap-2">
-                <button type="button"
+                <!-- <button type="button"
                     class="btn btn-dark btn-sm d-flex align-items-center"
                     data-bs-toggle="modal"
                     data-bs-target="#importFournisseurModal">
                     <i class="fas fa-file-import me-2"></i>
                     Importer
-                </button>
+                </button> -->
 
                 <div class="">
                     <input type="search" placeholder="Recherche de fournisseur ..." name="" class="form-control" id="searchFournisseur">

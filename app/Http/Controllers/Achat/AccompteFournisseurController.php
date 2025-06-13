@@ -48,7 +48,6 @@ class AccompteFournisseurController extends Controller
             $acomptes->search($request->search);
         }
 
-        // $acomptes = $acomptes->paginate(10);
         $acomptes = $acomptes->get();
 
         // Statistiques
@@ -82,7 +81,7 @@ class AccompteFournisseurController extends Controller
             return response()->json(['error' => 'Requête non autorisée'], 403);
         }
 
-        $acomptes = AcompteClient::with(['client', 'createdBy'])
+        $acomptes = AccompteFournisseur::with(['fournisseur', 'createdBy'])
             ->latest();
 
         // Application des filtres
@@ -105,17 +104,17 @@ class AccompteFournisseurController extends Controller
             $acomptes->search($request->search);
         }
 
-        $acomptes = $acomptes->paginate(10);
+        $acomptes = $acomptes->get();
 
         return response()->json([
-            'html' => view('pages.ventes.acompte.partials.list', compact('acomptes'))->render(),
+            'html' => view('pages.achat.acompte.partials.list', compact('acomptes'))->render(),
             'stats' => [
-                'total' => AcompteClient::count(),
-                'montant_total' => AcompteClient::sum('montant'),
-                'acomptes_mois' => AcompteClient::whereMonth('date', now()->month)
+                'total' => AccompteFournisseur::count(),
+                'montant_total' => AccompteFournisseur::sum('montant'),
+                'acomptes_mois' => AccompteFournisseur::whereMonth('date', now()->month)
                     ->whereYear('date', now()->year)
                     ->count(),
-                'montant_mois' => AcompteClient::whereMonth('date', now()->month)
+                'montant_mois' => AccompteFournisseur::whereMonth('date', now()->month)
                     ->whereYear('date', now()->year)
                     ->sum('montant')
             ]

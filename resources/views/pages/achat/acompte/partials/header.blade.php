@@ -31,9 +31,9 @@
                 </button>
 
                 <button type="button"
-                        class="btn btn-primary px-3 d-inline-flex align-items-center"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addAcompteModal">
+                    class="btn btn-primary px-3 d-inline-flex align-items-center"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addAcompteModal">
                     <i class="fas fa-plus me-2"></i>
                     Nouvel Acompte
                 </button>
@@ -145,36 +145,41 @@
 </div>
 
 <style>
-/* On garde les mêmes styles que l'original mais on ajoute quelques spécificités pour les montants */
-:root {
-    --kadjiv-orange: #FFA500;
-    --kadjiv-orange-light: rgba(255, 165, 0, 0.1);
-}
+    /* On garde les mêmes styles que l'original mais on ajoute quelques spécificités pour les montants */
+    :root {
+        --kadjiv-orange: #FFA500;
+        --kadjiv-orange-light: rgba(255, 165, 0, 0.1);
+    }
 
-/* Style spécifique pour les montants */
-.card h4 {
-    font-family: 'Consolas', monospace;
-    font-size: 1.5rem;
-}
+    /* Style spécifique pour les montants */
+    .card h4 {
+        font-family: 'Consolas', monospace;
+        font-size: 1.5rem;
+    }
 
-/* Animation pour les changements de montants */
-@keyframes highlight {
-    0% { background-color: var(--kadjiv-orange-light); }
-    100% { background-color: transparent; }
-}
+    /* Animation pour les changements de montants */
+    @keyframes highlight {
+        0% {
+            background-color: var(--kadjiv-orange-light);
+        }
 
-.amount-change {
-    animation: highlight 1s ease-out;
-}
+        100% {
+            background-color: transparent;
+        }
+    }
+
+    .amount-change {
+        animation: highlight 1s ease-out;
+    }
 </style>
 
 <script>
-function refreshPage() {
-    const icon = document.querySelector('.fa-sync-alt');
-    icon.classList.add('refresh-spinner');
+    function refreshPage() {
+        const icon = document.querySelector('.fa-sync-alt');
+        icon.classList.add('refresh-spinner');
 
-    setTimeout(() => {
-        window.location.reload();
-    }, 500);
-}
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+    }
 </script>
