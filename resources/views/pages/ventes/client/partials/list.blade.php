@@ -145,7 +145,7 @@
                             <td>
                                 <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->solde,2,',',' ')}}</span>
                             </td>
-                           
+                            
                             <td class="text-end">
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-light-primary btn-icon"
