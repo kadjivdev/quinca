@@ -76,6 +76,7 @@ class ReglementRevendeur extends Model
      *
      * @return array<string, string>
      */
+    
     public static function getTypesReglement(): array
     {
         return [
@@ -90,7 +91,6 @@ class ReglementRevendeur extends Model
             self::TYPE_AVOIR => 'Avoir'
         ];
     }
-
 
     /**
      * Relation avec la facture client
@@ -179,7 +179,7 @@ class ReglementRevendeur extends Model
 
         // Debug pour voir les valeurs
         Log::info('Vérification du montant du règlement', [
-            'facture_id' => $this->facture->id,
+            'facture_revendeur_id' => $this->facture->id,
             'montant_ttc' => $montantTTC,
             'total_deja_regle' => $totalDejaRegle,
             'reste_a_payer' => $resteAPayer,
@@ -203,7 +203,7 @@ class ReglementRevendeur extends Model
     {
         return $this->statut === self::STATUT_BROUILLON
             && $this->verifierMontant()
-            && $this->facture->statut === FactureClient::STATUT_VALIDE
+            && $this->facture->statut === FactureRevendeur::STATUT_VALIDE
             && $this->verifierInformationsRequises()
             && !$this->facture->est_solde;  // Vérification supplémentaire
     }
@@ -276,6 +276,7 @@ class ReglementRevendeur extends Model
      *
      * @return bool
      */
+
     private function verifierInformationsRequises(): bool
     {
         $champsRequis = self::$validationRules[$this->type_reglement] ?? [];
@@ -285,7 +286,6 @@ class ReglementRevendeur extends Model
                 return false;
             }
         }
-
         return true;
     }
 

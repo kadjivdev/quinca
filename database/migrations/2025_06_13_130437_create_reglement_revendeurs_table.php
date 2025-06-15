@@ -23,7 +23,7 @@ return new class extends Migration
 
             $table->foreignId('facture_revendeur_id')
                 ->nullable()
-                ->constrained('facture_clients')
+                ->constrained('facture_revendeurs')
                 ->onDelete('restrict');
 
             $table->foreignId('created_by')

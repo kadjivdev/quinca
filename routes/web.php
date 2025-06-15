@@ -13,7 +13,7 @@ use App\Http\Controllers\Parametre\ConversionUniteController;
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
 use App\Http\Controllers\Achat\{AccompteFournisseurController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
-use App\Http\Controllers\Vente\{AcompteClientController, ClientController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, TransportController};
+use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, TransportController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
@@ -913,6 +913,24 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('revendeurs')->group(function () {
+        // Clients
+        Route::prefix('clients')->group(function () {
+            Route::get('/', [ClientRevendeurController::class, 'index'])->name('revendeur.clients.index');
+            Route::post('/', [ClientRevendeurController::class, 'store'])->name('revendeur.clients.store');
+            Route::get('/refresh-list', [ClientRevendeurController::class, 'refreshList'])->name('revendeur.clients.refresh-list');
+            Route::get('/{client}', [ClientRevendeurController::class, 'show'])->name('revendeur.clients.show');
+            Route::put('/{client}', [ClientRevendeurController::class, 'update'])->name('revendeur.clients.update');
+            Route::delete('/{client}', [ClientRevendeurController::class, 'destroy'])->name('revendeur.clients.destroy');
+            Route::get('/{client}/historique', [ClientRevendeurController::class, 'historique'])->name('revendeur.clients.historique');
+            Route::get('/{client}/factures', [ClientRevendeurController::class, 'factures'])->name('revendeur.clients.factures');
+            Route::get('/{client}/reglements', [ClientRevendeurController::class, 'reglements'])->name('revendeur.clients.reglements');
+
+            Route::get('/template/download', [ClientRevendeurController::class, 'downloadTemplate'])
+                ->name('revendeur.clients.template.download');
+
+            Route::post('/import', [ClientRevendeurController::class, 'import'])->name('revendeur.clients.import');
+        });
+
         // Routes pour les factures
         Route::prefix('factures')->group(function () {
             // Liste des factures

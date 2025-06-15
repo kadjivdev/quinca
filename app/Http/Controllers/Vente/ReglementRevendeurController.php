@@ -22,6 +22,7 @@ class ReglementRevendeurController extends Controller
         // Récupération des réglements avec pagination et relations
         $reglements = ReglementRevendeur::with([
             'facture.client',
+            'facture.lignes.article',
             'createdBy',
             'validatedBy'
         ])->latest();
@@ -97,11 +98,9 @@ class ReglementRevendeurController extends Controller
             ->latest()
             ->get();
 
-            // dd($factures);
         // Types de règlement disponibles
         $typesReglement = ReglementRevendeur::getTypesReglement();
 
-        // dd($reglements);
         return view('pages.ventes.reglement-revendeurs.index', compact(
             'reglements',
             'clients',
@@ -185,7 +184,7 @@ class ReglementRevendeurController extends Controller
             // Validation des données
             $validated = $request->validate(
                 [
-                    'facture_id' => 'required|exists:facture_revendeurs,id',
+                    'facture_revendeur_id' => 'required|exists:facture_revendeurs,id',
                     'date_reglement' => 'required|date',
                     'type_reglement' => 'required|string',
                     'montant' => 'required|numeric|min:0',
@@ -196,18 +195,18 @@ class ReglementRevendeurController extends Controller
                 ],
                 [
                     "reference_preuve.unique" => "Cette reference existe déjà",
-                    "facture_id.facture_revendeurs"=>"La facture doit être une facture revendeur"
+                    "facture_revendeur_id.facture_revendeurs"=>"La facture doit être une facture revendeur"
                 ]
             );
 
             DB::beginTransaction();
 
             // Charger la facture avec ses règlements
-            $facture = FactureRevendeur::findOrFail($validated['facture_id']);
+            $facture = FactureRevendeur::findOrFail($validated['facture_revendeur_id']);
 
             // Créer le règlement
             $reglement = new ReglementRevendeur();
-            $reglement->facture_revendeur_id = $validated['facture_id'];
+            $reglement->facture_revendeur_id = $validated['facture_revendeur_id'];
             $reglement->facture()->associate($facture); // Important: associer la facture
             $reglement->date_reglement = $validated['date_reglement'];
             $reglement->type_reglement = $validated['type_reglement'];
@@ -266,27 +265,27 @@ class ReglementRevendeurController extends Controller
             DB::beginTransaction();
 
             // Récupérer le règlement avec sa facture et les relations nécessaires
-            $reglement = ReglementRevendeur::with(['facture', 'facture.reglements'])
+            $reglement = ReglementRevendeur::with(['facture.reglements'])
                 ->findOrFail($id);
 
             // Vérifier si on a une session de caisse ouverte
-            $sessionCaisse = SessionCaisse::where('utilisateur_id', auth()->id())
-                ->where('statut', 'ouverte')
-                ->first();
+            // $sessionCaisse = SessionCaisse::where('utilisateur_id', auth()->id())
+            //     ->where('statut', 'ouverte')
+            //     ->first();
 
-            if (!$sessionCaisse) {
-                throw new Exception('Vous devez avoir une session de caisse ouverte pour valider un règlement');
-            }
+            // if (!$sessionCaisse) {
+            //     throw new \Exception('Vous devez avoir une session de caisse ouverte pour valider un règlement');
+            // }
 
             // Valider le règlement
             if (!$reglement->valider(auth()->id())) {
-                throw new Exception("Erreur lors de la validation du règlement");
+                throw new \Exception("Erreur lors de la validation du règlement");
             }
 
             // Mettre à jour la session caisse
-            if (method_exists($sessionCaisse, 'mettreAJourTotaux')) {
-                $sessionCaisse->mettreAJourTotaux();
-            }
+            // if (method_exists($sessionCaisse, 'mettreAJourTotaux')) {
+            //     $sessionCaisse->mettreAJourTotaux();
+            // }
 
             DB::commit();
 
@@ -294,7 +293,7 @@ class ReglementRevendeurController extends Controller
             Log::info('Règlement validé avec succès', [
                 'reglement_id' => $id,
                 'utilisateur_id' => auth()->id(),
-                'session_caisse_id' => $sessionCaisse->id,
+                // 'session_caisse_id' => $sessionCaisse->id,
                 'montant' => $reglement->montant
             ]);
 
@@ -309,7 +308,7 @@ class ReglementRevendeurController extends Controller
                     ])
                 ]
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
 
             Log::error('Erreur lors de la validation du règlement', [
@@ -476,7 +475,7 @@ class ReglementRevendeurController extends Controller
 
             // Vérifier si le règlement est modifiable (statut brouillon)
             if ($reglement->statut !== ReglementRevendeur::STATUT_BROUILLON) {
-                throw new Exception('Ce règlement ne peut plus être modifié car il a déjà été validé ou annulé.');
+                throw new \Exception('Ce règlement ne peut plus être modifié car il a déjà été validé ou annulé.');
             }
 
             // Validation des données
@@ -500,7 +499,7 @@ class ReglementRevendeurController extends Controller
 
             // Vérifier si le nouveau montant ne dépasse pas le reste à payer
             if ($validated['montant'] > $resteAPayer) {
-                throw new Exception('Le montant du règlement dépasse le reste à payer de la facture');
+                throw new \Exception('Le montant du règlement dépasse le reste à payer de la facture');
             }
 
             // Validation spécifique selon le type de règlement
@@ -544,7 +543,7 @@ class ReglementRevendeurController extends Controller
             $reglement->banque = $validated['banque'];
             $reglement->date_echeance = $validated['date_echeance'];
             $reglement->notes = $validated['notes'];
-            $reglement->updated_by = auth()->id();
+            // $reglement->updated_by = auth()->id();
             $reglement->updated_at = now();
 
             // Sauvegarder les modifications
@@ -611,7 +610,7 @@ class ReglementRevendeurController extends Controller
 
             // Vérifier si le règlement n'est pas déjà annulé
             if ($reglement->statut === 'annule') {
-                throw new Exception('Ce règlement est déjà annulé');
+                throw new \Exception('Ce règlement est déjà annulé');
             }
 
             // Stocker l'ancien statut pour le log
@@ -642,7 +641,7 @@ class ReglementRevendeurController extends Controller
                     ])
                 ]
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur lors de l\'annulation du règlement:', [
                 'reglement_id' => $id,
@@ -657,7 +656,7 @@ class ReglementRevendeurController extends Controller
         }
     }
 
-    public function destroy(ReglementClient $reglement)
+    public function destroy(ReglementRevendeur $reglement)
     {
         try {
             if ($reglement->isValidated()) {
@@ -684,10 +683,10 @@ class ReglementRevendeurController extends Controller
     /**
      * Obtenir les détails d'un règlement
      *
-     * @param ReglementClient $reglement
+     * @param ReglementRevendeur $reglement
      * @return JsonResponse
      */
-    public function getDetailsReglement(ReglementClient $reglement): JsonResponse
+    public function getDetailsReglement(ReglementRevendeur $reglement): JsonResponse
     {
         // Chargement des relations nécessaires
         $reglement->load('facture.client');

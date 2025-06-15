@@ -26,7 +26,7 @@
         // Fonction pour valider le règlement
         function validateReglement(reglementId, row) {
             $.ajax({
-                url: `${apiUrl}/vente/reglement/${reglementId}/validate`,
+                url: `${apiUrl}/revendeurs/reglement-revendeurs/${reglementId}/validate`,
                 type: 'POST',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content')
@@ -46,34 +46,36 @@
                         });
 
                         // Rafraîchir la liste des règlements
-                        window.location.href = `${apiUrl}/vente/reglement/`
+                        window.location.href = `${apiUrl}/revendeurs/reglement-revendeurs/`
                         // refreshList();
                     } else {
                         Toast.fire({
                             icon: 'error',
                             title: response.message || 'Erreur lors de la validation'
                         });
-                        window.location.href = `${apiUrl}/vente/reglement/`
+                        window.location.href = `${apiUrl}/revendeurs/reglement-revendeurs/`
                     }
                 },
                 error: function(xhr) {
-
-                    // Gérer les différents types d'erreurs
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                    if (xhr.responseJSON.message) {
+                        alert(xhr.responseJSON.message)
                         Toast.fire({
-                            icon: 'error',
+                            icon: xhr.responseJSON.message,
                             title: xhr.responseJSON.message
-                        });
-                        // alert(xhr.responseJSON.message)
+                        })
+                    } else {
+                        Toast.fire({
+                            icon: `Une erreur est survenue`,
+                            title: xhr.responseJSON.message
+                        })
                     }
-
 
                     // Réactiver le bouton
                     row.find('.btn-validate-reglement')
                         .prop('disabled', false)
                         .html('<i class="fas fa-check"></i> Valider');
 
-                    window.location.href = `${apiUrl}/vente/reglement/`
+                    window.location.href = `${apiUrl}/revendeurs/reglement-revendeurs/`
                 }
             });
         }

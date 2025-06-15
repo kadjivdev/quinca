@@ -24,7 +24,7 @@
                 <td><span class="badge bg-light text-dark text-center"> {{ number_format($fournisseur->factureAchatAmount, 2, ',', ' ') }}</span></td>
                 <td><span class="badge bg-light text-warning text-center"> {{ number_format($fournisseur->reglementsAmount, 2, ',', ' ') }}</span></td>
                 <td><span class="badge bg-light text-warning text-center"> {{ number_format($fournisseur->accompteAmount, 2, ',', ' ') }}</span></td>
-                <td><span class="badge bg-success text-center"> {{ number_format($fournisseur->reste_solde, 2, ',', ' ') }}</span></td>
+                <td><span class="badge @if($fournisseur->reste_solde>0) bg-success @elseif($fournisseur->reste_solde<0) bg-danger @else bg-light text-dark @endif  text-center"> {{ number_format($fournisseur->reste_solde, 2, ',', ' ') }}</span></td>
                 <td class="border p-1 m-0">
                     <div class="dropdown text-center">
                         <button class="btn btn-icon w-100 btn-light" type="button" data-bs-toggle="dropdown">

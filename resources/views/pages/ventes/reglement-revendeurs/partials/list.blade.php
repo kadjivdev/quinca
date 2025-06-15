@@ -105,14 +105,14 @@
                                         <i class="fas fa-check"></i>
                                     </button>
 
-                                    @if ($reglement->statut !== 'annule')
+                                    <!-- @if ($reglement->statut !== 'annule')
                                     <button
                                         class="btn btn-sm btn-light-danger btn-icon ms-1 btn-cancel-reglement"
                                         data-reglement-id="{{ $reglement->id }}" data-bs-toggle="tooltip"
                                         title="Annuler le règlement">
                                         <i class="fas fa-times"></i>
                                     </button>
-                                    @endif
+                                    @endif -->
 
                                     {{-- Supprimer --}}
                                     <button class="btn btn-sm btn-light-danger btn-icon ms-1"

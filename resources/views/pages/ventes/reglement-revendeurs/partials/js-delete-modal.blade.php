@@ -13,13 +13,13 @@
             if (result.isConfirmed) {
                 // Stocker une référence au bouton
                 const button = $(`button[onclick="deleteReglement(${id})"]`);
-                
+
                 // Désactiver le bouton et afficher le loader
                 button.prop('disabled', true)
-                      .html('<i class="fas fa-spinner fa-spin"></i>');
-    
+                    .html('<i class="fas fa-spinner fa-spin"></i>');
+
                 $.ajax({
-                    url: `${apiUrl}/vente/reglement/${id}`,
+                    url: `${apiUrl}/revendeurs/reglement-revendeurs/${id}`,
                     type: 'DELETE',
                     success: function(response) {
                         if (response.success) {
@@ -27,7 +27,9 @@
                                 icon: 'success',
                                 title: response.message
                             });
-                            refreshList();
+                            // refreshList();
+                            window.location.href = `${apiUrl}/revendeurs/reglement-revendeurs/`
+
                         } else {
                             Toast.fire({
                                 icon: 'error',
@@ -35,7 +37,7 @@
                             });
                             // Restaurer le bouton en cas d'erreur
                             button.prop('disabled', false)
-                                  .html('<i class="fas fa-trash"></i>');
+                                .html('<i class="fas fa-trash"></i>');
                         }
                     },
                     error: function(xhr) {
@@ -49,10 +51,10 @@
                         });
                         // Restaurer le bouton en cas d'erreur
                         button.prop('disabled', false)
-                              .html('<i class="fas fa-trash"></i>');
+                            .html('<i class="fas fa-trash"></i>');
                     }
                 });
             }
         });
     }
-    </script>
+</script>

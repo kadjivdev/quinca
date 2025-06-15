@@ -62,7 +62,7 @@ class Client extends Model
     // Factures Revendeurs
     public function facturesRevendeur(): HasMany
     {
-        return $this->hasMany(FactureRevendeur::class)->with("client");
+        return $this->hasMany(FactureRevendeur::class)->with(["client", 'reglements']);
     }
 
     /** SOLDE DU CLIENT */
@@ -92,23 +92,20 @@ class Client extends Model
     public function soldeRevendeur()
     {
         // Factures Revendeurs
-        $facturesRevendeurAmount = $this->facturesRevendeur()
+        $facturesRevendeurAmount = $this->facturesRevendeur
             ->whereNotNull('validated_by')
             ->sum("montant_ttc");
 
         //sum des règlements de chaque factures
-        $reglementsAmount = $this->facturesRevendeur->sum(function ($facturesRevendeur) {
-            return $facturesRevendeur->reglements
-                ->whereNotNull('validated_at')
-                ->sum("montant");
-        });
+        $reglementsAmount = $this->facturesRevendeur
+            ->whereNotNull('validated_by')
+            ->sum(function ($factureRevendeur) { //sum des règlements de chaque factures
+                return $factureRevendeur->reglements
+                    ->whereNotNull('validated_at')
+                    ->sum("montant");
+            });
 
-        /** Les accomptes */
-        $clientAccomptesAmount = $this->acomptes
-            ->whereNotNull("validated_by")
-            ->sum("montant");
-
-        return $facturesRevendeurAmount - ($reglementsAmount + $clientAccomptesAmount);
+        return $facturesRevendeurAmount - $reglementsAmount;
     }
 
     public function soldeInitial()
@@ -129,6 +126,30 @@ class Client extends Model
     public function agent()
     {
         return $this->belongsTo(Agent::class, 'agent_id');
+    }
+
+    /** MONTANT DES REGLEMENT DES FACTURES CLIENTS */
+    function reglementFacturesClientsAmount(): float
+    {
+        return $this->facturesClient
+            ->whereNotNull("validated_by")
+            ->sum(function ($factureClient) {
+                return $factureClient->reglements
+                    ->whereNotNull("validated_by")
+                    ->sum("montant");
+            });
+    }
+
+    /** MONTANT DES REGLEMENT DES FACTURES REVENDEURS */
+    function reglementFacturesRevendeursAmount(): float
+    {
+        return $this->facturesRevendeur
+            ->whereNotNull("validated_by")
+            ->sum(function ($factureRevendeur) {
+                return $factureRevendeur->reglements
+                    ->whereNotNull("validated_by")
+                    ->sum("montant");
+            });
     }
 
     // Scopes

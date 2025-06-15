@@ -56,8 +56,6 @@ class LigneFactureRevendeur extends Model
         'montant_ttc' => 'decimal:3'
     ];
 
-
-
     public function tarification(): BelongsTo
     {
         return $this->belongsTo(Tarification::class);
@@ -67,7 +65,7 @@ class LigneFactureRevendeur extends Model
     {
         return $this->belongsTo(UniteMesure::class, 'unite_vente_id');
     }
-    
+
     /**
      * Le depot (magasin de la facture)
      */
@@ -155,8 +153,6 @@ class LigneFactureRevendeur extends Model
             throw $e;
         }
     }
-
-
 
     // Calcul des montants
     protected function calculerMontants()

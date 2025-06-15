@@ -120,7 +120,6 @@ class FactureRevendeur extends Model
         });
     }
 
-
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
@@ -133,7 +132,7 @@ class FactureRevendeur extends Model
 
     public function lignes(): HasMany
     {
-        return $this->hasMany(LigneFactureRevendeur::class);
+        return $this->hasMany(LigneFactureRevendeur::class)->with("article");
     }
 
     public function reglements(): HasMany

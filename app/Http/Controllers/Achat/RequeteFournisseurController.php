@@ -209,7 +209,7 @@ class RequeteFournisseurController extends Controller
                 'montant' =>  $requete->montant,
                 'facture_id' => null,
                 'fournisseur_id' => $requete->fournisseur_id,
-                'user_id' => Auth::user()->id,
+                // 'user_id' => Auth::user()->id,
                 'type_paiement' => 'virement',
                 'requete_id' => $requete->id,
                 'point_de_vente_id' => Auth::user()->point_de_vente_id,

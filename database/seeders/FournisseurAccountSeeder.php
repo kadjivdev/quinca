@@ -5,9 +5,11 @@ namespace Database\Seeders;
 use App\Models\Achat\Fournisseur;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
-class FournisseurApproSeeder extends Seeder
+class FournisseurAccountSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -88,8 +90,8 @@ class FournisseurApproSeeder extends Seeder
             "W58RHT" => 0,
             "W5SB0I" => 0,
             "W68HKH" => 0,
-            "WB7A96" => 1186100,
-            "WK5DAK" => 205405214,
+            "WB7A96" => 1344700,
+            "WK5DAK" => 198611801,
             "XFFQG0" => 0,
             "XRVPGF" => 0,
             "XTG0V5" => 0,
@@ -105,21 +107,26 @@ class FournisseurApproSeeder extends Seeder
             foreach ($fournisseurSoldes as $code => $solde) {
                 $fournisseur = Fournisseur::firstWhere("code_fournisseur", $code);
                 if ($fournisseur) {
-                    $fournisseur->approvisionnements()
+                    $fournisseur->accomptes()
                         ->create(
                             [
-                                "montant" => $solde,
-                                "user_id" => 1,
-                                "validated_by" => 1,
-                                "validated_at" => Carbon::now(),
                                 "date" => Carbon::now(),
-                                "source" => "DIRECTION",
+                                "montant" => $solde,
+                                'created_by' => 1,
+                                'type_paiement' => 'virement',
+                                'reference' => Str::uuid(),
+                                'point_de_vente_id' => 1,
+                                'observation' => "Account effectué lors de la migration",
+                                "statut" => 'valide',
+                                'validated_at' => now(),
+                                'validated_by' => 1,
+                                'created_by' => 1
                             ]
                         );
                 }
             }
             DB::commit();
-            echo "Approvisionnement éffectué avec succes";
+            echo "Insersion des accomptes éffectué avec succes";
         } catch (\Exception $e) {
             echo $e->getMessage();
         }

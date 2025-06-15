@@ -42,7 +42,7 @@
                                         {{-- Sélection Facture --}}
                                         <div class="col-md-6">
                                             <label class="form-label fw-medium required">Facture</label>
-                                            <select class="form-control" name="facture_id" id="factureSelect" required>
+                                            <select class="form-control" name="facture_revendeur_id" id="factureSelect" required>
                                                 <option value="">Sélectionner une facture</option>
                                             </select>
                                             <!-- <div class="invalid-feedback">Veuillez sélectionner une facture</div> -->
@@ -145,7 +145,9 @@
         </div>
     </div>
 </div>
+
 <link href="{{ asset('css/theme/modal.css') }}" rel="stylesheet">
+
 <style>
     .required:after {
         content: " *";

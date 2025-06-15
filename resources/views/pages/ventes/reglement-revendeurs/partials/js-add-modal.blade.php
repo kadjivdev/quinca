@@ -49,9 +49,6 @@
 
         // Détruire select2 à la fermeture du modal
         $('#addReglementModal').on('hidden.bs.modal', function() {
-            // if ($('#factureSelect').data('select2')) {
-            //     $('#factureSelect').select2('destroy');
-            // }
 
             if ($('#clientDisplay').data('select2')) {
                 $('#clientDisplay').select2('destroy');
@@ -74,14 +71,13 @@
 
                 // Mettre à jour l'affichage
                 factures.forEach(facture => {
-                    // console.log(facture)
                     $('#factureSelect').append(
                         facture.montant_ttc > facture.reglements_sum_montant ?
                         `<option value="${facture.id}"
                             data-client="${facture.client.raison_sociale}"
                             data-montant="${facture.montant_ttc}"
                             data-reste="${facture.montant_ttc - facture.montant_regle}">
-                            ${facture.id} | ${facture.numero} - ${facture.client.raison_sociale}
+                            ${facture.numero} - ${facture.client.raison_sociale}
                             (Montant: ${facture.montant_ttc} | Reste: ${facture.montant_ttc - facture.montant_regle} F)
                         </option>
                         ` :
@@ -116,9 +112,6 @@
                 // const clientName = selectedOption.data('client');
                 const resteAPayer = selectedOption.data('reste');
 
-                // console.log(selectedOption)
-                // Mettre à jour l'affichage
-                // $('#clientDisplay').text(clientName);
                 $('#resteAPayer').html(
                     `Reste à payer: <strong>${formatMontant(resteAPayer)} F</strong>`);
 
@@ -133,7 +126,6 @@
                 $('#resteAPayer').text('');
                 $('#montant').prop('disabled', true).val('');
             }
-
             updateSaveButton();
         });
 
@@ -208,7 +200,7 @@
             submitBtn.prop('disabled', true)
                 .html('<i class="fas fa-spinner fa-spin me-2"></i>Enregistrement...');
             $.ajax({
-                url: `${apiUrl}/vente/reglement/store`,
+                url: `${apiUrl}/revendeurs/reglement-revendeurs/store`,
                 type: 'POST',
                 data: new FormData(this),
                 processData: false,
@@ -223,7 +215,7 @@
                         // Réinitialiser le formulaire
                         resetForm();
                         // Rafraîchir la liste
-                        window.location.href = `${apiUrl}/vente/reglement/`
+                        window.location.href = `${apiUrl}/revendeurs/reglement-revendeurs/`
 
                         // refreshList();
                     } else {
@@ -231,18 +223,24 @@
                             icon: 'error',
                             title: response.message
                         });
-                        window.location.href = `${apiUrl}/vente/reglement/`
+                        window.location.href = `${apiUrl}/revendeurs/reglement-revendeurs/`
                     }
                 },
                 error: function(xhr) {
-                    let message = 'Une erreur est survenue';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        message = xhr.responseJSON.message;
+                    let message = `Une erreur est survenue`;
+                    if (xhr.responseJSON.message) {
+                        alert(xhr.responseJSON.message)
+                        Toast.fire({
+                            icon: xhr.responseJSON.message,
+                            title: xhr.responseJSON.message
+                        })
+                    } else {
+                        Toast.fire({
+                            icon: `Une erreur est survenue`,
+                            title: xhr.responseJSON.message
+                        })
                     }
-                    Toast.fire({
-                        icon: 'error',
-                        title: message
-                    });
+                    // alert(message);
                 },
                 complete: function() {
                     submitBtn.prop('disabled', false)

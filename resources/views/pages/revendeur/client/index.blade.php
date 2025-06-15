@@ -39,22 +39,22 @@
 
 @section('content')
     <div class="content">
-        @include('pages.ventes.client.partials.header')
+        @include('pages.revendeur.client.partials.header')
         <div class="row g-3 list mt-3" id="stockEntriesList">
-            @include('pages.ventes.client.partials.list')
+            @include('pages.revendeur.client.partials.list')
         </div>
     </div>
 
-    @include('pages.ventes.client.partials.add-modal')
-    @include('pages.ventes.client.partials.show-modal')
-    @include('pages.ventes.client.partials.edit-modal')
-    @include('pages.ventes.client.partials.import-modal')
+    @include('pages.revendeur.client.partials.add-modal')
+    @include('pages.revendeur.client.partials.show-modal')
+    @include('pages.revendeur.client.partials.edit-modal')
+    @include('pages.revendeur.client.partials.import-modal')
     
 @endsection
 @push('scripts')
 
-@include('pages.ventes.client.partials.js-add-modal')
-@include('pages.ventes.client.partials.js-edit-modal')
-@include('pages.ventes.client.partials.js-delete-modal')
-@include('pages.ventes.client.partials.js-import-modal')
+@include('pages.revendeur.client.partials.js-add-modal')
+@include('pages.revendeur.client.partials.js-edit-modal')
+@include('pages.revendeur.client.partials.js-delete-modal')
+@include('pages.revendeur.client.partials.js-import-modal')
 @endpush

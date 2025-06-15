@@ -213,7 +213,6 @@ class FactureClient extends Model
             ->exists();
     }
 
-
     public function estTotalementLivree(): bool
     {
         // Récupérer toutes les lignes de facture avec leurs quantités livrées

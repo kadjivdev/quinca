@@ -22,7 +22,7 @@
         });
 
         // Charger les données
-        fetch(`${apiUrl}/vente/reglement/${id}/details`)
+        fetch(`${apiUrl}/revendeurs/reglement-revendeurs/${id}/details`)
             .then(response => response.json())
             .then(response => {
                 if (!response.success) {

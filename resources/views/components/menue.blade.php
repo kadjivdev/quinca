@@ -267,7 +267,6 @@
                             <div class="dropdown-item-wrapper">Transports</div>
                         </a></li>
                     @endcan
-
                     @endcan
                 </ul>
             </li>
@@ -281,8 +280,8 @@
                     <span class="uil fs-8 me-2 uil-dollar-sign"></span>Revendeur
                 </a>
                 <ul class="dropdown-menu navbar-dropdown-caret">
-                    @cannot('revendeur.clients.view')
-                    <li><a class="dropdown-item" href="{{ route('vente.clients.clientRevendeur') }}">
+                    @can('revendeur.clients.view')
+                    <li><a class="dropdown-item" href="{{ route('revendeur.clients.index') }}">
                             <div class="dropdown-item-wrapper">Liste des Clients</div>
                         </a></li>
                     @endcan

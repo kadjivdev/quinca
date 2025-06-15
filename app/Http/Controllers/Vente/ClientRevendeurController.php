@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vente\{Client, ReglementClient};
+use App\Models\Vente\{Client, ReglementClient, ReglementRevendeur};
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +19,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
 
 
-class ClientController extends Controller
+class ClientRevendeurController extends Controller
 {
     /**
      * Affiche la liste des clients
@@ -39,17 +38,17 @@ class ClientController extends Controller
         $user = auth()->user();
         if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
             $clients = Client::with([
-                'facturesClient',
+                'facturesRevendeur',
                 'departement',
                 'agent',
-                'facturesClient.reglements' // Chargement des règlements via les factures
-            ])->latest();
+                'facturesRevendeur.reglements' // Chargement des règlements via les factures
+            ]);
         } else {
             $clients = Client::with([
-                'facturesClient',
+                'facturesRevendeur',
                 'departement',
                 'agent',
-                'facturesClient.reglements' // Chargement des règlements via les factures
+                'facturesRevendeur.reglements' // Chargement des règlements via les factures
             ])->where('point_de_vente_id', Auth()->user()->point_de_vente_id)->latest();
         }
 
@@ -74,107 +73,47 @@ class ClientController extends Controller
             $clients->avecCredit();
         }
 
+        // $clients = $clients->paginate(10);
         $clients = $clients->get()
             ->transform(function ($client) {
                 /**LES FACTURES */
-                $client->facturesAmount = $client->facturesClient
-                ->sum("montant_ttc");
+                $client->facturesAmount = $client->facturesRevendeur
+                    ->whereNotNull('validated_by')
+                    ->sum("montant_ttc");
 
                 /** LES REGLEMENTS */
-                $client->reglementAmount = $client->facturesClient->sum(function ($factureClient) { //sum des règlements de chaque factures
-                    return $factureClient->reglements
-                        ->whereNotNull('validated_at')
-                        ->sum("montant");
-                });
-
-                /** LES ACCOMPTES */
-                $client->clientAccomptesAmount = $client->acomptes
-                    ->whereNotNull("validated_by")
-                    ->sum("montant");
+                $client->reglementAmount = $client->facturesRevendeur
+                    ->whereNotNull('validated_by')
+                    ->sum(function ($factureRevendeur) { //sum des règlements de chaque factures
+                        return $factureRevendeur->reglements
+                            ->whereNotNull('validated_at')
+                            ->sum("montant");
+                    });
 
                 /** SOLDE */
-                $client->solde = $client->solde();
-
+                $client->solde = $client->soldeRevendeur();
                 return $client;
             });
 
         // Statistiques pour le header
+
         $stats = [
             'total_clients' => Client::count(),
             'clients_actifs' => Client::where('statut', true)->count(),
             'clients_professionnels' => Client::where('categorie', 'professionnel')->count(),
             'clients_avec_credit' => Client::where('plafond_credit', '>', 0)->count(),
-            'total_reglements' => DB::table('facture_clients')
-                ->join('reglement_clients', 'facture_clients.id', '=', 'reglement_clients.facture_client_id')
-                ->where('reglement_clients.statut', ReglementClient::STATUT_VALIDE)
-                ->sum('reglement_clients.montant')
+            'total_reglements' => DB::table('facture_revendeurs')
+                ->join('reglement_revendeurs', 'facture_revendeurs.id', '=', 'reglement_revendeurs.facture_revendeur_id')
+                ->where('reglement_revendeurs.statut', ReglementRevendeur::STATUT_VALIDE)
+                ->sum('reglement_revendeurs.montant')
         ];
 
         // Liste des villes pour le filtre
-        $villes = Client::distinct()->pluck('ville')->filter();
+        $villes = Client::distinct()
+            ->pluck('ville')
+            ->filter();
 
-        return view('pages.ventes.client.index', compact(
-            'clients',
-            'stats',
-            'villes',
-            'date'
-        ));
-    }
-
-    // clients pour les revendeurs
-    public function clientRevendeur(Request $request)
-    {
-        // 
-        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
-
-        // Récupération des données avec pagination
-        $clients = Client::with([
-            'facturesClient',
-            'departement',
-            'agent',
-            'facturesClient.reglements' // Chargement des règlements via les factures
-        ])->where('created_by', Auth()->user()->id)->latest();
-
-        // Application des filtres si présents dans la requête
-        if ($request->filled('categorie')) {
-            $clients->where('categorie', $request->categorie);
-        }
-
-        if ($request->filled('ville')) {
-            $clients->where('ville', $request->ville);
-        }
-
-        if ($request->filled('statut')) {
-            $clients->where('statut', $request->statut);
-        }
-
-        if ($request->filled('search')) {
-            $clients->search($request->search);
-        }
-
-        if ($request->has('avec_credit')) {
-            $clients->avecCredit();
-        }
-
-        // $clients = $clients->paginate(10);
-        $clients = $clients->get();
-
-        // Statistiques pour le header
-        $stats = [
-            'total_clients' => $clients->count(),
-            'clients_actifs' => $clients->where('statut', true)->count(),
-            'clients_professionnels' => $clients->where('categorie', 'professionnel')->count(),
-            'clients_avec_credit' => $clients->where('plafond_credit', '>', 0)->count(),
-            'total_reglements' => DB::table('facture_clients')
-                ->join('reglement_clients', 'facture_clients.id', '=', 'reglement_clients.facture_client_id')
-                ->where('reglement_clients.statut', ReglementClient::STATUT_VALIDE)
-                ->sum('reglement_clients.montant')
-        ];
-
-        // Liste des villes pour le filtre
-        $villes = Client::distinct()->pluck('ville')->filter();
-
-        return view('pages.ventes.client.index', compact(
+        return view('pages.revendeur.client.index', compact(
             'clients',
             'stats',
             'villes',
@@ -192,7 +131,7 @@ class ClientController extends Controller
         }
 
         $clients = Client::with([
-            'facturesClient',
+            'facturesRevendeur',
             'reglements'
         ])->latest();
 
@@ -232,7 +171,6 @@ class ClientController extends Controller
     /**
      * Enregistre un nouveau client
      */
-
 
     public function store(Request $request)
     {
@@ -285,7 +223,7 @@ class ClientController extends Controller
                 'message' => 'Client créé avec succès',
                 'data' => [
                     'client' => $client->load([
-                        'facturesClient',
+                        'facturesRevendeur',
                         'reglements',
                         'createdBy'
                     ])
@@ -310,14 +248,13 @@ class ClientController extends Controller
      */
     public function show(Request $request, Client $client)
     {
-        // if (!$request->ajax()) {
-        //     return response()->json(['error' => 'Requête non autorisée'], 403);
-        // }
-
+        if (!$request->ajax()) {
+            return response()->json(['error' => 'Requête non autorisée'], 403);
+        }
 
         // Charger les relations nécessaires
         $client->load([
-            'facturesClient.lignes.article',
+            'facturesRevendeur.lignes.article',
             // 'reglements',
             'createdBy'
         ]);
@@ -349,10 +286,10 @@ class ClientController extends Controller
                 'created_by' => $client->createdBy ? $client->createdBy->name : null
             ],
             'statistiques' => [
-                'total_factures' => $client->facturesClient->count(),
-                'factures_impayees' => $client->facturesClient->where('statut_paiement', 'impaye')->count(),
-                'chiffre_affaires' => $client->facturesClient->sum('montant_ttc'),
-                'total_reglements' => $client->reglementFacturesClientsAmount(),
+                'total_factures' => $client->facturesRevendeur->count(),
+                'factures_impayees' => $client->facturesRevendeur->where('statut_paiement', 'impaye')->count(),
+                'chiffre_affaires' => $client->facturesRevendeur->sum('montant_ttc'),
+                'total_reglements' => $client->reglementFacturesRevendeursAmount(),
             ],
         ];
 
@@ -408,7 +345,7 @@ class ClientController extends Controller
                 'message' => 'Client modifié avec succès',
                 'data' => [
                     'client' => $client->fresh([
-                        'facturesClient',
+                        'facturesRevendeur',
                         'reglements',
                         'createdBy'
                     ])
@@ -451,7 +388,7 @@ class ClientController extends Controller
             DB::beginTransaction();
 
             // Vérifier si le client peut être supprimé
-            if ($client->facturesClient()->count() > 0) {
+            if ($client->facturesRevendeur()->count() > 0) {
                 throw new \Exception('Impossible de supprimer ce client car il a des factures associées');
             }
 
