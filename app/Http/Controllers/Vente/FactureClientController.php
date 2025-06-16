@@ -217,9 +217,9 @@ class FactureClientController extends Controller
              * on verifie si les articles selectionnés
              * sont tous dans son depôts pour les non admins
              */
-            if (!auth()->user()->hasRole("Super Administrateur")) {
+            if (!auth()->user()->hasRole('Super Administrateur')) {
                 $userPv = auth()->user()->pointDeVente;
-                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+                $userPv_depotIds = $userPv->depots->pluck("id")->toArray(); //les depots du users
 
                 foreach ($request->lignes as $ligne) {
                     $depot = Depot::find($ligne["depot_id"]);
@@ -551,35 +551,56 @@ class FactureClientController extends Controller
     {
         $search = $request->get('q');
         Log::info("Terme de recherche:", ["terme" => $search]);
-
         $user = auth()->user();
 
         $stocks = StockDepot::with('article')
             ->get()
             ->filter(function ($stock) use ($search, $user) {
                 /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
-                // if ($user->hasRole("Super Administrateur") || $user->hasRole("CHARGE DES STOCKS ET SUIVI DES ACHATS")) {
-                //     return $stock->article->where('code_article', 'like', "%{$search}%")
-                //         ->orWhere('designation', 'like', "%{$search}%");
-                // }
+                if ($user->hasRole('Super Administrateur') || $user->hasRole('CHARGE DES STOCKS ET SUIVI DES ACHATS')) {
+                    Log::info("Ce user est un admin", $user->getRoleNames()->toArray());
+                    return (
+                        str_contains(strtolower($stock->article->designation), strtolower($search)) ||
+                        str_contains(strtolower($stock->article->code_article), strtolower($search))
+                    );
+                }
 
                 /** ON FILTRE LES STOCKS SELON LES POINT DE VENTE DU USER */
-                // $userPv = auth()->user()->pointDeVente;
-                // $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
-                // if (in_array($stock->depot_id, $userPv_depotIds)) {
-                //     return $stock->article->where('code_article', 'like', "%{$search}%")
-                //     ->orWhere('designation', 'like', "%{$search}%");
-                // }
-                return $stock->article->where('designation', "%{$search}%")
-                    ->orWhere('designation', 'like', "%{$search}%");
+                $userPv = auth()->user()->pointDeVente;
+                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
-                // return (
-                //     str_contains(strtolower($stock->article->designation), strtolower($search)) ||
-                //     str_contains(strtolower($stock->article->code_article), strtolower($search))
-                // );
+                if (in_array($stock->depot_id, $userPv_depotIds)) {
+                    Log::info("Dedans :" . in_array($stock->depot_id, $userPv_depotIds));
+                    Log::info("Ce user est simple", $user->getRoleNames()->toArray());
+
+                    return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
+                        str_contains(strtolower($stock->article->code_article), strtolower($search))
+                    );
+                } else {
+                    Log::info("Pas dedans :" . in_array($stock->depot_id, $userPv_depotIds));
+                }
             });
 
-        // dd($stocks->pluck("article")->pluck("designation"));
+        Log::info(
+            "Total : " .
+                $stocks->count()
+        );
+
+        Log::info(
+            "Les Ids des depots",
+            $stocks
+                ->pluck("depot_id")
+                ->toArray()
+        );
+
+        Log::info("Les Ids des depots du user", auth()->user()->pointDeVente
+            ->depot
+            ->pluck("id")->toArray());
+
+        Log::info("Les articles recherchés", $stocks->pluck("article")
+            ->pluck("designation")
+            ->toArray());
+
         return response()->json([
             'results' => $stocks->map(function ($stock) {
                 /**

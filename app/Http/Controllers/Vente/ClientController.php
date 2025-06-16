@@ -310,9 +310,9 @@ class ClientController extends Controller
      */
     public function show(Request $request, Client $client)
     {
-        // if (!$request->ajax()) {
-        //     return response()->json(['error' => 'Requête non autorisée'], 403);
-        // }
+        if (!$request->ajax()) {
+            return response()->json(['error' => 'Requête non autorisée'], 403);
+        }
 
 
         // Charger les relations nécessaires
