@@ -219,7 +219,7 @@ class FactureClientController extends Controller
              */
             if (!auth()->user()->hasRole('Super Administrateur')) {
                 $userPv = auth()->user()->pointDeVente;
-                $userPv_depotIds = $userPv->depots->pluck("id")->toArray(); //les depots du users
+                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
                 foreach ($request->lignes as $ligne) {
                     $depot = Depot::find($ligne["depot_id"]);
