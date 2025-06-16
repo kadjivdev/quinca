@@ -138,9 +138,9 @@ class ConversionUnite extends Model
             ->first();
 
         // Restaurer la conversion si elle est supprimée
-        if ($conversion && $conversion->trashed()) {
-            $conversion->restore();
-        }
+        // if ($conversion && $conversion->trashed()) {
+        //     $conversion->restore();
+        // }
 
         return $conversion;
     }

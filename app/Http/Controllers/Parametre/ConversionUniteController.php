@@ -161,15 +161,14 @@ class ConversionUniteController extends Controller
                         $articleId
                     );
 
-                    if (!$existingConversion) {
-                        $conversion = $this->createConversion($data);
-                        $createdConversions[] = $conversion;
-                    } else {
-                        throw new \Exception("Cette conversion existe déjà");
-
-                        // // Mettre à jour l'existant si nécessaire
-                        // $existingConversion->update($data);
+                    // Forcer la suppression definitivement
+                    if ($existingConversion) {
+                        $existingConversion->forceDelete();
                     }
+
+                    $conversion = $this->createConversion($data);
+                    $createdConversions[] = $conversion;
+                    
                 }
             }
 
