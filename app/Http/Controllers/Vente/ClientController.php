@@ -251,9 +251,9 @@ class ClientController extends Controller
                 'plafond_credit.required' => 'Le plafond de crédit est obligatoire',
                 'plafond_credit.numeric' => 'Le plafond de crédit doit être un nombre',
                 'plafond_credit.min' => 'Le plafond de crédit doit être positif ou nul',
-                'delai_paiement.required' => 'Le délai de paiement est obligatoire',
-                'delai_paiement.integer' => 'Le délai de paiement doit être un nombre entier',
-                'delai_paiement.min' => 'Le délai de paiement doit être positif ou nul',
+                // 'delai_paiement.required' => 'Le délai de paiement est obligatoire',
+                // 'delai_paiement.integer' => 'Le délai de paiement doit être un nombre entier',
+                // 'delai_paiement.min' => 'Le délai de paiement doit être positif ou nul',
                 'solde_initial.required' => 'Le solde initial est obligatoire',
                 'solde_initial.numeric' => 'Le solde initial doit être un nombre',
                 'solde_initial.min' => 'Le solde initial doit être positif ou nul',
@@ -286,7 +286,7 @@ class ClientController extends Controller
                 'data' => [
                     'client' => $client->load([
                         'facturesClient',
-                        'reglements',
+                        // 'reglements',
                         'createdBy'
                     ])
                 ]
