@@ -192,8 +192,8 @@ class ClientController extends Controller
         }
 
         $clients = Client::with([
-            'facturesClient',
-            'reglements'
+            'facturesClient.reglements',
+            // 'reglements'
         ])->latest();
 
         // Appliquer les filtres
@@ -408,8 +408,8 @@ class ClientController extends Controller
                 'message' => 'Client modifié avec succès',
                 'data' => [
                     'client' => $client->fresh([
-                        'facturesClient',
-                        'reglements',
+                        'facturesClient.reglements',
+                        // 'reglements',
                         'createdBy'
                     ])
                 ]
@@ -455,7 +455,7 @@ class ClientController extends Controller
                 throw new \Exception('Impossible de supprimer ce client car il a des factures associées');
             }
 
-            if ($client->reglements()->count() > 0) {
+            if ($client->facturesClient()->count() > 0) {
                 throw new \Exception('Impossible de supprimer ce client car il a des règlements associés');
             }
 
