@@ -283,7 +283,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
             Route::get('/{article}/show', [ArticleController::class, 'show'])->name('articles.show');
             Route::post('/{article}/article-affect', [ArticleController::class, 'articleAffect'])->name('articles.affect');
-            Route::put('/{article}', [ArticleController::class, 'update'])->name('articles.update');
+            Route::patch('/{article}/update', [ArticleController::class, 'update'])->name('articles.update');
             Route::delete('/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
 
             // inventaires

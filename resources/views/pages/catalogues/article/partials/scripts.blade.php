@@ -124,6 +124,7 @@
                     method: 'GET',
                     success: (response) => {
                         if (response.success) {
+                            // console.log(response.data)
                             this.fillEditForm(response.data);
                             $(this.selectors.editModal).modal('show');
                         }
@@ -141,7 +142,7 @@
             fillEditForm: function(article) {
                 const form = $(this.selectors.editForm);
 
-                form.attr('action', `${apiUrl}/catalogue/articles/${article.id}`);
+                form.attr('action', `${apiUrl}/catalogue/articles/${article.id}/update`);
 
                 // Remplissage des champs
                 form.find('[name="code_article"]').val(article.code_article);
@@ -153,6 +154,7 @@
                 form.find('[name="stock_securite"]').val(article.stock_securite);
                 form.find('[name="stock_actuel"]').val(article.stock_actuel);
                 form.find('[name="emplacement_stock"]').val(article.emplacement_stock);
+                form.find('[name="unite_mesure_id"]').val(article.unite_mesure.libelle_unite);
 
                 // Marquer le mode de reglement
                 const uniteList = $("[name='unite_mesure_id']");
@@ -190,6 +192,12 @@
 
                 formData.set('stockable', $(this.selectors.editStockableCheck).is(':checked') ? '1' : '0');
 
+                // Debug: Log form data
+                console.log('=== DONNÉES DU FORMULAIRE ===');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
                 submitBtn.prop('disabled', true)
                     .html('<i class="fas fa-spinner fa-spin me-2"></i>Traitement...');
 
@@ -210,6 +218,14 @@
                         }
                     },
                     error: (xhr) => {
+                        console.log('=== ERREURS DE VALIDATION ===');
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            console.log('Erreurs de validation:');
+                            for (let field in errors) {
+                                console.log(`${field}: ${errors[field].join(', ')}`);
+                            }
+                        }
                         Toast.fire({
                             icon: 'error',
                             title: xhr.responseJSON?.message || 'Erreur lors de la modification'

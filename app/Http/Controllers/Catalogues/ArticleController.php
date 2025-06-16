@@ -350,7 +350,7 @@ class ArticleController extends Controller
 
     public function edit($id)
     {
-        $article = Article::with(['famille'])->findOrFail($id);
+        $article = Article::with(['famille',"uniteMesure"])->findOrFail($id);
         return response()->json([
             'success' => true,
             'data' => $article
@@ -495,6 +495,8 @@ class ArticleController extends Controller
             ], 422);
         }
 
+        \Log::info("Après validation");
+        
         try {
             $data = $request->all();
             $data['stockable'] = $request->has('stockable');

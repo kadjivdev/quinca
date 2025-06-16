@@ -11,7 +11,7 @@
 
             <form method="POST" id="editArticleForm" enctype="multipart/form-data" class="needs-validation" novalidate>
                 @csrf
-                @method('PUT')
+                @method('PATCH')
                 <div class="modal-body p-4">
                     <div class="row g-4">
                         {{-- Code Article --}}
@@ -37,6 +37,19 @@
                                 <option value="">Sélectionner une famille</option>
                                 @foreach ($familles as $famille)
                                 <option value="{{ $famille->id }}">{{ $famille->libelle_famille }}</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner une famille d'articles
+                            </div>
+                        </div>
+
+                        {{-- unite de mesure --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold required">Unité de mesure</label>
+                            <select class="form-select" name="unite_mesure_id" required>
+                                @foreach ($unites as $unite)
+                                <option value="{{ $unite->id }}">{{ $unite->libelle_unite }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback">
