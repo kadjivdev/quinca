@@ -312,6 +312,34 @@
     </tr>
 </template>
 
+<!-- 
+/** */
+        $.ajax({
+            url: FactureConfig.routes.articlesSearch,
+            method: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                if (response.results) {
+                    console.log('Articles chargés avec succès:', response.results);
+                    response.results.forEach(function ($data) {
+                        let rowOption = `<option value="${$data.id}">${$data.depot.libelle_depot} | stock: ${$data.stock} ${$data.unite_mesure.libelle_unite}</option>`
+                        articleSelect.push(rowOption)
+                    })
+
+                    // Traitement des données reçues si nécessaire
+                } else {
+                    console.error('Erreur lors du chargement des articles:', response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Erreur AJAX:', error);
+                console.error('Status:', status);
+                console.error('Response:', xhr.responseText);
+            }
+        });
+
+
+-->
 
 @push("scripts")
 <script>

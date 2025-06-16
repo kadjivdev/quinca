@@ -570,13 +570,13 @@ class FactureClientController extends Controller
                 //     return $stock->article->where('code_article', 'like', "%{$search}%")
                 //     ->orWhere('designation', 'like', "%{$search}%");
                 // }
-                // return $stock->article->where('designation', "%{$search}%")
-                //     ->orWhere('designation', 'like', "%{$search}%");
+                return $stock->article->where('designation', "%{$search}%")
+                    ->orWhere('designation', 'like', "%{$search}%");
 
-                return (
-                    str_contains(strtolower($stock->article->designation), strtolower($search)) ||
-                    str_contains(strtolower($stock->article->code_article), strtolower($search))
-                );
+                // return (
+                //     str_contains(strtolower($stock->article->designation), strtolower($search)) ||
+                //     str_contains(strtolower($stock->article->code_article), strtolower($search))
+                // );
             });
 
         // dd($stocks->pluck("article")->pluck("designation"));

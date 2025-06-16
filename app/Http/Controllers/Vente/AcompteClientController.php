@@ -128,6 +128,7 @@ class AcompteClientController extends Controller
     public function store(Request $request)
     {
         try {
+
             // Validation des données
             $validated = $request->validate(AcompteClient::rules(), [
                 'date.required' => 'La date est obligatoire',
@@ -152,8 +153,10 @@ class AcompteClientController extends Controller
             // Ajouter le statut par défaut aux données validées
             $validated['statut'] = AcompteClient::STATUT_EN_ATTENTE;
 
+            Log::info("Les validés",$validated);
+
             $acompte = new AcompteClient();
-            $acompte->fill($validated);
+            $acompte->fill($request->all());
             $acompte->created_by = auth()->id();
             // $acompte->reference = $request->reference?->reference;
             $acompte->point_de_vente_id = auth()->user()->point_de_vente_id;
