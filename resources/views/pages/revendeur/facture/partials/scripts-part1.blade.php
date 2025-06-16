@@ -296,22 +296,55 @@ class FactureManager {
             dropdownParent: $('#addFactureModal'),
             placeholder: 'Rechercher un article...',
             allowClear: true,
-            ajax: {
+           ajax: {
                 url: FactureConfig.routes.articlesSearch,
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
+                    console.log('Paramètres de recherche:', params);
                     return {
                         q: params.term,
                         page: params.page || 1
                     };
                 },
                 processResults: function(data, params) {
-                    params.page = params.page || 1;
+                    console.log('Type de data:', typeof data);
+                    console.log('Data complète:', data);
+                    console.log('Data.results existe?', !!data.results);
+                    console.log('Data.results:', data.results);
+
+                    // Vérification basique de la structure
+                    if (!data.results) {
+                        console.error('Pas de résultats dans la réponse');
+                        return {
+                            results: [],
+                            pagination: { more: false }
+                        };
+                    }
+
+                    // Convertir l'objet en tableau
+                    const resultsArray = Object.values(data.results);
+                    console.log('Résultats convertis en tableau:', resultsArray);
+
+                    // Formatage simple des résultats
+                    const formattedResults = resultsArray.map(item => {
+                        console.log('Item brut:', item);
+                        return {
+                            id: item.id,
+                            text: item.text || item.libelle || item.nom || item.designation || 'Sans nom',
+                            code_article: item.code_article,
+                            depot: item.depot,
+                            stock: item.stock,
+                            unite_mesure: item.unite_mesure
+                        };
+                    });
+
+                    console.log('Résultats formatés:', formattedResults);
+
                     return {
-                        results: data.results,
+                        results: formattedResults,
                         pagination: {
-                            more: data.pagination?.more
+                            more: data.pagination?.more || false
                         }
                     };
                 },

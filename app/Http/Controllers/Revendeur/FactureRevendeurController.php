@@ -337,54 +337,60 @@ class FactureRevendeurController extends Controller
         }
     }
 
-    // public function searchArticles(Request $request)
-    // {
-    //     $search = $request->get('q');
-
-    //     $articles = Article::query()
-    //         ->where(function ($query) use ($search) {
-    //             $query->where('code_article', 'like', "%{$search}%")
-    //                 ->orWhere('designation', 'like', "%{$search}%");
-    //         })
-    //         ->where('statut', 'actif')
-    //         ->select(['id', 'code_article', 'designation', 'stock_actuel'])
-    //         ->limit(10)
-    //         ->get();  // Ceci retourne maintenant une Collection
-
-    //     return response()->json([
-    //         'results' => $articles->map(function ($article) {
-    //             return [
-    //                 'id' => $article->id,
-    //                 'text' => $article->designation,
-    //                 'code_article' => $article->code_article,
-    //                 'stock' => $article->stock_actuel
-    //             ];
-    //         })
-    //     ]);
-    // }
 
     public function searchArticles(Request $request)
     {
         $search = $request->get('q');
+        Log::info("Terme de recherche:", ["terme" => $search]);
         $user = auth()->user();
 
         $stocks = StockDepot::with('article')
             ->get()
             ->filter(function ($stock) use ($search, $user) {
                 /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
-                if ($user->hasRole("Super Administrateur") || $user->hasRole("CHARGE DES STOCKS ET SUIVI DES ACHATS")) {
-                    return $stock->article->where('code_article', 'like', "%{$search}%")
-                        ->orWhere('designation', 'like', "%{$search}%");
+                if ($user->hasRole('Super Administrateur') || $user->hasRole('CHARGE DES STOCKS ET SUIVI DES ACHATS')) {
+                    Log::info("Ce user est un admin", $user->getRoleNames()->toArray());
+                    return (
+                        str_contains(strtolower($stock->article->designation), strtolower($search)) ||
+                        str_contains(strtolower($stock->article->code_article), strtolower($search))
+                    );
                 }
 
                 /** ON FILTRE LES STOCKS SELON LES POINT DE VENTE DU USER */
                 $userPv = auth()->user()->pointDeVente;
                 $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+
                 if (in_array($stock->depot_id, $userPv_depotIds)) {
-                    return $stock->article->where('code_article', 'like', "%{$search}%")
-                        ->orWhere('designation', 'like', "%{$search}%");
+                    Log::info("Dedans :" . in_array($stock->depot_id, $userPv_depotIds));
+                    Log::info("Ce user est simple", $user->getRoleNames()->toArray());
+
+                    return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
+                        str_contains(strtolower($stock->article->code_article), strtolower($search))
+                    );
+                } else {
+                    Log::info("Pas dedans :" . in_array($stock->depot_id, $userPv_depotIds));
                 }
             });
+
+        Log::info(
+            "Total : " .
+                $stocks->count()
+        );
+
+        Log::info(
+            "Les Ids des depots",
+            $stocks
+                ->pluck("depot_id")
+                ->toArray()
+        );
+
+        Log::info("Les Ids des depots du user", auth()->user()->pointDeVente
+            ->depot
+            ->pluck("id")->toArray());
+
+        Log::info("Les articles recherchés", $stocks->pluck("article")
+            ->pluck("designation")
+            ->toArray());
 
         return response()->json([
             'results' => $stocks->map(function ($stock) {
@@ -394,8 +400,6 @@ class FactureRevendeurController extends Controller
 
                 $resteStock = $stock->article
                     ->reste($stock->depot_id);
-
-                // return $resteStock;
 
                 return [
                     'id' => $stock->article->id,
@@ -963,7 +967,7 @@ class FactureRevendeurController extends Controller
 
         return $pdf->stream("bordereau_{$facture->numero}.pdf");
     }
-    
+
 
     public function MakevalidationDaily(Request $request)
     {
