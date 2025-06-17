@@ -236,11 +236,11 @@
             </tr>
             <tr>
                 <td><strong>TVA (18 %)</strong></td>
-                <td class="text-right">{{ number_format($montantTTc * 18/100, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->montant_ht * 18/100, 3, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>AIB (1 %)</strong></td>
-                <td class="text-right">{{ number_format($montantTTc * 1/100, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->montant_ht * 1/100, 3, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>Total TTC</strong></td>
