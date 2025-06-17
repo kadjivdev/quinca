@@ -103,6 +103,7 @@
             <tr>
                 <th class="text-center">N° D'ORDRE</th>
                 <th class="text-center">ARTICLES</th>
+                <th class="text-right">UNITE DE MESURE</th>
                 <th class="text-center">QUANTITE</th>
             </tr>
         </thead>
@@ -112,6 +113,7 @@
                 <td class="text-center">{{$loop->index + 1}}</td>
                 <td class="text-center">{{ $ligne->article->designation }}</td>
                 <td class="text-center">{{ number_format($ligne->quantite, 3, ',', ' ') }} {{$ligne->uniteVente?->libelle_unite}} </td>
+                <td class="text-right">{{ $ligne->uniteVente->libelle_unite }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -119,7 +121,7 @@
         <tfoot class="mt-5">
             <tr>
                 <td class="text-center">CLIENT</td>
-                <td class="text-center">CONTROLEUR</td>
+                <td class="text-center" colspan="2" >CONTROLEUR</td>
                 <td class="text-center">COMMERCIAL</td>
             </tr>
         </tfoot>

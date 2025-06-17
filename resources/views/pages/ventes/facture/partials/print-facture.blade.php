@@ -198,6 +198,7 @@
                 <th>Article</th>
                 <th class="text-right">Qté</th>
                 <th class="text-right">Prix Unit. HT</th>
+                <th class="text-right">Unité de mesure</th>
                 <th class="text-right">Remise (%)</th>
                 <th class="text-right">Montant</th>
                 <th class="text-right">TVA</th>
@@ -209,8 +210,8 @@
             <tr>
                 <td>{{ $ligne->article->designation }}</td>
                 <td class="text-right">{{ number_format($ligne->quantite, 3, ',', ' ') }}</td>
-
                 <td class="text-right">{{ number_format($ligne->prix_unitaire_ht, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ $ligne->uniteVente->libelle_unite }}</td>
                 <td class="text-right">{{ number_format($ligne->taux_remise, 2, ',', ' ') }}</td>
                 <td class="text-right">{{ number_format($ligne->montant_ht_apres_remise, 3, ',', ' ') }}</td>
                 <td class="text-right">{{ number_format($ligne->montant_tva, 3, ',', ' ') }}</td>
