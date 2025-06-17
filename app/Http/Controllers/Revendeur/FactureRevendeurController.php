@@ -78,6 +78,7 @@ class FactureRevendeurController extends Controller
                 $factures = $query->where('point_de_vente_id', Auth()->user()->point_de_vente_id)
                     ->get();
             }
+            
             // Ajouter des attributs calculés pour chaque facture
             $factures->transform(function ($facture) {
                 // Calcul du reste à payer

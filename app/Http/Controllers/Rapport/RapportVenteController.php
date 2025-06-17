@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Rapport;
 
 use App\Http\Controllers\Controller;
 use App\Models\Catalogue\{Article, FamilleArticle};
-use App\Models\Vente\{AcompteClient, FactureClient, SessionCaisse, ReglementClient};
+use App\Models\Vente\{AcompteClient, FactureClient, SessionCaisse, ReglementClient, ReglementRevendeur};
 use App\Models\Vente\Client;
 use App\Models\Parametre\PointDeVente;
 use App\Models\Revendeur\FactureRevendeur;
@@ -400,11 +400,16 @@ class RapportVenteController extends Controller
                     'createdBy',
                     'lignes.article', // Ajout des lignes et de l'article
                     'reglements' => function ($query) {
-                        $query->where('statut', ReglementClient::STATUT_VALIDE);
+                        $query->where('statut', ReglementRevendeur::STATUT_VALIDE);
                     }
                 ])->whereDate('date_facture', $date)
                     ->where('statut', 'validee')
                     ->get();
+
+                dd($factureClients);
+
+                $ventes = $factureClients->concat($factureRevendeurs);
+                dd($ventes);
 
                 if ($ventes->isEmpty()) {
                     return view('pages.rapports.ventes.vente-journaliere')

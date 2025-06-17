@@ -188,7 +188,7 @@ class ReglementRevendeurController extends Controller
                     'date_reglement' => 'required|date',
                     'type_reglement' => 'required|string',
                     'montant' => 'required|numeric|min:0',
-                    'reference_preuve' => 'nullable|string|max:255|unique:reglement_clients',
+                    'reference_preuve' => 'nullable|string|max:255|unique:reglement_revendeurs',
                     'banque' => 'nullable|string|max:255',
                     'date_echeance' => 'nullable|date|after_or_equal:date_reglement',
                     'notes' => 'nullable|string'
