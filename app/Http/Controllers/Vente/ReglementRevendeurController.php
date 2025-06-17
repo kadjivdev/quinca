@@ -68,7 +68,6 @@ class ReglementRevendeurController extends Controller
                 ->get();
         }
 
-        // dd($reglements);
         // Données pour les filtres et le modal d'ajout
         $clients = Client::orderBy('raison_sociale')
             ->with(["facturesRevendeur" => function ($query) {

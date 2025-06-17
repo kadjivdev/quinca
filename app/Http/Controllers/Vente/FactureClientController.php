@@ -615,7 +615,7 @@ class FactureClientController extends Controller
                     'code_article' => $stock->article->code_article,
                     'depot' => $stock->depot,
                     'unite_mesure' => $stock->uniteMesure, //->libelle_unite,
-                    'stock' => $resteStock ? number_format($resteStock, 0, " ", " ") : 00,
+                    'stock' => $resteStock ?? 00,
                 ];
             })
         ]);
