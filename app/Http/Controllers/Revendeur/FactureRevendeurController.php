@@ -68,7 +68,11 @@ class FactureRevendeurController extends Controller
                 ->orderBy('date_facture', 'desc');
 
 
-            if (auth()->user()->hasRole("Super Administrateur") || auth()->user()->hasRole("CONTROLE INTERNE")) {
+            if (
+                auth()->user()->hasRole("Super Administrateur")
+                || auth()->user()->hasRole("CONTROLE INTERNE")
+                || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
+            ) {
                 $factures = $query->get();
             } else {
                 $factures = $query->where('point_de_vente_id', Auth()->user()->point_de_vente_id)
