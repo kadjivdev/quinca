@@ -61,7 +61,7 @@
                                 <ul class="m-0" style="width:100%;height:100px!important;overflow-y:scroll;">
                                     @forelse($facture->lignes as $ligne)
                                     <li class="bg-light text-dark rounded p-2" style="list-style-type: none">
-                                        <span class="badge d-block text-dark">{{$ligne->facturedepot->libelle_depot}}</span>
+                                        <span class="badge d-block text-dark">{{$ligne->facturedepot?->libelle_depot}}</span>
                                     </li>
                                     <hr>
                                     @empty

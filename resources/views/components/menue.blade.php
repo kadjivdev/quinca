@@ -404,11 +404,11 @@
                         </a></li>
                     @endcan
 
-                    @can('rapports.creances.view')
+                    <!-- @can('rapports.creances.view')
                     <li><a class="dropdown-item" href="{{ route('rapports.creances.index') }}">
                             <div class="dropdown-item-wrapper">Suivi des créances</div>
                         </a></li>
-                    @endcan
+                    @endcan -->
 
                     @can('vente.sessions.rapport.view')
                     <li><a class="dropdown-item" href="{{ route('vente.sessions.rapport') }}">
