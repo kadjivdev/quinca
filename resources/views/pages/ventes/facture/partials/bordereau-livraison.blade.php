@@ -61,7 +61,7 @@
         td {
             padding: 8px;
             font-size: 11px;
-            border: 1px solid #2c3e50;
+            border: 2px solid #2c3e50;
         }
 
         tr:nth-child(even) {
@@ -94,10 +94,10 @@
 
     <br><br><br><br><br>
     <div class="client-info">
-        <h4> <strong class="livraison-number">Cotonou le ................................................. </strong></h4>
-        <h3 class="text-center"> <strong class="livraison-number">BORDEREAU DE LIVRAISON : ........................................ </strong></h3>
+        <h4> <strong class="livraison-number">Cotonou le {{Carbon\Carbon::parse(now())->locale('fr')->isoFormat('D MMMM YYYY')}} </strong></h4>
+        <h3 class="text-center"> <strong class="livraison-number">BORDEREAU DE LIVRAISON : {{$facture->numero}} </strong></h3>
         <h3 class="text-left"> <strong class="livraison-number">DESTINATION </strong></h3>
-        <p> <strong>Client:</strong>  ................................................................................... </p>
+        <p> <strong>Client:</strong>  {{$facture->client?->raison_sociale}} </p>
     </div>
     
     <table>
@@ -112,8 +112,8 @@
             @foreach($facture->lignes as $ligne)
             <tr>
                 <td class="text-center">{{ $ligne->article->designation }}</td>
-                <td class="text-center">{{ number_format($ligne->quantite, 3, ',', ' ') }}</td>
-                <td class="text-center"></td>
+                <td class="text-center">{{ number_format($ligne->quantite, 3, ',', ' ') }} </td>
+                <td class="text-center">{{$ligne->uniteVente?->libelle_unite}}</td>
             </tr>
             @endforeach
         </tbody>

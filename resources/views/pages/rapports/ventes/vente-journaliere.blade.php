@@ -49,7 +49,7 @@
             <!-- Tableau des ventes -->
             <div class="card shadow-sm">
                 <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Rapport des ventes du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }}</h5>
+                    <h5 class="mb-0">Rapport des ventes du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }} | Légende: <span class="badge bg-light text-dark">Dépôt</span> |  <span class="border badge bg-white text-dark">Direction</span></h5>
                     <!-- <button class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-file-excel me-2"></i>Exporter
                     </button> -->
@@ -66,13 +66,15 @@
                                     <th>Type vente</th>
                                     <th>Catégorie vente</th>
                                     <th>Client</th>
+                                    <th>Crée par</th>
                                     <th class="text-end">Montant TTC</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 @forelse($ventes as $vente)
-                                <tr>
+                                <tr class="p-2 @if($vente['revendeur']) bg-light @endif">
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $vente['date_ecriture'] }}</td>
                                     <td>{{ $vente['date_vente'] }}</td>
@@ -88,6 +90,7 @@
                                     </td>
                                     <td>{{ $vente['categorie_vente'] }}</td>
                                     <td>{{ $vente['client'] }}</td>
+                                    <td><span class="badge bg-dark text-white"> {{ $vente['createdBy']?$vente['createdBy']['name']:'---' }}</span></td>
                                     <td class="text-end">
                                         {{ number_format($vente['montant_ttc'], 0, ',', ' ') }} FCFA
                                     </td>

@@ -394,7 +394,6 @@ class RapportVenteController extends Controller
                     ->where('statut', 'validee')
                     ->get();
 
-
                 $factureRevendeurs = FactureRevendeur::with([
                     'client',
                     'createdBy',
@@ -406,10 +405,12 @@ class RapportVenteController extends Controller
                     ->where('statut', 'validee')
                     ->get();
 
-                dd($factureClients);
+                $factureRevendeurs->map(function ($vente) {
+                    $vente->revendeur = true;
+                    return $vente;
+                });
 
                 $ventes = $factureClients->concat($factureRevendeurs);
-                dd($ventes);
 
                 if ($ventes->isEmpty()) {
                     return view('pages.rapports.ventes.vente-journaliere')
@@ -448,6 +449,8 @@ class RapportVenteController extends Controller
                             'date_vente' => $facture->date_facture->format('d/m/Y'),
                             'reference' => $facture->numero ?? 'N/A',
                             'type_vente' => $type_vente,
+                            'revendeur' => $facture->revendeur,
+                            'createdBy' => $facture->createdBy,
                             'categorie_vente' => $facture->client->categorie ?? 'N/A',
                             'client' => $facture->client->raison_sociale ?? 'Client inconnu',
                             'montant_ttc' => $facture->montant_ttc ?? 0,
@@ -468,6 +471,7 @@ class RapportVenteController extends Controller
                     'total_credit' => $ventesFormatted->where('type_vente', 'Crédit')->sum('montant_ttc'),
                 ];
 
+                
                 return view('pages.rapports.ventes.vente-journaliere', [
                     'ventes' => $ventesFormatted,
                     'totaux' => $totaux,

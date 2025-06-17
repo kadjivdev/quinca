@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class FactureClient extends Model
 {
     use SoftDeletes;
-
     public const STATUT_BROUILLON = 'brouillon';
     public const STATUT_VALIDE = 'valide';
     public const STATUT_ANNULE = 'annulee';
