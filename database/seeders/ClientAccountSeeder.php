@@ -1496,6 +1496,8 @@ class ClientAccountSeeder extends Seeder
             "LOKONON JEAN",
             "KPONDEHOU EMILE",
             "AKOWE ASSANATOU",
+
+            // =========
             "TATARO BUSINESS",
             "FANOU ROMUALD",
             "ALADJI ISSAOU",
