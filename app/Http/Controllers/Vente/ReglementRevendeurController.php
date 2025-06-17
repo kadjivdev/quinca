@@ -54,7 +54,18 @@ class ReglementRevendeurController extends Controller
             $reglements->whereDate('date_reglement', '<=', $request->date_fin);
         }
 
-        $reglements = $reglements->get();
+        if (
+            auth()->user()->hasRole("Super Administrateur")
+            || auth()->user()->hasRole("CONTROLE INTERNE")
+            || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
+        ) {
+            $reglements = $reglements->get();
+        } else {
+            $reglements = $reglements
+            ->where('point_de_vente_id', Auth()->user()->point_de_vente_id)
+            ->get();
+        }
+
 
         // Données pour les filtres et le modal d'ajout
         $clients = Client::orderBy('raison_sociale')
@@ -195,7 +206,7 @@ class ReglementRevendeurController extends Controller
                 ],
                 [
                     "reference_preuve.unique" => "Cette reference existe déjà",
-                    "facture_revendeur_id.facture_revendeurs"=>"La facture doit être une facture revendeur"
+                    "facture_revendeur_id.facture_revendeurs" => "La facture doit être une facture revendeur"
                 ]
             );
 

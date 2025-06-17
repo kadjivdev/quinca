@@ -471,7 +471,7 @@ class RapportVenteController extends Controller
                     'total_credit' => $ventesFormatted->where('type_vente', 'Crédit')->sum('montant_ttc'),
                 ];
 
-                
+
                 return view('pages.rapports.ventes.vente-journaliere', [
                     'ventes' => $ventesFormatted,
                     'totaux' => $totaux,
@@ -490,38 +490,69 @@ class RapportVenteController extends Controller
         }
     }
 
-    public function _enregistrementsNonValides(Request $request)
+    public function enregistrementsAll(Request $request)
     {
         try {
-            $date = Carbon::parse($request->date);
+            // $date = Carbon::parse($request->date);
 
             try {
-                $query = FactureClient::with([
+                $factureClientsQuery = FactureClient::with([
                     'client',
                     'createdBy',
                     'lignes.article', // Ajout des lignes et de l'article
-                    'reglements'
+                    'reglements' => function ($query) {
+                        $query->where('statut', ReglementClient::STATUT_VALIDE);
+                    }
                 ])
-                    ->orderBy('date_facture', 'desc');
+                    // ->whereDate('date_facture', $date)
+                    ->where('statut', 'validee');
+                // ->get();
+
+                $factureRevendeursQuery = FactureRevendeur::with([
+                    'client',
+                    'createdBy',
+                    'lignes.article', // Ajout des lignes et de l'article
+                    'reglements' => function ($query) {
+                        $query->where('statut', ReglementRevendeur::STATUT_VALIDE);
+                    }
+                ])
+                    // ->whereDate('date_facture', $date)
+                    ->where('statut', 'validee');
+                // ->get();
 
                 if ($request->date) {
                     $date = Carbon::parse($request->date);
-                    $ventes = $query->whereDate('date_facture', $date)
+                    $factureClients = $factureClientsQuery
+                        ->whereDate('date_facture', $date)
+                        ->get();
+                    $factureRevendeurs =
+                        $factureRevendeursQuery
+                        ->whereDate('date_facture', $date)
                         ->get();
                 } else {
-                    $ventes = $query->get();
+                    $factureClients = $factureClientsQuery
+                        ->get();
+                    $factureRevendeurs =
+                        $factureRevendeursQuery
+                        ->get();
                 }
 
+                $factureRevendeurs->map(function ($vente) {
+                    $vente->revendeur = true;
+                    return $vente;
+                });
+
+                $ventes = $factureClients->concat($factureRevendeurs);
+
                 if ($ventes->isEmpty()) {
-                    return view('pages.rapports.ventes.enregistrementsNonValides')
+                    return view('pages.rapports.ventes.enregistrements-all')
                         ->with('warning', 'Aucune vente trouvée pour cette date')
                         ->with('ventes', collect([]))
                         ->with('totaux', [
                             'total_global' => 0,
                             'total_comptant' => 0,
                             'total_credit' => 0,
-                        ])
-                        ->with('date', $date);
+                        ]);
                 }
 
                 // Mapping des données
@@ -549,6 +580,8 @@ class RapportVenteController extends Controller
                             'date_vente' => $facture->date_facture->format('m/d/Y'),
                             'reference' => $facture->numero ?? 'N/A',
                             'type_vente' => $type_vente,
+                            'revendeur' => $facture->revendeur,
+                            'createdBy' => $facture->createdBy,
                             'categorie_vente' => $facture->client->categorie ?? 'N/A',
                             'client' => $facture->client->raison_sociale ?? 'Client inconnu',
                             'montant_ttc' => $facture->montant_ttc ?? 0,
@@ -570,10 +603,9 @@ class RapportVenteController extends Controller
                     'total_credit' => $ventesFormatted->where('type_vente', 'Crédit')->sum('montant_ttc'),
                 ];
 
-                return view('pages.rapports.ventes.enregistrementsNonValides', [
+                return view('pages.rapports.ventes.enregistrements-all', [
                     'ventes' => $ventesFormatted,
                     'totaux' => $totaux,
-                    'date' => $date
                 ]);
             } catch (\Exception $e) {
                 \Log::error('Erreur lors de la récupération des ventes: ' . $e->getMessage());

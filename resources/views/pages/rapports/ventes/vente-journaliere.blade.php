@@ -49,7 +49,7 @@
             <!-- Tableau des ventes -->
             <div class="card shadow-sm">
                 <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Rapport des ventes du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }} | Légende: <span class="badge bg-light text-dark">Dépôt</span> |  <span class="border badge bg-white text-dark">Direction</span></h5>
+                    <h5 class="mb-0">Rapport des ventes du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }}  Légende: <span class="badge bg-light text-dark">Ecritures des Dépôts</span> |  <span class="border badge bg-white text-dark">Ecritures de la Direction</span></h5>
                     <!-- <button class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-file-excel me-2"></i>Exporter
                     </button> -->
@@ -113,17 +113,17 @@
                             </tbody>
                             <tfoot class="bg-light fw-bold">
                                 <tr>
-                                    <td colspan="7" class="text-end">Total Global:</td>
+                                    <td colspan="8" class="text-end">Total Global:</td>
                                     <td class="text-end">{{ number_format($totaux['total_global'], 0, ',', ' ') }} FCFA</td>
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="7" class="text-end">Total Comptant:</td>
+                                    <td colspan="8" class="text-end">Total Comptant:</td>
                                     <td class="text-end">{{ number_format($totaux['total_comptant'], 0, ',', ' ') }} FCFA</td>
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="7" class="text-end">Total Crédit:</td>
+                                    <td colspan="8" class="text-end">Total Crédit:</td>
                                     <td class="text-end">{{ number_format($totaux['total_credit'], 0, ',', ' ') }} FCFA</td>
                                     <td></td>
                                 </tr>

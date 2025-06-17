@@ -399,7 +399,7 @@
                         </a></li>
 
                     <!-- ENREGISTREMENTS (facturation vente clients dans le panel ventes) NON VALIDES -->
-                    <li><a class="dropdown-item" href="{{ route('rapports._enregistrementsNonValides') }}">
+                    <li><a class="dropdown-item" href="{{ route('rapports.enregistrementsAll') }}">
                             <div class="dropdown-item-wrapper">Tous les enregistrements</div>
                         </a></li>
                     @endcan

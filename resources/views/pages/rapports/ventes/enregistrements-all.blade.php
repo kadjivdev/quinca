@@ -8,7 +8,7 @@
             <!-- En-tête avec filtres -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <form action="{{ route('rapports._enregistrementsNonValides') }}" method="GET" class="row align-items-end">
+                    <form action="{{ route('rapports.enregistrementsAll') }}" method="GET" class="row align-items-end">
                         <div class="col-md-4">
                             <label class="form-label">Date du rapport <span class="badge bg-dark">m/d/Y</span> </label>
                             <div class="input-group">
@@ -49,7 +49,7 @@
             <!-- Tableau des ventes -->
             <div class="card shadow-sm">
                 <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Rapport des enregistrements du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }}</h5>
+                    <h5 class="mb-0"> Légende: <span class="badge bg-light text-dark">Ecritures des Dépôts</span> |  <span class="border badge bg-white text-dark">Ecritures de la Direction</span></h5>
                     <button class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-file-excel me-2"></i>Exporter
                     </button>
@@ -69,13 +69,14 @@
                                     <th>Statut vente</th>
                                     <th>Catégorie vente</th>
                                     <th>Client</th>
+                                    <th>Crée par</th>
                                     <th class="text-end">Montant TTC</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($ventes as $vente)
-                                <tr>
+                                <tr class="p-2 @if($vente['revendeur']) bg-light @endif">
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $vente['date_ecriture'] }}</td>
                                     <td>{{ $vente['date_vente'] }}</td>
@@ -94,6 +95,7 @@
                                     </td>
                                     <td>{{ $vente['categorie_vente'] }}</td>
                                     <td>{{ $vente['client'] }}</td>
+                                    <td><span class="badge bg-dark text-white"> {{ $vente['createdBy']?$vente['createdBy']['name']:'---' }}</span></td>
                                     <td class="text-end">
                                         {{ number_format($vente['montant_ttc'], 0, ',', ' ') }} FCFA
                                     </td>
@@ -116,17 +118,17 @@
                             </tbody>
                             <tfoot class="bg-light fw-bold">
                                 <tr>
-                                    <td colspan="8" class="text-end">Total Global:</td>
+                                    <td colspan="9" class="text-end">Total Global:</td>
                                     <td class="text-end">{{ number_format($totaux['total_global'], 0, ',', ' ') }} FCFA</td>
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="8" class="text-end">Total Comptant:</td>
+                                    <td colspan="9" class="text-end">Total Comptant:</td>
                                     <td class="text-end">{{ number_format($totaux['total_comptant'], 0, ',', ' ') }} FCFA</td>
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="8" class="text-end">Total Crédit:</td>
+                                    <td colspan="9" class="text-end">Total Crédit:</td>
                                     <td class="text-end">{{ number_format($totaux['total_credit'], 0, ',', ' ') }} FCFA</td>
                                     <td></td>
                                 </tr>

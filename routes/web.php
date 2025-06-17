@@ -1067,8 +1067,8 @@ Route::middleware('auth')->group(function () {
             ->name('rapports.vente-journaliere');
 
         // LES ENREGISTREMENTS NON VALIDES
-        Route::get('/enregistrement-non-valides', [RapportVenteController::class, '_enregistrementsNonValides'])
-            ->name('rapports._enregistrementsNonValides');
+        Route::get('/all-enregistrement', [RapportVenteController::class, 'enregistrementsAll'])
+            ->name('rapports.enregistrementsAll');
 
         // Route::post('rapports/stock/change-depot', 'RapportController@changeDepot')->name('rapports.stock.changeDepot');
         Route::get('/stock-alert', [StockAlertController::class, 'index'])
