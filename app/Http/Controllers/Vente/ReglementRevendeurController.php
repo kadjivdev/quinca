@@ -62,11 +62,13 @@ class ReglementRevendeurController extends Controller
             $reglements = $reglements->get();
         } else {
             $reglements = $reglements
-            ->where('point_de_vente_id', Auth()->user()->point_de_vente_id)
-            ->get();
+                ->whereHas("facture", function ($query) {
+                    $query->where('point_de_vente_id', Auth()->user()->point_de_vente_id);
+                })
+                ->get();
         }
 
-
+        // dd($reglements);
         // Données pour les filtres et le modal d'ajout
         $clients = Client::orderBy('raison_sociale')
             ->with(["facturesRevendeur" => function ($query) {
