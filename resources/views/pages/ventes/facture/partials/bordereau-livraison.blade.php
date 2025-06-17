@@ -95,7 +95,7 @@
     <br><br><br><br><br>
     <div class="client-info">
         <h4> <strong class="livraison-number">Cotonou le {{Carbon\Carbon::parse(now())->locale('fr')->isoFormat('D MMMM YYYY')}} </strong></h4>
-        <h3 class="text-center"> <strong class="livraison-number">BORDEREAU DE LIVRAISON : {{$facture->numero}} </strong></h3>
+        <h3 class="text-center"> <strong class="livraison-number">BORDEREAU DE LIVRAISON : {{str_replace("FAC","BL",$facture->numero)}} </strong></h3>
         <h3 class="text-left"> <strong class="livraison-number">DESTINATION </strong></h3>
         <p> <strong>Client:</strong>  {{$facture->client?->raison_sociale}} </p>
     </div>

@@ -156,7 +156,7 @@ class Fournisseur extends Model
 
     function reste_solde()
     {
-        // $appro_solde = $this->approvisionnements()->sum("montant");
+        $appro_solde = $this->approvisionnements()->sum("montant");
 
         /** Les factures */
         $facturesAmount = $this->facture_fournisseurs->sum("montant_ttc");
@@ -170,7 +170,7 @@ class Fournisseur extends Model
         $fournisseurAccomptesAmount = $this->accomptes
             ->sum("montant");
 
-        return $facturesAmount - ($reglements_amount + $fournisseurAccomptesAmount);
+        return $appro_solde - ($facturesAmount + $fournisseurAccomptesAmount);
     }
 
     /**

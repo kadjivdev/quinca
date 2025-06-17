@@ -161,8 +161,6 @@
         <div class="company-info">
             @if($logo)
             <img src="{{public_path('kadjiv.jpeg')}}" width="100" height="70" class="form-control" alt="" srcset="">
-            @else
-            <h2>QuincaKadjiv</h2>
             @endif
 
             {{-- Ajoutez vos informations d'entreprise --}}
@@ -172,11 +170,11 @@
         </div>
 
         <div class="invoice-details">
-            <h1>FACTURE</h1>
+            <h1>PROFORMA</h1>
             <p>
-                <strong>N° : </strong>{{ $facture->numero }}<br>
-                <strong>Date : </strong>{{ $facture->date_facture->format('d/m/Y') }}<br>
-                <strong>Échéance : </strong>{{ $facture->date_echeance->format('d/m/Y') }}<br>
+                <strong>N° : </strong>{{str_replace('FAC','PRO',$facture->numero) }}<br>
+                <strong>Date : </strong>{{ Carbon\Carbon::parse()->locale('fr')->isoFormat("D MMM YYY") }}<br>
+                <strong>Échéance : </strong>{{ Carbon\Carbon::parse($facture->date_echeance)->locale('fr')->isoFormat("D MMM YYY") }}<br>
                 @if($facture->statut === 'valide')
                 <strong>Date validation : </strong>{{ $facture->date_validation->format('d/m/Y') }}<br>
                 @endif
@@ -201,7 +199,7 @@
                 <th class="text-right">Qté</th>
                 <th class="text-right">Prix Unit. HT</th>
                 <th class="text-right">Remise (%)</th>
-                <th class="text-right">Montant HT</th>
+                <th class="text-right">Montant</th>
                 <th class="text-right">TVA</th>
                 <th class="text-right">Total TTC</th>
             </tr>
@@ -237,18 +235,16 @@
                 <td class="text-right">{{ number_format($facture->montant_ht_apres_remise, 3, ',', ' ') }}</td>
             </tr>
             <tr>
-                <td><strong>TVA ({{ $facture->taux_tva }}%)</strong></td>
-                <td class="text-right">{{ number_format($facture->montant_tva, 3, ',', ' ') }}</td>
+                <td><strong>TVA (18 %)</strong></td>
+                <td class="text-right">{{ number_format($montantTTc * 18/100, 3, ',', ' ') }}</td>
             </tr>
-            @if($facture->taux_aib > 0)
             <tr>
-                <td><strong>AIB ({{ $facture->taux_aib }}%)</strong></td>
-                <td class="text-right">{{ number_format($facture->montant_aib, 3, ',', ' ') }}</td>
+                <td><strong>AIB (1 %)</strong></td>
+                <td class="text-right">{{ number_format($montantTTc * 1/100, 3, ',', ' ') }}</td>
             </tr>
-            @endif
             <tr>
                 <td><strong>Total TTC</strong></td>
-                <td class="text-right"><strong>{{ number_format($facture->montant_ttc, 3, ',', ' ') }}</strong></td>
+                <td class="text-right"><strong>{{ number_format($montantTTc, 3, ',', ' ') }}</strong></td>
             </tr>
             <tr>
                 <td><strong>Montant réglé</strong></td>

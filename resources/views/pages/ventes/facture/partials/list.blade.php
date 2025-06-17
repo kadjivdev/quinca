@@ -258,6 +258,12 @@
                         <label class="form-check-label" for="checkIndeterminate">
                             Voulez-vous afficher le <strong class="text-primary"> logo </strong> kadjiv sur la facture?
                         </label>
+                        <div class="form-group">
+                            <label class="form-check-label" for="montantTTc">
+                                Montant TTC
+                            </label>
+                            <input type="number" value="0.00" name="montantTTc" id="montantTTc" class="form-control">
+                        </div>
                     </div>
                     <div class="form-check d-none" id="check-entete">
                         <input class="form-check-input" name="entete" type="checkbox">

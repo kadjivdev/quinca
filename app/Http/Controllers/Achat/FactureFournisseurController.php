@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Log;
 
 class FactureFournisseurController extends Controller
 {
-
     /**
      * Affiche la liste des factures
      */
