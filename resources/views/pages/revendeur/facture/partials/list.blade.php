@@ -16,7 +16,7 @@
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
                             <th class="border-bottom-0 text-end">Montant TTC</th>
-                            <th class="border-bottom-0 text-end">Reste à payer</th>
+                            <th class="border-bottom-0 text-end">Reste à régler</th>
                             <th class="border-bottom-0 text-center">Statut</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
