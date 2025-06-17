@@ -346,7 +346,6 @@ class FactureRevendeurController extends Controller
         }
     }
 
-
     public function searchArticles(Request $request)
     {
         $search = $request->get('q');
@@ -703,112 +702,6 @@ class FactureRevendeurController extends Controller
         }
     }
 
-    // public function validateFacture($id)
-    // {
-    //     try {
-    //         DB::beginTransaction();
-
-    //         $facture = FactureRevendeur::with(['client', 'lignes.article'])
-    //             ->findOrFail($id);
-
-    //         if ($facture->statut === 'validee') {
-    //             throw new Exception('Facture déjà validée');
-    //         }
-
-    //         foreach ($facture->lignes as $data) {
-    //             if ($data['quantite'] > 0) {
-
-    //                 // Conversion en unité de base si nécessaire
-    //                 $article = Article::findOrFail($data->article_id);
-    //                 $quantiteBase = $data['quantite'];
-
-    //                 if ($data['unite_vente_id'] != $article->unite_mesure_id) {
-    //                     $conversion = ConversionUnite::where([
-    //                         'unite_source_id' => $data->unite_vente_id,
-    //                         'unite_dest_id' => $article->unite_mesure_id,
-    //                         'article_id' => $article->id,
-    //                         'statut' => true
-    //                     ])->first();
-
-    //                     if (!$conversion) {
-    //                         throw new Exception(
-    //                             "Pas de conversion trouvée pour l'article " . $article->designation
-    //                         );
-    //                     }
-
-    //                     $quantiteBase = $conversion->convertir($data['quantite']);
-    //                 }
-
-    //                 $depot = Depot::where('point_de_vente_id', auth()->user()->point_de_vente_id)->first();
-
-    //                 // Vérifier le stock disponible
-    //                 $stock = StockDepot::where([
-    //                     'article_id' => $data->article_id,
-    //                     'depot_id' => $depot->id
-    //                 ])->first();
-
-    //                 if (!$stock || $stock->quantite_reelle < $data->quantite_base) {
-    //                     throw new Exception(
-    //                         "Stock insuffisant pour l'article {$data->article->designation} " .
-    //                             "(Demandé: {$data->quantite_base}, Disponible: " .
-    //                             ($stock ? $stock->quantite_reelle : 0) . ")"
-    //                     );
-    //                 }
-
-    //                 // Créer le mouvement de sortie
-    //                 $mouvementSortie = $this->serviceStockSortie->traiterSortieStock([
-    //                     'date_mouvement' => $facture->date_facture,
-    //                     'depot_id' => $depot->id,
-    //                     'article_id' => $data->article_id,
-    //                     'unite_mesure_id' => $article->unite_mesure_id,
-    //                     'quantite' => $quantiteBase,
-    //                     'reference_mouvement' => ' ',
-    //                     'document_type' => 'LIVRAISON_CLIENT',
-    //                     'document_id' => $facture->id,
-    //                     'user_id' => auth()->id(),
-    //                     'notes' => "Facture client #{$facture->numero}"
-    //                 ]);
-
-    //                 if (!$mouvementSortie['succes']) {
-    //                     throw new Exception($mouvementSortie['message']);
-    //                 }
-
-    //                 // Associer le mouvement à la ligne
-    //                 $data->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
-    //                 $data->save();
-    //             }
-    //         }
-
-    //         $updateData = [
-    //             'date_validation' => now(),
-    //             'validated_by' => auth()->id(),
-    //             'statut' => 'validee'
-    //         ];
-
-    //         $facture->update($updateData);
-
-    //         DB::commit();
-
-    //         return response()->json([
-    //             'status' => 'success',
-    //             'message' => 'Facture validée',
-    //             'data' => ['facture' => $facture->fresh(['client', 'createdBy'])]
-    //         ]);
-    //     } catch (Exception $e) {
-    //         DB::rollBack();
-    //         Log::error('Erreur validation facture', [
-    //             'facture_id' => $id,
-    //             'error' => $e->getMessage(),
-    //             'trace' => $e->getTraceAsString()
-    //         ]);
-
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
     public function validateFacture($id)
     {
         try {
@@ -866,7 +759,6 @@ class FactureRevendeurController extends Controller
             }
 
             // Supprimer les règlements de manière forcée
-            // $facture->reglements()->forceDelete();
 
             // Supprimer les lignes
             $facture->lignes()->delete();
@@ -893,6 +785,7 @@ class FactureRevendeurController extends Controller
             ], 500);
         }
     }
+    
     public function details(FactureRevendeur $facture)
     {
         return response()->json([

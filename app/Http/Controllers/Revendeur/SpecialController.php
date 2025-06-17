@@ -76,10 +76,10 @@ class SpecialController extends Controller
                 ])
                 ->where('type_vente', 'speciale')
                 ->orderBy('date_facture', 'desc')
-                ->paginate(10);
+                ->get();
 
             // Ajouter des attributs calculés pour chaque facture
-            $factures->getCollection()->transform(function ($facture) {
+            $factures->transform(function ($facture) {
                 // Calcul du reste à payer
                 $facture->reste_a_payer = $facture->montant_ttc - $facture->montant_regle;
 
@@ -104,7 +104,7 @@ class SpecialController extends Controller
             });
 
             Log::info('Liste des factures chargée avec succès', [
-                'nombre_factures' => $factures->total()
+                'nombre_factures' => $factures->count()
             ]);
 
             if (request()->ajax()) {
