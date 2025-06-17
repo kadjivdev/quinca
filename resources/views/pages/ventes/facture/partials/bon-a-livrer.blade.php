@@ -94,7 +94,7 @@
 
     <br><br><br><br><br>
     <div class="client-info">
-        <h3> <strong class="livraison-number">BON DE LIVRAISON : {{$facture->numero}} </strong>  | <strong class="livraison-date"> DATE : {{Carbon\Carbon::parse($facture->date_facture)->locale('fr')->isoFormat('D MMMM YYYY')}} </strong></h3>
+        <h3> <strong class="livraison-number">BON DE LIVRAISON : {{$facture->numero}} </strong>  | <strong class="livraison-date"> DATE : {{Carbon\Carbon::parse(now())->locale('fr')->isoFormat('D MMMM YYYY')}} </strong></h3>
         <p> <strong>Client:</strong>  {{$facture->client?->raison_sociale}} </p>
     </div>
     
