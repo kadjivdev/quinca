@@ -112,8 +112,8 @@
             <tr>
                 <td class="text-center">{{$loop->index + 1}}</td>
                 <td class="text-center">{{ $ligne->article->designation }}</td>
-                <td class="text-center">{{ number_format($ligne->quantite, 3, ',', ' ') }} {{$ligne->uniteVente?->libelle_unite}} </td>
-                <td class="text-right">{{ $ligne->uniteVente->libelle_unite }}</td>
+                <td class="text-right">{{ $ligne->uniteVente?->libelle_unite }}</td>
+                <td class="text-center">{{ number_format($ligne->quantite, 3, ',', ' ') }}</td>
             </tr>
             @endforeach
         </tbody>
