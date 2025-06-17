@@ -103,8 +103,8 @@
             <tr>
                 <th class="text-center">N° D'ORDRE</th>
                 <th class="text-center">ARTICLES</th>
-                <th class="text-right">UNITE DE MESURE</th>
                 <th class="text-center">QUANTITE</th>
+                <th class="text-right">UNITE DE MESURE</th>
             </tr>
         </thead>
         <tbody>
@@ -112,8 +112,8 @@
             <tr>
                 <td class="text-center">{{$loop->index + 1}}</td>
                 <td class="text-center">{{ $ligne->article->designation }}</td>
-                <td class="text-right">{{ $ligne->uniteVente?->libelle_unite }}</td>
                 <td class="text-center">{{ number_format($ligne->quantite, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ $ligne->uniteVente?->libelle_unite }}</td>
             </tr>
             @endforeach
         </tbody>
