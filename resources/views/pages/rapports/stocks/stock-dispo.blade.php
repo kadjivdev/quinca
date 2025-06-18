@@ -28,12 +28,12 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Stock Disponible</h5>
                 <div>
-                    <button class="btn btn-sm btn-primary" onclick="exportStock()">
+                    <!-- <button class="btn btn-sm btn-primary" onclick="exportStock()">
                         <i class="fas fa-file-excel me-1"></i> Exporter
-                    </button>
-                    <button class="btn btn-sm btn-info ms-2" onclick="printStock()">
+                    </button> -->
+                    <!-- <button class="btn btn-sm btn-info ms-2" onclick="printStock()">
                         <i class="fas fa-print me-1"></i> Imprimer
-                    </button>
+                    </button> -->
                 </div>
             </div>
             <div class="card-body">
@@ -44,11 +44,11 @@
                                 <th>Code</th>
                                 <th>Article</th>
                                 <th>Unité</th>
+                                <th class="text-end">Dépôt</th>
                                 <th class="text-end">Qté Réelle</th>
-                                <th class="text-end">Qté Réservée</th>
                                 <th class="text-end">Qté Disponible</th>
-                                <th class="text-end">Prix Moyen</th>
-                                <th class="text-end">Valeur Stock</th>
+                                <!-- <th class="text-end">Prix Moyen</th> -->
+                                <!-- <th class="text-end">Valeur Stock</th> -->
                                 <th>Statut</th>
                             </tr>
                         </thead>
@@ -58,12 +58,12 @@
                                     <td>{{ $stock['article']['code'] }}</td>
                                     <td>{{ $stock['article']['designation'] }} ({{ $stock['article']['unite'] }})</td>
                                     <td>{{$stock["unite_stock"]}} </td>
+                                    <td class="text-end">{{ $stock["depot"] }}</td>
                                     <td class="text-end">{{ number_format($stock['quantite_reelle'], 2, ',', ' ') }}</td>
-                                    <td class="text-end">{{ number_format($stock['quantite_reservee'], 2, ',', ' ') }}</td>
                                     <td class="text-end">{{ number_format($stock['quantite_disponible'], 2, ',', ' ') }}</td>
                                     <!-- <td class="text-end">{{ number_format($stock['prix_moyen'], 0, ',', ' ') }} FCFA</td> -->
-                                    <td class="text-end">---</td>
-                                    <td class="text-end">{{ number_format($stock['valeur_stock'], 0, ',', ' ') }} FCFA</td>
+                                    <!-- <td class="text-end">---</td> -->
+                                    <!-- <td class="text-end">{{ number_format($stock['valeur_stock'], 0, ',', ' ') }} FCFA</td> -->
                                     <td>
                                         @switch($stock['statut'])
                                             @case('Alerte')

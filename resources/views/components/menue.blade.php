@@ -416,11 +416,11 @@
                         </a></li>
                     @endcan
 
-                    @can('rapports.compte-client.view')
+                    <!-- @can('rapports.compte-client.view')
                     <li><a class="dropdown-item" href="{{ route('rapports.compte-client') }}">
                             <div class="dropdown-item-wrapper">Compte Client</div>
                         </a></li>
-                    @endcan
+                    @endcan -->
                 </ul>
             </li>
             @endcanany
@@ -433,23 +433,23 @@
                     <span class="uil fs-8 me-2 uil-chart-pie"></span>Rapports Stocks
                 </a>
                 <ul class="dropdown-menu navbar-dropdown-caret">
+                    @can('rapports.stock-dispo.view')
+                    <li><a class="dropdown-item" href="{{ route('rapports.stock-dispo') }}">
+                            <div class="dropdown-item-wrapper">Stock Disponible</div>
+                        </a></li>
+                    @endcan
+                    
                     @can('rapports.mouvement-stock.view')
                     <li><a class="dropdown-item" href="{{ route('rapports.mouvement-stock') }}">
                             <div class="dropdown-item-wrapper">Mouvements de Stock</div>
                         </a></li>
                     @endcan
 
-                    @can('rapports.stock-dispo.view')
-                    <li><a class="dropdown-item" href="{{ route('rapports.stock-dispo') }}">
-                            <div class="dropdown-item-wrapper">Stock Disponible</div>
-                        </a></li>
-                    @endcan
-
-                    @can('stock.rotation.view')
+                    <!-- @can('stock.rotation.view')
                     <li><a class="dropdown-item" href="{{ route('stock.rotation.index') }}">
                             <div class="dropdown-item-wrapper">Rotations de Stock</div>
                         </a></li>
-                    @endcan
+                    @endcan -->
                 </ul>
             </li>
             @endcanany

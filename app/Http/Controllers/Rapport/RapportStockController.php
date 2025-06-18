@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Rapport;
 
 use App\Http\Controllers\Controller;
@@ -51,7 +52,6 @@ class RapportStockController extends Controller
         $selectedDepot = $request->depot_id ?
             Depot::findOrFail($request->depot_id) :
             $depots->first();
-
         $stats = $this->getStats($selectedDepot->id);
         $stockDisponible = $this->getStockDisponible($selectedDepot->id);
         $mouvements = $this->getMouvements($request);
@@ -105,13 +105,13 @@ class RapportStockController extends Controller
         return [
             'entrees' => [
                 'nombre' => $entrees->count(),
-                'valeur' => $entrees->sum(function($m) {
+                'valeur' => $entrees->sum(function ($m) {
                     return $m->quantite * $m->prix_unitaire;
                 })
             ],
             'sorties' => [
                 'nombre' => $sorties->count(),
-                'valeur' => $sorties->sum(function($m) {
+                'valeur' => $sorties->sum(function ($m) {
                     return $m->quantite * $m->prix_unitaire;
                 })
             ],
@@ -151,12 +151,12 @@ class RapportStockController extends Controller
     {
         return StockDepot::with('article')
             ->where('depot_id', $depotId)
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereColumn('quantite_reelle', '<=', 'seuil_alerte')
                     ->orWhereColumn('quantite_reelle', '<=', 'stock_minimum');
             })
             ->get()
-            ->map(function($stock) {
+            ->map(function ($stock) {
                 return [
                     'article' => $stock->article,
                     'stock_actuel' => $stock->quantite_reelle,
@@ -171,13 +171,13 @@ class RapportStockController extends Controller
     {
         return StockDepot::with('article')
             ->where('depot_id', $depotId)
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where('quantite_reelle', '<=', DB::raw('seuil_alerte'))
                     ->orWhere('quantite_reelle', '<=', DB::raw('stock_minimum'))
                     ->orWhere('quantite_reelle', '>=', DB::raw('stock_maximum'));
             })
             ->get()
-            ->map(function($stock) {
+            ->map(function ($stock) {
                 return [
                     'article' => $stock->article,
                     'type_alerte' => $this->determinerTypeAlerte($stock),
@@ -228,7 +228,7 @@ class RapportStockController extends Controller
             $query->whereDate('date_mouvement', '<=', $request->date_fin);
         }
 
-        return $query->paginate(15);
+        return $query->get();
     }
 
     public function export(Request $request)
@@ -266,148 +266,102 @@ class RapportStockController extends Controller
     }
 
     public function changeDepot__(Request $request)
-{
-    $request->validate([
-        'depot_id' => 'required|exists:depots,id'
-    ]);
-
-    $selectedDepot = Depot::findOrFail($request->depot_id);
-    $stats = $this->getStats($selectedDepot->id);
-    $stockDisponible = $this->getStockDisponible($selectedDepot->id);
-    $mouvements = $this->getMouvements($request);
-    $alertes = $this->getAlertesStock($selectedDepot->id);
-
-    return view('pages.rapports.stocks.mouvement', compact(
-        'selectedDepot',
-        'stats',
-        'stockDisponible',
-        'mouvements',
-        'alertes'
-    ));
-}
-
-public function rapportStockDisponible(Request $request)
-{
-    $depots = Depot::actif()->get();
-    $selectedDepot = $request->depot_id ?
-        Depot::findOrFail($request->depot_id) :
-        $depots->first();
-
-    $stocks = StockDepot::with(['article.uniteMesure', 'depot'])
-        ->where('depot_id', $selectedDepot->id)
-        ->where('quantite_reelle', '>', 0)
-        ->get()
-        ->map(function ($stock) {
-            return [
-                'article' => [
-                    'code' => $stock->article->code_article,
-                    'designation' => $stock->article->designation,
-                    'unite' => $stock->article->uniteMesure?->libelle_unite,
-                ],
-                'unite_stock' => $stock->uniteMesure->libelle_unite,
-                'depot' => $stock->depot->libelle_depot,
-                'quantite_reelle' => $stock->quantite_reelle,
-                'quantite_disponible' => $stock->quantite_disponible,
-                'quantite_reservee' => $stock->quantite_reservee,
-                'prix_moyen' => $stock->prix_moyen,
-                'valeur_stock' => $stock->valeur_stock,
-                'statut' => $stock->isEnAlerte() ? 'Alerte' :
-                           ($stock->isStockMinimum() ? 'Minimum' :
-                           ($stock->isStockMaximum() ? 'Maximum' : 'Normal'))
-            ];
-        });
-
-    if ($request->wantsJson()) {
-        return response()->json([
-            'depots' => $depots,
-            'selected_depot' => $selectedDepot,
-            'stocks' => $stocks
+    {
+        $request->validate([
+            'depot_id' => 'required|exists:depots,id'
         ]);
+
+        $selectedDepot = Depot::findOrFail($request->depot_id);
+        $stats = $this->getStats($selectedDepot->id);
+        $stockDisponible = $this->getStockDisponible($selectedDepot->id);
+        $mouvements = $this->getMouvements($request);
+        $alertes = $this->getAlertesStock($selectedDepot->id);
+
+        return view('pages.rapports.stocks.mouvement', compact(
+            'selectedDepot',
+            'stats',
+            'stockDisponible',
+            'mouvements',
+            'alertes'
+        ));
     }
 
-    return view('pages.rapports.stocks.stock-dispo', compact('depots', 'selectedDepot', 'stocks'));
-}
+    public function rapportStockDisponible(Request $request)
+    {
+        $depots = Depot::actif()->get();
+        $selectedDepot = $request->depot_id ?
+            Depot::findOrFail($request->depot_id) :
+            $depots->first();
 
-// public function changeDepot(Request $request)
-// {
-//     $request->validate(['depot_id' => 'required|exists:depots,id']);
+        $stocks = StockDepot::with(['article.uniteMesure', 'depot'])
+            ->where('depot_id', $selectedDepot->id)
+            ->where('quantite_reelle', '>', 0)
+            ->get()
+            ->map(function ($stock) {
+                return [
+                    'article' => [
+                        'code' => $stock->article->code_article,
+                        'designation' => $stock->article->designation,
+                        'unite' => $stock->article->uniteMesure?->libelle_unite,
+                    ],
+                    'unite_stock' => $stock->uniteMesure->libelle_unite,
+                    'depot' => $stock->depot->libelle_depot,
+                    'quantite_reelle' => $stock->quantite_reelle,
+                    'quantite_disponible' => $stock->quantite_disponible,
+                    'quantite_reservee' => $stock->quantite_reservee,
+                    'prix_moyen' => $stock->prix_moyen,
+                    'valeur_stock' => $stock->valeur_stock,
+                    'statut' => $stock->isEnAlerte() ? 'Alerte' : ($stock->isStockMinimum() ? 'Minimum' : ($stock->isStockMaximum() ? 'Maximum' : 'Normal'))
+                ];
+            });
 
-//     $depot = Depot::findOrFail($request->depot_id);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'depots' => $depots,
+                'selected_depot' => $selectedDepot,
+                'stocks' => $stocks
+            ]);
+        }
 
-//     if ($request->wantsJson()) {
-//         return response()->json([
-//             'depot' => $depot,
-//             'stocks' => $this->getStockData($depot->id)
-//         ]);
-//     }
-
-//     return redirect()->route('rapports.stock.disponible', ['depot_id' => $depot->id]);
-// }
-
-// private function getStockData($depotId)
-// {
-//     return StockDepot::with(['article.uniteMesure', 'depot'])
-//         ->where('depot_id', $depotId)
-//         ->where('quantite_reelle', '>', 0)
-//         ->get()
-//         ->map(function ($stock) {
-//             return [
-//                 'article' => [
-//                     'code' => $stock->article->code_article,
-//                     'designation' => $stock->article->designation,
-//                     'unite' => $stock->article->uniteMesure?->libelle_unite
-//                 ],
-//                 'quantite_reelle' => $stock->quantite_reelle,
-//                 'quantite_disponible' => $stock->quantite_disponible,
-//                 'quantite_reservee' => $stock->quantite_reservee,
-//                 'prix_moyen' => $stock->prix_moyen,
-//                 'valeur_stock' => $stock->valeur_stock,
-//                 'statut' => $stock->isEnAlerte() ? 'Alerte' :
-//                           ($stock->isStockMinimum() ? 'Minimum' :
-//                           ($stock->isStockMaximum() ? 'Maximum' : 'Normal'))
-//             ];
-//         });
-// }
-
-public function changeDepot(Request $request)
-{
-    $request->validate(['depot_id' => 'required|exists:depots,id']);
-
-    $depot = Depot::findOrFail($request->depot_id);
-
-    if ($request->wantsJson()) {
-        return response()->json([
-            'depot' => $depot,
-            'stocks' => $this->getStockData($depot->id)
-        ]);
+        return view('pages.rapports.stocks.stock-dispo', compact('depots', 'selectedDepot', 'stocks'));
     }
 
-    return redirect()->route('rapports.stock-dispo', ['depot_id' => $depot->id]);
-}
+    public function changeDepot(Request $request)
+    {
+        $request->validate(['depot_id' => 'required|exists:depots,id']);
 
-private function getStockData($depotId)
-{
-    return StockDepot::with(['article.uniteMesure', 'depot'])
-        ->where('depot_id', $depotId)
-        ->where('quantite_reelle', '>', 0)
-        ->get()
-        ->map(function ($stock) {
-            return [
-                'article' => [
-                    'code' => $stock->article->code_article,
-                    'designation' => $stock->article->designation,
-                    'unite' => $stock->article->uniteMesure?->libelle_unite
-                ],
-                'quantite_reelle' => $stock->quantite_reelle,
-                'quantite_disponible' => $stock->quantite_disponible,
-                'quantite_reservee' => $stock->quantite_reservee,
-                'prix_moyen' => $stock->prix_moyen,
-                'valeur_stock' => $stock->valeur_stock,
-                'statut' => $stock->isEnAlerte() ? 'Alerte' :
-                          ($stock->isStockMinimum() ? 'Minimum' :
-                          ($stock->isStockMaximum() ? 'Maximum' : 'Normal'))
-            ];
-        });
-}
+        $depot = Depot::findOrFail($request->depot_id);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'depot' => $depot,
+                'stocks' => $this->getStockData($depot->id)
+            ]);
+        }
+
+        return redirect()->route('rapports.stock-dispo', ['depot_id' => $depot->id]);
+    }
+
+    private function getStockData($depotId)
+    {
+        return StockDepot::with(['article.uniteMesure', 'depot'])
+            ->where('depot_id', $depotId)
+            ->where('quantite_reelle', '>', 0)
+            ->get()
+            ->map(function ($stock) {
+                return [
+                    'article' => [
+                        'code' => $stock->article->code_article,
+                        'designation' => $stock->article->designation,
+                        'unite' => $stock->article->uniteMesure?->libelle_unite
+                    ],
+                    'quantite_reelle' => $stock->quantite_reelle,
+                    'quantite_disponible' => $stock->quantite_disponible,
+                    'quantite_reservee' => $stock->quantite_reservee,
+                    'prix_moyen' => $stock->prix_moyen,
+                    'valeur_stock' => $stock->valeur_stock,
+                    'statut' => $stock->isEnAlerte() ? 'Alerte' : ($stock->isStockMinimum() ? 'Minimum' : ($stock->isStockMaximum() ? 'Maximum' : 'Normal'))
+                ];
+            });
+    }
 }

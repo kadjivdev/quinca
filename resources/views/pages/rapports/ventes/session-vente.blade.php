@@ -24,9 +24,9 @@
                     <select name="session_id" id="session_id" class="form-select select2">
                         <option value="">Session courante</option>
                         @foreach($sessions as $s)
-                            <option value="{{ $s->id }}" {{ request('session_id') == $s->id ? 'selected' : '' }}>
-                                Session #{{ $s->id }} - {{ $s->date_ouverture->format('d/m/Y H:i') }}
-                            </option>
+                        <option value="{{ $s->id }}" {{ request('session_id') == $s->id ? 'selected' : '' }}>
+                            Session #{{ $s->id }} - {{ $s->date_ouverture->format('d/m/Y H:i') }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -36,7 +36,7 @@
                         <i class="fas fa-calendar me-2"></i>Date début
                     </label>
                     <input type="date" class="form-control" name="date_debut"
-                           value="{{ $dateDebut->format('Y-m-d') }}">
+                        value="{{ $dateDebut->format('Y-m-d') }}">
                 </div>
 
                 <div class="col-md-3">
@@ -44,7 +44,7 @@
                         <i class="fas fa-calendar me-2"></i>Date fin
                     </label>
                     <input type="date" class="form-control" name="date_fin"
-                           value="{{ $dateFin->format('Y-m-d') }}">
+                        value="{{ $dateFin->format('Y-m-d') }}">
                 </div>
 
                 <div class="col-md-2">
@@ -152,18 +152,18 @@
                             </thead>
                             <tbody>
                                 @php
-                                    $reglements = [];
-                                    $nombreReglements = [];
-                                    foreach($session->factures as $facture) {
-                                        foreach($facture->reglements as $reglement) {
-                                            if(!isset($reglements[$reglement->type_reglement])) {
-                                                $reglements[$reglement->type_reglement] = 0;
-                                                $nombreReglements[$reglement->type_reglement] = 0;
-                                            }
-                                            $reglements[$reglement->type_reglement] += $reglement->montant;
-                                            $nombreReglements[$reglement->type_reglement]++;
-                                        }
-                                    }
+                                $reglements = [];
+                                $nombreReglements = [];
+                                foreach($session->factures as $facture) {
+                                foreach($facture->reglements as $reglement) {
+                                if(!isset($reglements[$reglement->type_reglement])) {
+                                $reglements[$reglement->type_reglement] = 0;
+                                $nombreReglements[$reglement->type_reglement] = 0;
+                                }
+                                $reglements[$reglement->type_reglement] += $reglement->montant;
+                                $nombreReglements[$reglement->type_reglement]++;
+                                }
+                                }
                                 @endphp
                                 @foreach($reglements as $type => $montant)
                                 <tr>
@@ -202,6 +202,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>N° Facture</th>
+                                    <th>Caisse/Session</th>
                                     <th>Client</th>
                                     <th class="text-end">Montant TTC</th>
                                     <th class="text-end">Réglé</th>
@@ -214,6 +215,11 @@
                                     <td>
                                         <i class="fas fa-file-alt text-muted me-2"></i>
                                         {{ $facture->numero }}
+                                    </td>
+                                    <td>
+                                        caisse: {{$facture->sessionCaisse->caisse?->libelle}}/
+                                        Ouverture: {{$facture->sessionCaisse?->montant_ouverture}} -
+                                        Fermeture: {{$facture->sessionCaisse->montant_fermeture??00}}
                                     </td>
                                     <td>
                                         <i class="fas fa-user text-muted me-2"></i>
@@ -241,112 +247,112 @@
 
 @push('styles')
 <style>
-.status-indicator {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-}
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
 
-.select2-container--bootstrap4 .select2-selection--single {
-    height: 38px;
-    line-height: 1.5;
-    padding: 0.375rem 0.75rem;
-}
+    .select2-container--bootstrap4 .select2-selection--single {
+        height: 38px;
+        line-height: 1.5;
+        padding: 0.375rem 0.75rem;
+    }
 
-.card {
-    transition: transform 0.2s ease-in-out;
-}
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
 
-.card:hover {
-    transform: translateY(-5px);
-}
+    .card:hover {
+        transform: translateY(-5px);
+    }
 
-.badge {
-    font-weight: 500;
-    padding: 0.5em 0.8em;
-}
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 0.8em;
+    }
 
-.table > :not(caption) > * > * {
-    padding: 1rem 1rem;
-}
+    .table> :not(caption)>*>* {
+        padding: 1rem 1rem;
+    }
 
-.rounded-circle {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    .rounded-circle {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-.bg-opacity-10 {
-    --bs-bg-opacity: 0.1;
-}
+    .bg-opacity-10 {
+        --bs-bg-opacity: 0.1;
+    }
 </style>
 @endpush
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    // Configuration Select2
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%',
-        placeholder: 'Sélectionnez une session',
-        language: 'fr'
+    $(document).ready(function() {
+        // Configuration Select2
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            width: '100%',
+            placeholder: 'Sélectionnez une session',
+            language: 'fr'
+        });
+
+        // Configuration DataTables commune
+        const dataTableConfig = {
+            language: {
+                url: '/js/datatables-fr.json'
+            },
+            pageLength: 10,
+            order: [
+                [0, 'desc']
+            ],
+            responsive: true
+        };
+
+        // Initialisation des DataTables
+        $('#facturesTable').DataTable({
+            ...dataTableConfig,
+            dom: 'Bfrtip',
+            buttons: [{
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel me-1"></i>Exporter Excel',
+                className: 'btn btn-success btn-sm',
+                title: `Rapport Session #{{ $session->id }}`,
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4]
+                }
+            }]
+        });
+
+        $('#encaissementsTable').DataTable({
+            ...dataTableConfig,
+            searching: false,
+            info: false
+        });
+
+        // Gestion du formulaire de filtrage
+        $('#sessionForm').on('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const searchParams = new URLSearchParams(formData);
+
+            window.location.href = `{{ route('vente.sessions.rapport') }}?${searchParams.toString()}`;
+        });
+
+        // Fonction d'impression
+        $('#printBtn').on('click', function() {
+            window.print();
+        });
+
+        // Export Excel direct
+        $('#exportBtn').on('click', function() {
+            $('#facturesTable').DataTable().button(0).trigger();
+        });
     });
-
-    // Configuration DataTables commune
-    const dataTableConfig = {
-        language: {
-            url: '/js/datatables-fr.json'
-        },
-        pageLength: 10,
-        order: [[0, 'desc']],
-        responsive: true
-    };
-
-    // Initialisation des DataTables
-    $('#facturesTable').DataTable({
-        ...dataTableConfig,
-        dom: 'Bfrtip',
-        buttons: [{
-            extend: 'excel',
-            text: '<i class="fas fa-file-excel me-1"></i>Exporter Excel',
-            className: 'btn btn-success btn-sm',
-            title: `Rapport Session #{{ $session->id }}`,
-            exportOptions: {
-                columns: [0, 1, 2, 3, 4]
-            }
-        }]
-    });
-
-    $('#encaissementsTable').DataTable({
-        ...dataTableConfig,
-        searching: false,
-        info: false
-    });
-
-    // Gestion du formulaire de filtrage
-    $('#sessionForm').on('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const searchParams = new URLSearchParams(formData);
-
-        window.location.href = `{{ route('vente.sessions.rapport') }}?${searchParams.toString()}`;
-    });
-
-    // Fonction d'impression
-    $('#printBtn').on('click', function() {
-        window.print();
-    });
-
-    // Export Excel direct
-    $('#exportBtn').on('click', function() {
-        $('#facturesTable').DataTable().button(0).trigger();
-    });
-});
 </script>
 @endpush
-
-

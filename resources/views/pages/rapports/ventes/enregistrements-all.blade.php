@@ -5,6 +5,7 @@
 <div class="container-fluid px-4 py-4">
     <div class="row">
         <div class="col-12">
+
             <!-- En-tête avec filtres -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
@@ -110,7 +111,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4">
+                                    <td colspan="8" class="text-center py-4">
                                         <i class="fas fa-info-circle me-2"></i>Aucune vente pour cette date
                                     </td>
                                 </tr>
@@ -118,19 +119,9 @@
                             </tbody>
                             <tfoot class="bg-light fw-bold">
                                 <tr>
-                                    <td colspan="9" class="text-end">Total Global:</td>
-                                    <td class="text-end">{{ number_format($totaux['total_global'], 0, ',', ' ') }} FCFA</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="9" class="text-end">Total Comptant:</td>
-                                    <td class="text-end">{{ number_format($totaux['total_comptant'], 0, ',', ' ') }} FCFA</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="9" class="text-end">Total Crédit:</td>
-                                    <td class="text-end">{{ number_format($totaux['total_credit'], 0, ',', ' ') }} FCFA</td>
-                                    <td></td>
+                                    <td colspan="3" class="text-end">Total Global: {{ number_format($totaux['total_global'], 0, ',', ' ') }} FCFA</td>
+                                    <td colspan="3" class="text-end">Total Comptant: {{ number_format($totaux['total_comptant'], 0, ',', ' ') }} FCFA</td>
+                                    <td colspan="3" class="text-end">Total Crédit: {{ number_format($totaux['total_credit'], 0, ',', ' ') }} FCFA</td>
                                 </tr>
                             </tfoot>
                         </table>

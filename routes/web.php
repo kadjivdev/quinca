@@ -60,63 +60,6 @@ use Illuminate\Support\Facades\DB;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $lignesVenteRevendeurs = LigneFactureRevendeur::with(["uniteVente","factureRevendeur","article"])->where(["depot"=> 5,"article_id"=>384])
-    // ->whereHas("factureRevendeur",function ($query){
-    //     $query->whereNotNull("validated_by");
-    // })->sum("quantite_base");
-
-    $article384 = Article::findOrFail(384);
-
-    // return response()->json($article384->facturesVenteRevendeur(5)->sum("quantite_base"));
-    return response()->json($article384->qteVendu(5));
-
-    // Disable foreign key checks
-    // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
-    // Recouvrement::query()->delete();
-    // FactureClient::query()->delete();
-    // Devis::query()->delete();
-
-    // Inventaire::query()->delete();
-
-    // FournisseurApprovisionnement::query()->delete();
-
-    // LigneLivraisonClient::query()->delete();
-    // LivraisonClient::query()->delete();
-
-    // ReglementFournisseur::query()->delete();
-    // ReglementClient::query()->delete();
-
-    // StockDepot::query()->delete();
-    // StockMouvement::query()->delete();
-
-    // ProgrammationAchat::query()->delete();
-    // LigneProgrammationAchat::query()->delete();
-
-    // BonCommande::query()->delete();
-    // BonCommande::query()->delete();
-    // LigneBonCommande::query()->delete();
-
-    // FactureFournisseur::query()->delete();
-    // BonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
-    // LigneBonLivraisonFournisseur::query()->update(["deleted_at" => now()]);
-
-    // Article::query()->delete();
-
-    // ReglementFournisseur::query()->update(["deleted_at" => now()]);
-
-
-    // Article::query()->delete();
-
-    // Requete::query()->delete();
-
-    // Tarification::query()->delete();
-    // ConversionUnite::query()->delete();
-
-    // SessionCaisse::query()->delete();
-
-    // // Re-enable foreign key checks
-    // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
     return "Opération éffectuée avec succès!!";
 });
