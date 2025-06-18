@@ -297,7 +297,7 @@ class RapportStockController extends Controller
             ->where('depot_id', $selectedDepot->id)
             ->where('quantite_reelle', '>', 0)
             ->get()
-            ->map(function ($stock) {
+            ->map(function ($stock) use ($selectedDepot) {
                 return [
                     'article' => [
                         'code' => $stock->article->code_article,
@@ -307,7 +307,7 @@ class RapportStockController extends Controller
                     'unite_stock' => $stock->uniteMesure->libelle_unite,
                     'depot' => $stock->depot->libelle_depot,
                     'quantite_reelle' => $stock->quantite_reelle,
-                    'quantite_disponible' => $stock->quantite_disponible,
+                    'quantite_disponible' => $stock->article->reste($selectedDepot->id),
                     'quantite_reservee' => $stock->quantite_reservee,
                     'prix_moyen' => $stock->prix_moyen,
                     'valeur_stock' => $stock->valeur_stock,
