@@ -524,8 +524,6 @@ class FactureManager {
         }
     }
 
-
-
     updateTotaux() {
         let totalHT = 0;
         let totalTVA = 0;

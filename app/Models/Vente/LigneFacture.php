@@ -200,7 +200,7 @@ class LigneFacture extends Model
             }
 
             // Recalculer les montants
-            $ligneFacture->calculerMontants();
+            // $ligneFacture->calculerMontants();
         });
     }
     // protected static function boot()

@@ -46,23 +46,6 @@ class FactureClientController extends Controller
             $tauxTva = $configuration ? $configuration->taux_tva : 18;
 
             $query = FactureClient::with(['client'])
-                ->select([
-                    'id',
-                    'numero',
-                    'date_facture',
-                    'date_echeance',
-                    'client_id',
-                    'statut',
-                    'type_facture',
-                    'date_validation',
-                    'montant_ht',
-                    'montant_ttc',
-                    'montant_regle',
-                    'session_caisse_id',
-                    'created_by',
-                    'validated_by',
-                    'encaissed_at'
-                ])
                 ->orderBy('date_facture', 'desc');
 
             // Chargement des factures avec les relations nécessaires
@@ -100,6 +83,8 @@ class FactureClientController extends Controller
                 return $facture;
             });
 
+
+
             $facturesResteAPayer = $factures->filter(function ($facture) {
                 return $facture->reste_a_payer > 0;
             });
@@ -131,6 +116,7 @@ class FactureClientController extends Controller
                 'montant_en_attente' => $montantResteAPyer,
                 'factures_en_attente' => $facturesResteAPayer,
             ];
+
 
             Log::info('Liste des factures chargée avec succès', [
                 'nombre_factures' => count($factures)
@@ -299,8 +285,14 @@ class FactureClientController extends Controller
                     'montant_tva' => 0,
                     'montant_aib' => 0,
                     'montant_ttc' => 0,
-                    'taux_tva' => $request->type_facture === 'simple' ? 0 : $configuration->taux_tva,
-                    'taux_aib' => $request->type_facture === 'simple' ? 0 : $client->taux_aib,
+                    'taux_tva' => 0.18,
+                    'taux_aib' => 0.01,
+                    'taux_remise' => 0,
+                    'montant_ht_apres_remise' => 0,
+                    'montant_tva',
+                    'montant_aib' => 0,
+                    'montant_ttc' => 0,
+                    'montant_regle' => 0,
                 ]);
 
                 $facture->save();
@@ -309,43 +301,61 @@ class FactureClientController extends Controller
                 $totalRemise = 0;
                 $totalTVA = 0;
                 $totalAIB = 0;
+                $montantTTC = 0;
 
                 // Création des lignes
-                foreach ($request->lignes as $ligne) {
+                foreach ($request->lignes as $index => $ligne) {
+                    $ligneMontantHt = $ligne['quantite'] * $ligne['tarification_id'];
+                    $ligneMontantTVA = $ligneMontantHt * 0.18;
+                    $ligneMontantAIB = $ligneMontantHt * 0.01;
+                    $ligneMontantRemise = $ligneMontantHt * $ligne['taux_remise'] / 100;
+
+                    Log::info("La ligne $index", [
+                        "montantHt" => $ligneMontantHt,
+                        "montantTva" => $ligneMontantTVA,
+                        "montantAib" => $ligneMontantAIB,
+                        "montantRemise" => $ligneMontantRemise,
+                    ]);
+
                     $ligneFacture = new LigneFacture([
                         'article_id' => $ligne['article_id'],
                         'unite_vente_id' => $ligne['unite_vente_id'],
                         'quantite' => $ligne['quantite'],
+                        'depot' => $ligne['depot_id'],
                         'prix_unitaire_ht' => $ligne['tarification_id'],
                         'taux_remise' => $ligne['taux_remise'] ?? 0,
-                        'taux_tva' => $request->type_facture === 'simple' ? 0 : $configuration->taux_tva,
-                        'taux_aib' => $request->type_facture === 'simple' ? 0 : $client->taux_aib,
-                        'depot' => $ligne["depot_id"],
+                        'taux_tva' => $request->type_facture === 'simple' ? 0 : 18 / 100,
+                        'taux_aib' => $request->type_facture === 'simple' ? 0 : 1 / 100,
+                        'montant_ht' => $ligneMontantHt,
+                        'montant_tva' => $ligneMontantTVA,
+                        'montant_aib' => $ligneMontantAIB,
+                        'montant_ttc' => $ligneMontantHt + $ligneMontantTVA + $ligneMontantAIB,
+                        'montant_remise' => $ligneMontantRemise,
+                        'montant_ht_apres_remise' => $ligneMontantHt-$ligneMontantRemise,
+                        'quantite_livree' => 0,
                     ]);
 
                     $facture->lignes()->save($ligneFacture);
 
-                    $totalHT += $ligneFacture->montant_ht;
                     $totalRemise += $ligneFacture->montant_remise;
-                    if ($request->type_facture === 'normaliser') {
-                        $totalTVA += $ligneFacture->montant_tva;
-                        $totalAIB += $ligneFacture->montant_aib;
-                    }
                 }
 
-                $montantHTApresRemise = $totalHT - $totalRemise;
-                $montantTTC = $montantHTApresRemise;
-                if ($request->type_facture === 'normaliser') {
-                    $montantTTC += $totalTVA + $totalAIB;
-                }
+                $montantHTApresRemise = $facture
+                    ->lignes->sum("montant_ht") - $facture->lignes->sum("montant_remise");
+
+                // $montantTTC = $montantHTApresRemise;
+                $totalTVA +=  $facture->lignes->sum("montant_tva");
+                $totalAIB +=  $facture->lignes->sum("montant_aib");
+
+                $montantTTC += $montantHTApresRemise + $totalTVA + $totalAIB;
 
                 // Mise à jour des totaux
                 $facture->update([
-                    'montant_ht' => $totalHT,
-                    'montant_remise' => $totalRemise,
+                    'montant_ht' => $facture->lignes->sum("montant_ht"),
+                    'montant_remise' => $facture->sum("montant_remise"),
                     'montant_ht_apres_remise' => $montantHTApresRemise,
-                    'montant_tva' => $totalTVA,
-                    'montant_aib' => $totalAIB,
+                    'montant_tva' => $facture->lignes->sum("montant_tva"),
+                    'montant_aib' => $facture->lignes->sum("montant_aib"),
                     'montant_ttc' => $montantTTC,
                     'montant_regle' => $request->montant_regle,
                 ]);
@@ -913,7 +923,7 @@ class FactureClientController extends Controller
 
         // dd($facture->montant_ht * 18/100);
 
-        $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture', "logo","montantTTc"));
+        $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture', "logo", "montantTTc"));
         $pdf->setPaper('a4');
 
         return $pdf->stream("facture_{$facture->numero}.pdf");

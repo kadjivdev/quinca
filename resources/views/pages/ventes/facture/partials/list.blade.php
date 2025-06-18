@@ -35,6 +35,8 @@
                             <th class="border-bottom-0">Etat</th>
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
+                            <th class="border-bottom-0 text-end">Montant TVA</th>
+                            <th class="border-bottom-0 text-end">Montant AIB</th>
                             <th class="border-bottom-0 text-end">Montant TTC</th>
                             <th class="border-bottom-0 text-end">Reste à payer</th>
                             <th class="border-bottom-0 text-center">Type</th>
@@ -104,6 +106,12 @@
                                 {{ number_format($facture->montant_ht, 0, ',', ' ') }} F
                             </td>
                             <td class="text-end fw-medium">
+                                {{ number_format($facture->montant_tva, 0, ',', ' ') }} F
+                            </td>
+                             <td class="text-end fw-medium">
+                                {{ number_format($facture->montant_aib, 0, ',', ' ') }} F
+                            </td>
+                             <td class="text-end fw-medium">
                                 {{ number_format($facture->montant_ttc, 0, ',', ' ') }} F
                             </td>
                             <td class="text-end">
