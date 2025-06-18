@@ -168,14 +168,21 @@ class Article extends Model
      */
     function facturesVente($depotId = null)
     {
-        return $this->hasMany(LigneFacture::class, "article_id")->where("depot", $depotId)
-            ->get()->filter(function ($vente) {
-                if ($vente->factureClient) {
-                    if ($vente->factureClient->validated_by) {
-                        return $vente; // facture validées
-                    }
-                }
-            });
+        // return $this->hasMany(LigneFacture::class, "article_id")->where("depot", $depotId)
+        //     ->get()->filter(function ($vente) {
+        //         if ($vente->factureClient) {
+        //             // if ($vente->factureClient->validated_by) {
+        //             //     return $vente; // facture validées
+        //             // }
+        //             return $vente->factureClient->validated_by;
+        //         }
+        //     });
+
+        return $this->hasMany(LigneFacture::class, "article_id")
+            ->where("depot", $depotId)
+            ->whereHas("factureClient", function ($query) {
+                $query->whereNotNull("validated_by");
+            })->get();
     }
 
     /**
@@ -183,14 +190,11 @@ class Article extends Model
      */
     function facturesVenteRevendeur($depotId = null)
     {
-        return $this->hasMany(LigneFactureRevendeur::class, "article_id")->where("depot", $depotId)
-            ->get()->filter(function ($vente) {
-                if ($vente->factureRevendeur) {
-                    if ($vente->factureRevendeur->validated_by) {
-                        return $vente; // facture validées
-                    }
-                }
-            });
+        return $this->hasMany(LigneFactureRevendeur::class, "article_id")
+            ->where("depot", $depotId)
+            ->whereHas("factureRevendeur", function ($query) {
+                $query->whereNotNull("validated_by");
+            })->get();
     }
 
     /**
@@ -199,46 +203,48 @@ class Article extends Model
 
     function qteVendu($depotId = null)
     {
-        // on recupere le stock de cet article dans ce dépot
-        $stock = $this->stocks->firstWhere("depot_id", $depotId);
-
-        $serviceStockEntree = new ServiceStockEntree();
-
         //Vente à la directeur
-        $factureVente = $this->facturesVente($depotId);
+        $factureVentes = $this->facturesVente($depotId);
 
         //Vente revendeur (ventes speciales et autres)
-        $factureRevendeur = $this->facturesVenteRevendeur($depotId);
+        $factureRevendeurs = $this->facturesVenteRevendeur($depotId);
 
         $qteVenteConvertie = 0;
-        if ($factureVente->isEmpty() && $factureRevendeur->isEmpty()) {
+        if ($factureVentes->isEmpty() && $factureRevendeurs->isEmpty()) {
             $qteVenteConvertie = 0;
         }
 
         /**Conversion qteVendu Client*/
-        if ($factureVente->isNotEmpty()) {
-            $conversion = $serviceStockEntree
-                ->rechercherConversion(
-                    $factureVente->first()->unite_vente_id,
-                    $stock->unite_mesure_id,
-                    $stock->article_id
-                );
+        if ($factureVentes->isNotEmpty()) {
+            $qteVenteConvertie += $factureVentes->sum("quantite_base");
+            // foreach ($factureVentes as $vente) {
+            //     $conversion = $serviceStockEntree
+            //         ->rechercherConversion(
+            //             $vente->unite_vente_id,
+            //             $stock->unite_mesure_id,
+            //             $stock->article_id
+            //         );
 
-            $qteVenteConvertie += $serviceStockEntree
-                ->convertirQuantite($factureVente->sum("quantite"), $conversion, $stock->unite_mesure_id);
+            //     $qteVenteConvertie += $serviceStockEntree
+            //         ->convertirQuantite($factureVentes->sum("quantite"), $conversion, $stock->unite_mesure_id);
+            // }
         }
 
         /**Conversion qteVendu Revendeur*/
-        if ($factureRevendeur->isNotEmpty()) {
-            $conversion = $serviceStockEntree
-                ->rechercherConversion(
-                    $factureRevendeur->first()->unite_vente_id,
-                    $stock->unite_mesure_id,
-                    $stock->article_id
-                );
+        if ($factureRevendeurs->isNotEmpty()) {
+            $qteVenteConvertie += $factureRevendeurs->sum("quantite_base");
 
-            $qteVenteConvertie += $serviceStockEntree
-                ->convertirQuantite($factureRevendeur->sum("quantite"), $conversion, $stock->unite_mesure_id);
+            // foreach ($factureRevendeurs as $vente) {
+            //     $conversion = $serviceStockEntree
+            //         ->rechercherConversion(
+            //             $vente->unite_vente_id,
+            //             $stock->unite_mesure_id,
+            //             $stock->article_id
+            //         );
+
+            //     $qteVenteConvertie += $serviceStockEntree
+            //         ->convertirQuantite($factureRevendeurs->sum("quantite"), $conversion, $stock->unite_mesure_id);
+            // }
         }
 
         return $qteVenteConvertie;
