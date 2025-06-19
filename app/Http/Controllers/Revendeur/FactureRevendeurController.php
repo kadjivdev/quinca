@@ -54,7 +54,6 @@ class FactureRevendeurController extends Controller
                 ->where('type_vente', 'normale')
                 ->orderBy('date_facture', 'desc');
 
-
             if (
                 auth()->user()->hasRole("Super Administrateur")
                 || auth()->user()->hasRole("CONTROLE INTERNE")
