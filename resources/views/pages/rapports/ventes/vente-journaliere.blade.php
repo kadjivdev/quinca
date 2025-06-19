@@ -9,7 +9,7 @@
     }
 </style>
 
-<div class="container-fluid px-4 py-4">
+<div class="container-fluid px-4 py-4" id="venteBody">
     <div class="row">
         <div class="col-12">
             <!-- En-tête avec filtres -->
@@ -57,6 +57,7 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Rapport des ventes du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }} Légende: <span class="badge bg-secondary text-white">Ecritures des Dépôts</span> | <span class="border badge bg-white text-dark">Ecritures de la Direction</span></h5>
+                    <h5 class="">Total Global: <span class="badge bg-success" id="montantTotal">{{ number_format($totaux['total_global'], 0, ',', ' ') }} FCFA</span></h5>
                     <!-- <button class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-file-excel me-2"></i>Exporter
                     </button> -->
@@ -66,7 +67,7 @@
                         <table id="example1" class="table table-hover table-striped mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th>N°</th>
+                                    <!-- <th>N°</th> -->
                                     <th>Date Écriture</th>
                                     <th>Date vente</th>
                                     <th>Référence</th>
@@ -83,7 +84,7 @@
                             <tbody>
                                 @forelse($ventes as $vente)
                                 <tr class="p-2 @if($vente['revendeur']) bg-secondary @endif">
-                                    <td>{{ $loop->iteration }}</td>
+                                    <!-- <td>{{ $loop->iteration }}</td> -->
                                     <td>{{ $vente['date_ecriture'] }}</td>
                                     <td>{{ $vente['date_vente'] }}</td>
                                     <td>
@@ -97,7 +98,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $vente['categorie_vente'] }}</td>
-                                    <td><span class="badge border text-dark @if($vente['statut']=='valide') bg-success @elseif('$vente['statut']=='annulee') bg-danger @else bg-dark @endif)"> {{ $vente['statut'] }}</span></td>
+                                    <td><span class="badge border text-dark @if($vente['statut']=='valide') bg-success @elseif($vente['statut']=='annulee') bg-danger @else bg-dark text-white @endif"> {{ $vente['statut'] }}</span></td>
                                     <td>{{ $vente['client'] }}</td>
                                     <td><span class="badge bg-dark text-white"> {{ $vente['createdBy']?$vente['createdBy']['name']:'---' }}</span></td>
                                     <td class="text-end">
@@ -114,29 +115,12 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4">
+                                    <td colspan="6" class="text-center py-4">
                                         <i class="fas fa-info-circle me-2"></i>Aucune vente pour cette date
                                     </td>
                                 </tr>
                                 @endforelse
                             </tbody>
-                            <tfoot class="bg-light fw-bold">
-                                <tr>
-                                    <td colspan="8" class="text-end">Total Global:</td>
-                                    <td class="text-end">{{ number_format($totaux['total_global'], 0, ',', ' ') }} FCFA</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="8" class="text-end">Total Comptant:</td>
-                                    <td class="text-end">{{ number_format($totaux['total_comptant'], 0, ',', ' ') }} FCFA</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="8" class="text-end">Total Crédit:</td>
-                                    <td class="text-end">{{ number_format($totaux['total_credit'], 0, ',', ' ') }} FCFA</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -228,7 +212,31 @@
 @endpush
 
 @push('scripts')
-<script>
+<script type="text/javascript">
+    const search = document.querySelector('input[type="search"]')
+
+    // Fonction pour calculer le total
+    function calculateTotal() {
+        let table = $('#example1').DataTable();
+        let total = 0;
+        
+        // Parcourir toutes les lignes visibles et additionner les montants
+        table.column(8, {search: 'applied'}).data().each(function(value) {
+            // Nettoyer la valeur (enlever "FCFA" et les espaces, puis convertir en nombre)
+            let montant = parseInt(value.replace(/[^0-9-]/g, ''));
+            total += montant;
+        });
+
+        // Afficher le total formaté
+        $("#montantTotal").html(total.toLocaleString() + " FCFA");
+    }
+
+    // // Recalculer lors des changements dans le body
+    // $("#venteBody").on('change', calculateTotal);
+
+    // Recalculer lors de la recherche
+    $('#example1').on('search.dt', calculateTotal);
+
     document.addEventListener('DOMContentLoaded', function() {
         const exportBtn = document.querySelector('.btn-outline-primary');
         if (exportBtn) {

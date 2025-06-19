@@ -197,7 +197,7 @@ class RapportVenteController extends Controller
             ->join('facture_clients as f', 'f.id', '=', 'lf.facture_client_id')
             ->join('articles as a', 'a.id', '=', 'lf.article_id')
             ->join('famille_articles as fa', 'fa.id', '=', 'a.famille_id')
-            ->where('f.statut', 'validee')
+            // ->where('f.statut', 'validee')
             ->whereBetween('f.date_facture', [$startOfMonth, $endOfMonth])
             ->select([
                 'fa.libelle_famille',
@@ -464,6 +464,7 @@ class RapportVenteController extends Controller
                         return null;
                     }
                 })->filter();
+
 
                 // Calcul des totaux
                 $totaux = [
