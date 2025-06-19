@@ -21,7 +21,7 @@
                         @foreach ($transports as $transport)
                         <tr>
                             <td>{{ $loop->iteration }} </td>
-                            <td>{{ $transport->client->nom_client }} </td>
+                            <td>{{ $transport->client->raison_sociale }} </td>
                             <td>{{ Carbon\Carbon::parse($transport->date_op)->format('d-m-Y') }} </td>
                             <td>{{ $transport->montant }} </td>
                             <td>{{ $transport->observation }} </td>

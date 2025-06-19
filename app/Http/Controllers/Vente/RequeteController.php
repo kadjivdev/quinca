@@ -211,6 +211,8 @@ class RequeteController extends Controller
                 'user_id' => Auth::user()->id,
                 'type_paiement' => 'virement',
                 'requete_id' => $requete->id,
+                'statut'=>AcompteClient::STATUT_VALIDE,
+                'created_by'=>auth()->user()->id,
                 'point_de_vente_id' => Auth::user()->point_de_vente_id
             ]);
 

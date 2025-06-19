@@ -102,7 +102,7 @@ class TransportController extends Controller
             $request->validate([
                 'montant' => 'required|integer',
                 'date_op' => 'required|date',
-                'client_id' => 'required|string',
+                'client_id' => 'required|integer',
             ]);
 
             Transport::where('id', $id)->update([
@@ -150,6 +150,8 @@ class TransportController extends Controller
                 'user_id' => Auth::user()->id,
                 'type_paiement' => 'virement',
                 'transport_id' => $transport->id,
+                'statut'=>AcompteClient::STATUT_VALIDE,
+                'created_by'=>auth()->user()->id,
                 'point_de_vente_id' => Auth::user()->point_de_vente_id
             ]);
 

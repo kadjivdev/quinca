@@ -50,6 +50,16 @@ class AcompteClient extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function requete(): BelongsTo
+    {
+        return $this->belongsTo(Requete::class,'requete_id');
+    }
+
+    public function transport(): BelongsTo
+    {
+        return $this->belongsTo(Transport::class,'transport_id');
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

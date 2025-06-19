@@ -76,6 +76,8 @@
                             <th class="border-bottom-0 text-center">Type</th>
                             <th class="border-bottom-0 text-end">Montant</th>
                             <th class="border-bottom-0">Observation</th>
+                            <th class="border-bottom-0">Requete</th>
+                            <th class="border-bottom-0">Transport</th>
                             <th class="border-bottom-0">Créé par</th>
                             <th class="border-bottom-0 text-end" style="min-width: 100px;">Actions</th>
                         </tr>
@@ -126,6 +128,12 @@
                             </td>
                             <td>
                                 <span class="text-muted small">{{ $acompte->observation ?: '—' }}</span>
+                            </td>
+                            <td>
+                                <span class="text-muted small">{{ $acompte->requete?'REQUETE': '—' }}</span>
+                            </td>
+                            <td>
+                                <span class="text-muted small">{{ $acompte->transport?'TRANSPORT': '—' }}</span>
                             </td>
                             <td>
                                 <small class="text-muted">
