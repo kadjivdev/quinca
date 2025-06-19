@@ -114,7 +114,7 @@
                                                     <th>Quantité</th>
                                                     <th>Prix</th>
                                                     <th>Remise (%)</th>
-                                                    <th>Total HT</th>
+                                                    <th>Total TTC</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>

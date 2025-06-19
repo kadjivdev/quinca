@@ -12,12 +12,12 @@ const FactureConfig = {
         totalTVA: '#totalTVA',
         totalTTC: '#totalTTC',
         totalAIB: '#totalAIB',
-    montantRegle: '#montantRegle',
-    montantRestant: '#montantRestant',
-    messageRestant: '#messageRestant',
-    typeFacture: '#type_facture',
-    tvaRow: '#tvaRow',
-    aibRow: '#aibRow'
+        montantRegle: '#montantRegle',
+        montantRestant: '#montantRestant',
+        messageRestant: '#messageRestant',
+        typeFacture: '#type_facture',
+        tvaRow: '#tvaRow',
+        aibRow: '#aibRow'
     },
     classes: {
         ligne: 'ligne-facture',
@@ -127,11 +127,14 @@ class FactureManager {
         $(FactureConfig.selectors.totalTVA).closest('tr').hide();
         $(FactureConfig.selectors.totalAIB).closest('tr').hide();
 
-        typeSelect.on('change', (e) => {
-            this.isNormalized = e.target.value === 'normaliser';
-            this.toggleTaxRows();
-            this.updateTotaux();
-        });
+        //typeSelect.on('change', (e) => {
+        //    this.isNormalized = e.target.value === 'normaliser';
+        //    this.toggleTaxRows();
+        //    this.updateTotaux();
+        //});
+
+        this.toggleTaxRows();
+        this.updateTotaux();
     }
 
     // Ajouter cette nouvelle méthode
@@ -139,13 +142,16 @@ class FactureManager {
         const tvaRow = $(FactureConfig.selectors.totalTVA).closest('tr');
         const aibRow = $(FactureConfig.selectors.totalAIB).closest('tr');
 
-        if (this.isNormalized) {
-            tvaRow.show();
-            aibRow.show();
-        } else {
-            tvaRow.hide();
-            aibRow.hide();
-        }
+        //if (this.isNormalized) {
+        //    tvaRow.show();
+        //    aibRow.show();
+        //} else {
+        //    tvaRow.hide();
+        //    aibRow.hide();
+        //}
+
+        tvaRow.show();
+        aibRow.show();
     }
 
     initMontantRegleEvents() {
@@ -191,7 +197,6 @@ class FactureManager {
         }
     }
 
-
     async initTarifSelect(row, index) {
         const tarifSelect = row.find(`select[name="lignes[${index}][tarification_id]"]`);
 
@@ -211,9 +216,8 @@ class FactureManager {
         });
     }
 
-
     initEvents() {
-        const {addButton, ligneContainer, form, modal} = FactureConfig.selectors;
+        const { addButton, ligneContainer, form, modal } = FactureConfig.selectors;
 
         // Nettoyage et réinitialisation des événements
         $(document).off('click', addButton).on('click', addButton, () => this.addLigne());
@@ -284,7 +288,7 @@ class FactureManager {
 
     async initArticleSelect(row, index) {
         const articleSelect = row.find(`select[name="lignes[${index}][article_id]"]`);
-       
+
         if (articleSelect.hasClass('select2-hidden-accessible')) {
             articleSelect.select2('destroy');
         }
@@ -299,14 +303,14 @@ class FactureManager {
                 url: FactureConfig.routes.articlesSearch,
                 dataType: 'json',
                 delay: 250,
-                data: function(params) {
+                data: function (params) {
                     console.log('Paramètres de recherche:', params);
                     return {
                         q: params.term,
                         page: params.page || 1
                     };
                 },
-                processResults: function(data, params) {
+                processResults: function (data, params) {
                     console.log('Type de data:', typeof data);
                     console.log('Data complète:', data);
                     console.log('Data.results existe?', !!data.results);
@@ -353,10 +357,10 @@ class FactureManager {
             templateResult: this.formatArticle,
             templateSelection: this.formatArticleSelection,
             escapeMarkup: markup => markup
-        }).on('select2:select', (e)=> this.loadArticleDetails(index, e))
-        .on('select2:open', function() {
-            document.querySelector('.select2-search__field').focus();
-        });
+        }).on('select2:select', (e) => this.loadArticleDetails(index, e))
+            .on('select2:open', function () {
+                document.querySelector('.select2-search__field').focus();
+            });
     }
 
     formatArticle(article) {
@@ -400,7 +404,6 @@ class FactureManager {
             theme: 'bootstrap-5',
             width: '100%',
             dropdownParent: $('#addFactureModal'),
-            {{-- placeholder: 'Sélectionner une unité', --}}
             allowClear: true
         });
     }
@@ -409,16 +412,14 @@ class FactureManager {
         const articleId = e.target.value;
         const row = $(`select[name="lignes[${index}][article_id]"]`).closest('tr');
 
-        <!-- gestion des depots -->
         const depotSelect = document.querySelector(`input[name="lignes[${index}][depot_id]"]`);
         const depotQuantite = document.querySelector(`input[name="lignes[${index}][quantite]"]`);
         const depotLibelle = document.querySelector(`input[name="lignes[${index}][depot_libelle]"]`);
 
         const data = e.params.data
         depotSelect.value = data.depot.id;
-        depotLibelle.value =`${data.depot.libelle_depot} | stock: ${data.stock} ${data.unite_mesure.libelle_unite} `;
+        depotLibelle.value = `${data.depot.libelle_depot} | stock: ${data.stock} ${data.unite_mesure.libelle_unite} `;
         depotQuantite.min = 0
-        <!-- fin -->
 
         try {
             this.showRowLoading(row);
@@ -472,7 +473,6 @@ class FactureManager {
 
         // Mise à jour des unités
         const uniteSelect = row.find(`select[name="lignes[${index}][unite_vente_id]"]`);
-        {{-- uniteSelect.empty().append('<option value="">Sélectionner une unité</option>'); --}}
 
         if (unitesData?.data?.unites) {
             unitesData.data.unites.forEach(unite => {
@@ -512,10 +512,10 @@ class FactureManager {
             // Calcul du total HT avec remise
             const montantBrut = quantite * prix;
             const montantRemise = (remise > 0 && remise <= 100) ? montantBrut * (remise / 100) : 0;
-            const totalHT = FactureUtils.roundNumber(montantBrut - montantRemise);
+            const totalTTC = FactureUtils.roundNumber(montantBrut - montantRemise);
 
-            row.find('.total-ligne').val(this.formatMoney(totalHT));
-            return totalHT;
+            row.find('.total-ligne').val(this.formatMoney(totalTTC));
+            return totalTTC;
 
         } catch (error) {
             console.error('Erreur calcul total:', error);
@@ -525,35 +525,56 @@ class FactureManager {
     }
 
     updateTotaux() {
-        let totalHT = 0;
+
+        // totaux
+        let totalTTC = 0;
         let totalTVA = 0;
         let totalAIB = 0;
+        let totalHT = 0;
+
+        // totaux des lignes
+        let ligneMontantHt = 0;
+        let ligneMontantAIB = 0;
+        let ligneMontantTVA = 0;
 
         // Récupération du taux AIB du client sélectionné
-        const clientSelect = $('select[name="client_id"]');
-        const selectedOption = clientSelect.find(':selected');
-        const tauxAib = selectedOption.length ? FactureUtils.parseNumber(selectedOption.data('taux-aib')) : 0;
+        // const clientSelect = $('select[name="client_id"]');
+        // const selectedOption = clientSelect.find(':selected');
+        // const tauxAib = selectedOption.length ? FactureUtils.parseNumber(selectedOption.data('taux-aib')) : 0;
 
         $(FactureConfig.selectors.ligneContainer).find('tr').each((_, row) => {
             const $row = $(row);
-            const montantHT = FactureUtils.parseNumber($row.find('.total-ligne').val());
+            const ligneMontantTTC = FactureUtils.parseNumber($row.find('.total-ligne').val());
 
-            totalHT += montantHT;
+            console.log("Ligne TTC",ligneMontantTTC);
+            totalTTC += ligneMontantTTC;
+            console.log("Ligne totalTTC",totalTTC);
+
+
+            //ligneMontantHt += ligneMontantTTC / 1.19;
+            //ligneMontantAIB += ligneMontantHt * 0.01;
+            //ligneMontantTVA += ligneMontantHt * 0.18;
 
             // Ne calculer TVA et AIB que si la facture est normalisée
-            if (this.isNormalized) {
-                totalTVA += FactureUtils.roundNumber(montantHT * (FactureConfig.TVA.rate / 100));
-                <!-- l'ancienne façon de faire -->
-                <!-- totalAIB += FactureUtils.roundNumber(montantHT * (tauxAib / 100)); -->
-                totalAIB += FactureUtils.roundNumber(montantHT  / 100);
-            }
+            // if (this.isNormalized) {
+            //     totalTVA += FactureUtils.roundNumber(montantHT * (FactureConfig.TVA.rate / 100));
+            //         < !--l'ancienne façon de faire -->
+            //         < !--totalAIB += FactureUtils.roundNumber(montantHT * (tauxAib / 100)); -->
+            //         totalAIB += FactureUtils.roundNumber(montantHT  / 100);
+            //     }
         });
 
         // Arrondir les totaux
-        totalHT = FactureUtils.roundNumber(totalHT);
-        totalTVA = FactureUtils.roundNumber(totalTVA);
-        totalAIB = FactureUtils.roundNumber(totalAIB);
-        const totalTTC = FactureUtils.roundNumber(totalHT + (this.isNormalized ? (totalTVA + totalAIB) : 0));
+        totalTTC = FactureUtils.roundNumber(totalTTC);
+        totalHT += totalTTC / 1.19;//calcul du total HT à partir de totalTTC
+        totalTVA += totalHT * 0.18;
+        totalAIB += totalHT * 0.01;
+        // const totalHT = FactureUtils.roundNumber(totalHT + (this.isNormalized ? (totalTVA + totalAIB) : 0));
+
+        console.log("totalTTC :", totalTTC);
+        console.log("totalHT :", totalHT);
+        console.log("totalTVA :", totalTVA);
+        console.log("totalAIB :", totalAIB);
 
         // Mise à jour de l'affichage
         $(FactureConfig.selectors.totalHT).text(this.formatMoney(totalHT) + ' FCFA');
@@ -687,7 +708,7 @@ class FactureManager {
         form[0].reset();
 
         // Réinitialiser les select2
-        form.find('select').each(function() {
+        form.find('select').each(function () {
             if ($(this).hasClass('select2-hidden-accessible')) {
                 $(this).val(null).trigger('change');
             }

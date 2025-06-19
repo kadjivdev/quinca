@@ -108,11 +108,11 @@
                             <td class="text-end fw-medium">
                                 {{ number_format($facture->montant_tva, 0, ',', ' ') }} F
                             </td>
-                             <td class="text-end fw-medium">
+                            <td class="text-end fw-medium">
                                 {{ number_format($facture->montant_aib, 0, ',', ' ') }} F
                             </td>
-                             <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_ttc, 0, ',', ' ') }} F
+                            <td class="text-end fw-medium">
+                                {{ number_format($facture->montant_ttc-$facture->montant_remise, 0, ',', ' ') }} F
                             </td>
                             <td class="text-end">
                                 @if ($facture->reste_a_payer > 0)
