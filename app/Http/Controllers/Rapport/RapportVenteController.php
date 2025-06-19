@@ -391,7 +391,7 @@ class RapportVenteController extends Controller
                     }
                 ])
                     ->whereDate('date_facture', $date)
-                    ->where('statut', 'validee')
+                    // ->where('statut', 'validee')
                     ->get();
 
                 $factureRevendeurs = FactureRevendeur::with([
@@ -402,7 +402,7 @@ class RapportVenteController extends Controller
                         $query->where('statut', ReglementRevendeur::STATUT_VALIDE);
                     }
                 ])->whereDate('date_facture', $date)
-                    ->where('statut', 'validee')
+                    // ->where('statut', 'validee')
                     ->get();
 
                 $factureRevendeurs->map(function ($vente) {
@@ -452,6 +452,7 @@ class RapportVenteController extends Controller
                             'revendeur' => $facture->revendeur,
                             'createdBy' => $facture->createdBy,
                             'categorie_vente' => $facture->client->categorie ?? 'N/A',
+                            'statut' => $facture->statut,
                             'client' => $facture->client->raison_sociale ?? 'Client inconnu',
                             'montant_ttc' => $facture->montant_ttc ?? 0,
                             'montant_regle' => $facture->montant_regle ?? 0,

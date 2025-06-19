@@ -2,6 +2,12 @@
 @extends('layouts.rapport.facture')
 
 @section('content')
+
+<style>
+    tr.bg-secondary td {
+        color: white !important;
+    }
+</style>
 <div class="container-fluid px-4 py-4">
     <div class="row">
         <div class="col-12">
@@ -49,7 +55,7 @@
             <!-- Tableau des ventes -->
             <div class="card shadow-sm">
                 <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Rapport des ventes du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }}  Légende: <span class="badge bg-light text-dark">Ecritures des Dépôts</span> |  <span class="border badge bg-white text-dark">Ecritures de la Direction</span></h5>
+                    <h5 class="mb-0">Rapport des ventes du {{ Carbon\Carbon::parse(request('date', now()))->format('d/m/Y') }} Légende: <span class="badge bg-light text-dark">Ecritures des Dépôts</span> | <span class="border badge bg-white text-dark">Ecritures de la Direction</span></h5>
                     <!-- <button class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-file-excel me-2"></i>Exporter
                     </button> -->
@@ -65,6 +71,7 @@
                                     <th>Référence</th>
                                     <th>Type vente</th>
                                     <th>Catégorie vente</th>
+                                    <th>Statut</th>
                                     <th>Client</th>
                                     <th>Crée par</th>
                                     <th class="text-end">Montant TTC</th>
@@ -74,7 +81,7 @@
 
                             <tbody>
                                 @forelse($ventes as $vente)
-                                <tr class="p-2 @if($vente['revendeur']) bg-light @endif">
+                                <tr class="p-2 @if($vente['revendeur']) bg-secondary @endif">
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $vente['date_ecriture'] }}</td>
                                     <td>{{ $vente['date_vente'] }}</td>
@@ -89,6 +96,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $vente['categorie_vente'] }}</td>
+                                    <td><span class="badge border text-dark @if($vente['statut']=='valide') bg-success @elseif('$vente['statut']=='annulee') bg-danger @else bg-dark @endif)"> {{ $vente['statut'] }}</span></td>
                                     <td>{{ $vente['client'] }}</td>
                                     <td><span class="badge bg-dark text-white"> {{ $vente['createdBy']?$vente['createdBy']['name']:'---' }}</span></td>
                                     <td class="text-end">
