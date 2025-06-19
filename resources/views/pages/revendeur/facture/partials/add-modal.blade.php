@@ -1,5 +1,5 @@
 <div class="modal fade" id="addFactureModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 95%; width: 95%;">
+    <div class="modal-dialog modal-fullscreen-xxl-down bg-white">
         <div class="modal-content border-0 shadow-lg">
             {{-- Header du modal avec un nouveau design --}}
             <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
@@ -263,59 +263,59 @@
                 </div>
             </form>
         </div>
+        {{-- Template pour une nouvelle ligne --}}
+        <template id="ligneFactureTemplate">
+            <tr class="ligne-facture">
+                <td>
+                    <select class="form-select select2-articles" name="lignes[__INDEX__][article_id]" required>
+                        <option value="">Sélectionner un article</option>
+                    </select>
+                    <div class="invalid-feedback">L'article est requis</div>
+                </td>
+                <td>
+                    <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
+                    <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
+                    <div class="invalid-feedback">Le depôt est requis</div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
+                            placeholder="0.00" required min="0.01" step="0.01">
+                        <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" hidden required>
+                            {{-- <option value="">Unité</option> --}}
+                        </select>
+                    </div>
+                    <div class="invalid-feedback">La quantité est requise</div>
+                </td>
+                <td>
+                    <input type="number"
+                        class="form-control text-end select2-tarifs"
+                        name="lignes[__INDEX__][tarification_id]"
+                        placeholder="0.00"
+                        required
+                        min="0.01"
+                        step="0.01">
+                    <div class="invalid-feedback">Le prix est requis</div>
+                </td>
+                <td>
+                    <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
+                        placeholder="0.00" min="0" max="100" step="0.01">
+                </td>
+                <td>
+                    <div class="input-group">
+                        <span class="input-group-text">FCFA</span>
+                        <input type="text" class="form-control text-end total-ligne" readonly value="0">
+                    </div>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-ligne">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            </tr>
+        </template>
     </div>
 </div>
 
-{{-- Template pour une nouvelle ligne --}}
-<template id="ligneFactureTemplate">
-    <tr class="ligne-facture">
-        <td>
-            <select class="form-select select2-articles" name="lignes[__INDEX__][article_id]" required>
-                <option value="">Sélectionner un article</option>
-            </select>
-            <div class="invalid-feedback">L'article est requis</div>
-        </td>
-        <td>
-            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
-            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
-            <div class="invalid-feedback">Le depôt est requis</div>
-        </td>
-        <td>
-            <div class="input-group">
-                <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
-                    placeholder="0.00" required min="0.01" step="0.01">
-                <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" hidden required>
-                    {{-- <option value="">Unité</option> --}}
-                </select>
-            </div>
-            <div class="invalid-feedback">La quantité est requise</div>
-        </td>
-        <td>
-            <input type="number"
-                class="form-control text-end select2-tarifs"
-                name="lignes[__INDEX__][tarification_id]"
-                placeholder="0.00"
-                required
-                min="0.01"
-                step="0.01">
-            <div class="invalid-feedback">Le prix est requis</div>
-        </td>
-        <td>
-            <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
-                placeholder="0.00" min="0" max="100" step="0.01">
-        </td>
-        <td>
-            <div class="input-group">
-                <span class="input-group-text">FCFA</span>
-                <input type="text" class="form-control text-end total-ligne" readonly value="0">
-            </div>
-        </td>
-        <td class="text-center">
-            <button type="button" class="btn btn-outline-danger btn-sm remove-ligne">
-                <i class="fas fa-times"></i>
-            </button>
-        </td>
-    </tr>
-</template>
 
 </script>

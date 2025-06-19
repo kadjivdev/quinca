@@ -231,9 +231,6 @@
         $("#montantTotal").html(total.toLocaleString() + " FCFA");
     }
 
-    // // Recalculer lors des changements dans le body
-    // $("#venteBody").on('change', calculateTotal);
-
     // Recalculer lors de la recherche
     $('#example1').on('search.dt', calculateTotal);
 
