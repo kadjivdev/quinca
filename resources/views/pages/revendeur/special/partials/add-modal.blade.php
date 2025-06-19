@@ -1,5 +1,5 @@
 <div class="modal fade" id="addFactureModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 95%; width: 95%;">
+    <div class="modal-dialog modal-fullscreen-xxl-down bg-white">
         <div class="modal-content border-0 shadow-lg">
             {{-- Header du modal avec un nouveau design --}}
             <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
@@ -117,7 +117,7 @@
                                                     <th style="width: 15%">Quantité</th>
                                                     <th style="width: 20%">Prix</th>
                                                     <th style="width: 10%">Remise (%)</th>
-                                                    <th style="width: 25%">Total HT</th>
+                                                    <th style="width: 25%">Total TTC</th>
                                                     <th style="width: 5%"></th>
                                                 </tr>
                                             </thead>
@@ -309,7 +309,7 @@
         </td>
         <td>
             <div class="input-group">
-                <span class="input-group-text">FCFA</span>
+                <!-- <span class="input-group-text">FCFA</span> -->
                 <input type="text" class="form-control text-end total-ligne" readonly value="0">
             </div>
         </td>

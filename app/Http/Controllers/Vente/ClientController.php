@@ -78,14 +78,19 @@ class ClientController extends Controller
             ->transform(function ($client) {
                 /**LES FACTURES */
                 $client->facturesAmount = $client->facturesClient
-                ->sum("montant_ttc");
+                    ->whereNotNull('validated_by')
+                    ->sum("montant_ttc") - $client->facturesClient
+                    ->whereNotNull('validated_by')
+                    ->sum("montant_remise");
 
                 /** LES REGLEMENTS */
-                $client->reglementAmount = $client->facturesClient->sum(function ($factureClient) { //sum des règlements de chaque factures
-                    return $factureClient->reglements
-                        ->whereNotNull('validated_at')
-                        ->sum("montant");
-                });
+                $client->reglementAmount = $client->facturesClient
+                    ->whereNotNull('validated_by')
+                    ->sum(function ($factureClient) { //sum des règlements de chaque factures
+                        return $factureClient->reglements
+                            ->whereNotNull('validated_at')
+                            ->sum("montant");
+                    });
 
                 /** LES ACCOMPTES */
                 $client->clientAccomptesAmount = $client->acomptes

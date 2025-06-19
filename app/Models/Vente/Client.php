@@ -71,7 +71,9 @@ class Client extends Model
         // Factures clients
         $facturesAmount = $this->facturesClient()
             ->whereNotNull('validated_by')
-            ->sum("montant_ttc");
+            ->sum("montant_ttc") - $this->facturesClient()
+            ->whereNotNull('validated_by')
+            ->sum("montant_remise");
 
         //sum des règlements de chaque factures
         $reglementsAmount = $this->facturesClient->sum(function ($factureClient) {

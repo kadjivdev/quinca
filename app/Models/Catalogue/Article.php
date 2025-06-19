@@ -266,12 +266,12 @@ class Article extends Model
 
         /**Conversion qteVendu Client*/
         if ($factureVente->isNotEmpty()) {
-            $totalAmount += $factureVente->sum("montant_ht");
+            $totalAmount += $factureVente->sum("montant_ttc") - $factureVente->sum("montant_remise");
         }
 
         /**Conversion qteVendu Revendeur*/
         if ($factureRevendeur->isNotEmpty()) {
-            $totalAmount += $factureRevendeur->sum("montant_ht");
+            $totalAmount += $factureRevendeur->sum("montant_ttc") - $factureRevendeur->sum("montant_remise");
         }
 
         // dd($totalAmount);

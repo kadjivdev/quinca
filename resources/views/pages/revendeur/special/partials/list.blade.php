@@ -10,13 +10,18 @@
                             <th class="border-bottom-0 text-nowrap py-3">N° Facture</th>
                             <th class="border-bottom-0">Point de Vente</th>
                             <th class="border-bottom-0">Dépôt</th>
-
-                            <th class="border-bottom-0">Date</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
+                            <th class="border-bottom-0">Date facture</th>
                             <th class="border-bottom-0">Client</th>
+                            <th class="border-bottom-0">Etat</th>
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
+                            <th class="border-bottom-0 text-end">Montant TVA</th>
+                            <th class="border-bottom-0 text-end">Montant AIB</th>
                             <th class="border-bottom-0 text-end">Montant TTC</th>
                             <th class="border-bottom-0 text-end">Reste à payer</th>
+                            <th class="border-bottom-0 text-center">Type</th>
+                            <th class="border-bottom-0">Date validation</th>
                             <th class="border-bottom-0 text-center">Statut</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
@@ -47,6 +52,7 @@
                                     @endforelse
                                 </ul>
                             </td>
+                            <td>{{ Carbon\Carbon::parse($facture->created_at)->format('d/m/Y H:i:s') }}</td>
                             <td>{{ $facture->date_facture->format('d/m/Y') }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -59,12 +65,35 @@
                                     </div>
                                 </div>
                             </td>
+                            @php
+                            $qte = $facture->lignes()->sum("quantite");
+                            $qteLivre = $facture->lignes()->sum("quantite_livree")
+                            @endphp
+                            <td>
+                                @if($qte==$qteLivre)
+                                <span class="badge bg-primary"> Livrée </span>
+                                @else
+
+                                @if($qteLivre < 0 || $qteLivre==0)
+                                    <span class="badge bg-danger">Non Livrée </span>
+                                    @else
+                                    <span class="badge bg-info bg-opacity-10 text-info">Livré partiellement({{$qteLivre}})</span>
+                                    @endif
+
+                                    @endif
+                            </td>
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
                             <td class="text-end fw-medium">
                                 {{ number_format($facture->montant_ht, 0, ',', ' ') }} F
                             </td>
                             <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_ttc, 0, ',', ' ') }} F
+                                {{ number_format($facture->montant_tva, 0, ',', ' ') }} F
+                            </td>
+                            <td class="text-end fw-medium">
+                                {{ number_format($facture->montant_aib, 0, ',', ' ') }} F
+                            </td>
+                            <td class="text-end fw-medium">
+                                {{ number_format($facture->montant_ttc-$facture->montant_remise, 0, ',', ' ') }} F
                             </td>
                             <td class="text-end">
                                 @if ($facture->reste_a_payer > 0)
@@ -76,23 +105,25 @@
                                 @endif
                             </td>
                             <td class="text-center">
+                                <span class="badge bg-dark  px-3">{{$facture->type_facture}}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-primary  px-3">{{$facture->date_validation}}</span>
+                            </td>
+                            <td class="text-center">
                                 @switch($facture->statut_reel)
                                 @case('brouillon')
                                 <span class="badge bg-warning bg-opacity-10 text-warning px-3">Brouillon</span>
                                 @break
-
                                 @case('validee')
                                 <span class="badge bg-primary bg-opacity-10 text-primary px-3">Validée</span>
                                 @break
-
                                 @case('payee')
                                 <span class="badge bg-success bg-opacity-10 text-success px-3">Payée</span>
                                 @break
-
                                 @case('partiellement_payee')
                                 <span class="badge bg-info bg-opacity-10 text-info px-3">Partiellement payée</span>
                                 @break
-
                                 @default
                                 <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulée</span>
                                 @endswitch
@@ -100,35 +131,44 @@
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
+                                    @can("vente.facture.view")
                                     <button class="btn btn-sm btn-light-primary btn-icon"
-                                        onclick="showFacture({{ $facture->id }})" data-bs-toggle="tooltip"
-                                        title="Voir les détails">
+                                        onclick="showFacture({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Voir les détails">
                                         <i class="fas fa-eye"></i>
                                     </button>
+                                    @endcan
 
-                                    @if ($facture->statut === 'brouillon')
+                                    @can("vente.facture.edit")
+                                    @if($facture->statut === 'brouillon')
                                     {{-- Modifier --}}
-                                    <!-- <button class="btn btn-sm btn-light-warning btn-icon ms-1"
-                                        onclick="editFacture({{ $facture->id }})" data-bs-toggle="tooltip"
-                                        title="Modifier">
+                                    <button class="btn btn-sm btn-light-warning btn-icon ms-1"
+                                        onclick="editFactures({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Modifier">
                                         <i class="fas fa-edit"></i>
-                                    </button> -->
+                                    </button>
+                                    @endcan
 
                                     {{-- Valider --}}
-                                    <!-- <a target="_blank" href="{{route('revendeur.facture.validate',$facture->id)}}" class="">Valider</a> -->
+                                    @can("vente.facture.validate")
+                                    @if(!$facture->validated_by)
                                     <button class="btn btn-sm btn-light-success btn-icon ms-1"
-                                        onclick="validateFacture({{ $facture->id }})" data-bs-toggle="tooltip"
-                                        title="Valider">
+                                        onclick="validateFacture({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Valider">
                                         <i class="fas fa-check"></i>
                                     </button>
+                                    @endif
+                                    @endcan
 
+                                    @can("vente.facture.delete")
                                     {{-- Supprimer --}}
                                     <button class="btn btn-sm btn-light-danger btn-icon ms-1"
-                                        onclick="deleteFacture({{ $facture->id }})" data-bs-toggle="tooltip"
-                                        title="Supprimer">
+                                        onclick="deleteFacture({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Supprimer">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     @endif
+                                    @endcan
 
                                     {{-- Imprimer --}}
                                     <div class="btn-group ms-1">
@@ -174,13 +214,13 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="11" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucune facture trouvée</h6>
-                                    <p class="text-muted small mb-3">Les factures que vous créez apparaîtront ici
-                                    </p>
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    <p class="text-muted small mb-3">Les factures que vous créez apparaîtront ici</p>
+                                    <button class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
                                         data-bs-target="#addFactureModal">
                                         <i class="fas fa-plus me-2"></i>Créer une facture
                                     </button>

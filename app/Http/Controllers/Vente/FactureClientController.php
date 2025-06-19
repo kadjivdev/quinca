@@ -61,8 +61,8 @@ class FactureClientController extends Controller
             // Ajouter des attributs calculés pour chaque facture
             $factures->transform(function ($facture) {
                 // Calcul du reste à payer
-                $facture->reste_a_payer = $facture->montant_ttc - $facture->montant_regle;
-
+                $facture->reste_a_payer = ($facture->montant_ttc - $facture->montant_remise) - $facture->montant_regle;
+                
                 // Détermination du vrai statut basé sur le paiement
                 if ($facture->statut === 'brouillon') {
                     $facture->statut_reel = 'brouillon';

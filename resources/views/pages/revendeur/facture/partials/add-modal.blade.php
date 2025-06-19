@@ -114,7 +114,7 @@
                                                     <th>Quantité</th>
                                                     <th>Prix</th>
                                                     <th>Remise (%)</th>
-                                                    <th>Total HT</th>
+                                                    <th>Total TTC</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -303,7 +303,7 @@
                 </td>
                 <td>
                     <div class="input-group">
-                        <span class="input-group-text">FCFA</span>
+                        <!-- <span class="input-group-text">FCFA</span> -->
                         <input type="text" class="form-control text-end total-ligne" readonly value="0">
                     </div>
                 </td>
