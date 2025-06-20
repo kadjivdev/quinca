@@ -64,19 +64,19 @@ Route::get("/debug", function () {
     // SEVERIN
     $facturesSeverain = FactureRevendeur::where("created_by", 12)->get();
     foreach ($facturesSeverain as $facture) {
-        $facture->update(["point_de_vente_id" => 2, "validated_by" => null, "updated_by" => null]);
+        $facture->update(["point_de_vente_id" => 2, "validated_by" => null, "updated_by" => null, "statut" => "brouillon", "date_validation" => null]);
     }
 
     // KANDI
     $facturesHabirou = FactureRevendeur::where("created_by", 17)->get();
     foreach ($facturesHabirou as $facture) {
-        $facture->update(["point_de_vente_id" => 4, "validated_by" => null, "updated_by" => null]);
+        $facture->update(["point_de_vente_id" => 4, "validated_by" => null, "updated_by" => null, "statut" => "brouillon", "date_validation" => null]);
     }
 
     // DJOUGOU
     $facturesYERIMA = FactureRevendeur::where("created_by", 20)->get();
     foreach ($facturesYERIMA as $facture) {
-        $facture->update(["point_de_vente_id" => 3, "validated_by" => null, "updated_by" => null]);
+        $facture->update(["point_de_vente_id" => 3, "validated_by" => null, "updated_by" => null, "statut" => "brouillon", "date_validation" => null]);
     }
 
     return "Opération éffectuée avec succès!!";
