@@ -695,7 +695,9 @@ class RapportVenteController extends Controller
 
             // Load relationships with filters
             $session->load([
-                'factures.reglements'
+                'factures.reglements' => function ($q) use ($dateDebut, $dateFin) {
+                    $q->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                }
             ]);
 
             // Get sessions list for dropdown
@@ -731,7 +733,9 @@ class RapportVenteController extends Controller
 
             // Load relationships with filters
             $session->load([
-                'accompteClients'
+                'accompteClients' => function ($q) use ($dateDebut, $dateFin) {
+                    $q->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                }
             ]);
 
             // Get sessions list for dropdown
