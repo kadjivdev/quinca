@@ -412,7 +412,13 @@
 
                     @can('vente.sessions.rapport.view')
                     <li><a class="dropdown-item" href="{{ route('vente.sessions.rapport') }}">
-                            <div class="dropdown-item-wrapper">Vente Session</div>
+                            <div class="dropdown-item-wrapper">Session Vente</div>
+                        </a></li>
+                    <li><a class="dropdown-item" href="{{ route('vente.sessions-reglements.rapport') }}">
+                            <div class="dropdown-item-wrapper">Session Règlements</div>
+                        </a></li>
+                    <li><a class="dropdown-item" href="{{ route('vente.sessions-accomptes.rapport') }}">
+                            <div class="dropdown-item-wrapper">Session Accomptes</div>
                         </a></li>
                     @endcan
 
@@ -438,7 +444,7 @@
                             <div class="dropdown-item-wrapper">Stock Disponible</div>
                         </a></li>
                     @endcan
-                    
+
                     @can('rapports.mouvement-stock.view')
                     <li><a class="dropdown-item" href="{{ route('rapports.mouvement-stock') }}">
                             <div class="dropdown-item-wrapper">Mouvements de Stock</div>

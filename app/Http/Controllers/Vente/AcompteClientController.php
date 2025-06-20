@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vente\{AcompteClient, Client};
+use App\Models\Vente\{AcompteClient, Client, SessionCaisse};
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -129,6 +129,18 @@ class AcompteClientController extends Controller
     {
         try {
 
+            // Vérifications initiales
+            $sessionCaisse = SessionCaisse::ouverte()
+                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                ->first();
+
+            if (!$sessionCaisse) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Session de caisse requise.'
+                ], 422);
+            }
+
             // Validation des données
             $validated = $request->validate(AcompteClient::rules(), [
                 'date.required' => 'La date est obligatoire',
@@ -153,10 +165,15 @@ class AcompteClientController extends Controller
             // Ajouter le statut par défaut aux données validées
             $validated['statut'] = AcompteClient::STATUT_EN_ATTENTE;
 
-            Log::info("Les validés",$validated);
+            Log::info("Les validés", $validated);
 
             $acompte = new AcompteClient();
-            $acompte->fill($request->all());
+            $data = array_merge(
+                $request->all(),
+                ["session_caisse_id" => $sessionCaisse->id]
+            );
+            $acompte->fill($data);
+            
             $acompte->created_by = auth()->id();
             // $acompte->reference = $request->reference?->reference;
             $acompte->point_de_vente_id = auth()->user()->point_de_vente_id;

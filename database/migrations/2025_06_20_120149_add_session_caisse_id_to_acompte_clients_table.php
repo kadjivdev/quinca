@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('facture_clients', function (Blueprint $table) {
+        Schema::table('acompte_clients', function (Blueprint $table) {
             $table->foreignId('session_caisse_id')
                 ->nullable()
                 ->after('id')
@@ -23,10 +23,9 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    
     public function down(): void
     {
-        Schema::table('facture_clients', function (Blueprint $table) {
+        Schema::table('acompte_clients', function (Blueprint $table) {
             $table->dropForeign(['session_caisse_id']);
             $table->dropColumn('session_caisse_id');
         });

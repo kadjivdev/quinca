@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Vente\FactureClient;
 use App\Models\Parametre\Caisse;
 use App\Models\Parametre\PointDeVente;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SessionCaisse extends Model
 {
@@ -51,6 +52,16 @@ class SessionCaisse extends Model
     public function factures()
     {
         return $this->hasMany(FactureClient::class, 'session_caisse_id');
+    }
+
+    public function reglements()
+    {
+        return $this->hasMany(ReglementClient::class, 'session_caisse_id');
+    }
+
+    public function accompteClients(): HasMany
+    {
+        return $this->hasMany(AcompteClient::class, 'session_caisse_id');
     }
 
     public function utilisateur()

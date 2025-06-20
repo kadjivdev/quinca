@@ -35,7 +35,8 @@ class AcompteClient extends Model
         'validated_at',
         'validated_by',
         'requete_id',
-        'transport_id'
+        'transport_id',
+        'session_caisse_id',
     ];
 
     protected $casts = [
@@ -43,6 +44,11 @@ class AcompteClient extends Model
         'montant' => 'decimal:3',
         'validated_at' => 'datetime',
     ];
+
+    public function sessionCaisse(): BelongsTo
+    {
+        return $this->belongsTo(SessionCaisse::class, 'session_caisse_id');
+    }
 
     // Relations
     public function client(): BelongsTo
@@ -52,12 +58,12 @@ class AcompteClient extends Model
 
     public function requete(): BelongsTo
     {
-        return $this->belongsTo(Requete::class,'requete_id');
+        return $this->belongsTo(Requete::class, 'requete_id');
     }
 
     public function transport(): BelongsTo
     {
-        return $this->belongsTo(Transport::class,'transport_id');
+        return $this->belongsTo(Transport::class, 'transport_id');
     }
 
     public function createdBy(): BelongsTo

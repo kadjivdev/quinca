@@ -16,7 +16,7 @@
     <!-- Session Selector Card -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
-            <form id="sessionForm" class="row g-3 align-items-end" action="{{ route('vente.sessions.rapport') }}" method="GET">
+            <form id="sessionForm" class="row g-3 align-items-end" action="{{ route('vente.sessions-reglements.rapport') }}" method="GET">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold text-dark">
                         <i class="fas fa-calendar-alt text-primary me-2"></i>Session
@@ -64,8 +64,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted fw-normal mb-2">Solde Initial</h6>
-                            <h3 class="mb-0">{{ number_format($session->montant_ouverture, 0, ',', ' ') }} F</h3>
+                            <h6 class="text-muted fw-normal mb-2">Total règlements</h6>
+                            <h3 class="mb-0">{{ number_format($session->reglements()->count(), 0, ',', ' ') }} F</h3>
                         </div>
                         <div class="rounded-circle bg-primary bg-opacity-10 p-3">
                             <i class="fas fa-money-bill text-primary fa-2x"></i>
@@ -81,8 +81,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted fw-normal mb-2">Total Encaissements</h6>
-                            <h3 class="mb-0">{{ number_format($session->factures()->sum('montant_ttc')-$session->factures()->sum('montant_remise'), 0, ',', ' ') }} F</h3>
+                            <h6 class="text-muted fw-normal mb-2">Total Reglements</h6>
+                            <h3 class="mb-0">{{ number_format($session->reglements()->sum('montant'), 0, ',', ' ') }} F</h3>
                         </div>
                         <div class="rounded-circle bg-success bg-opacity-10 p-3">
                             <i class="fas fa-cash-register text-success fa-2x"></i>
@@ -137,7 +137,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">
                             <i class="fas fa-file-invoice text-primary me-2"></i>
-                            Factures <span class="badge bg-primary ms-2">{{ $session->factures->count() }}</span>
+                            Règlements <span class="badge bg-primary ms-2">{{ $session->reglements->count() }}</span>
                         </h5>
                     </div>
                 </div>
@@ -146,46 +146,39 @@
                         <table class="table table-hover" id="example1">
                             <thead class="table-light">
                                 <tr>
-                                    <th>N° Facture</th>
+                                    <th>N° Règlement</th>
                                     <th>Caisse/Session</th>
-                                    <th>Client</th>
-                                    <th class="text-end">Montant TTC</th>
+                                    <th>Facture/Client</th>
+                                    <th class="text-end">Montant</th>
                                     <th class="text-end">Statut</th>
-                                    <th class="text-end">Réglé</th>
-                                    <th class="text-center">Etat</th>
                                     <th class="text-end">Insére par</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($session->factures as $facture)
+                                @foreach($session->reglements as $reglement)
                                 <tr>
                                     <td>
                                         <span class="badge bg-light text-dark border">
                                             <i class="fas fa-file-alt text-muted me-2"></i>
-                                            {{ $facture->numero }}
+                                            {{ $reglement->numero }}
                                         </span>
                                     </td>
                                     <td>
-                                        caisse: {{$facture->sessionCaisse->caisse?->libelle}}/
-                                        Ouverture: {{$facture->sessionCaisse?->montant_ouverture}} -
-                                        Fermeture: {{$facture->sessionCaisse->montant_fermeture??00}}
+                                        caisse: {{$reglement->sessionCaisse->caisse?->libelle}}/
+                                        Ouverture: {{$reglement->sessionCaisse?->montant_ouverture}} -
+                                        Fermeture: {{$reglement->sessionCaisse->montant_fermeture??00}}
                                     </td>
                                     <td>
-                                        <i class="fas fa-user text-muted me-2"></i>
-                                        {{ $facture->client->raison_sociale }}
-                                    </td>
-                                    <td class="text-end">{{ number_format($facture->montant_ttc-$facture->montant_remise, 0, ',', ' ') }} F</td>
-                                    <td class="text-center">
-                                        <span class="badge bg-{{ $facture->validated_by ? 'success' : 'warning' }} rounded-pill">
-                                            <i class="fas fa-{{ $facture->est_solde ? 'check-circle' : 'clock' }} me-1"></i>
-                                            {{ $facture->validated_by ? 'Vaildée' : 'Pas validée' }}
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="fas fa-user text-muted me-2"></i>
+                                            {{ $reglement->facture->numero }}/{{ $reglement->facture->client->raison_sociale }}
                                         </span>
                                     </td>
-                                    <td class="text-end">{{ number_format($facture->montant_regle, 0, ',', ' ') }} F</td>
+                                    <td class="text-end">{{ number_format($reglement->montant, 0, ',', ' ') }} F</td>
                                     <td class="text-center">
-                                        <span class="badge bg-{{ $facture->est_solde ? 'success' : 'warning' }} rounded-pill">
-                                            <i class="fas fa-{{ $facture->est_solde ? 'check-circle' : 'clock' }} me-1"></i>
-                                            {{ $facture->est_solde ? 'Soldée' : 'En cours' }}
+                                        <span class="badge bg-{{ $reglement->validated_by ? 'success' : 'warning' }} rounded-pill">
+                                            <i class="fas fa-{{ $reglement->validated_by ? 'check-circle' : 'clock' }} me-1"></i>
+                                            {{ $reglement->validated_by ? 'Vaildée' : 'Pas validée' }}
                                         </span>
                                     </td>
                                     <td class="text-end"> <span class="badge bg-light text-dark border"> {{ $accompte->createdBy->name }}</span> </td>
@@ -276,7 +269,7 @@
             const formData = new FormData(this);
             const searchParams = new URLSearchParams(formData);
 
-            window.location.href = `{{ route('vente.sessions.rapport') }}?${searchParams.toString()}`;
+            window.location.href = `{{ route('vente.sessions-reglements.rapport') }}?${searchParams.toString()}`;
         });
     });
 

@@ -73,6 +73,11 @@ class ReglementClient extends Model
         'avoir' => ['reference_preuve']
     ];
 
+    public function sessionCaisse(): BelongsTo
+    {
+        return $this->belongsTo(SessionCaisse::class, 'session_caisse_id');
+    }
+
     /**
      * Liste des types de règlement disponibles avec leurs libellés
      *
@@ -200,7 +205,7 @@ class ReglementClient extends Model
      *
      * @return bool
      */
-    
+
     public function peutEtreValide(): bool
     {
         return $this->statut === self::STATUT_BROUILLON

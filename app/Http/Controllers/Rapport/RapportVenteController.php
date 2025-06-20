@@ -656,13 +656,8 @@ class RapportVenteController extends Controller
             // Load relationships with filters
             $session->load([
                 'factures' => function ($q) use ($dateDebut, $dateFin) {
-                    $q->where('statut', 'validee')
-                        ->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
-                },
-                'factures.reglements' => function ($q) {
-                    $q->where('statut', ReglementClient::STATUT_VALIDE);
-                },
-                'factures.client',
+                    $q->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                }
             ]);
 
             // Get sessions list for dropdown
@@ -671,10 +666,83 @@ class RapportVenteController extends Controller
                     ->orWhere('id', $session->id);
             })
                 ->orderBy('date_ouverture', 'desc')
-                ->limit(10)
+                // ->limit(10)
                 ->get();
 
             return view('pages.rapports.ventes.session-vente', compact(
+                'session',
+                'sessions',
+                'dateDebut',
+                'dateFin'
+            ));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur: ' . $e->getMessage());
+        }
+    }
+
+    public function sessionReglement(Request $request)
+    {
+        try {
+            $sessionId = $request->get('session_id');
+            $dateDebut = $request->get('date_debut') ? Carbon::parse($request->get('date_debut')) : Carbon::now()->startOfMonth();
+            $dateFin = $request->get('date_fin') ? Carbon::parse($request->get('date_fin')) : Carbon::now();
+
+            // Get session
+            $session = $sessionId ?
+                SessionCaisse::findOrFail($sessionId) :
+                SessionCaisse::where('statut', 'ouverte')
+                ->latest()->firstOrFail();
+
+            // Load relationships with filters
+            $session->load([
+                'factures.reglements'
+            ]);
+
+            // Get sessions list for dropdown
+            $sessions = SessionCaisse::where(function ($q) use ($session) {
+                $q->where('statut', 'fermee')
+                    ->orWhere('id', $session->id);
+            })
+                ->orderBy('date_ouverture', 'desc')
+                ->get();
+
+            return view('pages.rapports.ventes.session-reglements', compact(
+                'session',
+                'sessions',
+                'dateDebut',
+                'dateFin'
+            ));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur: ' . $e->getMessage());
+        }
+    }
+
+    public function sessionAccompte(Request $request)
+    {
+        try {
+            $sessionId = $request->get('session_id');
+            $dateDebut = $request->get('date_debut') ? Carbon::parse($request->get('date_debut')) : Carbon::now()->startOfMonth();
+            $dateFin = $request->get('date_fin') ? Carbon::parse($request->get('date_fin')) : Carbon::now();
+
+            // Get session
+            $session = $sessionId ?
+                SessionCaisse::findOrFail($sessionId) :
+                SessionCaisse::where('statut', 'ouverte')->latest()->firstOrFail();
+
+            // Load relationships with filters
+            $session->load([
+                'accompteClients'
+            ]);
+
+            // Get sessions list for dropdown
+            $sessions = SessionCaisse::where(function ($q) use ($session) {
+                $q->where('statut', 'fermee')
+                    ->orWhere('id', $session->id);
+            })
+                ->orderBy('date_ouverture', 'desc')
+                ->get();
+
+            return view('pages.rapports.ventes.session-accomptes', compact(
                 'session',
                 'sessions',
                 'dateDebut',

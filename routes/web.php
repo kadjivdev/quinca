@@ -1047,8 +1047,12 @@ Route::middleware('auth')->group(function () {
             ->name('rapports.alert-stock');
 
         // Route principale pour la session ouverte
-        Route::get('/rapports/sessions/rapport', [RapportVenteController::class, 'sessionVente'])
+        Route::get('/sessions', [RapportVenteController::class, 'sessionVente'])
             ->name('vente.sessions.rapport');
+        Route::get('/sessions-reglements', [RapportVenteController::class, 'sessionReglement'])
+            ->name('vente.sessions-reglements.rapport');
+        Route::get('/sessions-accomptes', [RapportVenteController::class, 'sessionAccompte'])
+            ->name('vente.sessions-accomptes.rapport');
 
         // Route pour une session spécifique
         Route::get('/rapports/sessions/{session?}/rapport', [RapportVenteController::class, 'sessionVente'])
