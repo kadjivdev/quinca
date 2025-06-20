@@ -288,7 +288,8 @@
         $('#factureSelect').select2({
             theme: 'bootstrap-5',
             width: '100%',
-            placeholder: 'Sélectionner une facture'
+            placeholder: 'Sélectionner une facture',
+            dropdownParent: $('#addLivraisonModal')
         });
 
         // Vérification dynamique des stocks
