@@ -242,7 +242,7 @@ class FactureRevendeurController extends Controller
                     'date_facture' => Carbon::parse($request->date_facture)->startOfDay(),
                     'client_id' => $request->client_id,
                     'date_echeance' => Carbon::parse($request->date_echeance)->startOfDay(),
-                    // 'session_caisse_id' => $sessionCaisse->id,
+                    'point_de_vente_id' => Auth()->user()->point_de_vente_id,
                     'created_by' => auth()->id(),
                     'observations' => $request->observations,
                     'statut' => 'brouillon',

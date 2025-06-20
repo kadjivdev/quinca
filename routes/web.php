@@ -33,6 +33,7 @@ use App\Models\Catalogue\Article;
 use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\Caisse;
 use App\Models\Parametre\ConversionUnite;
+use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Stock\StockDepot;
 use App\Models\Stock\StockMouvement;
@@ -60,6 +61,23 @@ use Illuminate\Support\Facades\DB;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
+    // SEVERIN
+    $facturesSeverain = FactureRevendeur::where("created_by", 12)->get();
+    foreach ($facturesSeverain as $facture) {
+        $facture->update(["point_de_vente_id" => 2, "validated_by" => null, "updated_by" => null]);
+    }
+
+    // KANDI
+    $facturesHabirou = FactureRevendeur::where("created_by", 17)->get();
+    foreach ($facturesHabirou as $facture) {
+        $facture->update(["point_de_vente_id" => 4, "validated_by" => null, "updated_by" => null]);
+    }
+
+    // DJOUGOU
+    $facturesYERIMA = FactureRevendeur::where("created_by", 20)->get();
+    foreach ($facturesYERIMA as $facture) {
+        $facture->update(["point_de_vente_id" => 3, "validated_by" => null, "updated_by" => null]);
+    }
 
     return "Opération éffectuée avec succès!!";
 });
