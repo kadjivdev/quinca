@@ -181,7 +181,7 @@
                                             {{ $reglement->validated_by ? 'Vaildée' : 'Pas validée' }}
                                         </span>
                                     </td>
-                                    <td class="text-end"> <span class="badge bg-light text-dark border"> {{ $accompte->createdBy->name }}</span> </td>
+                                    <td class="text-end"> <span class="badge bg-light text-dark border"> {{ $reglement->createdBy->name }}</span> </td>
                                 </tr>
                                 @endforeach
                             </tbody>
