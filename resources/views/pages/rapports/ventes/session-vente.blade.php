@@ -150,6 +150,7 @@
                                     <th>Caisse/Session</th>
                                     <th>Client</th>
                                     <th class="text-end">Montant TTC</th>
+                                    <th class="text-end">Insére le</th>
                                     <th class="text-end">Statut</th>
                                     <th class="text-end">Réglé</th>
                                     <th class="text-center">Etat</th>
@@ -175,6 +176,7 @@
                                         {{ $facture->client->raison_sociale }}
                                     </td>
                                     <td class="text-end">{{ number_format($facture->montant_ttc-$facture->montant_remise, 0, ',', ' ') }} F</td>
+                                    <td class="text-end">{{ $facture->created_at }} </td>
                                     <td class="text-center">
                                         <span class="badge bg-{{ $facture->validated_by ? 'success' : 'warning' }} rounded-pill">
                                             <i class="fas fa-{{ $facture->est_solde ? 'check-circle' : 'clock' }} me-1"></i>
@@ -287,7 +289,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [3, 'desc']
+            [4, 'desc']
         ],
         "pageLength": 15,
         language: {

@@ -150,6 +150,7 @@
                                     <th>Caisse/Session</th>
                                     <th>Client</th>
                                     <th class="text-end">Montant</th>
+                                    <th class="text-end">Insére le</th>
                                     <th class="text-end">Statut</th>
                                     <th class="text-end">Insére par</th>
                                 </tr>
@@ -173,6 +174,7 @@
                                         {{ $accompte->client->raison_sociale }}
                                     </td>
                                     <td class="text-end">{{ number_format($accompte->montant, 0, ',', ' ') }} F</td>
+                                    <td class="text-end">{{ $accompte->created_at }} </td>
                                     <td class="text-center">
                                         <span class="badge bg-{{ $accompte->validated_by ? 'success' : 'warning' }} rounded-pill">
                                             <i class="fas fa-{{ $accompte->validated_by ? 'check-circle' : 'clock' }} me-1"></i>
@@ -249,17 +251,6 @@
             language: 'fr'
         });
 
-        // Configuration DataTables commune
-        const dataTableConfig = {
-            language: {
-                url: '/js/datatables-fr.json'
-            },
-            pageLength: 10,
-            order: [
-                [0, 'desc']
-            ],
-            responsive: true
-        };
 
         // Gestion du formulaire de filtrage
         $('#sessionForm').on('submit', function(e) {
@@ -278,7 +269,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [3, 'desc']
+            [4, 'desc']
         ],
         "pageLength": 15,
         language: {

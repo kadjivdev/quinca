@@ -25,7 +25,7 @@
                         <option value="">Session courante</option>
                         @foreach($sessions as $s)
                         <option value="{{ $s->id }}" {{ request('session_id') == $s->id ? 'selected' : '' }}>
-                                                        Session #{{ $s->id }} - {{ $s->date_ouverture->format('d/m/Y H:i') }} - {{$s->utilisateur->name}} | Statut: ({{$s->statut}})
+                            Session #{{ $s->id }} - {{ $s->date_ouverture->format('d/m/Y H:i') }} - {{$s->utilisateur->name}} | Statut: ({{$s->statut}})
                         </option>
                         @endforeach
                     </select>
@@ -150,6 +150,7 @@
                                     <th>Caisse/Session</th>
                                     <th>Facture/Client</th>
                                     <th class="text-end">Montant</th>
+                                    <th class="text-end">Insére le</th>
                                     <th class="text-end">Statut</th>
                                     <th class="text-end">Insére par</th>
                                 </tr>
@@ -175,6 +176,7 @@
                                         </span>
                                     </td>
                                     <td class="text-end">{{ number_format($reglement->montant, 0, ',', ' ') }} F</td>
+                                    <td class="text-end">{{ $reglement->created_at }} </td>
                                     <td class="text-center">
                                         <span class="badge bg-{{ $reglement->validated_by ? 'success' : 'warning' }} rounded-pill">
                                             <i class="fas fa-{{ $reglement->validated_by ? 'check-circle' : 'clock' }} me-1"></i>
@@ -251,18 +253,6 @@
             language: 'fr'
         });
 
-        // Configuration DataTables commune
-        const dataTableConfig = {
-            language: {
-                url: '/js/datatables-fr.json'
-            },
-            pageLength: 10,
-            order: [
-                [0, 'desc']
-            ],
-            responsive: true
-        };
-
         // Gestion du formulaire de filtrage
         $('#sessionForm').on('submit', function(e) {
             e.preventDefault();
@@ -280,7 +270,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [3, 'desc']
+            [4, 'desc']
         ],
         "pageLength": 15,
         language: {
