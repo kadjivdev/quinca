@@ -162,7 +162,6 @@ class BonLivraisonFournisseurController extends Controller
             ]);
 
             // Création des lignes du bon de livraison
-
             foreach ($validated['lignes'] as $ligne) {
                 if (($ligne['quantite'] + ($ligne['quantite_supplementaire'] ?? 0)) > 0) {
                     LigneBonLivraisonFournisseur::create([
