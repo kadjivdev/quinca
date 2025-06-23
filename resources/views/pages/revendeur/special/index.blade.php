@@ -66,7 +66,6 @@
             @include('pages.revendeur.special.partials.scripts-part1')
             @include('pages.revendeur.special.partials.js-delete')
 
-
             // Initialisation unique
             if (!window.factureManager) {
                 console.log('Création nouvelle instance FactureManager');
