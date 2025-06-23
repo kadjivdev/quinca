@@ -60,10 +60,20 @@ class SpecialController extends Controller
             $tauxTva = $configuration ? $configuration->taux_tva : 18;
 
             // Chargement des factures avec les relations nécessaires
-            $factures = FactureRevendeur::with(['client'])
+            $query = FactureRevendeur::with(['client'])
                 ->where('type_vente', 'speciale')
-                ->orderBy('date_facture', 'desc')
-                ->get();
+                ->orderBy('date_facture', 'desc');
+
+            if (
+                auth()->user()->hasRole("Super Administrateur")
+                || auth()->user()->hasRole("CONTROLE INTERNE")
+                || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
+            ) {
+                $factures = $query->get();
+            } else {
+                $factures = $query->where('point_de_vente_id', Auth()->user()->point_de_vente_id)
+                    ->get();
+            }
 
             // Ajouter des attributs calculés pour chaque facture
             $factures->transform(function ($facture) {
