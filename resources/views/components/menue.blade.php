@@ -252,7 +252,7 @@
                         </a></li>
                     @endcan
 
-                    @can(["requetes.view","transports.view"])
+                    @canany(["requetes.view","transports.view"])
                     <hr>
                     <!-- requetes -->
                     @can("requetes.view")

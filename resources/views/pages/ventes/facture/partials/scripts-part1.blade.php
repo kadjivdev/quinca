@@ -550,7 +550,6 @@ class FactureManager {
             totalTTC += ligneMontantTTC;
             console.log("Ligne totalTTC",totalTTC);
 
-
             //ligneMontantHt += ligneMontantTTC / 1.19;
             //ligneMontantAIB += ligneMontantHt * 0.01;
             //ligneMontantTVA += ligneMontantHt * 0.18;

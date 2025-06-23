@@ -1,6 +1,6 @@
 <div class="modal fade" id="updateFactureModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 95%; width: 95%;">
-        <div class="modal-content border-0 shadow-lg">
+    <div class="modal-dialog modal-fullscreen-xxl-down bg-white">
+        <div class="modal-content border-0">
             <div class="modal-header bg-warning bg-opacity-10 border-bottom-0 py-3">
                 <div class="d-flex align-items-center">
                     <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3">
@@ -50,9 +50,9 @@
                                                 <select class="form-select" name="client_id" id="updateClientId" required>
                                                     <option value="">Sélectionner un client</option>
                                                     @foreach ($clients as $client)
-                                                        <option value="{{ $client->id }}" data-taux-aib="{{ $client->taux_aib }}">
-                                                            {{ $client->raison_sociale }}
-                                                        </option>
+                                                    <option value="{{ $client->id }}" data-taux-aib="{{ $client->taux_aib }}">
+                                                        {{ $client->raison_sociale }}
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -67,7 +67,7 @@
                                                 <input type="date" class="form-control" name="date_echeance" id="updateDateEcheance" required>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="col-md-3">
                                             <label class="form-label fw-medium required">Type de Facture</label>
                                             <div class="input-group">
@@ -103,12 +103,13 @@
                                         <table class="table table-bordered table-hover">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th style="width: 30%">Article</th>
-                                                    <th style="width: 15%">Quantité</th>
-                                                    <th style="width: 20%">Prix unitaire</th>
-                                                    <th style="width: 10%">Remise (%)</th>
-                                                    <th style="width: 25%">Total HT</th>
-                                                    <th style="width: 5%"></th>
+                                                    <th>Article</th>
+                                                    <th style="width: 30%">Dépôt</th>
+                                                    <th>Quantité</th>
+                                                    <th>Prix</th>
+                                                    <th>Remise (%)</th>
+                                                    <th>Total TTC</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody id="updateLignesContainer">
@@ -116,23 +117,23 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
+                                                    <td colspan="5" class="text-end fw-bold">Total HT</td>
                                                     <td class="text-end fw-bold" id="updateTotalHT">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">TVA</td>
+                                                    <td colspan="5" class="text-end fw-bold">TVA</td>
                                                     <td class="text-end fw-bold" id="updateTotalTVA">0,00 FCFA</td>
                                                     <input name="taux_tva_mod" type="hidden">
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">AIB</td>
+                                                    <td colspan="5" class="text-end fw-bold">AIB</td>
                                                     <td class="text-end fw-bold" id="updateTotalAIB">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr class="table-light">
-                                                    <td colspan="4" class="text-end fw-bold">Total TTC</td>
+                                                    <td colspan="5" class="text-end fw-bold">Total TTC</td>
                                                     <td class="text-end fw-bold" id="updateTotalTTC">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
@@ -182,8 +183,13 @@
             <div class="invalid-feedback">L'article est requis</div>
         </td>
         <td>
+            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
+            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
+            <div class="invalid-feedback">Le depôt est requis</div>
+        </td>
+        <td>
             <div class="input-group">
-                <input style="width: 100%" type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
+                <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
                     placeholder="0.00" required min="0.01" step="0.01">
                 <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" hidden required>
                     {{-- <option value="">Unité</option> --}}
@@ -193,16 +199,16 @@
         </td>
         <td>
             <input type="number"
-                   class="form-control text-end select2-tarifs"
-                   name="lignes[__INDEX__][tarification_id]"
-                   placeholder="0.00"
-                   required
-                   min="0.01"
-                   step="0.01">
+                class="form-control text-end select2-tarifs"
+                name="lignes[__INDEX__][tarification_id]"
+                placeholder="0.00"
+                required
+                min="0.01"
+                step="0.01">
             <div class="invalid-feedback">Le prix est requis</div>
         </td>
         <td>
-            <input type="number" style="width: 100%" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
+            <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
                 placeholder="0.00" min="0" max="100" step="0.01">
         </td>
         <td>
@@ -220,252 +226,268 @@
 </template>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize update modal functionality
-    const updateFactureModal = document.getElementById('updateFactureModal');
-    const updateForm = document.getElementById('updateFactureForm');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize update modal functionality
+        const updateFactureModal = document.getElementById('updateFactureModal');
+        const updateForm = document.getElementById('updateFactureForm');
 
-    // Function to load facture data into update modal
-    window.loadFactureData = async function(factureId) {
-    try {
-        const response = await fetch(`${apiUrl}/vente/factures/${factureId}`);
-        const data = await response.json();
+        // Function to load facture data into update modal
+        window.loadFactureData = async function(factureId) {
+            try {
+                const response = await fetch(`${apiUrl}/vente/factures/${factureId}`);
+                const data = await response.json();
 
-        if (data.status === 'success') {
-            const facture = data.data.facture;
+                if (data.status === 'success') {
+                    const facture = data.data.facture;
 
-            // Informations de base
-            document.getElementById('factureId').value = facture.id;
-            document.getElementById('factureNumber').textContent = facture.numero;
-            document.getElementById('updateDateFacture').value = facture.date_facture.split('T')[0];
-            document.getElementById('updateClientId').value = facture.client_id;
-            document.getElementById('updateDateEcheance').value = facture.date_echeance.split('T')[0];
-            document.getElementById('type_factureMod').value = facture.type_facture;
-            document.getElementById('updateObservations').value = facture.observations || '';
-            $("[name='taux_tva_mod']").val(facture.taux_tva)
+                    // Informations de base
+                    document.getElementById('factureId').value = facture.id;
+                    document.getElementById('factureNumber').textContent = facture.numero;
+                    document.getElementById('updateDateFacture').value = facture.date_facture.split('T')[0];
+                    document.getElementById('updateClientId').value = facture.client_id;
+                    document.getElementById('updateDateEcheance').value = facture.date_echeance.split('T')[0];
+                    document.getElementById('type_factureMod').value = facture.type_facture;
+                    document.getElementById('updateObservations').value = facture.observations || '';
+                    $("[name='taux_tva_mod']").val(facture.taux_tva)
 
-            // Mise à jour du select client
-            const clientSelect = document.getElementById('updateClientId');
-            $(clientSelect).val(facture.client_id).trigger('change');
+                    // Mise à jour du select client
+                    const clientSelect = document.getElementById('updateClientId');
+                    $(clientSelect).val(facture.client_id).trigger('change');
 
-            // Vider le conteneur des lignes
-            const container = document.getElementById('updateLignesContainer');
-            container.innerHTML = '';
+                    // Vider le conteneur des lignes
+                    const container = document.getElementById('updateLignesContainer');
+                    container.innerHTML = '';
 
-            // Ajouter chaque ligne de facture
-            for (let i = 0; i < facture.lignes.length; i++) {
-                const ligne = facture.lignes[i];
+                    // Ajouter chaque ligne de facture
+                    for (let i = 0; i < facture.lignes.length; i++) {
+                        const ligne = facture.lignes[i];
 
-                // Créer nouvelle ligne
-                const newLine = createUpdateLigneFature(i);
-                container.appendChild(newLine);
-                const lineEl = container.lastElementChild;
+                        // Créer nouvelle ligne
+                        const newLine = createUpdateLigneFature(i);
+                        container.appendChild(newLine);
+                        const lineEl = container.lastElementChild;
 
-                // Configurer Select2 pour l'article
-                const articleSelect = lineEl.querySelector('[name$="[article_id]"]');
-                $(articleSelect).select2({
-                    theme: 'bootstrap-5',
-                    placeholder: 'Sélectionner un article'
-                }).append(new Option(ligne.article.designation, ligne.article.id, true, true)).trigger('change');
+                        // Configurer Select2 pour l'article
+                        const articleSelect = lineEl.querySelector('[name$="[article_id]"]');
 
-                // Charger les unités pour cet article
-                const unitesResponse = await fetch(`${apiUrl}/vente/factures/articles/${ligne.article.id}/unites`);
-                const unitesData = await unitesResponse.json();
+                        $(articleSelect).select2({
+                            theme: 'bootstrap-5',
+                            placeholder: 'Sélectionner un article'
+                        }).append(new Option(ligne.article.designation, ligne.article.id, true, true)).trigger('change');
 
-                if (unitesData.status === 'success') {
-                    const uniteSelect = lineEl.querySelector('[name$="[unite_vente_id]"]');
-                    unitesData.data.unites.forEach(unite => {
-                        const option = new Option(unite.text, unite.id, false, unite.id == ligne.unite_vente_id);
-                        $(uniteSelect).append(option);
-                    });
-                    $(uniteSelect).val(ligne.unite_vente_id).trigger('change');
-                    uniteSelect.hidden = false;
-                }
+                        // Charger les unités pour cet article
+                        const unitesResponse = await fetch(`${apiUrl}/vente/factures/articles/${ligne.article.id}/unites`);
+                        const unitesData = await unitesResponse.json();
 
-                // Définir les autres valeurs
-                lineEl.querySelector('[name$="[quantite]"]').value = ligne.quantite;
-                lineEl.querySelector('[name$="[taux_remise]"]').value = ligne.taux_remise || 0;
-                lineEl.querySelector('[name$="[tarification_id]"]').value = ligne.prix_unitaire_ht || 0;
+                        if (unitesData.status === 'success') {
+                            const uniteSelect = lineEl.querySelector('[name$="[unite_vente_id]"]');
+                            unitesData.data.unites.forEach(unite => {
+                                const option = new Option(unite.text, unite.id, false, unite.id == ligne.unite_vente_id);
+                                $(uniteSelect).append(option);
+                            });
+                            $(uniteSelect).val(ligne.unite_vente_id).trigger('change');
+                            uniteSelect.hidden = false;
+                        }
 
-                // Mettre à jour le total de la ligne
-                const totalInput = lineEl.querySelector('.total-ligne');
-                totalInput.value = parseFloat(ligne.montant_ht).toFixed(2);
-            }
+                        // Définir les autres valeurs
+                        lineEl.querySelector('[name$="[quantite]"]').value = ligne.quantite;
+                        lineEl.querySelector('[name$="[taux_remise]"]').value = ligne.taux_remise || 0;
+                        lineEl.querySelector('[name$="[tarification_id]"]').value = ligne.prix_unitaire_ht || 0;
 
-            // Mettre à jour les totaux
-            updateTotals();
+                        // Mettre à jour le total de la ligne
+                        const totalInput = lineEl.querySelector('.total-ligne');
+                        totalInput.value = parseFloat(ligne.montant_ht).toFixed(2);
+                    }
 
-            // Afficher le modal
-            const modal = new bootstrap.Modal(document.getElementById('updateFactureModal'));
-            modal.show();
-        }
-    } catch (error) {
-        console.error('Error loading facture:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erreur',
-            text: 'Impossible de charger les données de la facture'
-        });
-    }
-
-    $("#updateLignesContainer").off('click', '.remove-ligne').on('click', '.remove-ligne', (e) => {
-        const row = $(e.target).closest('tr');
-        if ($("#updateLignesContainer").find('tr').length > 1) {
-            if (confirm('Voulez vous supprimer cette ligne ? Cette actio est irreversible')) {
-                row.fadeOut(300, () => {
-                    row.remove();
+                    // Mettre à jour les totaux
                     updateTotals();
-                });
-            }
-        }else{
-            Swal.fire({
-            icon: 'warning',
-            title: 'Attention',
-            text: 'Suppression impossible. Un article au moins est requis'
-        });
-        }
-    });
-};
 
-    // Handle form submission
-    updateForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        const factureId = formData.get('facture_id');
-
-        try {
-            const response = await fetch(`${apiUrl}/vente/factures/${factureId}/update`, {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Facture mise à jour avec succès'
-                });
-
-                // Close modal and refresh page
-                bootstrap.Modal.getInstance(updateFactureModal).hide();
-                window.location.reload();
-            } else {
-                Toast.fire({
-                    icon: 'error',
-                    title: data.message || 'Erreur lors de la mise à jour'
-                });
-            }
-        } catch (error) {
-            console.error('Error updating facture:', error);
-            Toast.fire({
-                icon: 'error',
-                title: 'Erreur lors de la mise à jour'
-            });
-        }
-    });
-
-    // Add line button handler
-    document.getElementById('btnUpdateAddLigne').addEventListener('click', function() {
-        const container = document.getElementById('updateLignesContainer');
-        const index = container.children.length;
-        container.appendChild(createUpdateLigneFature(index));
-        initializeSelect2();
-    });
-});
-
-function createUpdateLigneFature(index) {
-    const template = document.getElementById('updateLigneFactureTemplate');
-    const clone = template.content.cloneNode(true);
-
-    // Update all name attributes with correct index
-    clone.querySelectorAll('[name*="__INDEX__"]').forEach(el => {
-        el.name = el.name.replace('__INDEX__', index);
-    });
-
-    return clone;
-}
-
-function updateTotals() {
-    const rows = document.querySelectorAll('#updateLignesContainer .ligne-facture');
-    let totalHT = 0;
-    let tauxTVA = parseFloat(document.querySelector('[name="taux_tva_mod"]')?.value || 18);
-    let tauxAIB = parseFloat(document.querySelector('#updateClientId option:checked')?.dataset?.tauxAib || 0);
-
-    rows.forEach(row => {
-        const montantHT = parseFloat(row.querySelector('.total-ligne').value || 0);
-        totalHT += montantHT;
-    });
-
-    const montantTVA = (totalHT * tauxTVA) / 100;
-    const montantAIB = (totalHT * tauxAIB) / 100;
-    const totalTTC = totalHT + montantTVA + montantAIB;
-
-    // Mise à jour des affichages
-    document.getElementById('updateTotalHT').textContent = `${totalHT.toFixed(2)} FCFA`;
-    document.getElementById('updateTotalTVA').textContent = `${montantTVA.toFixed(2)} FCFA`;
-    document.getElementById('updateTotalAIB').textContent = `${montantAIB.toFixed(2)} FCFA`;
-    document.getElementById('updateTotalTTC').textContent = `${totalTTC.toFixed(2)} FCFA`;
-}
-
-
-
-// Re-use existing initialization functions
-function initializeSelect2() {
-    // Initialize select2 for articles and tarifs
-    $('.select2-articles').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Sélectionner un article',
-        ajax: {
-            url: `${apiUrl}/vente/articles/search`,
-            dataType: 'json',
-            delay: 250,
-            processResults: function(data) {
-                return {
-                    results: data.results
-                };
-            },
-            cache: true
-        }
-    });
-
-    $('.select2-tarifs').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Sélectionner un tarif'
-    });
-}
-
-function editFacture(id) {
-    try {
-        // Afficher un indicateur de chargement
-        Swal.fire({
-            title: 'Chargement...',
-            html: '<div class="spinner-border text-primary" role="status"></div>',
-            showConfirmButton: false,
-            allowOutsideClick: false
-        });
-
-        // Charger les données de la facture
-        loadFactureData(id)
-            .then(() => {
-                Swal.close();
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
+                    // Afficher le modal
+                    const modal = new bootstrap.Modal(document.getElementById('updateFactureModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                console.error('Error loading facture:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Erreur',
                     text: 'Impossible de charger les données de la facture'
                 });
+            }
+
+            $("#updateLignesContainer").off('click', '.remove-ligne').on('click', '.remove-ligne', (e) => {
+                const row = $(e.target).closest('tr');
+                if ($("#updateLignesContainer").find('tr').length > 1) {
+                    if (confirm('Voulez vous supprimer cette ligne ? Cette actio est irreversible')) {
+                        row.fadeOut(300, () => {
+                            row.remove();
+                            updateTotals();
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Attention',
+                        text: 'Suppression impossible. Un article au moins est requis'
+                    });
+                }
             });
-    } catch (error) {
-        console.error('Erreur:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erreur',
-            text: 'Une erreur est survenue'
+        };
+
+        // Handle form submission
+        updateForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const factureId = formData.get('facture_id');
+
+            try {
+                const response = await fetch(`${apiUrl}/vente/factures/${factureId}/update`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Facture mise à jour avec succès'
+                    });
+
+                    // Close modal and refresh page
+                    bootstrap.Modal.getInstance(updateFactureModal).hide();
+                    window.location.reload();
+                } else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: data.message || 'Erreur lors de la mise à jour'
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating facture:', error);
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Erreur lors de la mise à jour'
+                });
+            }
+        });
+
+        // Add line button handler
+        document.getElementById('btnUpdateAddLigne').addEventListener('click', function() {
+            const container = document.getElementById('updateLignesContainer');
+            const index = container.children.length;
+            container.appendChild(createUpdateLigneFature(index));
+            initializeSelect2();
+        });
+    });
+
+    function createUpdateLigneFature(index) {
+        const template = document.getElementById('updateLigneFactureTemplate');
+        const clone = template.content.cloneNode(true);
+
+        // Update all name attributes with correct index
+        clone.querySelectorAll('[name*="__INDEX__"]').forEach(el => {
+            el.name = el.name.replace('__INDEX__', index);
+        });
+
+        return clone;
+    }
+
+    function updateTotals() {
+        // totaux
+        let totalTTC = 0;
+        let totalTVA = 0;
+        let totalAIB = 0;
+        let totalHT = 0;
+
+        // totaux des lignes
+        let ligneMontantHt = 0;
+        let ligneMontantAIB = 0;
+        let ligneMontantTVA = 0;
+
+        const rows = document.querySelectorAll('#updateLignesContainer .ligne-facture');
+        let tauxTVA = parseFloat(document.querySelector('[name="taux_tva_mod"]')?.value || 18);
+        let tauxAIB = parseFloat(document.querySelector('#updateClientId option:checked')?.dataset?.tauxAib || 0);
+
+        rows.forEach(row => {
+            const montantTTC = parseFloat(row.querySelector('.total-ligne').value || 0);
+            totalTTC += montantTTC;
+        });
+
+        // totalTTC = FactureUtils.roundNumber(totalTTC);
+        totalHT += totalTTC / 1.19;//calcul du total HT à partir de totalTTC
+        totalTVA += totalHT * 0.18;
+        totalAIB += totalHT * 0.01;
+
+        // const montantTVA = (totalHT * tauxTVA) / 100;
+        // const montantAIB = (totalHT * tauxAIB) / 100;
+        // const totalTTC = totalHT + montantTVA + montantAIB;
+
+        // Mise à jour des affichages
+        document.getElementById('updateTotalHT').textContent = `${totalHT.toFixed(2)} FCFA`;
+        document.getElementById('updateTotalTVA').textContent = `${montantTVA.toFixed(2)} FCFA`;
+        document.getElementById('updateTotalAIB').textContent = `${montantAIB.toFixed(2)} FCFA`;
+        document.getElementById('updateTotalTTC').textContent = `${totalTTC.toFixed(2)} FCFA`;
+    }
+
+
+
+    // Re-use existing initialization functions
+    function initializeSelect2() {
+        // Initialize select2 for articles and tarifs
+        $('.select2-articles').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner un article',
+            ajax: {
+                url: `${apiUrl}/vente/articles/search`,
+                dataType: 'json',
+                delay: 250,
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('.select2-tarifs').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner un tarif'
         });
     }
-}
+
+    function editFacture(id) {
+        try {
+            // Afficher un indicateur de chargement
+            Swal.fire({
+                title: 'Chargement...',
+                html: '<div class="spinner-border text-primary" role="status"></div>',
+                showConfirmButton: false,
+                allowOutsideClick: false
+            });
+
+            // Charger les données de la facture
+            loadFactureData(id)
+                .then(() => {
+                    Swal.close();
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: 'Impossible de charger les données de la facture'
+                    });
+                });
+        } catch (error) {
+            console.error('Erreur:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Une erreur est survenue'
+            });
+        }
+    }
 </script>

@@ -83,8 +83,6 @@ class FactureClientController extends Controller
                 return $facture;
             });
 
-
-
             $facturesResteAPayer = $factures->filter(function ($facture) {
                 return $facture->reste_a_payer > 0;
             });
