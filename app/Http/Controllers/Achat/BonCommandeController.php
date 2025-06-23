@@ -500,50 +500,50 @@ class BonCommandeController extends Controller
         ]);
     }
 
-    public function generatePDF($id, $bon_object)
+    public function generatePDF(Request $request, $id, $bon_object, $entete = false)
     {
         $bcde = BonCommande::with(['fournisseur'])->where('id', $id)->first();
 
-        // dd($bcde->fournisseur); test
         $pdf = new PDF_MC_Table();
         $pdf->AliasNbPages();  // To use the total number of pages
-        // $pdf->setLanguageArray($pdf->getLanguageArray('fr'));
         $pdf->AddPage();
         $pdf->SetFont('Arial', 'B', 16);
 
-        // Définir la police à "DejaVu Sans" qui supporte les caractères UTF-8
-        // $pdf->SetFont('DejaVu Sans', '', 12); // Ou 'dejavusans' pour une version UTF-8
+        // dd($entete==="true");
+        //entete du pdf
+        if ($entete === "true") {
+            $pdf->Image("kadjiv.jpeg", 150, 10, 50, 30);
+            $pdf->Image("head_facture.jpg", 10, 10, 70, 30);
+            $date = Carbon::now();
+            $date->locale('fr');
 
-        $pdf->Image("kadjiv.jpeg", 150, 10, 50, 30);
-        $pdf->Image("head_facture.jpg", 10, 10, 70, 30);
+            $pdf->SetFont('Arial', 'B', 10);
+            $dateText = Carbon::now()->locale('fr')->isoFormat('D MMMM YYYY');
 
-        $date = Carbon::now();
-        $date->locale('fr');
+            $pdf->Text(150, 42, 'Cotonou, le ' . utf8_decode($dateText));
 
-        $pdf->SetFont('', 'B', 10);
-        $dateText = Carbon::now()->locale('fr')->isoFormat('D MMMM YYYY');
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Text(10, 62, utf8_decode('FOURNISSEUR : ' . $bcde->fournisseur->raison_sociale));
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Text(10, 69, utf8_decode("OBJET : $bon_object"));
+        }else {
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Text(10, 30, utf8_decode('FOURNISSEUR : ' . $bcde->fournisseur->raison_sociale));
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Text(10, 45, utf8_decode("OBJET : $bon_object"));
+        }
 
-        $pdf->Text(150, 42, 'Cotonou, le ' . utf8_decode($dateText));
 
-        $pdf->SetFont('', 'B', 12);
-        // $pdf->Text(10, 55, 'FOURNISSEUR');
-        $pdf->SetFont('', 'B', 12);
-        $pdf->Text(10, 62, utf8_decode('FOURNISSEUR : ' . $bcde->fournisseur->raison_sociale));
-        $pdf->SetFont('', 'B', 12);
-        $pdf->Text(10, 69, utf8_decode("OBJET : $bon_object"));
-
-        // $pdf->Text(13, 80, 'Client : '.$devis->client->nom_client);
         $pdf->SetXY(10, 73);
         $pdf->MultiCell(190, 15, utf8_decode('BON DE COMMANDE : ' . $bcde->code), '', 'C');
 
         $pdf->SetXY(10, 85);
-        $pdf->SetFont('', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetWidths(array(100, 20, 30, 40));
         $pdf->SetAligns(array('L', 'C', 'R', 'R'));
         $pdf->Row(array(utf8_decode('Désignation'), utf8_decode('Quantité'), utf8_decode('PU'), utf8_decode('Montant')));
 
         $ligne_commandes = DB::table('ligne_bon_commandes')
-            // ->with("article")
             ->join('articles', 'articles.id', '=', 'ligne_bon_commandes.article_id')
             ->where('ligne_bon_commandes.bon_commande_id', $bcde->id)
             ->select('*')
@@ -564,23 +564,22 @@ class BonCommandeController extends Controller
         $lettre = new ChiffreEnLettre;
         $prix_lettre = $lettre->Conversion($tot_ht);
 
-        $pdf->SetFont('', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 10);
         $pdf->CheckPageBreak(10);
         $pdf->Text($pdf->GetX(), $pdf->GetY() + 10, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre));
 
         $pdf->CheckPageBreak(45);
-        $pdf->SetFont('', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 10);
         $pdf->Text($pdf->GetX() + 147, $pdf->GetY() + 45, utf8_decode('LA DIRECTRICE GENERALE'));
         $pdf->Text($pdf->GetX() + 150, $pdf->GetY() + 75, utf8_decode('Kadidjatou A. DJAOUGA'));
 
         // Générer le nom de fichier unique pour le PDF
         $fileName = uniqid('Bon_Commande_', true) . '.pdf';
 
-        // Stocker le PDF dans le système de fichiers temporaire
-        // $tempFilePath = storage_path('app/temp/' . $fileName);
-        if ($pdf->Output('I', $fileName)) {
-
-            // return redirect()->route('devis.index')->with('success', 'Proforma enregistré avec succès.');
-        }
+        // Générer le PDF et le retourner avec les bons headers
+        $pdfContent = $pdf->Output('S');
+        return response($pdfContent)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $fileName . '"');
     }
 }

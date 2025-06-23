@@ -128,10 +128,18 @@
                     </div>
 
                     <div class="bg-light shadow-sm roundered show_reference" id="show_object" hidden>
-                        <!-- <form id="exportForm"> -->
+                        <!-- <form method="POST" id="exportForm"> -->
+                        @csrf
                         <div class="modal-body">
                             <input type="hidden" id="bon_id">
                             <textarea name="" required id="bon_object" class="form-control" placeholder="Tapez l'objet ici ...."></textarea>
+                            <br>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="entete" id="entete" checked>
+                                <label class="form-check-label" for="entete">
+                                    Voulez-vous une entête?
+                                </label>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" onclick="closeObject()">Close</button>

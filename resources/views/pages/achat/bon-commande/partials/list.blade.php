@@ -109,8 +109,7 @@
                                     </button>
                                     @endcan
                                     @endif
-
-                                    <div class="btn-group ms-1">
+                                    <!-- <div class="btn-group ms-1">
                                         <button class="btn btn-sm btn-light-secondary btn-icon"
                                             data-bs-toggle="dropdown">
                                             <i class="fas fa-print"></i>
@@ -128,7 +127,7 @@
                                                 </a>
                                             </li>
                                         </ul>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </td>
                         </tr>
@@ -352,13 +351,16 @@
     }
 
     function exportation() {
+        let entete = $("#entete").is(":checked");
+        // alert(entete)
         let bon_id = $("#bon_id").val()
         let bon_object = $("#bon_object").val()
         if (bon_object) {
-            window.open(`${apiUrl}/achat/bon-commandes/${bon_id}/${bon_object}/pdf`)
+            window.open(`${apiUrl}/achat/bon-commandes/${bon_id}/${bon_object}/${entete}/pdf`)
             // window.location.href = `/quinkadjiv_refont/public/achat/bon-commandes/${bon_id}/${bon_object}/pdf`
+        }else{
+            alert("Saisissez un object dans le champ ...")
         }
-        alert("Saisissez un object dans le champ ...")
     }
 
     $("#exportForm").on("submit", function(e) {
