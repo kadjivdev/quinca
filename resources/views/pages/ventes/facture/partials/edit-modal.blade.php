@@ -1,13 +1,15 @@
-<div class="modal fade" id="updateFactureModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-xxl-down bg-white">
-        <div class="modal-content border-0">
-            <div class="modal-header bg-warning bg-opacity-10 border-bottom-0 py-3">
+<!-- Modal de mise à jour -->
+<div class="modal fade" id="editFactureModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 95%; width: 95%;">
+        <div class="modal-content border-0 shadow-lg">
+            {{-- Header du modal avec un design similaire à l'ajout --}}
+            <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
                 <div class="d-flex align-items-center">
-                    <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3">
-                        <i class="fas fa-edit fs-4 text-warning"></i>
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                        <i class="fas fa-file-invoice fs-4 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">Modifier la Facture <span id="factureNumber"></span></h5>
+                        <h5 class="modal-title fw-bold mb-0">Modifier gogo update la facture <span id="factureNumber"></span></h5>
                         <p class="text-muted small mb-0">Modifiez les informations de la facture</p>
                     </div>
                 </div>
@@ -17,11 +19,10 @@
             <form action="#" method="POST" id="updateFactureForm" class="needs-validation" novalidate>
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="facture_id" id="factureId">
 
                 <div class="modal-body p-4">
                     <div class="row g-4">
-                        <!-- Informations Générales -->
+                        {{-- Section informations générales --}}
                         <div class="col-12">
                             <div class="card border border-light-subtle">
                                 <div class="card-header bg-light">
@@ -37,7 +38,7 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-calendar-alt text-primary"></i>
                                                 </span>
-                                                <input type="date" class="form-control" name="date_facture" id="updateDateFacture" required>
+                                                <input type="date" class="form-control" name="date_facture" required>
                                             </div>
                                         </div>
 
@@ -47,10 +48,11 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-user text-primary"></i>
                                                 </span>
-                                                <select class="form-select" name="client_id" id="updateClientId" required>
+                                                <select class="form-select" name="client_id" required>
                                                     <option value="">Sélectionner un client</option>
                                                     @foreach ($clients as $client)
-                                                    <option value="{{ $client->id }}" data-taux-aib="{{ $client->taux_aib }}">
+                                                    <option value="{{ $client->id }}"
+                                                        data-taux-aib="{{ $client->taux_aib }}">
                                                         {{ $client->raison_sociale }}
                                                     </option>
                                                     @endforeach
@@ -64,7 +66,8 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-clock text-primary"></i>
                                                 </span>
-                                                <input type="date" class="form-control" name="date_echeance" id="updateDateEcheance" required>
+                                                <input type="date" class="form-control" name="date_echeance"
+                                                    required>
                                             </div>
                                         </div>
 
@@ -74,27 +77,27 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-file-invoice text-primary"></i>
                                                 </span>
-                                                <select class="form-select" name="type_facture" id="type_factureMod" required>
+                                                <select class="form-select" name="type_facture" id="update_type_facture"
+                                                    required>
                                                     <option value="">Sélectionner le type</option>
-                                                    <option value="SIMPLE">Simple</option>
-                                                    <option value="NORMALISE">Normalisée</option>
+                                                    <option value="simple">Simple</option>
+                                                    <option value="normaliser">Normalisée</option>
                                                 </select>
                                             </div>
-                                            <div class="invalid-feedback">Le type de facture est requis</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Articles -->
+                        {{-- Section articles --}}
                         <div class="col-12">
                             <div class="card border border-light-subtle">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h6 class="card-title mb-0">
                                         <i class="fas fa-box me-2"></i>Articles
                                     </h6>
-                                    <button type="button" class="btn btn-warning btn-sm" id="btnUpdateAddLigne">
+                                    <button type="button" class="btn btn-primary btn-sm" id="addLineUpdate">
                                         <i class="fas fa-plus me-2"></i>Ajouter un article
                                     </button>
                                 </div>
@@ -103,37 +106,35 @@
                                         <table class="table table-bordered table-hover">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>Article</th>
-                                                    <th style="width: 30%">Dépôt</th>
-                                                    <th>Quantité</th>
-                                                    <th>Prix</th>
-                                                    <th>Remise (%)</th>
-                                                    <th>Total TTC</th>
-                                                    <th></th>
+                                                    <th style="width: 30%">Article</th>
+                                                    <th style="width: 15%">Quantité</th>
+                                                    <th style="width: 20%">Prix</th>
+                                                    <th style="width: 10%">Remise (%)</th>
+                                                    <th style="width: 20%">Total HT</th>
+                                                    <th style="width: 5%"></th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="updateLignesContainer">
-                                                <!-- Les lignes seront ajoutées ici -->
+                                            <tbody id="updateLinesContainer">
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="5" class="text-end fw-bold">Total HT</td>
+                                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
                                                     <td class="text-end fw-bold" id="updateTotalHT">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
-                                                <tr>
-                                                    <td colspan="5" class="text-end fw-bold">TVA</td>
+                                                <tr id="updateTvaRow">
+                                                    <td colspan="4" class="text-end fw-bold">TVA
+                                                        ({{ $tauxTva }}%)</td>
                                                     <td class="text-end fw-bold" id="updateTotalTVA">0,00 FCFA</td>
-                                                    <input name="taux_tva_mod" type="hidden">
                                                     <td></td>
                                                 </tr>
-                                                <tr>
-                                                    <td colspan="5" class="text-end fw-bold">AIB</td>
+                                                <tr id="updateAibRow">
+                                                    <td colspan="4" class="text-end fw-bold">AIB</td>
                                                     <td class="text-end fw-bold" id="updateTotalAIB">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr class="table-light">
-                                                    <td colspan="5" class="text-end fw-bold">Total TTC</td>
+                                                    <td colspan="4" class="text-end fw-bold">Total TTC</td>
                                                     <td class="text-end fw-bold" id="updateTotalTTC">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
@@ -144,7 +145,84 @@
                             </div>
                         </div>
 
-                        <!-- Observations -->
+                        {{-- Section règlement --}}
+                        <div class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-money-bill-wave me-2"></i>Règlement
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Montant réglé</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-money-bill text-primary"></i>
+                                                </span>
+                                                <input type="number" class="form-control" name="montant_regle" id="updateMontantRegle" required min="0" step="0.01">
+                                                <span class="input-group-text">FCFA</span>
+                                            </div>
+
+                                            <div id="champsBancaires" class="row g-3 mt-0" style="display: none;">
+                                                <div class="col-md-12">
+                                                    <label class="form-label fw-medium">Banque</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white">
+                                                            <i class="fas fa-university text-primary"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control" name="nom_banque" id="nomBanque">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label class="form-label fw-medium">Référence</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white">
+                                                            <i class="fas fa-hashtag text-primary"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control" name="reference_bancaire" id="referenceBancaire">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Moyen de règlement</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-credit-card text-primary"></i>
+                                                </span>
+
+                                                <select class="form-select" name="moyen_reglement" id="moyenReglement" required>
+                                                    <option value="">Sélectionner</option>
+                                                    <option value="espece">Espèce</option>
+                                                    <option value="cheque">Chèque</option>
+                                                    <option value="virement">Virement</option>
+                                                    <option value="carte_bancaire">Carte Bancaire</option>
+                                                    <option value="MoMo">MoMo</option>
+                                                    <option value="Flooz">Flooz</option>
+                                                    <option value="Celtis_Pay">Celtis Pay</option>
+                                                    <option value="Effet">Effet</option>
+                                                    <option value="Avoir">Avoir</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-12 mt-5">
+                                                <div class="d-flex justify-content-end align-items-center">
+                                                    <div class="text-end">
+                                                        <h3 id="updateMessageRestant" class="fs-6 text-muted mb-1">Montant à régler</h3>
+                                                        <h2 id="updateMontantRestant" class="fs-3 fw-bold mb-0">0,00 FCFA</h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section observations --}}
                         <div class="col-12">
                             <div class="card border border-light-subtle">
                                 <div class="card-header bg-light">
@@ -153,7 +231,7 @@
                                     </h6>
                                 </div>
                                 <div class="card-body">
-                                    <textarea class="form-control" name="observations" id="updateObservations" rows="3" placeholder="Observations éventuelles"></textarea>
+                                    <textarea class="form-control" name="observations" rows="3" placeholder="Observations éventuelles"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -164,7 +242,7 @@
                     <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Annuler
                     </button>
-                    <button type="submit" class="btn btn-warning px-4">
+                    <button type="submit" class="btn btn-primary px-4">
                         <i class="fas fa-save me-2"></i>Mettre à jour
                     </button>
                 </div>
@@ -173,8 +251,8 @@
     </div>
 </div>
 
-<!-- Template pour une nouvelle ligne dans le formulaire de mise à jour -->
-<template id="updateLigneFactureTemplate">
+{{-- Template pour ligne de mise à jour --}}
+<template id="updateLineTemplate">
     <tr class="ligne-facture">
         <td>
             <select class="form-select select2-articles" name="lignes[__INDEX__][article_id]" required>
@@ -183,28 +261,18 @@
             <div class="invalid-feedback">L'article est requis</div>
         </td>
         <td>
-            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
-            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
-            <div class="invalid-feedback">Le depôt est requis</div>
-        </td>
-        <td>
             <div class="input-group">
                 <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
                     placeholder="0.00" required min="0.01" step="0.01">
-                <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" hidden required>
-                    {{-- <option value="">Unité</option> --}}
+                <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" required>
+                    <option value="">Unité</option>
                 </select>
             </div>
             <div class="invalid-feedback">La quantité est requise</div>
         </td>
         <td>
-            <input type="number"
-                class="form-control text-end select2-tarifs"
-                name="lignes[__INDEX__][tarification_id]"
-                placeholder="0.00"
-                required
-                min="0.01"
-                step="0.01">
+            <input type="number" class="form-control text-end select2-tarifs"
+                name="lignes[__INDEX__][tarification_id]" placeholder="0.00" required min="0.01" step="0.01">
             <div class="invalid-feedback">Le prix est requis</div>
         </td>
         <td>
@@ -269,7 +337,6 @@
 
                         // Configurer Select2 pour l'article
                         const articleSelect = lineEl.querySelector('[name$="[article_id]"]');
-
                         $(articleSelect).select2({
                             theme: 'bootstrap-5',
                             placeholder: 'Sélectionner un article'
@@ -395,34 +462,19 @@
     }
 
     function updateTotals() {
-        // totaux
-        let totalTTC = 0;
-        let totalTVA = 0;
-        let totalAIB = 0;
-        let totalHT = 0;
-
-        // totaux des lignes
-        let ligneMontantHt = 0;
-        let ligneMontantAIB = 0;
-        let ligneMontantTVA = 0;
-
         const rows = document.querySelectorAll('#updateLignesContainer .ligne-facture');
+        let totalHT = 0;
         let tauxTVA = parseFloat(document.querySelector('[name="taux_tva_mod"]')?.value || 18);
         let tauxAIB = parseFloat(document.querySelector('#updateClientId option:checked')?.dataset?.tauxAib || 0);
 
         rows.forEach(row => {
-            const montantTTC = parseFloat(row.querySelector('.total-ligne').value || 0);
-            totalTTC += montantTTC;
+            const montantHT = parseFloat(row.querySelector('.total-ligne').value || 0);
+            totalHT += montantHT;
         });
 
-        // totalTTC = FactureUtils.roundNumber(totalTTC);
-        totalHT += totalTTC / 1.19;//calcul du total HT à partir de totalTTC
-        totalTVA += totalHT * 0.18;
-        totalAIB += totalHT * 0.01;
-
-        // const montantTVA = (totalHT * tauxTVA) / 100;
-        // const montantAIB = (totalHT * tauxAIB) / 100;
-        // const totalTTC = totalHT + montantTVA + montantAIB;
+        const montantTVA = (totalHT * tauxTVA) / 100;
+        const montantAIB = (totalHT * tauxAIB) / 100;
+        const totalTTC = totalHT + montantTVA + montantAIB;
 
         // Mise à jour des affichages
         document.getElementById('updateTotalHT').textContent = `${totalHT.toFixed(2)} FCFA`;

@@ -9,7 +9,7 @@
                         <i class="fas fa-file-invoice fs-4 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">Modifier la facture <span id="factureNumber"></span></h5>
+                        <h5 class="modal-title fw-bold mb-0">Modifier gogo update la facture <span id="factureNumber"></span></h5>
                         <p class="text-muted small mb-0">Modifiez les informations de la facture</p>
                     </div>
                 </div>
@@ -51,10 +51,10 @@
                                                 <select class="form-select" name="client_id" required>
                                                     <option value="">Sélectionner un client</option>
                                                     @foreach ($clients as $client)
-                                                        <option value="{{ $client->id }}"
-                                                            data-taux-aib="{{ $client->taux_aib }}">
-                                                            {{ $client->raison_sociale }}
-                                                        </option>
+                                                    <option value="{{ $client->id }}"
+                                                        data-taux-aib="{{ $client->taux_aib }}">
+                                                        {{ $client->raison_sociale }}
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -106,35 +106,36 @@
                                         <table class="table table-bordered table-hover">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th style="width: 30%">Article</th>
-                                                    <th style="width: 15%">Quantité</th>
-                                                    <th style="width: 20%">Prix</th>
-                                                    <th style="width: 10%">Remise (%)</th>
-                                                    <th style="width: 20%">Total HT</th>
-                                                    <th style="width: 5%"></th>
+                                                    <th>Article</th>
+                                                    <th style="width: 30%">Dépôt</th>
+                                                    <th>Quantité</th>
+                                                    <th>Prix</th>
+                                                    <th>Remise (%)</th>
+                                                    <th>Total TTC</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody id="updateLinesContainer">
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
+                                                    <td colspan="5" class="text-end fw-bold">Total HT</td>
                                                     <td class="text-end fw-bold" id="updateTotalHT">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr id="updateTvaRow">
-                                                    <td colspan="4" class="text-end fw-bold">TVA
+                                                    <td colspan="5" class="text-end fw-bold">TVA
                                                         ({{ $tauxTva }}%)</td>
                                                     <td class="text-end fw-bold" id="updateTotalTVA">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr id="updateAibRow">
-                                                    <td colspan="4" class="text-end fw-bold">AIB</td>
+                                                    <td colspan="5" class="text-end fw-bold">AIB</td>
                                                     <td class="text-end fw-bold" id="updateTotalAIB">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr class="table-light">
-                                                    <td colspan="4" class="text-end fw-bold">Total TTC</td>
+                                                    <td colspan="5" class="text-end fw-bold">Total TTC</td>
                                                     <td class="text-end fw-bold" id="updateTotalTTC">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
@@ -263,11 +264,11 @@
         <td>
             <div class="input-group">
                 <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
-                    placeholder="0.00" required min="0.01" step="0.01">
+                    placeholder="0.00" required min="0.01" step="0.01"> <br>
+                </div>
                 <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" required>
                     <option value="">Unité</option>
                 </select>
-            </div>
             <div class="invalid-feedback">La quantité est requise</div>
         </td>
         <td>
@@ -276,12 +277,16 @@
             <div class="invalid-feedback">Le prix est requis</div>
         </td>
         <td>
+            <input type="number" class="form-control text-end select2-tarifs"
+                name="lignes[__INDEX__][taux_remise]" placeholder="0.00" required min="0.01" step="0.01">
+        </td>
+        <td>
             <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
                 placeholder="0.00" min="0" max="100" step="0.01">
         </td>
         <td>
             <div class="input-group">
-                <span class="input-group-text">FCFA</span>
+                <!-- <span class="input-group-text">FCFA</span> -->
                 <input type="text" class="form-control text-end total-ligne" readonly value="0">
             </div>
         </td>

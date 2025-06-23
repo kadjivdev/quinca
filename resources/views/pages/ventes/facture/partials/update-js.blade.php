@@ -1,6 +1,6 @@
 <script>
     'use strict';
-    
+
     // Configuration pour la mise à jour
     const UpdateConfig = {
         selectors: {
@@ -47,7 +47,7 @@
             this.initTypeFacture();
             this.initMontantRegleEvents();
         }
-        
+
         async handleArticleSelect(e, $line) {
             const articleId = e.target.value;
             if (!articleId) return;
@@ -328,6 +328,7 @@
             let totalHT = 0;
             let totalTVA = 0;
             let totalAIB = 0;
+            let totalTTC = 0;
 
             // Récupération du taux AIB du client sélectionné
             const clientSelect = this.form.find('[name="client_id"]');
@@ -337,26 +338,24 @@
             $(UpdateConfig.selectors.ligneContainer).find('tr').each((_, row) => {
                 const $row = $(row);
                 console.log('Row:', $row.find('.total-ligne').val());
-                const montantHT = this.parseMoney($row.find('.total-ligne').val());
-                console.log('Montant HT:', montantHT);
+                const montantTTC = this.parseMoney($row.find('.total-ligne').val());
+                console.log('Montant HT:', montantTTC);
 
-                totalHT += montantHT;
+                totalTTC += montantTTC;
 
                 // Ne calculer TVA et AIB que si la facture est normalisée
-                if (this.isNormalized) {
-                    totalTVA += this.roundNumber(montantHT * (0.18)); // TVA 18%
-                    totalAIB += this.roundNumber(montantHT * (tauxAib / 100));
-                }
+                // if (this.isNormalized) {
+                //     totalTVA += this.roundNumber(montantHT * (0.18)); // TVA 18%
+                //     totalAIB += this.roundNumber(montantHT * (tauxAib / 100));
+                // }
             });
-
-            console.log('Total HT:', totalHT);
 
 
             // Arrondir les totaux
-            totalHT = this.roundNumber(totalHT);
-            totalTVA = this.roundNumber(totalTVA);
-            totalAIB = this.roundNumber(totalAIB);
-            const totalTTC = this.roundNumber(totalHT + (this.isNormalized ? (totalTVA + totalAIB) : 0));
+            totalTTC = FactureUtils.roundNumber(totalTTC);
+            totalHT += totalTTC / 1.19; //calcul du total HT à partir de totalTTC
+            totalTVA += totalHT * 0.18;
+            totalAIB += totalHT * 0.01;
 
             // Mise à jour de l'affichage
             $(UpdateConfig.selectors.totalHT).text(this.formatMoney(totalHT) + ' FCFA');
@@ -428,7 +427,7 @@
             if (!value) return 0;
             return parseFloat(value.replace(/[^\d,.-]/g, '')) || 0;
         }
-        
+
 
         reset() {
             this.form[0].reset();

@@ -50,7 +50,6 @@
 
 @include('pages.ventes.facture.partials.add-modal')
 @include('pages.ventes.facture.partials.update-modal')
-@include('pages.ventes.facture.partials.edit-modal')
 @include('pages.ventes.facture.partials.show-modal')
 @include('pages.ventes.facture.partials.add-reg-modal')
 @endsection
