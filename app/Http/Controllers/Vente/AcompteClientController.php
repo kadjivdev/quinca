@@ -131,7 +131,8 @@ class AcompteClientController extends Controller
 
             // Vérifications initiales
             $sessionCaisse = SessionCaisse::ouverte()
-                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                // ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                ->where('utilisateur_id', auth()->user()->id)
                 ->first();
 
             if (!$sessionCaisse) {
@@ -173,7 +174,7 @@ class AcompteClientController extends Controller
                 ["session_caisse_id" => $sessionCaisse->id]
             );
             $acompte->fill($data);
-            
+
             $acompte->created_by = auth()->id();
             // $acompte->reference = $request->reference?->reference;
             $acompte->point_de_vente_id = auth()->user()->point_de_vente_id;

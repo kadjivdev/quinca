@@ -1,6 +1,6 @@
 <!-- Modal de mise à jour -->
 <div class="modal fade" id="updateFactureModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 95%; width: 95%;">
+    <div class="modal-dialog modal-fullscreen-xxl-down bg-white">
         <div class="modal-content border-0 shadow-lg">
             {{-- Header du modal avec un design similaire à l'ajout --}}
             <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
@@ -9,7 +9,7 @@
                         <i class="fas fa-file-invoice fs-4 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">Modifier gogo update la facture <span id="factureNumber"></span></h5>
+                        <h5 class="modal-title fw-bold mb-0">Modifier la facture <span id="factureNumber"></span></h5>
                         <p class="text-muted small mb-0">Modifiez les informations de la facture</p>
                     </div>
                 </div>
@@ -113,7 +113,6 @@
                                                     <th>Remise (%)</th>
                                                     <th>Total TTC</th>
                                                     <th></th>
-                                                </tr>
                                             </thead>
                                             <tbody id="updateLinesContainer">
                                             </tbody>
@@ -262,13 +261,18 @@
             <div class="invalid-feedback">L'article est requis</div>
         </td>
         <td>
+            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control depot-input">
+            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control depot-libelle">
+            <div class="invalid-feedback">Le depôt est requis</div>
+        </td>
+        <td>
             <div class="input-group">
                 <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
                     placeholder="0.00" required min="0.01" step="0.01"> <br>
-                </div>
-                <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" required>
-                    <option value="">Unité</option>
-                </select>
+            </div>
+            <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" required>
+                <option value="">Unité</option>
+            </select>
             <div class="invalid-feedback">La quantité est requise</div>
         </td>
         <td>
@@ -277,16 +281,11 @@
             <div class="invalid-feedback">Le prix est requis</div>
         </td>
         <td>
-            <input type="number" class="form-control text-end select2-tarifs"
-                name="lignes[__INDEX__][taux_remise]" placeholder="0.00" required min="0.01" step="0.01">
-        </td>
-        <td>
             <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
                 placeholder="0.00" min="0" max="100" step="0.01">
         </td>
         <td>
             <div class="input-group">
-                <!-- <span class="input-group-text">FCFA</span> -->
                 <input type="text" class="form-control text-end total-ligne" readonly value="0">
             </div>
         </td>

@@ -52,6 +52,7 @@
             const articleId = e.target.value;
             if (!articleId) return;
 
+            // alert("handleArticleSelect")
             try {
                 // Charger les tarifs et unités simultanément
                 const [tarifsRes, unitesRes] = await Promise.all([
@@ -75,6 +76,10 @@
                         uniteSelect.val(unites.data.unites[0].id).trigger('change');
                     }
                 }
+
+                // const data = e.params.data;
+                console.log("Data a revoir: ",e.params.data);
+
 
                 // Mettre à jour les prix
                 if (tarifs.status === 'success' && tarifs.data.tarifs.length > 0) {
@@ -147,6 +152,8 @@
             $line.find('.quantite-input').val(data.quantite);
             $line.find('.select2-tarifs').val(data.prix_unitaire_ht);
             $line.find('.remise-input').val(data.taux_remise || 0);
+            $line.find('.depot-input').val(data.depot);
+            $line.find('.depot-libelle').val(data.facturedepot.libelle_depot);
 
             this.calculateLineTotal($line);
             this.updateTotaux();
@@ -162,6 +169,7 @@
 
             // Initialiser Select2 pour l'article
             const articleSelect = $line.find('.select2-articles');
+
             articleSelect.select2({
                 theme: 'bootstrap-5',
                 dropdownParent: this.modal,
@@ -174,14 +182,50 @@
                         q: params.term,
                         page: params.page || 1
                     }),
-                    processResults: (data) => ({
-                        results: data.results.map(item => ({
-                            id: item.id,
-                            text: `${item.code_article} - ${item.text}`,
-                            code_article: item.code_article
-                        }))
-                    })
-                }
+                    processResults: function(data, params) {
+                        // Vérification basique de la structure
+                        if (!data.results) {
+                            // console.error('Pas de résultats dans la réponse');
+                            return {
+                                results: [],
+                                pagination: {
+                                    more: false
+                                }
+                            };
+                        }
+
+                        // Convertir l'objet en tableau
+                        const resultsArray = Object.values(data.results);
+                        // console.log('Résultats convertis en tableau:', resultsArray);
+
+                        // Formatage simple des résultats
+                        const formattedResults = resultsArray.map(item => {
+                            // console.log('Item brut:', item);
+                            return {
+                                id: item.id,
+                                text: item.text || item.libelle || item.nom || item.designation || 'Sans nom',
+                                code_article: item.code_article,
+                                depot: item.depot,
+                                stock: item.stock,
+                                unite_mesure: item.unite_mesure
+                            };
+                        });
+
+                        // console.log('Résultats formatés:', formattedResults);
+
+                        return {
+                            results: formattedResults,
+                            pagination: {
+                                more: data.pagination?.more || false
+                            }
+                        };
+                    },
+                    cache: true,
+                },
+                minimumInputLength: 1,
+                templateResult: this.formatArticle.bind(this),
+                templateSelection: this.formatArticleSelection.bind(this),
+                escapeMarkup: markup => markup
             }).on('select2:select', (e) => this.handleArticleSelect(e, $line));
 
             if (data) {
@@ -192,6 +236,21 @@
             return $line;
         }
 
+        formatArticle(article) {
+            console.log("Article formatage:", article);
+            if (article.loading) return article.text;
+            return `<div class="select2-result-article">
+                    <div class="select2-result-article__code">${article.code_article || ''}</div>
+                    <div class="select2-result-article__title">${article.text || ''}</div>
+                    <div class="select2-result-article__stock">Stock: ${article.depot.libelle_depot} (${article.stock})</div>
+                </div>`;
+        }
+
+        formatArticleSelection(article) {
+            console.log("Article selection:", article);
+            if (!article.id) return article.text;
+            return `${article.text}`;
+        }
 
         initTypeFacture() {
             const typeSelect = $(UpdateConfig.selectors.typeFacture);
