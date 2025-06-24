@@ -52,7 +52,7 @@
             const articleId = e.target.value;
             if (!articleId) return;
 
-            // alert("handleArticleSelect")
+            console.log("handleArticleSelect")
             try {
                 // Charger les tarifs et unités simultanément
                 const [tarifsRes, unitesRes] = await Promise.all([
