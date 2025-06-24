@@ -52,7 +52,6 @@
             const articleId = e.target.value;
             if (!articleId) return;
 
-            console.log("handleArticleSelect")
             try {
                 // Charger les tarifs et unités simultanément
                 const [tarifsRes, unitesRes] = await Promise.all([
@@ -77,9 +76,10 @@
                     }
                 }
 
-                // const data = e.params.data;
-                console.log("Data a revoir: ",e.params.data);
-
+                const data = e.params.data;
+                $line.find('.depot-input').val(data.depot.id);
+                $line.find('.depot-libelle').val(`${data.depot.libelle_depot} | Stock ${data.stock} (${data.unite_mesure.libelle_unite}) `);
+                $line.find('.quantite-input').attr("max", data.stock)
 
                 // Mettre à jour les prix
                 if (tarifs.status === 'success' && tarifs.data.tarifs.length > 0) {
@@ -148,12 +148,14 @@
             // Charger les unités avant de définir les autres valeurs
             await this.loadUnites(data.article_id, $line, data.unite_vente_id);
 
+            console.log("Data du fill line",data);
+
             // Autres champs
             $line.find('.quantite-input').val(data.quantite);
             $line.find('.select2-tarifs').val(data.prix_unitaire_ht);
             $line.find('.remise-input').val(data.taux_remise || 0);
             $line.find('.depot-input').val(data.depot);
-            $line.find('.depot-libelle').val(data.facturedepot.libelle_depot);
+            $line.find('.depot-libelle').val(`${data.facturedepot.libelle_depot} | Stock ${data.quantite} (${data.unite_vente.libelle_unite}) `);
 
             this.calculateLineTotal($line);
             this.updateTotaux();
