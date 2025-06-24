@@ -656,17 +656,22 @@ class RapportVenteController extends Controller
             // Load relationships with filters
             $session->load([
                 'factures' => function ($q) use ($dateDebut, $dateFin) {
-                    $q->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                    if (
+                        auth()->user()->hasRole("Super Administrateur")
+                        || auth()->user()->hasRole("CONTROLE INTERNE")
+                        || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
+                    ) {
+                        $q->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                    } else {
+                        //un unser simple ne vera que ses ventes
+                        $q->where("created_by", auth()->user()->id)
+                            ->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                    }
                 }
             ]);
 
             // Get sessions list for dropdown
-            $sessions = SessionCaisse::where(function ($q) use ($session) {
-                $q->where('statut', 'fermee')
-                    ->orWhere('id', $session->id);
-            })
-                ->orderBy('date_ouverture', 'desc')
-                // ->limit(10)
+            $sessions = SessionCaisse::orderBy('date_ouverture', 'desc')
                 ->get();
 
             return view('pages.rapports.ventes.session-vente', compact(
@@ -696,16 +701,22 @@ class RapportVenteController extends Controller
             // Load relationships with filters
             $session->load([
                 'reglements' => function ($q) use ($dateDebut, $dateFin) {
-                    $q->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                    if (
+                        auth()->user()->hasRole("Super Administrateur")
+                        || auth()->user()->hasRole("CONTROLE INTERNE")
+                        || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
+                    ) {
+                        $q->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                    } else {
+                        //un ser simple ne vera que ses reglements
+                        $q->where("created_by", auth()->user()->id)
+                            ->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                    }
                 }
             ]);
 
             // Get sessions list for dropdown
-            $sessions = SessionCaisse::where(function ($q) use ($session) {
-                $q->where('statut', 'fermee')
-                    ->orWhere('id', $session->id);
-            })
-                ->orderBy('date_ouverture', 'desc')
+            $sessions = SessionCaisse::orderBy('date_ouverture', 'desc')
                 ->get();
 
             return view('pages.rapports.ventes.session-reglements', compact(
@@ -735,16 +746,24 @@ class RapportVenteController extends Controller
             $session->load([
                 'accompteClients' => function ($q) use ($dateDebut, $dateFin) {
                     $q->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+
+                    if (
+                        auth()->user()->hasRole("Super Administrateur")
+                        || auth()->user()->hasRole("CONTROLE INTERNE")
+                        || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
+                    ) {
+                        $q->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                    } else {
+                        //un user simple ne vera que ses accomptes
+                        $q->where("created_by", auth()->user()->id)
+                            ->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                    }
                 }
             ]);
 
             // return response()->json($session);
             // Get sessions list for dropdown
-            $sessions = SessionCaisse::where(function ($q) use ($session) {
-                $q->where('statut', 'fermee')
-                    ->orWhere('id', $session->id);
-            })
-                ->orderBy('date_ouverture', 'desc')
+            $sessions = SessionCaisse::orderBy('date_ouverture', 'desc')
                 ->get();
 
             return view('pages.rapports.ventes.session-accomptes', compact(
