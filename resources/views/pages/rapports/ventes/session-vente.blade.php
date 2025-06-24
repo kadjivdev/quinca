@@ -9,7 +9,6 @@
             <h1 class="h3 mb-0 text-gray-800">
                 <i class="fas fa-cash-register text-primary me-2"></i>Rapport de Session
             </h1>
-
         </div>
     </header>
 
@@ -82,7 +81,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted fw-normal mb-2">Total Encaissements</h6>
-                            <h3 class="mb-0">{{ number_format($session->factures()->sum('montant_ttc')-$session->factures()->sum('montant_remise'), 0, ',', ' ') }} F</h3>
+                            <h3 class="mb-0">{{ number_format($session->factures->sum('montant_ttc')-$session->factures->sum('montant_remise'), 0, ',', ' ') }} F</h3>
                         </div>
                         <div class="rounded-circle bg-success bg-opacity-10 p-3">
                             <i class="fas fa-cash-register text-success fa-2x"></i>

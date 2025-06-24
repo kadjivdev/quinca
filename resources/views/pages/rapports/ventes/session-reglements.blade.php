@@ -64,8 +64,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted fw-normal mb-2">Total règlements</h6>
-                            <h3 class="mb-0">{{ number_format($session->reglements()->count(), 0, ',', ' ') }} F</h3>
+                            <h6 class="text-muted fw-normal mb-2">Total</h6>
+                            <h3 class="mb-0">{{ number_format($session->reglements->count(), 0, ',', ' ') }} </h3>
                         </div>
                         <div class="rounded-circle bg-primary bg-opacity-10 p-3">
                             <i class="fas fa-money-bill text-primary fa-2x"></i>
@@ -82,7 +82,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted fw-normal mb-2">Total Reglements</h6>
-                            <h3 class="mb-0">{{ number_format($session->reglements()->sum('montant'), 0, ',', ' ') }} F</h3>
+                            <h3 class="mb-0">{{ number_format($session->reglements->sum('montant'), 0, ',', ' ') }} F</h3>
                         </div>
                         <div class="rounded-circle bg-success bg-opacity-10 p-3">
                             <i class="fas fa-cash-register text-success fa-2x"></i>

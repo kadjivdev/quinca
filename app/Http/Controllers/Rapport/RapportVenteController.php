@@ -695,7 +695,7 @@ class RapportVenteController extends Controller
 
             // Load relationships with filters
             $session->load([
-                'factures.reglements' => function ($q) use ($dateDebut, $dateFin) {
+                'reglements' => function ($q) use ($dateDebut, $dateFin) {
                     $q->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
                 }
             ]);
@@ -738,6 +738,7 @@ class RapportVenteController extends Controller
                 }
             ]);
 
+            // return response()->json($session);
             // Get sessions list for dropdown
             $sessions = SessionCaisse::where(function ($q) use ($session) {
                 $q->where('statut', 'fermee')
