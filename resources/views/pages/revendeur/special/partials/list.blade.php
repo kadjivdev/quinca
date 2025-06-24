@@ -13,7 +13,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date facture</th>
                             <th class="border-bottom-0">Client</th>
-                            <th class="border-bottom-0">Etat</th>
+                            <!-- <th class="border-bottom-0">Etat</th> -->
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
                             <th class="border-bottom-0 text-end">Montant TVA</th>
@@ -69,7 +69,7 @@
                             $qte = $facture->lignes()->sum("quantite");
                             $qteLivre = $facture->lignes()->sum("quantite_livree")
                             @endphp
-                            <td>
+                            <!-- <td>
                                 @if($qte==$qteLivre)
                                 <span class="badge bg-primary"> Livrée </span>
                                 @else
@@ -81,7 +81,7 @@
                                     @endif
 
                                     @endif
-                            </td>
+                            </td> -->
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
                             <td class="text-end fw-medium">
                                 {{ number_format($facture->montant_ht, 0, ',', ' ') }} F
@@ -580,7 +580,7 @@
                 const token = document.querySelector('meta[name="csrf-token"]').content;
 
                 // Envoyer la requête de suppression
-                fetch(`${apiUrl}/ventes-speciales/factures/${id}/delete`, {
+                fetch(`${apiUrl}/revendeurs/ventes-speciales/${id}/delete`, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': token,

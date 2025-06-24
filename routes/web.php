@@ -61,7 +61,7 @@ use Illuminate\Support\Facades\DB;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    
+
 
     return "Opération éffectuée avec succès!!";
 });

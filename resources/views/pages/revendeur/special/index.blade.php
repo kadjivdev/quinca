@@ -64,7 +64,6 @@
 
             // Votre code de configuration et classe ici
             @include('pages.revendeur.special.partials.scripts-part1')
-            @include('pages.revendeur.special.partials.js-delete')
 
             // Initialisation unique
             if (!window.factureManager) {

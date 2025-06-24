@@ -566,7 +566,7 @@ class BonCommandeController extends Controller
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->CheckPageBreak(10);
-        $pdf->Text($pdf->GetX(), $pdf->GetY() + 10, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre));
+        $pdf->Text($pdf->GetX(), $pdf->GetY() + 10, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre .' FCFA'));
 
         $pdf->CheckPageBreak(45);
         $pdf->SetFont('Arial', 'B', 10);

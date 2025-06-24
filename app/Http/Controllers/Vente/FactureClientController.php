@@ -407,8 +407,8 @@ class FactureClientController extends Controller
             }
 
             $facture = FactureClient::findOrFail($id);
-            $client = Client::findOrFail($request->client_id);
-            $configuration = Societe::firstOrFail();
+            // $client = Client::findOrFail($request->client_id);
+            // $configuration = Societe::firstOrFail();
 
             // Validation
             $validator = Validator::make($request->all(), [
@@ -484,11 +484,6 @@ class FactureClientController extends Controller
                     ]);
                     $facture->reglements()->save($reglement);
                 }
-
-                $totalHT = 0;
-                $totalRemise = 0;
-                $totalTVA = 0;
-                $totalAIB = 0;
 
                 // Mise à jour des lignes
                 foreach ($request->lignes as $index => $ligne) {
