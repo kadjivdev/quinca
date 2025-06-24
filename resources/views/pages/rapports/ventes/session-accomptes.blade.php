@@ -25,7 +25,7 @@
                         <option value="">Session courante</option>
                         @foreach($sessions as $s)
                         <option value="{{ $s->id }}" {{ request('session_id') == $s->id ? 'selected' : '' }}>
-                            Session #{{ $s->id }} - {{ $s->date_ouverture->format('d/m/Y H:i') }} - {{$s->utilisateur->name}} | Statut: ({{$s->statut}})
+                            Session #{{ $s->id }} - Ouverte le: {{ $s->date_ouverture->format('d/m/Y H:i') }} -Fermée le : {{ $s->date_fermeture?->format('d/m/Y H:i') }} - Par: {{$s->utilisateur->name}} | Statut: ({{$s->statut}})
                         </option>
                         @endforeach
                     </select>
