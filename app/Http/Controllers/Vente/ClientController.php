@@ -327,7 +327,9 @@ class ClientController extends Controller
             'createdBy'
         ]);
 
-        $reglements = $client->facturesClient->pluck("reglements")
+        $reglements = $client->facturesClient
+            ->whereNotNull('validated_by')
+            ->pluck("reglements")
             ->flatten();
 
         // Préparer les données pour la réponse

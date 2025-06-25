@@ -69,9 +69,9 @@ class FactureClientController extends Controller
                 } elseif ($facture->statut === 'validee') {
                     if ($facture->montant_regle == 0) {
                         $facture->statut_reel = 'validee';
-                    } elseif ($facture->montant_regle < $facture->montant_ttc) {
+                    } elseif ($facture->montant_regle < $facture->montant_ttc - $facture->montant_remise) {
                         $facture->statut_reel = 'partiellement_payee';
-                    } elseif ($facture->montant_regle >= $facture->montant_ttc) {
+                    } elseif ($facture->montant_regle >= $facture->montant_ttc - $facture->montant_remise) {
                         $facture->statut_reel = 'payee';
                     }
                 }
@@ -114,7 +114,6 @@ class FactureClientController extends Controller
                 'montant_en_attente' => $montantResteAPyer,
                 'factures_en_attente' => $facturesResteAPayer,
             ];
-
 
             Log::info('Liste des factures chargée avec succès', [
                 'nombre_factures' => count($factures)
