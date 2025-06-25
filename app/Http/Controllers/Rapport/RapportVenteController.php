@@ -664,7 +664,8 @@ class RapportVenteController extends Controller
                         $q->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
                     } else {
                         //un unser simple ne vera que ses ventes
-                        $q->where("created_by", auth()->user()->id)
+                        $q
+                            // ->where("created_by", auth()->user()->id)
                             ->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
                     }
                 }
