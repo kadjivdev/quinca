@@ -37,10 +37,10 @@
                                         <option value="{{ $bc->id }}" data-code="{{ $bc->code }}"
                                             data-point-vente="{{ $bc->pointVente->nom_pv }}"
                                             data-point-vente-id="{{ $bc->point_de_vente_id }}"
-                                            data-fournisseur="{{ $bc->fournisseur->raison_sociale }}"
+                                            data-fournisseur="{{ $bc->fournisseur?->raison_sociale }}"
                                             data-fournisseur-id="{{ $bc->fournisseur_id }}"
                                             data-montant="{{ $bc->montant_total }}">
-                                            {{ $bc->code }} - {{ $bc->fournisseur->raison_sociale }}
+                                            {{ $bc->code }} - {{ $bc->fournisseur?->raison_sociale }}
                                             ({{ number_format($bc->montant_total, 2) }} FCFA)
                                         </option>
                                         @endforeach

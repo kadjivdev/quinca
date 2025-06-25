@@ -44,10 +44,10 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-fournisseur me-2">
-                                        {{ substr($bonCommande->fournisseur->raison_sociale, 0, 2) }}
+                                        {{ substr($bonCommande->fournisseur?->raison_sociale, 0, 2) }}
                                     </div>
                                     <div>
-                                        <div class="fw-medium">{{ $bonCommande->fournisseur->raison_sociale }}</div>
+                                        <div class="fw-medium">{{ $bonCommande->fournisseur?->raison_sociale }}</div>
                                     </div>
                                 </div>
                             </td>

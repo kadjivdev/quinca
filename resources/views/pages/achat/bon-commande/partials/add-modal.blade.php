@@ -39,11 +39,11 @@
                                             data-code="{{ $prog->code }}"
                                             data-point-vente="{{ $prog->pointVente->nom_pv }}"
                                             data-point-vente-id="{{ $prog->point_de_vente_id }}"
-                                            data-fournisseur="{{ $prog->fournisseur->raison_sociale }}"
+                                            data-fournisseur="{{ $prog->fournisseur?->raison_sociale }}"
                                             data-fournisseur-id="{{ $prog->fournisseur_id }}"
                                             data-validation="{{ $prog->validated_at->format('d/m/Y') }}"
                                             >
-                                            {{ $prog->code }} - {{ $prog->fournisseur->raison_sociale }}
+                                            {{ $prog->code }} - {{ $prog->fournisseur?->raison_sociale }}
                                             (Validée le {{ $prog->validated_at->format('d/m/Y') }})
                                         </option>
                                         @endforeach
