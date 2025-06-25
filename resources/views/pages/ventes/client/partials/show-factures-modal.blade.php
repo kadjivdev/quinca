@@ -19,7 +19,7 @@
             <div class="modal-body p-4">
                 <div class="row g-4">
                     <div class="table-responsive">
-                        <table class="table table-sm" id="facturesTable">
+                        <table class="table table-sm">
                             <thead>
                                 <tr>
                                     <th>Numéro</th>
@@ -44,17 +44,6 @@
         </div>
     </div>
 </div>
-
-<script src="/plugins/datatables/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-<script src="/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-<script src="/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-<script src="/plugins/jszip/jszip.min.js"></script>
-<script src="/plugins/pdfmake/pdfmake.min.js"></script>
-<script src="/plugins/pdfmake/vfs_fonts.js"></script>
-<script src="/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-<script src="/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-<script src="/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
 <script>
     function showFactures(id) {
@@ -107,36 +96,6 @@
                             `
                         );
                     }
-
-                    // Initialiser ou réinitialiser DataTable
-                    if ($.fn.DataTable.isDataTable('#facturesTable')) {
-                        $('#facturesTable').DataTable().destroy();
-                    }
-                    $('#facturesTable').DataTable({
-                        language: {
-                            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
-                        },
-                        dom: 'Bfrtip',
-                        buttons: [
-                            {
-                                extend: 'excelHtml5',
-                                text: '<i class="fas fa-file-excel"></i> Excel',
-                                className: 'btn btn-success btn-sm'
-                            },
-                            {
-                                extend: 'pdfHtml5',
-                                text: '<i class="fas fa-file-pdf"></i> PDF',
-                                className: 'btn btn-danger btn-sm'
-                            },
-                            {
-                                extend: 'print',
-                                text: '<i class="fas fa-print"></i> Imprimer',
-                                className: 'btn btn-secondary btn-sm'
-                            }
-                        ],
-                        responsive: true,
-                        retrieve: true
-                    });
 
                     // Fermer le loader
                     Swal.close();

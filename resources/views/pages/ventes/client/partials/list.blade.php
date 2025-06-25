@@ -173,18 +173,21 @@
 
                                     <!-- autres details -->
                                     <div class="btn-group">
-                                        <button class="btn btn-sm btn-light-primary"
+                                        <!-- <button class="btn btn-sm btn-light-primary"
                                             onclick="showFactures({{ $client->id }})">
                                             Voir les factures
-                                        </button>
-                                        <button class="btn btn-sm btn-light-primary"
+                                        </button> -->
+                                        <a target="_blank" href="{{route('vente.clients.detailFactures',$client->id) }}" class="btn btn-sm btn-light text-dark border"><i class="fas fa-eye"></i> Voir les factures</a>
+                                        <!-- <button class="btn btn-sm btn-light-primary"
                                             onclick="showReglements({{ $client->id }})">
                                             Voir les règlements
-                                        </button>
-                                        <button class="btn btn-sm btn-light-primary"
+                                        </button> -->
+                                        <a target="_blank" href="{{route('vente.clients.detailReglements',$client->id) }}" class="btn btn-sm btn-light text-dark border"><i class="fas fa-eye"></i> Voir les règlements </a>
+                                        <!-- <button class="btn btn-sm btn-light-primary"
                                             onclick="showAccomptes({{ $client->id }})">
                                             Voir les accomptes
-                                        </button>
+                                        </button> -->
+                                        <a target="_blank" href="{{route('vente.clients.detailAccomptes',$client->id) }}" class="btn btn-sm btn-light text-dark border"><i class="fas fa-eye"></i> Voir les accomptes </a>
                                     </div>
                                 </div>
                             </td>

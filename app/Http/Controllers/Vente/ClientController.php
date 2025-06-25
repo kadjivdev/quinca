@@ -376,6 +376,69 @@ class ClientController extends Controller
     }
 
     /**
+     * Affiche les détails des factures d'un client
+     */
+    public function facturesDetails(Request $request, $clientId)
+    {
+        $client = Client::findOrFail($clientId);
+
+        // Charger les relations nécessaires
+        $client->load([
+            'facturesClient.lignes.article',
+            'facturesRevendeur.lignes.article',
+            'acomptes.client',
+            'createdBy'
+        ]);
+        // Préparer les données pour la réponse
+
+        // dd($client->facturesClient);
+        return view('pages.ventes.client.partials.details.facture', compact(
+            'client',
+        ));
+    }
+
+    /**
+     * Affiche les détails des règlements d'un client
+     */
+    public function detailReglements(Request $request, $clientId)
+    {
+        $client = Client::findOrFail($clientId);
+
+        $reglements = $client->facturesClient
+            ->whereNotNull('validated_by')
+            ->pluck("reglements")
+            ->flatten();
+
+        // Préparer les données pour la réponse
+
+        return view('pages.ventes.client.partials.details.reglements', compact(
+            'reglements',
+            'client'
+        ));
+    }
+
+    /**
+     * Affiche les détails des accomptes d'un client
+     */
+    public function detailAccomptes(Request $request, $clientId)
+    {
+        $client = Client::findOrFail($clientId);
+
+        // Charger les relations nécessaires
+        $client->load([
+            'facturesRevendeur.lignes.article',
+            'acomptes',
+            'createdBy'
+        ]);
+
+        // Préparer les données pour la réponse
+
+        return view('pages.ventes.client.partials.details.accomptes', compact(
+            'client'
+        ));
+    }
+
+    /**
      * Met à jour les informations d'un client
      */
     public function update(Request $request, Client $client)

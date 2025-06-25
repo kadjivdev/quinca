@@ -778,7 +778,6 @@ class RapportVenteController extends Controller
         }
     }
 
-
     public function rapportCompteClient(Request $request)
     {
         // Construction de la requête principale
