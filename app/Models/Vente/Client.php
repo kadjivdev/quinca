@@ -91,6 +91,12 @@ class Client extends Model
         return $facturesAmount - ($reglementsAmount + $clientAccomptesAmount);
     }
 
+    // Reglements
+    public function reglements(): HasMany
+    {
+        return $this->hasMany(ReglementClient::class);
+    }
+
     /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */
     public function soldeRevendeur()
     {

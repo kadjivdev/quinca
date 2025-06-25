@@ -145,7 +145,7 @@
                             <td>
                                 <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->solde,2,',',' ')}}</span>
                             </td>
-                            
+
                             <td class="text-end">
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-light-primary btn-icon"
@@ -163,13 +163,29 @@
                                     </button>
 
                                     @if($client->facturesClient->count() == 0)
-                                    <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                    <button class="mx-1 btn btn-sm btn-light-danger btn-icon ms-1"
                                         onclick="deleteClient({{ $client->id }})"
                                         data-bs-toggle="tooltip"
                                         title="Supprimer">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     @endif
+
+                                    <!-- autres details -->
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-light-primary"
+                                            onclick="showFactures({{ $client->id }})">
+                                            Voir les factures
+                                        </button>
+                                        <button class="btn btn-sm btn-light-primary"
+                                            onclick="showReglements({{ $client->id }})">
+                                            Voir les règlements
+                                        </button>
+                                        <button class="btn btn-sm btn-light-primary"
+                                            onclick="showAccomptes({{ $client->id }})">
+                                            Voir les accomptes
+                                        </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>

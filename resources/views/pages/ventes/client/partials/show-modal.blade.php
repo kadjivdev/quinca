@@ -144,59 +144,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Dernières transactions -->
-                    <div class="row g-3 mt-3">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-3 text-muted">
-                                        <i class="fas fa-file-invoice me-2"></i>Dernières Factures
-                                    </h6>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Numéro</th>
-                                                    <th>Date</th>
-                                                    <th class="text-end">Montant</th>
-                                                    <th class="text-center">Statut</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="dernieresFactures">
-                                                <!-- Les factures seront injectées ici -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-3 text-muted">
-                                        <i class="fas fa-money-check me-2"></i>Derniers Règlements
-                                    </h6>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Numéro</th>
-                                                    <th>Date</th>
-                                                    <th>Mode</th>
-                                                    <th class="text-end">Montant</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="derniersReglements">
-                                                <!-- Les règlements seront injectés ici -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -306,40 +253,6 @@ function showClient(id) {
                     $('#totalReglements').text(new Intl.NumberFormat('fr-FR').format(stats.total_reglements) + ' FCFA');
                 }
 
-                // Dernières transactions
-                if (dernieresFactures.length > 0) {
-                    let facturesHtml = '';
-                    dernieresFactures.forEach(facture => {
-                        facturesHtml += `
-                            <tr>
-                                <td>${facture.numero}</td>
-                                <td>${facture.date}</td>
-                                <td class="text-end">${new Intl.NumberFormat('fr-FR').format(facture.montant)} FCFA</td>
-                                <td class="text-center">
-                                    <span class="badge bg-${facture.statut_paiement === 'paye' ? 'success' : 'warning'} bg-opacity-10 text-${facture.statut_paiement === 'paye' ? 'success' : 'warning'}">
-                                        ${facture.statut_paiement}
-                                    </span>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    $('#dernieresFactures').html(facturesHtml);
-                }
-
-                if (derniersReglements.length > 0) {
-                    let reglementsHtml = '';
-                    derniersReglements.forEach(reglement => {
-                        reglementsHtml += `
-                            <tr>
-                                <td>${reglement.numero}</td>
-                                <td>${reglement.date}</td>
-                                <td>${reglement.mode_reglement}</td>
-                                <td class="text-end">${new Intl.NumberFormat('fr-FR').format(reglement.montant)} FCFA</td>
-                            </tr>
-                        `;
-                    });
-                    $('#derniersReglements').html(reglementsHtml);
-                }
             }
         },
         error: function(xhr, status, error) {

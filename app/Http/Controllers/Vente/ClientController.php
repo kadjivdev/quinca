@@ -319,13 +319,16 @@ class ClientController extends Controller
             return response()->json(['error' => 'Requête non autorisée'], 403);
         }
 
-
         // Charger les relations nécessaires
         $client->load([
             'facturesClient.lignes.article',
-            // 'reglements',
+            'facturesRevendeur.lignes.article',
+            'acomptes.client',
             'createdBy'
         ]);
+
+        $reglements = $client->facturesClient->pluck("reglements")
+            ->flatten();
 
         // Préparer les données pour la réponse
         $data = [
@@ -343,6 +346,9 @@ class ClientController extends Controller
                 'statut' => $client->statut,
                 'taux_aib' => $client->taux_aib,
                 'created_at' => $client->created_at->format('d/m/Y'),
+                'factures' => $client->facturesClient,
+                'acomptes' => $client->acomptes,
+                'reglements' => $reglements,
                 'credit' => [
                     'plafond' => $client->plafond_credit,
                     'delai_paiement' => $client->delai_paiement,

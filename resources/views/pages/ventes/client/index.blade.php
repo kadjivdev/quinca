@@ -49,6 +49,12 @@
     @include('pages.ventes.client.partials.show-modal')
     @include('pages.ventes.client.partials.edit-modal')
     @include('pages.ventes.client.partials.import-modal')
+
+    <!-- modals de details factures, acomptes, et reglements -->
+    @include('pages.ventes.client.partials.show-factures-modal')
+    @include('pages.ventes.client.partials.show-accomptes-modal')
+    @include('pages.ventes.client.partials.show-reglements-modal')
+
     
 @endsection
 @push('scripts')
