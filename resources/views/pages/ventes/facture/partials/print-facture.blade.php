@@ -268,14 +268,14 @@
     @endif
 
     <div class="footer">
-        <div class="signature-section">
+        <!-- <div class="signature-section">
             <p>
                 Facture créée par: {{ $facture->createdBy->name }} le {{ $facture->created_at->format('d/m/Y H:i') }}
                 @if($facture->validated_by)
                 <br>Validée par: {{ $facture->validatedBy->name }} le {{ $facture->date_validation->format('d/m/Y H:i') }}
                 @endif
             </p>
-        </div>
+        </div> -->
 
         @if($facture->numero_normalise)
         <div class="normalisation-info">

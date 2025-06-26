@@ -927,8 +927,6 @@ class FactureClientController extends Controller
         $logo = $request->get("logo");
         $montantTTc = $request->get("montantTTc");
 
-        // dd($facture->montant_ht * 18/100);
-
         $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture', "logo", "montantTTc"));
         $pdf->setPaper('a4');
 
