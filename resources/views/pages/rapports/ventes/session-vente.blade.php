@@ -80,7 +80,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted fw-normal mb-2">Total Encaissements</h6>
+                            <h6 class="text-muted fw-normal mb-2">Total factures</h6>
                             <h3 class="mb-0">{{ number_format($session->factures->sum('montant_ttc')-$session->factures->sum('montant_remise'), 0, ',', ' ') }} F</h3>
                         </div>
                         <div class="rounded-circle bg-success bg-opacity-10 p-3">
@@ -90,42 +90,21 @@
                 </div>
             </div>
         </div>
-        <!-- 
-        <div class="col-md-3">
+       <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted fw-normal mb-2">Solde Théorique</h6>
-                            <h3 class="mb-0">{{ number_format($session->solde_theorique, 0, ',', ' ') }} F</h3>
+                            <h6 class="text-muted fw-normal mb-2">Total soldé</h6>
+                            <h3 class="mb-0">{{ number_format($montantSolde) }} F</h3>
                         </div>
-                        <div class="rounded-circle bg-info bg-opacity-10 p-3">
-                            <i class="fas fa-calculator text-info fa-2x"></i>
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                            <i class="fas fa-cash-register text-danger fa-2x"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        @if($session->statut === 'fermee')
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted fw-normal mb-2">Écart</h6>
-                            <h3 class="mb-0 {{ $session->ecart >= 0 ? 'text-success' : 'text-danger' }}">
-                                {{ $session->ecart >= 0 ? '+' : '' }}{{ number_format($session->ecart, 0, ',', ' ') }} F
-                            </h3>
-                        </div>
-                        <div class="rounded-circle bg-{{ $session->ecart >= 0 ? 'success' : 'danger' }} bg-opacity-10 p-3">
-                            <i class="fas fa-balance-scale text-{{ $session->ecart >= 0 ? 'success' : 'danger' }} fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif -->
     </div>
 
     <div class="row g-4">

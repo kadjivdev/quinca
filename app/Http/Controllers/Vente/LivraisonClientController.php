@@ -844,10 +844,10 @@ class LivraisonClientController extends Controller
                         'reference' => $ligne->article->code_article,
                         'designation' => $ligne->article->designation
                     ],
-                    'quantite' => $ligne->quantite,
+                    'quantite' => number_format($ligne->quantite, 2, ".", " "),
                     'unite' => $ligne->uniteVente->libelle_unite,
                     'prix_unitaire' => $ligne->prix_unitaire,
-                    'montant_total' => $ligne->montant_total
+                    'montant_total' => number_format($ligne->montant_total, 2, ".", " ")
                 ];
             })
         ];

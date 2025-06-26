@@ -146,7 +146,7 @@ class FactureClient extends Model
 
     public function getResteAReglerAttribute(): float
     {
-        return $this->montant_ttc - $this->montant_regle;
+        return ($this->montant_ttc - $this->montant_remise) - $this->montant_regle;
     }
 
     public function getEstSoldeAttribute(): bool

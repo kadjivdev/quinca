@@ -675,11 +675,16 @@ class RapportVenteController extends Controller
             $sessions = SessionCaisse::orderBy('date_ouverture', 'desc')
                 ->get();
 
+            $montantSolde = $session->factures->filter(function ($facture) {
+                return $facture->est_solde;
+            })->sum("montant_ttc");
+
             return view('pages.rapports.ventes.session-vente', compact(
                 'session',
                 'sessions',
                 'dateDebut',
-                'dateFin'
+                'dateFin',
+                'montantSolde'
             ));
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur: ' . $e->getMessage());
