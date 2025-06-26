@@ -661,12 +661,12 @@ class RapportVenteController extends Controller
                         || auth()->user()->hasRole("CONTROLE INTERNE")
                         || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
                     ) {
-                        $q->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                        $q->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
                     } else {
                         //un unser simple ne vera que ses ventes
                         $q
                             // ->where("created_by", auth()->user()->id)
-                            ->whereBetween('date_facture', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
+                            ->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
                     }
                 }
             ]);
@@ -677,7 +677,7 @@ class RapportVenteController extends Controller
 
             $montantSolde = $session->factures->filter(function ($facture) {
                 return $facture->est_solde;
-            })->sum("montant_ttc");
+            })->sum(fn($facture)=>($facture->montant_ttc - $facture->montant_remise));
 
             return view('pages.rapports.ventes.session-vente', compact(
                 'session',

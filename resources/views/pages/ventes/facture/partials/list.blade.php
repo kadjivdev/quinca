@@ -27,6 +27,7 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">N° Facture</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Session</th>
                             <th class="border-bottom-0">Point de Vente</th>
                             <th class="border-bottom-0">Dépôt</th>
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
@@ -56,6 +57,7 @@
                                     @endif
                                 </div>
                             </td>
+                            <td><span class="badge bg-light text-dark border">#{{$facture->sessionCaisse?->id}}</span></td>
                             <td>
                                 <span class="badge bg-dark text-white">{{$facture->createdBy->pointDeVente->nom_pv}}</span>
                             </td>
