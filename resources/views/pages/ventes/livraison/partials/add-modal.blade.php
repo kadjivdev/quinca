@@ -99,7 +99,7 @@
                                     </thead>
                                     <tbody id="lignesFacture">
                                         <tr>
-                                            <td colspan="7" class="text-center py-4 text-muted">
+                                            <td colspan="5" class="text-center py-4 text-muted">
                                                 Veuillez sélectionner une facture
                                             </td>
                                         </tr>
