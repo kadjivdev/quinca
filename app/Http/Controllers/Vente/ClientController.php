@@ -95,7 +95,8 @@ class ClientController extends Controller
                 $client->reglementAmount = $client->facturesClient
                     ->whereNotNull('validated_by')
                     ->pluck("reglements")
-                    ->flatten()
+                    ->flatten()//le flatten permet de regrouper les tableaux des reglements en un seul seul tableau
+                    ->whereNotNull('validated_by')
                     ->sum("montant");
 
                 /** LES ACCOMPTES */
@@ -413,7 +414,8 @@ class ClientController extends Controller
         $reglements = $client->facturesClient
             ->whereNotNull('validated_by')
             ->pluck("reglements")
-            ->flatten();
+            ->flatten()
+            ->whereNotNull('validated_by');
 
         // Préparer les données pour la réponse
 
