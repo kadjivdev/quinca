@@ -467,13 +467,13 @@ class LivraisonClientController extends Controller
                         'id' => $ligne->uniteVente->id,
                         'libelle' => $ligne->uniteVente->libelle_unite
                     ],
-                    'quantite_facturee' => $ligne->quantite,
-                    'quantite_base' => $ligne->quantite_base,
-                    'quantite_livree' => $quantiteLivree,
-                    'quantite_livree_simple' => $ligne->quantite_livree_simple,
+                    'quantite_facturee' => number_format($ligne->quantite, 2, ".", " "),
+                    'quantite_base' => number_format($ligne->quantite_base, 2, ".", " "),
+                    'quantite_livree' => number_format($quantiteLivree, 2, ".", " "),
+                    'quantite_livree_simple' => number_format($ligne->quantite_livree_simple, 2, ".", " "),
                     'depot' => $ligne->facturedepot->libelle_depot,
-                    'reste_a_livrer' => $ligne->quantite - $quantiteLivree,
-                    'stock_disponible' => $stockDisponible,
+                    'reste_a_livrer' => number_format($ligne->quantite - $quantiteLivree, 2, ".", " "),
+                    'stock_disponible' => number_format($stockDisponible, 2, ".", " "),
                     'prix_unitaire' => $ligne->prix_unitaire_ht
                 ];
             });
@@ -746,7 +746,7 @@ class LivraisonClientController extends Controller
                     $ligneLivraison->livraison_client_id = $livraisonClient->id;
                     $ligneLivraison->ligne_facture_id = $data['ligne_facture_id'];
                     $ligneLivraison->article_id = $data['article_id'];
-                    $ligneLivraison->unite_vente_id = $uniteVenteId;//(int) $data['unite_vente_id'];
+                    $ligneLivraison->unite_vente_id = $uniteVenteId; //(int) $data['unite_vente_id'];
                     $ligneLivraison->quantite = $data['quantite'];
                     // $ligneLivraison->quantite_base = $quantiteBase;
                     $ligneLivraison->prix_unitaire = $data['prix_unitaire'];

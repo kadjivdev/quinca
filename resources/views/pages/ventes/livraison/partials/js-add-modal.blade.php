@@ -43,7 +43,6 @@
                         let html = '';
 
                         response.lignes.forEach(function(ligne) {
-
                             const stockClass = ligne.stock_disponible < ligne
                                 .reste_a_livrer ? 'stock-danger' : '';
 
@@ -76,7 +75,7 @@
                                         <input type="number"
                                             class="form-control quantite-input"
                                             name="lignes[${ligne.id}][quantite]"
-                                            min="1"
+                                            min="0"
                                             max="${ligne.reste_a_livrer}"
                                             step="0.001"
                                             value="0">
