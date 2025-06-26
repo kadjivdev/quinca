@@ -4,7 +4,7 @@
 
     {{-- Table des livraisons --}}
     <div class="col-12">
-        <div class="card border-0 shadow-sm">
+        <div class="card p-3 border-0 shadow-sm">
             <div class="table-responsive">
                 <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
                     <thead class="bg-light">
