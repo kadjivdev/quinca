@@ -88,7 +88,8 @@ class Client extends Model
         if ($facturesAmount == 0 && $reglementsAmount == 0) {
             return $clientAccomptesAmount;
         }
-        return $facturesAmount - ($reglementsAmount + $clientAccomptesAmount);
+        
+        return ($reglementsAmount + $clientAccomptesAmount) - $facturesAmount;
     }
 
     // Reglements
