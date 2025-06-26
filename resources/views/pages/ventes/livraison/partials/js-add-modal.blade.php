@@ -81,12 +81,6 @@
                                             value="0">
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <span class="badge bg-light text-dark stock-badge ${stockClass}">
-                                        ${ligne.stock_disponible}
-                                        <small>${uniteVenteLibelle}</small>
-                                    </span>
-                                </td>
                             </tr>
                         `;
                         });

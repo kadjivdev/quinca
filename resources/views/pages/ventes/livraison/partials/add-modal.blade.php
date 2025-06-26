@@ -95,8 +95,6 @@
                                             <th class="text-center">Déjà livrée</th>
                                             <th class="text-center">Reste à livrer</th>
                                             <th class="text-center" style="width: 150px;">Quantité à livrer</th>
-                                            <th class="text-center">Stock disponible</th>
-                                            {{-- <th class="text-center">Prix moyen (CUMP)</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody id="lignesFacture">
