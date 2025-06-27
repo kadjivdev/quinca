@@ -20,33 +20,8 @@ use App\Http\Controllers\Revendeur\FactureRevendeurController;
 
 use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientController, SoldeInitialFournisseurController, RapportAchatController, RapportStockController, RapportValorisationController, StockRotationController, StockAlertController, RapportCreanceController};
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Achat\BonCommande;
-use App\Models\Achat\BonLivraisonFournisseur;
-use App\Models\Achat\FactureFournisseur;
-use App\Models\Achat\FournisseurApprovisionnement;
-use App\Models\Achat\LigneBonCommande;
-use App\Models\Achat\LigneBonLivraisonFournisseur;
-use App\Models\Achat\LigneProgrammationAchat;
-use App\Models\Achat\ProgrammationAchat;
-use App\Models\Achat\ReglementFournisseur;
-use App\Models\Catalogue\Article;
-use App\Models\Catalogue\Inventaire;
-use App\Models\Parametre\Caisse;
-use App\Models\Parametre\ConversionUnite;
-use App\Models\Revendeur\FactureRevendeur;
-use App\Models\Revendeur\LigneFactureRevendeur;
-use App\Models\Stock\StockDepot;
-use App\Models\Stock\StockMouvement;
-use App\Models\Tarification;
-use App\Models\Vente\Devis;
-use App\Models\Vente\FactureClient;
-use App\Models\Vente\LigneLivraisonClient;
-use App\Models\Vente\LivraisonClient;
-use App\Models\Vente\Recouvrement;
-use App\Models\Vente\ReglementClient;
+use App\Models\Vente\AcompteClient;
 use App\Models\Vente\Requete;
-use App\Models\Vente\SessionCaisse;
-use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,7 +36,12 @@ use Illuminate\Support\Facades\DB;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
+    $requete3 = Requete::findOrFail(3);
+    $requete3->update(["validate_at" => null]);
+    // return response()->json($requete3);
 
+    $acompte = AcompteClient::firstWhere("requete_id", 3);
+    return response()->json($acompte);
 
     return "Opération éffectuée avec succès!!";
 });

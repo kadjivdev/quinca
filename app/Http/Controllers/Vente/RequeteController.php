@@ -175,7 +175,7 @@ class RequeteController extends Controller
             return redirect()->route('requetes.index')->with('success', 'Requête modifiée avec succès');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('requetes.index')->with('error', 'Une erreur est survenue '.$e->getMessage());
+            return redirect()->route('requetes.index')->with('error', 'Une erreur est survenue ' . $e->getMessage());
         }
     }
 
@@ -211,8 +211,10 @@ class RequeteController extends Controller
                 'user_id' => Auth::user()->id,
                 'type_paiement' => 'virement',
                 'requete_id' => $requete->id,
-                'statut'=>AcompteClient::STATUT_VALIDE,
-                'created_by'=>auth()->user()->id,
+                'statut' => AcompteClient::STATUT_VALIDE,
+                'created_by' => auth()->user()->id,
+                'validated_at' => now(),
+                'validated_by' => auth()->user()->id,
                 'point_de_vente_id' => Auth::user()->point_de_vente_id
             ]);
 
