@@ -74,11 +74,13 @@ class Client extends Model
             ->sum("montant_remise");
 
         //sum des règlements de chaque factures
-        $reglementsAmount = $this->facturesClient->sum(function ($factureClient) {
-            return $factureClient->reglements
-                ->whereNotNull('validated_at')
-                ->sum("montant");
-        });
+
+        $reglementsAmount = $this->facturesClient
+            ->whereNotNull('validated_by')
+            ->pluck("reglements")
+            ->flatten() //le flatten permet de regrouper les tableaux des reglements en un seul seul tableau
+            ->whereNotNull('validated_by')
+            ->sum("montant");
 
         /** Les accomptes */
         $clientAccomptesAmount = $this->acomptes
@@ -88,7 +90,7 @@ class Client extends Model
         if ($facturesAmount == 0 && $reglementsAmount == 0) {
             return $clientAccomptesAmount;
         }
-        
+
         return ($reglementsAmount + $clientAccomptesAmount) - $facturesAmount;
     }
 
