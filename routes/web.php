@@ -40,7 +40,7 @@ Route::get("/debug", function () {
     $requete3->update(["validate_at" => null]);
     // return response()->json($requete3);
 
-    $acompte = AcompteClient::firstWhere("requete_id", 3);
+    $acompte = AcompteClient::firstWhere("requete_id", 3)->delete();
     return response()->json($acompte);
 
     return "Opération éffectuée avec succès!!";
