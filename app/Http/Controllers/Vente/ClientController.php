@@ -104,8 +104,8 @@ class ClientController extends Controller
                     ->whereNotNull("validated_by")
                     ->sum("montant");
 
-                /** SOLDE */
-                $client->solde = $client->solde();
+                /** SOLDE = SOLDE CLIENT + SOLDE REVENDEUR*/
+                $client->solde = $client->solde() + $client->soldeRevendeur();
 
                 return $client;
             });

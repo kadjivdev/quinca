@@ -94,11 +94,6 @@ class Client extends Model
         return ($reglementsAmount + $clientAccomptesAmount) - $facturesAmount;
     }
 
-    // Reglements
-    public function reglements(): HasMany
-    {
-        return $this->hasMany(ReglementClient::class);
-    }
 
     /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */
     public function soldeRevendeur()
@@ -109,16 +104,30 @@ class Client extends Model
             ->sum("montant_ttc");
 
         //sum des règlements de chaque factures
-        $reglementsAmount = $this->facturesRevendeur
-            ->whereNotNull('validated_by')
-            ->sum(function ($factureRevendeur) { //sum des règlements de chaque factures
-                return $factureRevendeur->reglements
-                    ->whereNotNull('validated_at')
-                    ->sum("montant");
-            });
+        // $reglementsAmount = $this->facturesRevendeur
+        //     ->whereNotNull('validated_by')
+        //     ->sum(function ($factureRevendeur) { //sum des règlements de chaque factures
+        //         return $factureRevendeur->reglements
+        //             ->whereNotNull('validated_at')
+        //             ->sum("montant");
+        //     });
 
-        return $facturesRevendeurAmount - $reglementsAmount;
+        $reglementsAmount = $this->facturesClient
+            ->whereNotNull('validated_by')
+            ->pluck("reglements")
+            ->flatten() //le flatten permet de regrouper les tableaux des reglements en un seul seul tableau
+            ->whereNotNull('validated_by')
+            ->sum("montant");
+
+        return $reglementsAmount - $facturesRevendeurAmount;
     }
+
+    // Reglements
+    public function reglements(): HasMany
+    {
+        return $this->hasMany(ReglementClient::class);
+    }
+
 
     public function soldeInitial()
     {
