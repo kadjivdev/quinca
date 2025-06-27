@@ -36,12 +36,11 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $requete3 = Requete::findOrFail(3);
-    $requete3->update(["validate_at" => null]);
-    // return response()->json($requete3);
+    // $requete3 = Requete::findOrFail(3);
+    // $requete3->update(["validate_at" => null]);
 
-    $acompte = AcompteClient::firstWhere("requete_id", 3)->delete();
-    return response()->json($acompte);
+    // $acompte = AcompteClient::firstWhere("requete_id", 3)->delete();
+    // return response()->json($acompte);
 
     return "Opération éffectuée avec succès!!";
 });
