@@ -112,7 +112,7 @@ class Client extends Model
         //             ->sum("montant");
         //     });
 
-        $reglementsAmount = $this->facturesClient
+        $reglementsAmount = $this->facturesRevendeur
             ->whereNotNull('validated_by')
             ->pluck("reglements")
             ->flatten() //le flatten permet de regrouper les tableaux des reglements en un seul seul tableau
