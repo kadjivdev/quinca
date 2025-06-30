@@ -86,7 +86,7 @@ class FactureClientController extends Controller
             $facturesResteAPayer = $factures->filter(function ($facture) {
                 return $facture->reste_a_payer > 0;
             });
-            $montantResteAPyer = $facturesResteAPayer->sum('montant_ttc');
+            $montantResteAPyer = $facturesResteAPayer->sum('montant_ttc')-$facturesResteAPayer->sum('montant_remise');
 
             // Calculer le montant total des factures du mois en cours
             $currentMonth = Carbon::now()->month;
@@ -186,7 +186,7 @@ class FactureClientController extends Controller
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
-                // 'depot' => 'required',
+                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir]",
             ]);
 
             if ($validator->fails()) {
@@ -278,6 +278,7 @@ class FactureClientController extends Controller
                     'observations' => $request->observations,
                     'statut' => 'brouillon',
                     'type_facture' => $request->type_facture === "normaliser" ? "NORMALISE" : "SIMPLE",
+                    'moyen_reglement' => $request->moyen_reglement,
                     'montant_ht' => 0,
                     'montant_remise' => 0,
                     'montant_tva' => 0,
@@ -391,7 +392,9 @@ class FactureClientController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            Log::info("Total de ligne en debut de requete ", ["lignes" => $request->lignes]);
             Log::info('Début mise à jour facture', ['request' => $request->all(), 'facture_id' => $id]);
+
 
             // Vérifications initiales
             $sessionCaisse = SessionCaisse::ouverte()
@@ -425,7 +428,7 @@ class FactureClientController extends Controller
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
-                // 'depot' => 'required',
+                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir]",
             ]);
 
             if ($validator->fails()) {
@@ -448,6 +451,7 @@ class FactureClientController extends Controller
                     'observations' => $request->observations,
                     'statut' => 'brouillon',
                     'type_facture' => $request->type_facture === "normaliser" ? "NORMALISE" : "SIMPLE",
+                    'moyen_reglement' => $request->moyen_reglement ?? $facture->moyen_reglement,
                     'montant_ht' => 0,
                     'montant_remise' => 0,
                     'montant_tva' => 0,
@@ -463,6 +467,8 @@ class FactureClientController extends Controller
                     'montant_regle' => 0,
                     'montant_regle' => $request->montant_regle
                 ]);
+
+                Log::info("Total de ligne avant suppression des anciennes ", ["count" => count($request->lignes)]);
 
                 // Suppression des anciens règlements
                 $facture->reglements()->delete();
@@ -483,6 +489,8 @@ class FactureClientController extends Controller
                     ]);
                     $facture->reglements()->save($reglement);
                 }
+
+                Log::info("Total de ligne après suppression des anciennes", ["count" => count($request->lignes)]);
 
                 // Mise à jour des lignes
                 foreach ($request->lignes as $index => $ligne) {
@@ -531,7 +539,7 @@ class FactureClientController extends Controller
                     'montant_regle' => $request->montant_regle,
                 ]);
 
-                $sessionCaisse->mettreAJourTotaux();
+                // $sessionCaisse->mettreAJourTotaux();
                 DB::commit();
 
                 return response()->json([
@@ -573,7 +581,6 @@ class FactureClientController extends Controller
             ->filter(function ($stock) use ($search, $user) {
                 /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
                 if ($user->hasRole('Super Administrateur') || $user->hasRole('CHARGE DES STOCKS ET SUIVI DES ACHATS')) {
-                    Log::info("Ce user est un admin", $user->getRoleNames()->toArray());
                     return (
                         str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
@@ -585,36 +592,12 @@ class FactureClientController extends Controller
                 $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
                 if (in_array($stock->depot_id, $userPv_depotIds)) {
-                    Log::info("Dedans :" . in_array($stock->depot_id, $userPv_depotIds));
-                    Log::info("Ce user est simple", $user->getRoleNames()->toArray());
 
                     return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
                     );
-                } else {
-                    Log::info("Pas dedans :" . in_array($stock->depot_id, $userPv_depotIds));
-                }
+                } 
             });
-
-        Log::info(
-            "Total : " .
-                $stocks->count()
-        );
-
-        Log::info(
-            "Les Ids des depots",
-            $stocks
-                ->pluck("depot_id")
-                ->toArray()
-        );
-
-        Log::info("Les Ids des depots du user", auth()->user()->pointDeVente
-            ->depot
-            ->pluck("id")->toArray());
-
-        Log::info("Les articles recherchés", $stocks->pluck("article")
-            ->pluck("designation")
-            ->toArray());
 
         return response()->json([
             'results' => $stocks->map(function ($stock) {

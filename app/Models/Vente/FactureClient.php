@@ -44,7 +44,8 @@ class FactureClient extends Model
         'session_caisse_id',
         'encaissed_by',
         'encaissed_at',
-        'reference_recu'
+        'reference_recu',
+        'moyen_reglement'
     ];
 
     protected $casts = [

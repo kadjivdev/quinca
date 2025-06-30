@@ -148,8 +148,6 @@
             // Charger les unités avant de définir les autres valeurs
             await this.loadUnites(data.article_id, $line, data.unite_vente_id);
 
-            console.log("Data du fill line",data);
-
             // Autres champs
             $line.find('.quantite-input').val(data.quantite);
             $line.find('.select2-tarifs').val(data.prix_unitaire_ht);
@@ -163,9 +161,11 @@
 
         // Mise à jour de la méthode addLigne pour initialiser correctement l'unité
         async addLigne(data = null) {
+            this.index++;
+
             const template = $(UpdateConfig.selectors.template).html();
             const newLine = template.replace(/__INDEX__/g, this.index);
-            const $line = $(newLine);
+            let $line = $(newLine);
 
             $(UpdateConfig.selectors.ligneContainer).append($line);
 
@@ -234,7 +234,6 @@
                 await this.fillLine($line, data);
             }
 
-            this.index++;
             return $line;
         }
 
@@ -451,6 +450,20 @@
 
                 const data = await response.json();
 
+                if (!response.ok) {
+                    // Gestion des erreurs HTTP (ex: 422)
+                    let errorMsg = data.message || 'Erreur lors de la mise à jour';
+                    if (data.errors) {
+                        errorMsg = Object.values(data.errors).flat().join('\n');
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: errorMsg
+                    });
+                    return;
+                }
+
                 if (data.status === 'success') {
                     Swal.fire({
                         icon: 'success',
@@ -463,10 +476,17 @@
                         window.location.reload();
                     });
                 } else {
-                    throw new Error(data.message || 'Erreur lors de la mise à jour');
+                    let errorMsg = data.message || 'Erreur lors de la mise à jour';
+                    if (data.errors) {
+                        errorMsg = Object.values(data.errors).flat().join('\n');
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: errorMsg
+                    });
                 }
             } catch (error) {
-                console.error('Erreur:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Erreur',
@@ -599,7 +619,9 @@
                 }
             })
             .catch(error => {
-                console.error('Erreur:', error);
+                error.response.json().then(errData => {
+                    console.error('Erreur détaillée:', errData);
+                });
                 Swal.fire({
                     icon: 'error',
                     title: 'Erreur',

@@ -15,6 +15,7 @@
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            
             <!-- route('vente.facture.store') -->
             <form action="{{route('vente.facture.store')}}" method="POST" id="addFactureForm" class="needs-validation" novalidate>
                 @csrf
@@ -110,7 +111,7 @@
                                             <thead class="table-light">
                                                 <tr>
                                                     <th>Article</th>
-                                                    <th style="width: 30%">Dépôt</th>
+                                                    <!-- <th style="width: 30%">Dépôt</th> -->
                                                     <th>Quantité</th>
                                                     <th>Prix</th>
                                                     <th>Remise (%)</th>
@@ -200,7 +201,7 @@
                                                     <i class="fas fa-credit-card text-primary"></i>
                                                 </span>
 
-                                                <select class="form-select" name="moyen_reglement" id="moyenReglement" required>
+                                                <select class="form-select" name="moyen_reglement" id="updateMoyenReglement" required>
                                                     <option value="">Sélectionner</option>
                                                     <option value="espece">Espèce</option>
                                                     <option value="cheque">Chèque</option>
@@ -222,7 +223,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -265,12 +265,12 @@
                 <option value="">Sélectionner un article</option>
             </select>
             <div class="invalid-feedback">L'article est requis</div>
-        </td>
-        <td>
             <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
             <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
             <div class="invalid-feedback">Le depôt est requis</div>
         </td>
+        <!-- <td>
+        </td> -->
         <td>
             <div class="input-group">
                 <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"

@@ -106,8 +106,8 @@
                                         <table class="table table-bordered table-hover">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>Article</th>
-                                                    <th style="width: 30%">Dépôt</th>
+                                                    <th style="width: 25%">Article</th>
+                                                    <!-- <th style="width: 10%">Dépôt</th> -->
                                                     <th>Quantité</th>
                                                     <th>Prix</th>
                                                     <th>Remise (%)</th>
@@ -118,23 +118,23 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="5" class="text-end fw-bold">Total HT</td>
+                                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
                                                     <td class="text-end fw-bold" id="updateTotalHT">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr id="updateTvaRow">
-                                                    <td colspan="5" class="text-end fw-bold">TVA
+                                                    <td colspan="4" class="text-end fw-bold">TVA
                                                         ({{ $tauxTva }}%)</td>
                                                     <td class="text-end fw-bold" id="updateTotalTVA">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr id="updateAibRow">
-                                                    <td colspan="5" class="text-end fw-bold">AIB</td>
+                                                    <td colspan="4" class="text-end fw-bold">AIB</td>
                                                     <td class="text-end fw-bold" id="updateTotalAIB">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr class="table-light">
-                                                    <td colspan="5" class="text-end fw-bold">Total TTC</td>
+                                                    <td colspan="4" class="text-end fw-bold">Total TTC</td>
                                                     <td class="text-end fw-bold" id="updateTotalTTC">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
@@ -259,8 +259,6 @@
                 <option value="">Sélectionner un article</option>
             </select>
             <div class="invalid-feedback">L'article est requis</div>
-        </td>
-        <td>
             <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control depot-input">
             <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control depot-libelle">
             <div class="invalid-feedback">Le depôt est requis</div>
@@ -282,7 +280,7 @@
         </td>
         <td>
             <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
-                placeholder="0.00" min="0" max="100" step="0.01">
+                value="0.00" min="0" max="100" step="0.01">
         </td>
         <td>
             <div class="input-group">

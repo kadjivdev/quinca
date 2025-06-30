@@ -243,9 +243,10 @@ class ReglementClient extends Model
             ]);
 
             // Mise à jour du montant réglé de la facture
-            $nouveauMontantRegle = round($this->facture->montant_regle + $this->montant, 3);
+            // $nouveauMontantRegle = round($this->facture->montant_regle + $this->montant, 3);
+            $nouveauMontantRegle = round($this->montant, 3);
 
-            if ($nouveauMontantRegle > round($this->facture->montant_ttc + 0.001, 3)) {
+            if ($nouveauMontantRegle > round(($this->facture->montant_ttc - $this->facture->montant_remise) + 0.001, 3)) {
                 throw new \Exception("Le montant total réglé dépasserait le montant de la facture");
             }
 

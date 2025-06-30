@@ -101,16 +101,11 @@ class Client extends Model
         // Factures Revendeurs
         $facturesRevendeurAmount = $this->facturesRevendeur
             ->whereNotNull('validated_by')
-            ->sum("montant_ttc");
+            ->sum("montant_ttc") - $this->facturesRevendeur
+            ->whereNotNull('validated_by')
+            ->sum("montant_remise");
 
         //sum des règlements de chaque factures
-        // $reglementsAmount = $this->facturesRevendeur
-        //     ->whereNotNull('validated_by')
-        //     ->sum(function ($factureRevendeur) { //sum des règlements de chaque factures
-        //         return $factureRevendeur->reglements
-        //             ->whereNotNull('validated_at')
-        //             ->sum("montant");
-        //     });
 
         $reglementsAmount = $this->facturesRevendeur
             ->whereNotNull('validated_by')

@@ -65,6 +65,7 @@ class FactureRevendeurController extends Controller
                     ->get();
             }
 
+            // return response()->json($factures);
             // Ajouter des attributs calculés pour chaque facture
             $factures->transform(function ($facture) {
                 // Calcul du reste à payer
@@ -106,7 +107,8 @@ class FactureRevendeurController extends Controller
             $depots = Depot::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->get();
 
             // Charger la liste des clients pour le filtre
-            $clients =  Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
+            $clients =  Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)
+                ->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
 
             return view('pages.revendeur.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'depots'));
         } catch (Exception $e) {
@@ -351,7 +353,6 @@ class FactureRevendeurController extends Controller
             ->filter(function ($stock) use ($search, $user) {
                 /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
                 if ($user->hasRole('Super Administrateur') || $user->hasRole('CHARGE DES STOCKS ET SUIVI DES ACHATS')) {
-                    Log::info("Ce user est un admin", $user->getRoleNames()->toArray());
                     return (
                         str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
@@ -363,36 +364,12 @@ class FactureRevendeurController extends Controller
                 $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
                 if (in_array($stock->depot_id, $userPv_depotIds)) {
-                    Log::info("Dedans :" . in_array($stock->depot_id, $userPv_depotIds));
-                    Log::info("Ce user est simple", $user->getRoleNames()->toArray());
 
                     return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
                     );
-                } else {
-                    Log::info("Pas dedans :" . in_array($stock->depot_id, $userPv_depotIds));
                 }
             });
-
-        Log::info(
-            "Total : " .
-                $stocks->count()
-        );
-
-        Log::info(
-            "Les Ids des depots",
-            $stocks
-                ->pluck("depot_id")
-                ->toArray()
-        );
-
-        Log::info("Les Ids des depots du user", auth()->user()->pointDeVente
-            ->depot
-            ->pluck("id")->toArray());
-
-        Log::info("Les articles recherchés", $stocks->pluck("article")
-            ->pluck("designation")
-            ->toArray());
 
         return response()->json([
             'results' => $stocks->map(function ($stock) {

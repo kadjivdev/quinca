@@ -268,9 +268,9 @@ class ReglementClientController extends Controller
             $reglement = ReglementClient::with(['facture', 'facture.reglements'])
                 ->findOrFail($id);
 
-            // Vérifier si on a une session de caisse ouverte
-            $sessionCaisse = SessionCaisse::where('utilisateur_id', auth()->id())
-                ->where('statut', 'ouverte')
+            $sessionCaisse = SessionCaisse::ouverte()
+                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                // ->where('utilisateur_id', auth()->user()->id)
                 ->first();
 
             if (!$sessionCaisse) {

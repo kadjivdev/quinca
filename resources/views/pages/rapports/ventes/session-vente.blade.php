@@ -90,12 +90,12 @@
                 </div>
             </div>
         </div>
-       <div class="col-md-3">
+        <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted fw-normal mb-2">Total soldé</h6>
+                            <h6 class="text-muted fw-normal mb-2">Total réglé en dehors des Momos</h6>
                             <h3 class="mb-0">{{ number_format($montantSolde) }} F</h3>
                         </div>
                         <div class="rounded-circle bg-success bg-opacity-10 p-3">
@@ -131,6 +131,7 @@
                                     <th class="text-end">Insére le</th>
                                     <th class="text-end">Statut</th>
                                     <th class="text-end">Réglé</th>
+                                    <th class="text-end">Moyen</th>
                                     <th class="text-center">Etat</th>
                                     <th class="text-end">Insére par</th>
                                 </tr>
@@ -161,7 +162,8 @@
                                             {{ $facture->validated_by ? 'Vaildée' : 'Pas validée' }}
                                         </span>
                                     </td>
-                                    <td class="text-end">{{ number_format($facture->montant_regle, 0, ',', ' ') }} F</td>
+                                    <td class="text-end">{{ number_format($facture->montantRegle, 0, ',', ' ') }} F</td>
+                                    <td class="text-end"><span class="badge bg-light text-dark border"> {{ $facture->moyen_reglement }} </span></td>
                                     <td class="text-center">
                                         <span class="badge bg-{{ $facture->est_solde ? 'success' : 'warning' }} rounded-pill">
                                             <i class="fas fa-{{ $facture->est_solde ? 'check-circle' : 'clock' }} me-1"></i>

@@ -21,6 +21,7 @@ use App\Http\Controllers\Revendeur\FactureRevendeurController;
 use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientController, SoldeInitialFournisseurController, RapportAchatController, RapportStockController, RapportValorisationController, StockRotationController, StockAlertController, RapportCreanceController};
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Vente\AcompteClient;
+use App\Models\Vente\Client;
 use App\Models\Vente\Requete;
 
 /*

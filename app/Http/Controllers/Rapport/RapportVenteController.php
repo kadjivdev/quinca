@@ -668,16 +668,30 @@ class RapportVenteController extends Controller
                             // ->where("created_by", auth()->user()->id)
                             ->whereBetween('created_at', [$dateDebut->startOfDay(), $dateFin->endOfDay()]);
                     }
-                }
+                },
             ]);
+
+            $session->factures
+                ->map(function ($facture) {
+                    $facture->montantRegle = 0;
+
+                    if ($facture->reglements->count() > 0) {
+                        $facture->montantRegle = $facture->reglements->whereNotNull("validated_by")
+                            ->sum("montant");
+                    };
+                });
 
             // Get sessions list for dropdown
             $sessions = SessionCaisse::orderBy('date_ouverture', 'desc')
                 ->get();
 
-            $montantSolde = $session->factures->filter(function ($facture) {
-                return $facture->est_solde;
-            })->sum(fn($facture)=>($facture->montant_ttc - $facture->montant_remise));
+            $montantSolde = $session->factures
+                ->where("moyen_reglement",'!=', "MoMo")// exception des momos
+                ->flatMap(function ($facture) {//on recupère tous les reglements en un seul tableau
+                    return $facture->reglements;
+                })
+                ->whereNotNull("validated_by")
+                ->sum("montant");
 
             return view('pages.rapports.ventes.session-vente', compact(
                 'session',
@@ -687,6 +701,7 @@ class RapportVenteController extends Controller
                 'montantSolde'
             ));
         } catch (\Exception $e) {
+            \Log::info("Erreure lors du chargement", ["error" => $e->getMessage()]);
             return back()->with('error', 'Erreur: ' . $e->getMessage());
         }
     }
