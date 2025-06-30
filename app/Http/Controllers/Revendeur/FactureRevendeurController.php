@@ -511,6 +511,7 @@ class FactureRevendeurController extends Controller
                 'client',
                 'lignes.article',
                 'lignes.uniteVente',
+                'lignes.facturedepot',
                 // 'sessionCaisse',
                 'createdBy',
                 'pointDeVente'
@@ -548,34 +549,28 @@ class FactureRevendeurController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            Log::info("Total de ligne en debut de requete ", ["lignes" => $request->lignes]);
             Log::info('Début mise à jour facture', ['request' => $request->all(), 'facture_id' => $id]);
 
-            // Vérifications initiales
-            // $sessionCaisse = SessionCaisse::ouverte()
-            //     ->where('utilisateur_id', auth()->id())
-            //     ->first();
-
-            // if (!$sessionCaisse) {
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => 'Session de caisse requise.'
-            //     ], 422);
-            // }
-
             $facture = FactureRevendeur::findOrFail($id);
-            $client = Client::findOrFail($request->client_id);
-            $configuration = Societe::firstOrFail();
 
             // Validation
             $validator = Validator::make($request->all(), [
                 'date_facture' => 'required|date',
                 'client_id' => 'required|exists:clients,id',
                 'date_echeance' => 'date',
-                // 'montant_regle' => 'required|numeric|min:0',
-                // 'moyen_reglement' => 'required|string',
+                'montant_regle' => 'required|numeric|min:0',
+                'moyen_reglement' => 'required|string',
+
                 'lignes' => 'required|array|min:1',
-                // 'type_facture' => 'required|in:simple,normaliser',
-                'observations' => 'nullable|string'
+                'lignes*article_id' => 'required|exists,articles',
+                'lignes*depot_id' => 'required|exits,depots',
+                'lignes*quantite' => 'required',
+                'lignes*tarification_id' => 'required',
+
+                'type_facture' => 'required|in:simple,normaliser',
+                'observations' => 'nullable|string',
+                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir]",
             ]);
 
             if ($validator->fails()) {
@@ -593,56 +588,97 @@ class FactureRevendeurController extends Controller
                     'date_facture' => Carbon::parse($request->date_facture)->startOfDay(),
                     'client_id' => $request->client_id,
                     'date_echeance' => Carbon::parse($request->date_echeance)->startOfDay(),
-                    'updated_by' => auth()->id(),
+                    // 'session_caisse_id' => $sessionCaisse->id,
+                    'created_by' => auth()->id(),
                     'observations' => $request->observations,
-                    'taux_tva' => $request->type_facture === 'simple' ? 0 : $configuration->taux_tva,
-                    'taux_aib' => $request->type_facture === 'simple' ? 0 : $client->taux_aib,
+                    'statut' => 'brouillon',
+                    'type_facture' => $request->type_facture === "normaliser" ? "NORMALISE" : "SIMPLE",
+                    'moyen_reglement' => $request->moyen_reglement ?? $facture->moyen_reglement,
+                    'montant_ht' => 0,
+                    'montant_remise' => 0,
+                    'montant_tva' => 0,
+                    'montant_aib' => 0,
+                    'montant_ttc' => 0,
+                    'taux_tva' => 0.18,
+                    'taux_aib' => 0.01,
+                    'taux_remise' => 0,
+                    'montant_ht_apres_remise' => 0,
+                    'montant_tva' => 0,
+                    'montant_aib' => 0,
+                    'montant_ttc' => 0,
+                    'montant_regle' => 0,
+                    'montant_regle' => $request->montant_regle
                 ]);
+
+                Log::info("Total de ligne avant suppression des anciennes ", ["count" => count($request->lignes)]);
+
+                // Suppression des anciens règlements
+                $facture->reglements()->delete();
 
                 // Réinitialisation des totaux et suppression des anciennes lignes
                 $facture->lignes()->delete();
 
-                $totalHT = 0;
-                $totalRemise = 0;
-                $totalTVA = 0;
-                $totalAIB = 0;
+                // Création du règlement si nécessaire
+                if ($request->montant_regle > 0) {
+                    $reglement = new ReglementClient([
+                        'facture_client_id' => $facture->id,
+                        'date_reglement' => Carbon::parse($request->date_facture),
+                        'type_reglement' => $request->moyen_reglement,
+                        'montant' => $request->montant_regle,
+                        'statut' => 'brouillon',
+                        // 'session_caisse_id' => $sessionCaisse->id,
+                        'created_by' => auth()->id(),
+                    ]);
+                    $facture->reglements()->save($reglement);
+                }
+
+                Log::info("Total de ligne après suppression des anciennes", ["count" => count($request->lignes)]);
 
                 // Mise à jour des lignes
-                foreach ($request->lignes as $ligne) {
+                foreach ($request->lignes as $index => $ligne) {
+                    $ligneMontantTTC = $ligne['quantite'] * $ligne['tarification_id'];
+                    $ligneMontantHt = $ligneMontantTTC / 1.19;
+                    $ligneMontantTVA = $ligneMontantHt * 0.18;
+                    $ligneMontantAIB = $ligneMontantHt * 0.01;
+                    $ligneMontantRemise = $ligneMontantTTC * $ligne['taux_remise'] / 100;
+
+                    Log::info("La ligne $index", [
+                        "montantHt" => $ligneMontantHt,
+                        "montantTva" => $ligneMontantTVA,
+                        "montantAib" => $ligneMontantAIB,
+                        "montantRemise" => $ligneMontantRemise,
+                    ]);
+
                     $ligneFacture = new LigneFactureRevendeur([
                         'article_id' => $ligne['article_id'],
                         'unite_vente_id' => $ligne['unite_vente_id'],
                         'quantite' => $ligne['quantite'],
+                        'depot' => $ligne['depot_id'],
                         'prix_unitaire_ht' => $ligne['tarification_id'],
                         'taux_remise' => $ligne['taux_remise'] ?? 0,
-                        'taux_tva' => $request->type_facture === 'simple' ? 0 : $configuration->taux_tva,
-                        'taux_aib' => $request->type_facture === 'simple' ? 0 : $client->taux_aib
+                        'taux_tva' => $request->type_facture === 'simple' ? 0 : 18 / 100,
+                        'taux_aib' => $request->type_facture === 'simple' ? 0 : 1 / 100,
+                        'montant_ht' => $ligneMontantHt,
+                        'montant_tva' => $ligneMontantTVA,
+                        'montant_aib' => $ligneMontantAIB,
+                        'montant_ttc' => $ligneMontantTTC,
+                        'montant_remise' => $ligneMontantRemise,
+                        'montant_ht_apres_remise' => $ligneMontantHt - $ligneMontantRemise,
+                        'quantite_livree' => 0,
                     ]);
 
                     $facture->lignes()->save($ligneFacture);
-
-                    $totalHT += $ligneFacture->montant_ht;
-                    $totalRemise += $ligneFacture->montant_remise;
-                    if ($request->type_facture === 'normaliser') {
-                        $totalTVA += $ligneFacture->montant_tva;
-                        $totalAIB += $ligneFacture->montant_aib;
-                    }
                 }
 
-                $montantHTApresRemise = $totalHT - $totalRemise;
-                $montantTTC = $montantHTApresRemise;
-                if ($request->type_facture === 'normaliser') {
-                    $montantTTC += $totalTVA + $totalAIB;
-                }
-
-                // Mise à jour des totaux de la facture
+                // Mise à jour des totaux
                 $facture->update([
-                    'montant_ht' => $totalHT,
-                    'montant_remise' => $totalRemise,
-                    'montant_ht_apres_remise' => $montantHTApresRemise,
-                    'montant_tva' => $totalTVA,
-                    'montant_aib' => $totalAIB,
-                    'montant_ttc' => $montantTTC,
+                    'montant_ht' => $facture->lignes->sum("montant_ht"),
+                    'montant_remise' => $facture->lignes->sum("montant_remise"),
+                    'montant_ht_apres_remise' => $facture->lignes->sum("montant_ht_apres_remise"),
+                    'montant_tva' => $facture->lignes->sum("montant_tva"),
+                    'montant_aib' => $facture->lignes->sum("montant_aib"),
+                    'montant_ttc' => $facture->lignes->sum("montant_ttc"),
+                    'montant_regle' => $request->montant_regle,
                 ]);
 
                 DB::commit();

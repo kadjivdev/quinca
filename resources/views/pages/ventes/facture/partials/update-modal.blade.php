@@ -19,7 +19,6 @@
             <form action="#" method="POST" id="updateFactureForm" class="needs-validation" novalidate>
                 @csrf
                 @method('PUT')
-
                 <div class="modal-body p-4">
                     <div class="row g-4">
                         {{-- Section informations générales --}}
@@ -48,7 +47,7 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="fas fa-user text-primary"></i>
                                                 </span>
-                                                <select class="form-select" name="client_id" required>
+                                                <select class="form-select " name="client_id" required>
                                                     <option value="">Sélectionner un client</option>
                                                     @foreach ($clients as $client)
                                                     <option value="{{ $client->id }}"
@@ -113,6 +112,7 @@
                                                     <th>Remise (%)</th>
                                                     <th>Total TTC</th>
                                                     <th></th>
+                                                </tr>
                                             </thead>
                                             <tbody id="updateLinesContainer">
                                             </tbody>

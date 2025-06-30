@@ -56,6 +56,8 @@
 
 @push('scripts')
 
+@include('pages.revendeur.facture.partials.update-js')
+
 <script type="text/javascript">
     // Attendre que jQuery soit chargé
     $(function() {

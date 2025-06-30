@@ -14,7 +14,6 @@ use App\Models\Vente\{FactureClient, LigneLivraisonClient};
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-
 class LigneFactureRevendeur extends Model
 {
     protected $table = 'ligne_facture_revendeurs';  // Ajout de cette ligne
