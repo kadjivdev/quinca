@@ -361,36 +361,11 @@ class SpecialController extends Controller
                 $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
                 if (in_array($stock->depot_id, $userPv_depotIds)) {
-                    Log::info("Dedans :" . in_array($stock->depot_id, $userPv_depotIds));
-                    Log::info("Ce user est simple", $user->getRoleNames()->toArray());
-
                     return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
                     );
-                } else {
-                    Log::info("Pas dedans :" . in_array($stock->depot_id, $userPv_depotIds));
                 }
             });
-
-        Log::info(
-            "Total : " .
-                $stocks->count()
-        );
-
-        Log::info(
-            "Les Ids des depots",
-            $stocks
-                ->pluck("depot_id")
-                ->toArray()
-        );
-
-        Log::info("Les Ids des depots du user", auth()->user()->pointDeVente
-            ->depot
-            ->pluck("id")->toArray());
-
-        Log::info("Les articles recherchés", $stocks->pluck("article")
-            ->pluck("designation")
-            ->toArray());
 
         return response()->json([
             'results' => $stocks->map(function ($stock) {
@@ -532,6 +507,7 @@ class SpecialController extends Controller
                 'client',
                 'lignes.article',
                 'lignes.uniteVente',
+                'lignes.facturedepot',
                 'lignes.tarification.typeTarif',
                 // 'sessionCaisse',
                 'createdBy'
