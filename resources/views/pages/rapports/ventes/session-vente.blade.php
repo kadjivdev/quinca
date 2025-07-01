@@ -162,7 +162,7 @@
                                             {{ $facture->validated_by ? 'Vaildée' : 'Pas validée' }}
                                         </span>
                                     </td>
-                                    <td class="text-end">{{ number_format($facture->montantRegle, 0, ',', ' ') }} F</td>
+                                    <td class="text-end">{{ number_format($facture->reglements->sum("montant"), 0, ',', ' ') }} F</td>
                                     <td class="text-end"><span class="badge bg-light text-dark border"> {{ $facture->moyen_reglement }} </span></td>
                                     <td class="text-center">
                                         <span class="badge bg-{{ $facture->est_solde ? 'success' : 'warning' }} rounded-pill">

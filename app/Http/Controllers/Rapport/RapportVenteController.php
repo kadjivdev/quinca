@@ -671,26 +671,16 @@ class RapportVenteController extends Controller
                 },
             ]);
 
-            $session->factures
-                ->map(function ($facture) {
-                    $facture->montantRegle = 0;
-
-                    if ($facture->reglements->count() > 0) {
-                        $facture->montantRegle = $facture->reglements->whereNotNull("validated_by")
-                            ->sum("montant");
-                    };
-                });
-
             // Get sessions list for dropdown
             $sessions = SessionCaisse::orderBy('date_ouverture', 'desc')
                 ->get();
 
             $montantSolde = $session->factures
-                ->where("moyen_reglement",'!=', "MoMo")// exception des momos
-                ->flatMap(function ($facture) {//on recupère tous les reglements en un seul tableau
+                ->where("moyen_reglement", '!=', "MoMo") // exception des momos
+                ->flatMap(function ($facture) { //on recupère tous les reglements en un seul tableau
                     return $facture->reglements;
                 })
-                ->whereNotNull("validated_by")
+                // ->whereNotNull("validated_by")
                 ->sum("montant");
 
             return view('pages.rapports.ventes.session-vente', compact(
