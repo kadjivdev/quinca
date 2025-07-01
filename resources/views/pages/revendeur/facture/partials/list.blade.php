@@ -602,7 +602,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [3, 'desc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {
