@@ -673,6 +673,10 @@ Route::middleware('auth')->group(function () {
             // Ventes par session
             Route::get('/{sessionId}/ventes', [SessionCaisseController::class, 'ventesBySession'])->name('ventes.sessions.list-ventes');
 
+            // Ventes par session
+            Route::get('/{sessionId}/edit', [SessionCaisseController::class, 'show'])->name('ventes.sessions.show');
+            Route::patch('/{sessionId}/update', [SessionCaisseController::class, 'update'])->name('ventes.sessions.update');
+
             // Encaisser une vente
             Route::put('vente/{facture}/encaisser', [SessionCaisseController::class, 'encaisser'])->name('vente.sessions.encaisser');
         });

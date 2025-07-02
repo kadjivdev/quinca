@@ -23,7 +23,6 @@ class SessionCaisseController extends Controller
         // Récupérer les sessions avec la pagination
         $sessions = SessionCaisse::with(['factures', 'caisse', 'utilisateur'])
             ->orderBy('date_ouverture', 'desc')
-            // ->paginate(10);
             ->get();
 
         // Récupérer l'utilisateur connecté
@@ -180,14 +179,92 @@ class SessionCaisseController extends Controller
             ], 500);
         }
     }
+
     /**
      * Affiche les détails d'une session
      */
-    public function show(SessionCaisse $session)
+    public function show(Request $request, $sessionId)
     {
-        $session->load(['factures', 'detailsComptage', 'utilisateur']);
+        // Récupérer les sessions avec la pagination
+        $sessions = SessionCaisse::with(['factures', 'caisse', 'utilisateur'])
+            ->orderBy('date_ouverture', 'desc')
+            ->get();
 
-        return view('pages.ventes.session.show', compact('session'));
+        $session = SessionCaisse::findOrFail($sessionId);
+
+        // Récupérer l'utilisateur connecté
+        $user = auth()->user();
+
+        $caisses = Caisse::All();
+
+        // Vérifier si l'utilisateur a une session ouverte
+        $hasSessionOuverte = SessionCaisse::where('utilisateur_id', $user->id)
+            ->where('statut', 'ouverte')
+            ->exists();
+
+        // Calculer les statistiques
+        $totalEncaissements = SessionCaisse::whereMonth('date_ouverture', now()->month)
+            ->sum('total_encaissements');
+
+        $ecartMoyen = SessionCaisse::whereMonth('date_ouverture', now()->month)
+            ->where('statut', 'fermee')
+            ->avg('ecart') ?? 0;
+
+        // Formater la date
+        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+
+        $session->load(['factures', 'utilisateur']);
+        return view('pages.ventes.session.partials.edit', compact(
+            'session',
+            'sessions',
+            'caisses',
+            'hasSessionOuverte',
+            'totalEncaissements',
+            'ecartMoyen',
+            'date'
+        ));
+    }
+
+    public function update(Request $request, $sessionId)
+    {
+        try {
+            // Récupérer l'utilisateur connecté
+            $user = auth()->user();
+
+            // Vérifier le point de vente
+            if (!$user->point_de_vente_id) {
+                Log::error('Point de vente non trouvé', ['user_id' => $user->id]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous n\'êtes associé à aucun point de vente.'
+                ], 422);
+            }
+
+            // Vérifier session existante
+            $session = SessionCaisse::findOrFail($sessionId);
+
+            // Créer la session avec montant fixe et coordonnées
+            DB::beginTransaction();
+            try {
+                $session->update($request->all());
+
+                DB::commit();
+                return back()
+                    ->withInput()
+                    ->with("message", "Session de caisse modifiée avec succès");
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            Log::error('Erreur création session', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()
+                ->withInput()
+                ->with("error", "Un problème est survenu " . $e->getMessage());
+        }
     }
 
     /**
@@ -270,7 +347,6 @@ class SessionCaisseController extends Controller
     }
 
     // Ajout d'une méthode de debug
-
 
     public function debugSession(SessionCaisse $session)
     {

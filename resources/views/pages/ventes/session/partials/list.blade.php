@@ -86,6 +86,15 @@
                                         <i class="fas fa-eye"></i>
                                     </a>
 
+                                    @if($session->estOuverte())
+                                    <a class="btn btn-sm btn-light-primary btn-icon ms-1"
+                                        href="{{route('ventes.sessions.show', $session->id)}}"
+                                        data-bs-toggle="tooltip"
+                                        title="Modifier">
+                                        <i class="fas fa-pencil"></i>
+                                    </a>
+                                    @endif
+
                                     @if(!$session->estOuverte())
                                     <button class="btn btn-sm btn-light-secondary btn-icon ms-1"
                                         onclick="downloadSessionReport({{ $session->id }})"

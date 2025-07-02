@@ -94,7 +94,6 @@ class Client extends Model
         return ($reglementsAmount + $clientAccomptesAmount) - $facturesAmount;
     }
 
-
     /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */
     public function soldeRevendeur()
     {
