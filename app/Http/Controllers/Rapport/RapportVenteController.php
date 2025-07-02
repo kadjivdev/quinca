@@ -12,6 +12,7 @@ use App\Services\ServiceStockEntree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Faker\Provider\Lorem;
 
 class RapportVenteController extends Controller
 {
@@ -651,7 +652,7 @@ class RapportVenteController extends Controller
             // Get session
             $session = $sessionId ?
                 SessionCaisse::findOrFail($sessionId) :
-                SessionCaisse::where('statut', 'ouverte')->latest()->firstOrFail();
+                SessionCaisse::orderByDesc("id")->first(); //on prends la dernière session
 
             // Load relationships with filters
             $session->load([

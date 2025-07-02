@@ -23,7 +23,7 @@
                     <select name="session_id" id="session_id" class="form-select select2">
                         <option value="">Session courante</option>
                         @foreach($sessions as $s)
-                        <option value="{{ $s->id }}" {{ request('session_id') == $s->id ? 'selected' : '' }}>
+                        <option value="{{ $s->id }}" @selected($s->id==$session->id) {{ request('session_id') == $s->id ? 'selected' : '' }}>
                             Session #{{ $s->id }} - Ouverte le: {{ $s->date_ouverture->format('d/m/Y H:i') }} -Fermée le : {{ $s->date_fermeture?->format('d/m/Y H:i') }} - Par: {{$s->utilisateur->name}} | Statut: ({{$s->statut}})
                         </option>
                         @endforeach
@@ -100,6 +100,18 @@
                         </div>
                         <div class="rounded-circle bg-success bg-opacity-10 p-3">
                             <i class="fas fa-cash-register text-danger fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-normal mb-2">Commentaire de la fermeture de session</h6>
+                            <textarea name="" class="form-control" rows="2" disabled placeholder="{{$session->observations_fermeture??'Aucun commentaire pour cette session'}}"></textarea>
                         </div>
                     </div>
                 </div>
