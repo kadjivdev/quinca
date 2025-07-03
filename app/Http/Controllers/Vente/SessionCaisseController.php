@@ -312,7 +312,7 @@ class SessionCaisseController extends Controller
                     ->update([
                         'date_fermeture' => now(),
                         'montant_fermeture' => $validated['montant_fermeture'],
-                        'observations_fermeture' => $validated['observations_fermeture'],
+                        'observations_fermeture' => $request->observations_fermeture?? $session->observations_fermeture,
                         'statut' => 'fermee',
                         'updated_at' => now()
                     ]);
