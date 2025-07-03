@@ -302,17 +302,9 @@
                             <div class="dropdown-item-wrapper">Reglement factures</div>
                         </a></li>
 
-                    <!-- @can('revendeur.normale.rapport.view')
-                    <li><a class="dropdown-item" href="{{ route('revendeur.normale.rapport') }}">
-                            <div class="dropdown-item-wrapper">Validation Vente</div>
+                    <li><a class="dropdown-item" href="{{ route('revendeur.depenses.index') }}">
+                            <div class="dropdown-item-wrapper">Enregistrements des dépenses</div>
                         </a></li>
-                    @endcan -->
-
-                    <!-- @can('revendeur.speciale.rapport.view')
-                    <li><a class="dropdown-item" href="{{ route('revendeur.speciale.rapport') }}">
-                            <div class="dropdown-item-wrapper">Validation Vente Spéciale</div>
-                        </a></li>
-                    @endcan -->
                 </ul>
             </li>
             @endcanany

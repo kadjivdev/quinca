@@ -19,6 +19,7 @@ use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
 
 use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientController, SoldeInitialFournisseurController, RapportAchatController, RapportStockController, RapportValorisationController, StockRotationController, StockAlertController, RapportCreanceController};
+use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Vente\AcompteClient;
 use App\Models\Vente\Client;
@@ -980,6 +981,21 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/refresh', [ReglementRevendeurController::class, 'refreshList'])
                 ->name('refresh-revendeurs');
+        });
+
+        // Les depenses
+        Route::prefix('depenses')->group(function () {
+            // Liste des depenses
+            Route::get('/', [DepenseRevendeurController::class, 'index'])->name('revendeur.depenses.index');
+
+            // Créer une nouvelle facture
+            Route::post('/store', [DepenseRevendeurController::class, 'store'])->name('revendeur.depenses.store');
+
+            // Voir les détails d'une facture
+            Route::get('/{id}', [DepenseRevendeurController::class, 'show'])->name('revendeur.depenses.show');
+
+            // Supprimer une depenses
+            Route::delete('/{id}/destroy', [DepenseRevendeurController::class, 'destroy'])->name('revendeur.depenses.destroy');
         });
     });
 
