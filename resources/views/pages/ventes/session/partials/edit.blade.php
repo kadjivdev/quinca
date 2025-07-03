@@ -96,11 +96,11 @@
                 </div>
 
                 <div class="modal-footer bg-light border-top-0 py-3">
-                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
+                    <a href="{{route('vente.sessions.index')}}" class="btn btn-light px-4" >
                         <i class="fas fa-times me-2"></i>Annuler
-                    </button>
+                    </a>
                     <button type="submit" class="btn btn-primary px-4" id="saveSessionBtn">
-                        <i class="fas fa-check me-2"></i>Ouvrir la session
+                        <i class="fas fa-pencil me-2"></i>Modifier la session
                     </button>
                 </div>
             </form>
