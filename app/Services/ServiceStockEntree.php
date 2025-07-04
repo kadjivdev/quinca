@@ -80,13 +80,12 @@ class ServiceStockEntree
             $stock = StockDepot::firstOrNew([
                 'depot_id' => $donnees['depot_id'],
                 'article_id' => $article->id,
-                'unite_mesure_id' => $donnees["unite_mesure_id"]
+                'unite_mesure_id' => $donnees["unite_mesure_id"],
+                'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
             ]);
-
 
             $ancien_stock = $stock->quantite_reelle ?? 0;
             $ancien_cump = $stock->prix_moyen ?? 0;
-
 
             // 6. Calcul du nouveau CUMP
             $nouveau_cump = $this->calculerCUMP(
@@ -189,8 +188,12 @@ class ServiceStockEntree
      */
     public function traiterEntreesMultiples(array $entrees): array
     {
+
+        \Log::debug("Début traitement au niveau *traiterEntreesMultiples*", ['donnees' => $entrees]);
+
         $resultats = [];
         $erreurs = [];
+
 
         DB::beginTransaction();
         try {

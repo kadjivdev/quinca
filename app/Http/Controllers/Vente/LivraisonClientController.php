@@ -197,27 +197,6 @@ class LivraisonClientController extends Controller
                         );
                     }
 
-                    // // Conversion en unité de base si nécessaire
-                    // $article = Article::findOrFail($data['article_id']);
-                    // $quantiteBase = $data['quantite'];
-
-                    // if ($data['unite_vente_id'] != $article->unite_mesure_id) {
-                    //     $conversion = ConversionUnite::where([
-                    //         'unite_source_id' => $data['unite_vente_id'],
-                    //         'unite_dest_id' => $article->unite_mesure_id,
-                    //         'article_id' => $article->id,
-                    //         'statut' => true
-                    //     ])->first();
-
-                    //     if (!$conversion) {
-                    //         throw new Exception(
-                    //             "Pas de conversion trouvée pour l'article " . $article->designation
-                    //         );
-                    //     }
-
-                    //     $quantiteBase = $conversion->convertir($data['quantite']);
-                    // }
-
                     $ligneLivraison = new LigneLivraisonClient();
                     $ligneLivraison->livraison_client_id = $livraison->id;
                     $ligneLivraison->ligne_facture_id = $data['ligne_facture_id'];
@@ -297,76 +276,43 @@ class LivraisonClientController extends Controller
                 /**MAJ de la ligne facture client */
                 $ligneFactureClient
                     ->update([
-                        "quantite_livree" => $ligneFactureClient->quantite_livree + $livraisonLigne->quantite
+                        "quantite_livree" => $ligneFactureClient
+                            ->quantite_livree + $livraisonLigne->quantite
                     ]);
+
+                /** DATA POUR APPROVISIONNEMENT */
+                if ($livraisonClient->depot_dest_id) {
+                    //cette opération se fait seulement quand un dépôt de destination est choisi
+                    $entrees[] = [
+                        'depot_id' => $livraisonClient->depot_dest_id,
+                        'article_id' => $livraisonLigne->article_id,
+                        'unite_mesure_id' => $livraisonLigne->unite_vente_id,
+                        'quantite' => $livraisonLigne->quantite,
+                        'prix_unitaire' => $livraisonLigne->prix_unitaire,
+                        'date_mouvement' => now(),
+                        'notes' => "Entrée en stock via livraison dans le dépôt",
+                        'user_id' => auth()->user()->id,
+                        'livraison' => $livraisonClient->id, //pour mentionner qu'il s'agit d'un approvisionnement venant d'une livraison
+                        'date_mouvement' => $livraisonClient->date_livraison,
+                        'reference_mouvement' => $livraisonClient->numero,
+                        'document_type' => 'BON_LIVRAISON_FOURNISSEUR',
+                        'document_id' => $livraisonClient->id,
+                        'notes' => "Livraison client #{$livraisonClient->numero}",
+                    ];
+                }
             }
 
-            // Traiter chaque ligne
-            // foreach ($livraisonClient->lignes as $ligne) {
-            // Vérifier le stock disponible
-            // $stock = StockDepot::where([
-            //     'article_id' => $ligne->article_id,
-            //     'depot_id' => $livraisonClient->depot_id
-            // ])->first();
+            Log::debug('Les données:', $entrees);
 
-            // if (!$stock || $stock->quantite_reelle < $ligne->quantite_base) {
-            //     throw new Exception(
-            //         "Stock insuffisant pour l'article {$ligne->article->designation} " .
-            //             "(Demandé: {$ligne->quantite_base}, Disponible: " .
-            //             ($stock ? $stock->quantite_reelle : 0) . ")"
-            //     );
-            // }
-
-            // Créer le mouvement de sortie
-            // $mouvementSortie = $this->serviceStockSortie->traiterSortieStock([
-            //     'date_mouvement' => $livraisonClient->date_livraison,
-            //     'depot_id' => $livraisonClient->depot_id,
-            //     'article_id' => $ligne->article_id,
-            //     'unite_mesure_id' => $ligne->article->unite_mesure_id,
-            //     'quantite' => $ligne->quantite_base,
-            //     'reference_mouvement' => $livraisonClient->numero,
-            //     'document_type' => 'LIVRAISON_CLIENT',
-            //     'document_id' => $livraisonClient->id,
-            //     'user_id' => auth()->id(),
-            //     'notes' => "Livraison client #{$livraisonClient->numero}"
-            // ]);
-
-            // if (!$mouvementSortie['succes']) {
-            //     throw new Exception($mouvementSortie['message']);
-            // }
-
-            // // Associer le mouvement à la ligne
-            // $ligne->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
-
-            // $ligne->update([""]) save();
-
-            // if ($livraisonClient->depot_dest_id !== null) {
-            //     $entrees[] = [
-            //         'depot_id' => $livraisonClient->depot_dest_id,
-            //         'article_id' => $ligne->article_id,
-            //         'unite_mesure_id' => $ligne->article->unite_mesure_id,
-            //         'quantite' => $ligne->quantite_base,
-            //         'prix_unitaire' => $ligne->prix_unitaire,
-            //         'date_mouvement' => $livraisonClient->date_livraison,
-            //         'reference_mouvement' => $livraisonClient->numero,
-            //         'document_type' => 'BON_LIVRAISON_FOURNISSEUR',
-            //         'document_id' => $livraisonClient->id,
-            //         'notes' => "Livraison client #{$livraisonClient->numero}",
-            //         'user_id' => auth()->id()
-            //     ];
-            // }
-            // }
-
-            // if ($livraisonClient->depot_dest_id !== null) {
-            //     // Traiter les entrées en stock
-            //     $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
-
-            //     \Log::debug('Résultat traitement stock:', $resultatStock);
-
-            //     if (!$resultatStock['succes']) {
-            //         throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
-            //     }
-            // }
+            //cette opération se fait seulement quand un dépôt de destination est choisi
+            if ($livraisonClient->depot_dest_id) {
+                // Traiter les entrées en stock
+                $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
+                Log::debug('Résultat traitement stock:', $resultatStock);
+                if (!$resultatStock['succes']) {
+                    throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
+                }
+            }
 
             // Valider la livraison
             $livraisonClient->update([

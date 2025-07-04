@@ -14,7 +14,7 @@
                             <th class="border-bottom-0">Date Livraison</th>
                             <th class="border-bottom-0">N° Facture</th>
                             <th class="border-bottom-0">Client</th>
-                            <th class="border-bottom-0">Magasin</th>
+                            <th class="border-bottom-0">Magasin(source/Destination)</th>
                             <th class="border-bottom-0">Articles</th>
                             <th class="border-bottom-0 text-center">Statut</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
@@ -29,9 +29,11 @@
                             <td>{{ Carbon\Carbon::parse($livraison->created_at)->format('d/m/Y H:i:s') }}</td>
                             <td>{{ $livraison->date_livraison->format('d/m/Y') }}</td>
                             <td>
-                                <a href="#" class="text-decoration-none">
-                                    {{ $livraison->facture->numero }}
-                                </a>
+                                <span class="badge bg-light border">
+                                    <a href="#" class="text-decoration-none">
+                                        {{ $livraison->facture->numero }}
+                                    </a>
+                                </span>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -48,8 +50,10 @@
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <i class="fas fa-warehouse text-primary me-2"></i>
-                                    {{ $livraison->depot->libelle }}
+                                    <span class="badge bg-light border text-dark">
+                                        <i class="fas fa-warehouse text-primary me-2"></i>
+                                        {{ $livraison->depot?->libelle_depot }}/{{$livraison->depotDestination?->libelle_depot}}
+                                    </span>
                                 </div>
                             </td>
                             <td>
@@ -472,7 +476,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {

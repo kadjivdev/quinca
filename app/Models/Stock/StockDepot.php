@@ -29,7 +29,9 @@ class StockDepot extends Model
         'stock_maximum',
         'emplacement',
         'user_id',
-        'unite_mesure_id'
+        'unite_mesure_id',
+        'livraison',
+        'validated_by'
     ];
 
     protected $casts = [
@@ -43,7 +45,7 @@ class StockDepot extends Model
         'date_dernier_inventaire' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
     ];
 
     // Relations

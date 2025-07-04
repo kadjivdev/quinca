@@ -66,6 +66,11 @@ class LivraisonClient extends Model
         return $this->belongsTo(Depot::class);
     }
 
+    public function depotDestination(): BelongsTo
+    {
+        return $this->belongsTo(Depot::class, "depot_dest_id");
+    }
+
     public function lignes(): HasMany
     {
         return $this->hasMany(LigneLivraisonClient::class);
@@ -124,14 +129,13 @@ class LivraisonClient extends Model
 
             DB::commit();
             return true;
-
         } catch (Exception $e) {
             DB::rollback();
             throw $e;
         }
     }
 
-    
+
     protected static function boot()
     {
         parent::boot();
