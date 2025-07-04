@@ -267,6 +267,8 @@ class LivraisonClientController extends Controller
             // Charger les relations nécessaires
             $livraisonClient->load(['lignes.article', 'lignes.uniteVente']);
 
+            $entrees = [];
+            
             /** */
             foreach ($livraisonClient->lignes as $livraisonLigne) {
                 /**Ligne Facture client associée */

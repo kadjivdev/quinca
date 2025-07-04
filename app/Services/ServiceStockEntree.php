@@ -81,7 +81,6 @@ class ServiceStockEntree
                 'depot_id' => $donnees['depot_id'],
                 'article_id' => $article->id,
                 'unite_mesure_id' => $donnees["unite_mesure_id"],
-                'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
             ]);
 
             $ancien_stock = $stock->quantite_reelle ?? 0;
@@ -119,12 +118,9 @@ class ServiceStockEntree
                 'quantite_reelle' => $ancien_stock + $donnees['quantite'], //old $quantite_base,
                 'prix_moyen' => $nouveau_cump ?? 0.00,
                 'date_dernier_mouvement' => $donnees['date_mouvement'],
-                'user_id' => $donnees['user_id']
+                'user_id' => $donnees['user_id'],
+                'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
             ]);
-
-            // if (!$stock->exists) {
-            //     $stock->unite_mesure_id = $article->unite_mesure_id;
-            // }
 
             $stock->save();
 
