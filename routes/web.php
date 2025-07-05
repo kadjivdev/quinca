@@ -20,6 +20,7 @@ use App\Http\Controllers\Revendeur\FactureRevendeurController;
 
 use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientController, SoldeInitialFournisseurController, RapportAchatController, RapportStockController, RapportValorisationController, StockRotationController, StockAlertController, RapportCreanceController};
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
+use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Vente\AcompteClient;
 use App\Models\Vente\Client;
@@ -721,19 +722,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/validate-proforma/{id}', [ProformaController::class, 'valider'])->name("validate-proforma");
         });
 
-        // Routes pour les reglements
-        // Route::prefix('reglement')->group(function () {
-        //     // Liste des factures
-        //     Route::get('/', [ReglementClientController::class, 'index'])
-        //         ->name('vente.reglement.index');
-
-        //     // Créer une nouvelle facture
-        //     Route::post('/store', [ReglementClientController::class, 'store'])->name('vente.reglement.store');
-
-        //     // Voir les détails d'une facture
-        //     Route::get('/{id}', [ReglementClientController::class, 'show'])->name('vente.reglement.show');
-        // });
-
         Route::prefix('reglement')->group(function () {
             // Liste des règlements
             Route::get('/', [ReglementClientController::class, 'index'])
@@ -847,6 +835,21 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/pdf/a5/bon-livrasion/{facture}', [LivraisonClientController::class, 'generateBonA5'])
                 ->name('vente.livraisons.pdf.bon-livraison');
+        });
+
+        // Les retour sur marchandises
+        Route::prefix('marchand-back')->group(function () {
+            // Liste des marchandises
+            Route::get('/', [MarchandBackController::class, 'index'])->name('vente.marchand-back.index');
+
+            // Créer une nouvelle marchandise
+            Route::post('/store', [MarchandBackController::class, 'store'])->name('vente.marchand-back.store');
+
+            // valider une marchandise
+            Route::get('/{id}', [MarchandBackController::class, 'validerMarchandise'])->name('vente.marchand-back.validate');
+
+            // Supprimer une depenses
+            Route::delete('/{id}/destroy', [MarchandBackController::class, 'destroy'])->name('vente.marchand-back.destroy');
         });
 
         // REQUTES

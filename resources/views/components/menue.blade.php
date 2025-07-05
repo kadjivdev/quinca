@@ -250,6 +250,10 @@
                     <li><a class="dropdown-item" href="{{ route('vente.livraisons.index') }}">
                             <div class="dropdown-item-wrapper">Bons de Livraison</div>
                         </a></li>
+
+                    <li><a class="dropdown-item" href="{{ route('vente.marchand-back.index') }}">
+                            <div class="dropdown-item-wrapper">Retour de marchandises</div>
+                        </a></li>
                     @endcan
 
                     @canany(["requetes.view","transports.view"])

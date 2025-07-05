@@ -1,18 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Revendeur;
+namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vente\Client;
-use App\Models\Catalogue\{Tarification, Article};
-use App\Models\Parametre\ConversionUnite;
-use App\Models\Parametre\Depot;
-use App\Models\Vente\{FactureClient, SessionCaisse, ReglementClient, RevendeurDepense};
-use App\Models\Parametre\Societe;
-use App\Models\Parametre\UniteMesure;
+use App\Models\Vente\{FactureClient, LivraisonClient, MarchandBack, SessionCaisse, ReglementClient, RevendeurDepense};
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Revendeur\LigneFactureRevendeur;
-use App\Models\Stock\StockDepot;
+use App\Services\ServiceStockEntree;
 use App\Services\ServiceStockSortie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,17 +16,20 @@ use Exception;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-
-class DepenseRevendeurController extends Controller
+class MarchandBackController extends Controller
 {
-    /**
-     * Affiche la liste des factures
-     */
+    private $serviceStockSortie, $serviceStockEntree;
+
+    public function __construct(ServiceStockSortie $serviceStockSortie, ServiceStockEntree $serviceStockEntree)
+    {
+        $this->serviceStockSortie = $serviceStockSortie;
+        $this->serviceStockEntree = $serviceStockEntree;
+    }
 
     public function index(Request $request)
     {
         try {
-            Log::info('Début du chargement de la liste des factures');
+            Log::info('Début du chargement de la liste des Retour de marchandises');
             $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
             // User connecté
@@ -41,11 +38,11 @@ class DepenseRevendeurController extends Controller
             $day = $request->day;
             // Chargement des factures avec les relations nécessaires
             if ($day) {
-                $query = RevendeurDepense::with(['createdBy', 'validatedBy'])
-                    ->whereDate("day", $day)
+                $query = MarchandBack::with(['livraison', 'createdBy', 'validatedBy'])
+                    ->whereDate("date", $date)
                     ->orderByDesc('id');
             } else {
-                $query = RevendeurDepense::with(['createdBy', 'validatedBy'])
+                $query = MarchandBack::with(['livraison', 'createdBy', 'validatedBy'])
                     ->orderByDesc('id');
             }
 
@@ -54,38 +51,21 @@ class DepenseRevendeurController extends Controller
                 || auth()->user()->hasRole("CONTROLE INTERNE")
                 || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
             ) {
-                $depenses = $query->get();
-                $depots = Depot::get();
+                $marchanBacks = $query->get();
+                $livraisons = LivraisonClient::get();
             } else {
-                $depenses = $query
+                $marchanBacks = $query
                     ->where('created_by', $user->id)
                     ->get();
-                $depots = $user->pointDeVente->depot;
+                $livraisons = LivraisonClient::where("created_by")
+                    ->whereNotNull("validated_by")
+                    ->get();
             }
-            $depenses = $query
-                ->where('created_by', $user->id)
-                ->get();
 
-            /**Montant total des ventes du jour */
-            $totalVenteAmount = FactureRevendeur::whereNotNull("validated_by")
-                ->whereDate("created_at", $day)
-                ->where("point_de_vente_id", $user->point_de_vente_id)
-                ->get()->sum(fn($facture) => ($facture->montant_ttc - $facture->montant_remise));
-
-            /**Total des depenses du jour */
-            $totalDepenses = $depenses->sum("amount");
-
-            /** Calcul de la recette du jour */
-            $recetteTotale = $totalVenteAmount - $totalDepenses;
-
-            return view('pages.revendeur.depense.index', compact(
-                'depenses',
-                'depots',
+            return view('pages.ventes.marchand-back.index', compact(
+                'livraisons',
+                'marchanBacks',
                 'date',
-                'day',
-                'totalVenteAmount',
-                'totalDepenses',
-                'recetteTotale'
             ));
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement de la liste des depenses', [
@@ -100,37 +80,44 @@ class DepenseRevendeurController extends Controller
     public function store(Request $request)
     {
         try {
-            Log::info('Début création facture Revendeur', ['request' => $request->all()]);
+            Log::info('Début création de retour de marchandise', ['request' => $request->all()]);
 
             // Validation
             $validated = $request->validate([
-                'day' => 'required|date',
-                'depot_id' => 'required|exists:depots,id',
-                'amount' => 'required',
-            ]);
+                'date' => 'required|date',
+                'livraison_id' => 'required|exists:livraison_clients,id',
+                'documents' => 'nullable|file|mimes:jpg,png,jpeg,gif,svg',
+            ], ["documents.mimes" => "Le document doit être de type jpg,png,jpeg,gif,svg"]);
+
+            if ($request->hasFile("documents")) {
+                $fileName = $request->file('documents')->getClientOriginalName();
+                $request->file('documents')->move("marchand_docs", $fileName);
+                $validated["documents"] = asset("marchand_docs/" . $fileName);
+            }
+
 
             DB::beginTransaction();
 
             try {
                 // Création de la depense
-                RevendeurDepense::create($validated);
+                MarchandBack::create($validated);
 
                 DB::commit();
 
                 return back()
-                    ->with("success", 'Dépense inserée avec succès');
+                    ->with("success", 'Retour de marchandise éffectué avec succès');
             } catch (Exception $e) {
                 DB::rollBack();
                 throw $e;
             }
         } catch (Exception $e) {
-            Log::error('Erreur création dépense', [
+            Log::error('Erreur création marchandise', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
             return back()
-                ->with("error", 'Erreur création dépense: ' . $e->getMessage());
+                ->with("error", 'Erreur création marchandise: ' . $e->getMessage());
         }
     }
 
@@ -195,14 +182,14 @@ class DepenseRevendeurController extends Controller
                 'moyen_reglement' => 'required|string',
 
                 'lignes' => 'required|array|min:1',
-                'lignes*article_id' => 'required|exists,articles',
-                'lignes*depot_id' => 'required|exits,depots',
-                'lignes*quantite' => 'required',
-                'lignes*tarification_id' => 'required',
+                'lignes.*.article_id' => 'required|exists:articles,id',
+                'lignes.*.depot_id' => 'required|exists:depots,id',
+                'lignes.*.quantite' => 'required',
+                'lignes.*.tarification_id' => 'required',
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
-                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir]",
+                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir",
             ]);
 
             if ($validator->fails()) {
@@ -341,44 +328,70 @@ class DepenseRevendeurController extends Controller
         }
     }
 
-    public function validateFacture($id)
+    public function validerMarchandise($id)
     {
         try {
             DB::beginTransaction();
 
-            $facture = FactureRevendeur::findOrFail($id);
+            $marchand = MarchandBack::findOrFail($id);
 
-            if ($facture->statut === 'validee') {
-                throw new Exception('Facture déjà validée');
+            if ($marchand->validated_by) {
+                throw new Exception('Marchandise déjà validée');
             }
 
-            $updateData = [
-                'date_validation' => now(),
+            $marchand->update([
                 'validated_by' => auth()->id(),
-                'statut' => 'validee'
-            ];
+            ]);
 
-            $facture->update($updateData);
+            $livraisonClient = $marchand
+                ->livraison->load(['lignes.article', 'lignes.uniteVente']);
+
+            /** RESTITUTION DE STOCK DE L'ARTICLE */
+
+            $entrees = [];
+
+            /** */
+            foreach ($livraisonClient->lignes as $livraisonLigne) {
+
+                /** DATA POUR APPROVISIONNEMENT */
+                $entrees[] = [
+                    'depot_id' => $livraisonClient->depot_dest_id,
+                    'article_id' => $livraisonLigne->article_id,
+                    'unite_mesure_id' => $livraisonLigne->unite_vente_id,
+                    'quantite' => $livraisonLigne->quantite,
+                    'prix_unitaire' => $livraisonLigne->prix_unitaire,
+                    'date_mouvement' => now(),
+                    'notes' => "Entrée en stock via livraison dans le dépôt",
+                    'user_id' => auth()->user()->id,
+                    'livraison' => $livraisonClient->id, //pour mentionner qu'il s'agit d'un approvisionnement venant d'une livraison
+                    'date_mouvement' => $livraisonClient->date_livraison,
+                    'reference_mouvement' => $livraisonClient->numero,
+                    'document_id' => $livraisonClient->id,
+                    'notes' => "Retour de marchandise sur livraison #{$marchand->numero}",
+                ];
+            }
+
+
+            // Traiter les entrées en stock
+            $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
+            Log::debug('Résultat traitement stock:', $resultatStock);
+            if (!$resultatStock['succes']) {
+                throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
+            }
 
             DB::commit();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Facture validée',
-                'data' => ['facture' => $facture->fresh(['client', 'createdBy'])]
-            ]);
+            return back()
+                ->with("success", "Marchandise ($marchand->numero) validée avec succès");
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Erreur validation facture', [
+            Log::error('Erreur validation marchandise', [
                 'facture_id' => $id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ], 500);
+            return back()
+                ->with("Erreure de validation " . $e->getMessage());
         }
     }
 
@@ -387,10 +400,10 @@ class DepenseRevendeurController extends Controller
         try {
             DB::beginTransaction();
 
-            $depense = RevendeurDepense::findOrFail($id);
+            $marchand = MarchandBack::findOrFail($id);
 
             // Vérifier le statut
-            if (!$depense) {
+            if (!$marchand) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'La depense n\'existe pas'
@@ -398,17 +411,17 @@ class DepenseRevendeurController extends Controller
             }
 
             // Supprimer la facture
-            $depense->delete();
+            $marchand->delete();
 
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Dépense supprimée avec succès'
+                'message' => 'Marchandise supprimée avec succès'
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Erreur suppression dépense', [
+            Log::error('Erreur suppression marchandise', [
                 'facture_id' => $id,
                 'error' => $e->getMessage()
             ]);
@@ -416,210 +429,6 @@ class DepenseRevendeurController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function details(FactureRevendeur $facture)
-    {
-        return response()->json([
-            'id' => $facture->id,
-            'numero' => $facture->numero,
-            'client' => [
-                'id' => $facture->client->id,
-                'raison_sociale' => $facture->client->raison_sociale
-            ],
-            'montant_ttc' => $facture->montant_ttc,
-            'montant_ttc' => $facture->montant_ttc,
-            'montant_regle' => $facture->montant_regle,
-            'reste_a_payer' => $facture->reste_a_payer,
-            'date_facture' => $facture->date_facture->format('Y-m-d'),
-            'statut' => $facture->statut
-        ]);
-    }
-
-    /**
-     * 
-     */
-    public function print(Request $request, FactureRevendeur $facture)
-    {
-        // Chargement des relations nécessaires
-        $facture->load([
-            'client',
-            'lignes.article',
-            'lignes.uniteVente',
-            'createdBy',
-            'validatedBy'
-        ]);
-
-        $logo = $request->get("logo");
-
-        $pdf = PDF::loadView('pages.ventes.facture.partials.print-facture', compact('facture', "logo"));
-        $pdf->setPaper('a4');
-
-        return $pdf->stream("facture_{$facture->numero}.pdf");
-    }
-
-    /**
-     * Bon à livrer
-     */
-    public function bonALivrer(Request $request, FactureRevendeur $facture)
-    {
-        // Chargement des relations nécessaires
-        $facture->load([
-            'client',
-            'lignes.article',
-            'lignes.uniteVente',
-            'createdBy',
-            'validatedBy'
-        ]);
-
-        $entete = $request->get("entete");
-
-        $pdf = PDF::loadView('pages.ventes.facture.partials.bon-a-livrer', compact('facture', 'entete'));
-        $pdf->setPaper('a4');
-
-        return $pdf->stream("bon_a_livrer_{$facture->numero}.pdf");
-    }
-
-    /**
-     * Bordereau de livraison
-     */
-    public function bordereauLivraison(Request $request, FactureRevendeur $facture)
-    {
-        // Chargement des relations nécessaires
-        $facture->load([
-            'client',
-            'lignes.article',
-            'lignes.uniteVente',
-            'createdBy',
-            'validatedBy'
-        ]);
-
-        $entete = $request->get("entete");
-
-        $pdf = PDF::loadView('pages.ventes.facture.partials.bordereau-livraison', compact('facture', 'entete'));
-        $pdf->setPaper('a4');
-
-        return $pdf->stream("bordereau_{$facture->numero}.pdf");
-    }
-
-
-    public function MakevalidationDaily(Request $request)
-    {
-        $request->validate([
-            'date_debut' => 'nullable|date',
-            'client_id' => 'required|exists:clients,id',
-            'moyen_paiement' => 'nullable|string|max:255',
-        ]);
-
-        try {
-            DB::beginTransaction();
-            $dateDebut = $request->get('date_debut', Carbon::now()->startOfMonth()->format('Y-m-d'));
-
-            $factures = FactureRevendeur::whereBetween('date_facture', [$dateDebut, $dateDebut])
-                ->where('type_vente', 'normale')
-                ->where('encaisse', 'non')
-                ->where('statut', 'validee')
-                ->with('client')
-                ->get();
-
-            // Calcul de la somme des montants_ttc
-            $sommeMontantTTCC = $factures->sum('montant_ttc');
-
-            $facturesNonReglees = FactureClient::where('statut', 'validee')
-                ->whereColumn('montant_regle', '<', 'montant_ttc') // montant réglé < montant total
-                ->where('client_id', $request->client_id)
-                ->orderBy('date_facture', 'asc') // Trier par date
-                ->get();
-
-            if (count($facturesNonReglees) == 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Aucune facture en attente de règlement',
-                ]);
-            }
-
-            foreach ($facturesNonReglees as $facture) {
-                // Calculer le montant restant à régler pour cette facture
-                $montantRestant = $facture->montant_ttc - $facture->montant_regle;
-
-                if ($sommeMontantTTCC <= 0) {
-                    break; // On arrête si la somme totale à régler est épuisée
-                }
-
-                // Le montant à régler pour cette facture est soit le montant restant, soit ce qui reste de la somme totale
-                $montantARegler = min($montantRestant, $sommeMontantTTCC);
-
-                $reglement = new ReglementClient();
-                $reglement->facture_client_id = $facture->id;
-                $reglement->facture()->associate($facture); // Important: associer la facture
-                $reglement->date_reglement = now();
-                $reglement->type_reglement = $request->type_reglement;
-                $reglement->montant = $montantARegler;
-                $reglement->created_by = auth()->id();
-                $reglement->statut = ReglementClient::STATUT_BROUILLON;
-                $reglement->save();
-
-                // Vérifier si on a une session de caisse ouverte
-                $sessionCaisse = SessionCaisse::where('utilisateur_id', auth()->id())
-                    ->where('statut', 'ouverte')
-                    ->first();
-
-                if (!$sessionCaisse) {
-                    throw new Exception('Vous devez avoir une session de caisse ouverte pour valider un règlement');
-                }
-
-                // Valider le règlement
-                if (!$reglement->valider(auth()->id())) {
-                    throw new Exception("Erreur lors de la validation du règlement");
-                }
-
-                // Mettre à jour la session caisse
-                if (method_exists($sessionCaisse, 'mettreAJourTotaux')) {
-                    $sessionCaisse->mettreAJourTotaux();
-                }
-
-                // Mettre à jour le montant réglé de la facture
-                $facture->montant_regle += $montantARegler;
-                $facture->save();
-
-                // Réduire la somme totale à régler
-                $sommeMontantTTCC -= $montantARegler;
-            }
-
-            foreach ($factures as $facture) {
-                $facture->encaisse = 'oui';
-                $facture->encaissed_at = now();
-                $facture->save();
-            }
-
-            DB::commit();
-
-            // Log de l'action
-            Log::info('Règlement journalier revendeur avec succès', [
-                'date' => $request->date_debut,
-                'utilisateur_id' => auth()->id(),
-                // 'session_caisse_id' => $sessionCaisse->id,
-                'montant' => $sommeMontantTTCC
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Validation effectuée avec succès',
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            Log::error('Erreur lors de la validation du règlement journalier revendeur', [
-                'date' => $request->date_debut,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
             ], 500);
         }
     }

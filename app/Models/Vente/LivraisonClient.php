@@ -55,7 +55,6 @@ class LivraisonClient extends Model
         return sprintf('%s-%s-%s', $prefix, $date, $random);
     }
 
-
     public function facture(): BelongsTo
     {
         return $this->belongsTo(FactureClient::class, 'facture_client_id');
@@ -134,7 +133,6 @@ class LivraisonClient extends Model
             throw $e;
         }
     }
-
 
     protected static function boot()
     {

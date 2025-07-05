@@ -783,6 +783,10 @@ class LivraisonClientController extends Controller
                     'libelle' => $livraisonClient->depot->libelle_depot,
                     'adresse' => $livraisonClient->depot->adresse_depot
                 ],
+                'depot_source' => [
+                    'libelle' => $livraisonClient->depot->libelle_depot,
+                    'adresse' => $livraisonClient->depot->adresse_depot
+                ],
                 'created_by' => $livraisonClient->createdBy ? $livraisonClient->createdBy->name : null,
                 'validated_by' => $livraisonClient->validatedBy ? $livraisonClient->validatedBy->name : null
             ],
