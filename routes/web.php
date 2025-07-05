@@ -848,6 +848,9 @@ Route::middleware('auth')->group(function () {
             // valider une marchandise
             Route::get('/{id}', [MarchandBackController::class, 'validerMarchandise'])->name('vente.marchand-back.validate');
 
+            // show marchandise details
+            Route::get('/{id}/show', [MarchandBackController::class, 'show'])->name('vente.marchand-back.show');
+
             // Supprimer une depenses
             Route::delete('/{id}/destroy', [MarchandBackController::class, 'destroy'])->name('vente.marchand-back.destroy');
         });

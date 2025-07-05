@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MarchandBack extends Model
@@ -59,6 +60,13 @@ class MarchandBack extends Model
     function validatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, "validated_by");
+    }
+
+    /** Les lignes */
+
+    function lignes(): HasMany
+    {
+        return $this->hasMany(LigneMarchandise::class, "marchandise");
     }
 
     /**

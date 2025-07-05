@@ -164,8 +164,6 @@ class LigneLivraisonClient extends Model
             : $conversion->convertirInverse($this->quantite_base);
     }
 
-
-
     public function verifierDisponibiliteStock(): bool
     {
         $stockDisponible = StockDepot::getStock($this->article_id, $this->livraison->depot_id);

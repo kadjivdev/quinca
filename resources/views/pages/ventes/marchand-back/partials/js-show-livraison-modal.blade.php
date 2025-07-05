@@ -2,7 +2,7 @@
     function showLivraison(id) {
         // Afficher un loader dans le modal
         $('#showLivraisonModal').modal('show');
-        
+
         // Charger les données
         $.ajax({
             url: `${apiUrl}/vente/livraisons/${id}`,
@@ -10,7 +10,7 @@
             success: function(response) {
                 if (response.success) {
                     const data = response.data;
-                    
+
                     $("#depotSourceLib").text(data.livraison.depot.libelle)
                     $("#depotSourceAdr").text(data.livraison.depot.adresse)
 
@@ -18,12 +18,12 @@
                     $('#blNumero').text(`Bon de livraison N° ${data.livraison.numero}`);
                     $('#factureNumero').text(data.livraison.facture.numero);
                     $('#factureDate').text(data.livraison.facture.date);
-                    
+
                     // Informations client
                     $('#clientNom').text(data.livraison.facture.client.raison_sociale);
                     $('#clientContact').text(data.livraison.facture.client.telephone);
                     $('#clientAdresse').text(data.livraison.facture.client.adresse);
-                    
+
                     // Lignes de livraison
                     let lignesHtml = '';
                     data.lignes.forEach(ligne => {
@@ -40,7 +40,7 @@
                         `;
                     });
                     $('#lignesLivraison').html(lignesHtml);
-                    
+
                     // Notes et infos supplémentaires
                     $('#livraisonNotes').text(data.livraison.notes || 'Aucune note');
                     $('#createInfo').text(data.livraison.created_by || '-');
@@ -56,7 +56,7 @@
             }
         });
     }
-    
+
     // Fonction utilitaire pour formater les montants
     function formatMontant(montant) {
         return new Intl.NumberFormat('fr-FR', {
@@ -64,4 +64,4 @@
             maximumFractionDigits: 2
         }).format(montant);
     }
-    </script>
+</script>

@@ -87,6 +87,14 @@ class MarchandBackController extends Controller
                 'date' => 'required|date',
                 'livraison_id' => 'required|exists:livraison_clients,id',
                 'documents' => 'nullable|file|mimes:jpg,png,jpeg,gif,svg',
+
+                //les lignes
+                'lignes' => 'array',
+                'lignes*article_id' => "required|exists:articles,id",
+                'lignes*quantite' => "required",
+                'lignes*prix_unitaire' => "required",
+                'lignes*unite_vente_id' => "required|exists:unite_mesures,id",
+
             ], ["documents.mimes" => "Le document doit être de type jpg,png,jpeg,gif,svg"]);
 
             if ($request->hasFile("documents")) {
@@ -95,12 +103,27 @@ class MarchandBackController extends Controller
                 $validated["documents"] = asset("marchand_docs/" . $fileName);
             }
 
-
+            // dd($validated["lignes"]);
             DB::beginTransaction();
 
             try {
                 // Création de la depense
-                MarchandBack::create($validated);
+                $marchandise = MarchandBack::create($validated);
+
+                if (is_null($request->lignes)) {
+                    throw new Exception("Aucun article n'est disponible sur cette livraison", 1);
+                }
+
+                /** Creation des lignes */
+                foreach ($validated["lignes"] as $ligne) {
+                    Log::info("Début d'enregistrement des lignes d'article");
+                    $marchandise->lignes()->create([
+                        "article_id" => $ligne["article_id"],
+                        "quantite" => $ligne["quantite"],
+                        "unite_vente_id" => $ligne["unite_vente_id"],
+                        "prix_unitaire" => $ligne["prix_unitaire"],
+                    ]);
+                }
 
                 DB::commit();
 
@@ -124,35 +147,32 @@ class MarchandBackController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            Log::info('Début du chargement des détails de la facture revendeur ...', ['facture_id' => $id]);
+            Log::info('Début du chargement des détails de la marchandise ...', ['marchandise_id' => $id]);
 
-            $facture = FactureRevendeur::with([
+            $marchand = MarchandBack::with([
                 'client',
+                'livraison',
                 'lignes.article',
                 'lignes.uniteVente',
-                'lignes.facturedepot',
-                // 'sessionCaisse',
                 'createdBy',
-                'pointDeVente'
             ])->findOrFail($id);
 
+            // Formater les quantités après chargement
+            $marchand->lignes->each(function ($ligne) {
+                $ligne->quantite_formatted = number_format($ligne->quantite, 2, ".", "");
+                $ligne->prix_formatted = number_format($ligne->prix_unitaire, 2, ".", "");
+            });
+
+            Log::info("Marchandise showing ...", ["marhandise" => $marchand]);
+
             return response()->json([
-                'status' => 'success',
+                'success' => true,
                 'data' => [
-                    'facture' => $facture,
-                    'dateFacture' => $facture->date_facture->format('d/m/Y'),
-                    'dateEcheance' => $facture->date_echeance->format('d/m/Y'),
-                    'montantHT' => number_format($facture->montant_ht, 0, ',', ' '),
-                    'montantTVA' => number_format($facture->montant_tva, 0, ',', ' '),
-                    'montantTTC' => number_format($facture->montant_ttc, 0, ',', ' '),
-                    'montantRegle' => number_format($facture->montant_regle, 0, ',', ' '),
-                    'montantRestant' => number_format($facture->montant_ttc - $facture->montant_regle, 0, ',', ' '),
-                    'tauxTVA' => $facture->taux_tva,
-                    'tauxAIB' => $facture->taux_aib
+                    'marchand' => $marchand,
                 ]
             ]);
         } catch (Exception $e) {
-            Log::error('Erreur lors du chargement des détails de la facture', [
+            Log::error('Erreur lors du chargement des détails de la marchandise', [
                 'facture_id' => $id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -351,17 +371,17 @@ class MarchandBackController extends Controller
             $entrees = [];
 
             /** */
-            foreach ($livraisonClient->lignes as $livraisonLigne) {
+            foreach ($marchand->lignes as $ligne) {
 
                 /** DATA POUR APPROVISIONNEMENT */
                 $entrees[] = [
                     'depot_id' => $livraisonClient->depot_dest_id,
-                    'article_id' => $livraisonLigne->article_id,
-                    'unite_mesure_id' => $livraisonLigne->unite_vente_id,
-                    'quantite' => $livraisonLigne->quantite,
-                    'prix_unitaire' => $livraisonLigne->prix_unitaire,
+                    'article_id' => $ligne->article_id,
+                    'unite_mesure_id' => $ligne->unite_vente_id,
+                    'quantite' => $ligne->quantite,
+                    'prix_unitaire' => $ligne->prix_unitaire,
                     'date_mouvement' => now(),
-                    'notes' => "Entrée en stock via livraison dans le dépôt",
+                    'notes' => "Entrée en stock via retour de marchandise",
                     'user_id' => auth()->user()->id,
                     'livraison' => $livraisonClient->id, //pour mentionner qu'il s'agit d'un approvisionnement venant d'une livraison
                     'date_mouvement' => $livraisonClient->date_livraison,

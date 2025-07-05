@@ -27,7 +27,7 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">N° Marchandise</th>
-                            <th class="border-bottom-0" >Livraison</th>
+                            <th class="border-bottom-0">Livraison</th>
                             <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date concernée</th>
@@ -76,6 +76,12 @@
 
                             <td class="text-center">
                                 <div class="btn-group">
+                                    <span class="w-100 badge btn bg-primary"
+                                        onclick="showMarchand({{ $marchand->id }})"
+                                        data-bs-toggle="tooltip" title="Détails marchandise">
+                                        <i class="fas fa-eye"></i>
+                                    </span>
+
                                     @if(!$marchand->validated_by)
                                     @if(auth()->user()->hasRole('CONTROLE INTERNE') || auth()->user()->hasRole('Super Administrateur') )
                                     <a href="{{route('vente.marchand-back.validate',$marchand->id)}}"
@@ -263,7 +269,6 @@
 </style>
 
 <script>
-
     function deleteFacture(id) {
         Swal.fire({
             title: 'Êtes-vous sûr?',

@@ -783,23 +783,22 @@ class LivraisonClientController extends Controller
                     'libelle' => $livraisonClient->depot->libelle_depot,
                     'adresse' => $livraisonClient->depot->adresse_depot
                 ],
-                'depot_source' => [
-                    'libelle' => $livraisonClient->depot->libelle_depot,
-                    'adresse' => $livraisonClient->depot->adresse_depot
-                ],
                 'created_by' => $livraisonClient->createdBy ? $livraisonClient->createdBy->name : null,
                 'validated_by' => $livraisonClient->validatedBy ? $livraisonClient->validatedBy->name : null
             ],
             'lignes' => $livraisonClient->lignes->map(function ($ligne) {
                 return [
+                    'id'=>$ligne->id,
                     'article' => [
+                        'id' => $ligne->article->id,
                         'reference' => $ligne->article->code_article,
                         'designation' => $ligne->article->designation
                     ],
                     'quantite' => number_format($ligne->quantite, 2, ".", " "),
+                    'unite_id' => $ligne->uniteVente->id,
                     'unite' => $ligne->uniteVente->libelle_unite,
-                    'prix_unitaire' => $ligne->prix_unitaire,
-                    'montant_total' => number_format($ligne->montant_total, 2, ".", " ")
+                    'prix_unitaire' => number_format($ligne->prix_unitaire, 2, ".", ""),
+                    'montant_total' => number_format($ligne->montant_total, 2, ".", "")
                 ];
             })
         ];
