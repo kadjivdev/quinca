@@ -375,7 +375,7 @@ class MarchandBackController extends Controller
 
                 /** DATA POUR APPROVISIONNEMENT */
                 $entrees[] = [
-                    'depot_id' => $livraisonClient->depot_dest_id,
+                    'depot_id' => $livraisonClient->depot_dest_id??$livraisonClient->depot_id,
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_vente_id,
                     'quantite' => $ligne->quantite,
