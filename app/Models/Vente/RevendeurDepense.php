@@ -19,7 +19,8 @@ class RevendeurDepense extends Model
         "numero",
         "created_by",
         "validated_by",
-        "depot_id"
+        "depot_id",
+        "observation"
     ];
 
     protected $casts = [

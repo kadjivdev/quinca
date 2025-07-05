@@ -32,6 +32,7 @@
                             <th class="border-bottom-0">Jour concerné</th>
                             <th class="border-bottom-0">Inserée par</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
+                            <th class="border-bottom-0 text-end">Observation</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
                     </thead>
@@ -51,6 +52,9 @@
                             <td> <span class="badge bg-light border text-dark">{{$depense->createdBy?->name}}</span> </td>
                             <td class="text-end fw-medium">
                                 {{ number_format($depense->amount, 2, '.', ' ') }} F
+                            </td>
+                            <td>
+                                <textarea rows="1" name="" class="form-control" id="" placeholder="{{$depense->observation}}"></textarea>
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">

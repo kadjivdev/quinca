@@ -30,7 +30,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row g-3">
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label class="form-label fw-medium required">Date dépense</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white">
@@ -41,7 +41,7 @@
                                             </div>
                                             <div class="invalid-feedback">La date est requise</div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label class="form-label fw-medium required">Dépôt</label>
                                             <div class="input-group">
                                                 <div class="">
@@ -56,10 +56,15 @@
                                             </div>
                                             <div class="invalid-feedback">Le dépôt est requis</div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label class="form-label fw-medium required">Montant</label>
-                                            <input type="number" placeholder="0.00" min="10"  name="amount" class="form-control" id="">
+                                            <input type="number" placeholder="0.00" min="10" name="amount" class="form-control" id="">
                                             <div class="invalid-feedback">Le Montant est invalide (10 minimum)</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Observation</label>
+                                            <textarea name="observation" class="form-control" id=""></textarea>
+                                            <div class="invalid-feedback"></div>
                                         </div>
                                     </div>
                                 </div>

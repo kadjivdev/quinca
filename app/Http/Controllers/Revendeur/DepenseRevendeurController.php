@@ -107,8 +107,10 @@ class DepenseRevendeurController extends Controller
                 'day' => 'required|date',
                 'depot_id' => 'required|exists:depots,id',
                 'amount' => 'required',
+                'observation'=>"nullable"
             ]);
 
+            // dd($validated);
             DB::beginTransaction();
 
             try {
