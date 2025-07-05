@@ -35,11 +35,11 @@ class MarchandBackController extends Controller
             // User connecté
             $user = auth()->user();
 
-            $day = $request->day;
+            $day = $request->date;
             // Chargement des factures avec les relations nécessaires
             if ($day) {
                 $query = MarchandBack::with(['livraison', 'createdBy', 'validatedBy'])
-                    ->whereDate("date", $date)
+                    ->whereDate("date", $day)
                     ->orderByDesc('id');
             } else {
                 $query = MarchandBack::with(['livraison', 'createdBy', 'validatedBy'])
