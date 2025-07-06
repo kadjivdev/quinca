@@ -15,10 +15,8 @@ use App\Models\Stock\StockDepot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Vente\DevisDetail;
-use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Services\ServiceStockEntree;
 
 /**
  * Class Article
@@ -40,12 +38,13 @@ use App\Services\ServiceStockEntree;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- *
+ 
  * @property-read FamilleArticle $famille
  * @property-read Collection|Tarification[] $tarifications
  * @property-read Collection|StockDepot[] $stockDepots
  * @property-read Collection|StockPointVente[] $stockPointsVente
  */
+
 class Article extends Model
 {
     use SoftDeletes, HasFactory;
@@ -166,6 +165,7 @@ class Article extends Model
     /**
      * LES DETAILS DES FACTURES CLIENTS
      */
+
     function facturesVente($depotId = null)
     {
         // return $this->hasMany(LigneFacture::class, "article_id")->where("depot", $depotId)
@@ -181,7 +181,9 @@ class Article extends Model
         return $this->hasMany(LigneFacture::class, "article_id")
             ->where("depot", $depotId)
             ->whereHas("factureClient", function ($query) {
-                $query->whereNotNull("validated_by");
+                $query
+                ->whereNotNull("validated_by")
+                ->whereNull("inventaire_id");//les ventes qui n'appartiennent à aucun inventaire
             })->get();
     }
 
@@ -193,7 +195,9 @@ class Article extends Model
         return $this->hasMany(LigneFactureRevendeur::class, "article_id")
             ->where("depot", $depotId)
             ->whereHas("factureRevendeur", function ($query) {
-                $query->whereNotNull("validated_by");
+                $query
+                ->whereNotNull("validated_by")
+                ->whereNull("inventaire_id");//les ventes qui n'appartiennent à aucun inventaire
             })->get();
     }
 

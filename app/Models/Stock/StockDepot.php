@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Catalogue\Article;
+use App\Models\Catalogue\DetailInventaire;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Securite\User;
@@ -47,6 +48,10 @@ class StockDepot extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    function inventaireDetails() : HasMany {
+        return $this->hasMany(DetailInventaire::class,"stock_depot_id");
+    }
 
     // Relations
     public function article(): BelongsTo

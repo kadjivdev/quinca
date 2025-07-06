@@ -4,7 +4,7 @@ namespace App\Models\Catalogue;
 
 use App\Models\Parametre\Depot;
 use App\Models\Securite\User;
-use App\Models\Vente\Magasin;
+// use App\Models\Vente\Magasin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

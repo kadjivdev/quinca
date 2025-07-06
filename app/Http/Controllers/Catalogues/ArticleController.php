@@ -9,7 +9,9 @@ use App\Models\Catalogue\FamilleArticle;
 use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
+use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\FactureClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -55,6 +57,7 @@ class ArticleController extends Controller
 
         $articles->map(function ($article) {
             $article->stocks->map(function ($stock) use ($article) {
+
                 $conversion = $this->serviceStockEntree
                     ->rechercherConversion(
                         $stock->unite_mesure_id,
@@ -77,23 +80,27 @@ class ArticleController extends Controller
         $articlesIds = $articles->pluck("id");
 
         // les depot liés à ces articles
-        $depotIds = StockDepot::whereIn("article_id", $articlesIds)->distinct()->pluck("depot_id");
+        $depotIds = StockDepot::whereIn("article_id", $articlesIds)
+            ->distinct()->pluck("depot_id");
 
         $familles = FamilleArticle::where('statut', true)
             ->orderBy('libelle_famille')
             ->get();
 
         $totalArticles = Article::count();
+
         $articlesEnStock = Article::where('stockable', true)
             ->where('stock_actuel', '>', 0)
             ->count();
+
         $articlesCritiques = Article::where('stockable', true)
             ->whereRaw('stock_actuel <= stock_minimum')
             ->count();
-        $articlesActifs = Article::where('statut', Article::STATUT_ACTIF)->count();
+
+        $articlesActifs = Article::where('statut', Article::STATUT_ACTIF)
+            ->count();
 
         $depots = Depot::get();
-
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
         $unites = UniteMesure::all();
@@ -602,12 +609,18 @@ class ArticleController extends Controller
             // Insertion en masse des détails d'inventaire
             DetailInventaire::insert($detailsInventaire);
 
-
             // Mise à jour en masse des stocks
             foreach ($stockUpdates as $update) {
                 StockDepot::where('id', $update['id'])
                     ->update(['quantite_reelle' => $update['quantite_reelle']]);
             }
+
+            /** Classement des ventes(direction et revendeur) dans l'inventaires | il s'agit bien des ventes 
+             * qui ne sont pas encore associées à un inventaire
+             */
+
+            FactureClient::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+            FactureRevendeur::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
 
             DB::commit();
 

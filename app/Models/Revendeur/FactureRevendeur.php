@@ -2,6 +2,7 @@
 
 namespace App\Models\Revendeur;
 
+use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\PointDeVente;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -43,6 +44,7 @@ class FactureRevendeur extends Model
         'encaissed_at',
         'created_by',
         'validated_by',
+        'inventaire_id'
     ];
 
     protected $casts = [
@@ -120,6 +122,11 @@ class FactureRevendeur extends Model
         });
     }
 
+    public function inventaire(): BelongsTo
+    {
+        return $this->belongsTo(Inventaire::class);
+    }
+    
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);

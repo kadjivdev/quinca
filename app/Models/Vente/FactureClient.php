@@ -2,6 +2,7 @@
 
 namespace App\Models\Vente;
 
+use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\Depot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -45,7 +46,8 @@ class FactureClient extends Model
         'encaissed_by',
         'encaissed_at',
         'reference_recu',
-        'moyen_reglement'
+        'moyen_reglement',
+        'inventaire_id'
     ];
 
     protected $casts = [
@@ -123,6 +125,11 @@ class FactureClient extends Model
                 $facture->montant_regle = $facture->montant_ttc;
             }
         });
+    }
+
+    public function inventaire(): BelongsTo
+    {
+        return $this->belongsTo(Inventaire::class);
     }
 
     public function client(): BelongsTo
