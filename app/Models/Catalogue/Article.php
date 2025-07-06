@@ -285,6 +285,7 @@ class Article extends Model
     {
         // on recupere le stock de cet article dans ce dépot
         $stock = $this->stocks->firstWhere("depot_id", $depotId);
+        // $stock = $this->stocks->Where("depot_id", $depotId)->sum("quantite_reelle");
         return $stock->quantite_reelle - $this->qteVendu($depotId);
     }
 

@@ -43,7 +43,6 @@ class ServiceStockEntree
             $unite_origine_id = $donnees['unite_mesure_id'];
 
             // 4. Conversion si nécessaire
-            // if ($unite_origine_id !== $article->unite_mesure_id) {
             $uniteSource = UniteMesure::findOrFail($unite_origine_id);
             $uniteBase = $article->uniteMesure;
 
@@ -74,7 +73,6 @@ class ServiceStockEntree
                 'quantite_base' => $quantite_base,
                 'unite_base' => $uniteBase->code_unite
             ]);
-            // }
 
             // 5. Récupération ou création du stock
             $stock = StockDepot::firstOrNew([

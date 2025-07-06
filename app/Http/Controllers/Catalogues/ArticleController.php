@@ -63,7 +63,7 @@ class ArticleController extends Controller
                     );
 
                 $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
-                $stock->resteStock = $article->reste($stock->depot_id);
+                $stock->resteStock = $stock->quantite_reelle - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
 
                 $stock->qantiteBase = $conversion ? $this->serviceStockEntree
                     ->convertirQuantite(
@@ -350,7 +350,7 @@ class ArticleController extends Controller
 
     public function edit($id)
     {
-        $article = Article::with(['famille',"uniteMesure"])->findOrFail($id);
+        $article = Article::with(['famille', "uniteMesure"])->findOrFail($id);
         return response()->json([
             'success' => true,
             'data' => $article
@@ -379,7 +379,7 @@ class ArticleController extends Controller
 
             $data['stockable'] = filter_var($request->input('stockable'), FILTER_VALIDATE_BOOLEAN);
 
-            $validator = Validator::make($data, [           
+            $validator = Validator::make($data, [
                 'code_article' => 'required|unique:articles,code_article,',
                 'designation' => 'required|string|max:255',
                 'description' => 'nullable|string',
@@ -477,7 +477,7 @@ class ArticleController extends Controller
         }
 
         \Log::info("Après validation");
-        
+
         try {
             $data = $request->all();
             $data['stockable'] = $request->has('stockable');
@@ -601,6 +601,7 @@ class ArticleController extends Controller
 
             // Insertion en masse des détails d'inventaire
             DetailInventaire::insert($detailsInventaire);
+
 
             // Mise à jour en masse des stocks
             foreach ($stockUpdates as $update) {
