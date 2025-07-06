@@ -15,7 +15,7 @@
                             <th class="border-bottom-0">Famille</th>
                             <th class="border-bottom-0">Unité de mesure</th>
                             <!-- <th class="border-bottom-0">Stockable</th> -->
-                            <th class="border-bottom-0">Stock appro(en unité de base)</th>
+                            <th class="border-bottom-0">Stock total</th>
                             <th class="border-bottom-0" style="min-width: 150px;">Dépôts</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
@@ -41,8 +41,8 @@
                                         <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
                                         <span class="badge d-block d-flex text-dark">Qte base : {{$stock->qantiteBase}} ({{$article->uniteMesure->libelle_unite}}) </span>
                                         <span class="badge d-block d-flex align-items-center text-dark">Qte appro: ({{$stock->uniteMesure->libelle_unite}}) : <input type="number" name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}"></span>
-                                        <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVendu,2,'.','')}}</span>
-                                        <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($stock->resteStock,2,'.','')}}</span>
+                                        <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVendu,2,'.','')}} ({{$article->uniteMesure->libelle_unite}})</span>
+                                        <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($stock->resteStock,2,'.','')}} ({{$article->uniteMesure->libelle_unite}})</span>
                                     </li>
                                     <hr>
                                     @empty
