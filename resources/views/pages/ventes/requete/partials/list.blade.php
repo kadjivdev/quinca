@@ -2,6 +2,16 @@
 <div class="row g-3">
     {{-- Filtres --}}
 
+    @if($errors->any())
+    {!! implode('', $errors->all('<div>:message</div>')) !!}
+    @endif
+
+    @if(session()->has("success"))
+    <div class="alert bg-sussess">{{session()->get("success")}}</div>
+    @elseif(session()->has("error"))
+    <div class="alert bg-danger">{{session()->get("error")}}</div>
+    @endif
+
     {{-- Table des règlements --}}
     <div class="col-12">
         <div class="card border-0 shadow-sm p-3">
@@ -15,6 +25,7 @@
                             <th class="border-bottom-0">Mention</th>
                             <th class="border-bottom-0">Articles</th>
                             <th class="border-bottom-0">Montant</th>
+                            <th class="border-bottom-0">Document</th>
                             <th class="border-bottom-0">Action</th>
                         </tr>
                     </thead>
@@ -38,6 +49,13 @@
                                 @endif
                             </td>
                             <td>{{ $requete->montant }}</td>
+                            <td>
+                                @if($requete->fichier)
+                                <a target="__blank" href="{{$requete->fichier}}" class="btn btn-sm "> <span class="badge border bg-primary"> Voir </span></a>
+                                @else
+                                ---
+                                @endif
+                            </td>
                             <td>
                                 @if (is_null($requete->validate_at))
                                 <div class="dropdown">

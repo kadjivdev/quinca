@@ -15,7 +15,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form class="row p-3" action="#" id="addRequeteForm" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <form class="row p-3" action="{{route('requetes.store')}}" id="_addRequeteForm" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                 @csrf
                 <div class="col-6 mb-3">
                     <label for="num_demande">N° demande</label>
@@ -60,6 +60,11 @@
                 </div>
 
                 <div class="col-12 mb-3">
+                    <label>Document justificatif</label>
+                    <input type="file" class="form-control" name="_fichier">
+                </div>
+
+                <div class="col-12 mb-3">
                     <label for="articles">Motif</label>
                     <select name="motif" id="motif" class="select2 form-select" required>
                         <option value="">Choisir le motif </option>
@@ -74,7 +79,7 @@
                         <option value="">Choisir l'article </option>
                         @foreach ($articles as $article)
                         <option value="{{ $article->id }}" {{ in_array($article->id, old('articles', [])) ? 'selected' : '' }}>
-                           <span class="badge">{{ $article->designation }}</span>
+                            <span class="badge">{{ $article->designation }}</span>
                         </option>
                         @endforeach
                     </select>

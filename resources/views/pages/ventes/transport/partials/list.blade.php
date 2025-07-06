@@ -14,6 +14,7 @@
                             <th>Date</th>
                             <th>Montant</th>
                             <th>Observation</th>
+                            <th class="border-bottom-0">Document</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -25,6 +26,13 @@
                             <td>{{ Carbon\Carbon::parse($transport->date_op)->format('d-m-Y') }} </td>
                             <td>{{ $transport->montant }} </td>
                             <td>{{ $transport->observation }} </td>
+                            <td>
+                                @if($transport->documents)
+                                <a target="__blank" href="{{$transport->documents}}" class="btn btn-sm "> <span class="badge border bg-primary"> Voir </span></a>
+                                @else
+                                ---
+                                @endif
+                            </td>
                             <td>
                                 @if (is_null($transport->validate_at))
                                 <div class="dropdown">

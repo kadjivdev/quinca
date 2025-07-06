@@ -23,7 +23,7 @@ class Requete extends Model
         'validator',
         'validate_at',
         'motif',
-        'motif_content'
+        'motif_content',
     ];
 
     public function articles(){

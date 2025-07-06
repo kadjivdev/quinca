@@ -40,6 +40,11 @@
                 </div>
 
                 <div class="col-12 mb-3">
+                    <label>Document justificatif</label>
+                    <input type="file" class="form-control" name="documents">
+                </div>
+
+                <div class="col-12 mb-3">
                     <label for="observation">Observation</label>
                     <textarea class="form-control" name="observation" id="observation"></textarea>
                 </div>

@@ -17,7 +17,8 @@ class Transport extends Model
         'observation',
         'client_id',
         'validator',
-        'validate_at'
+        'validate_at',
+        'documents'
     ];
 
     public function client() : BelongsTo {

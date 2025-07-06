@@ -47,6 +47,7 @@ class RequeteController extends Controller
     public function store(Request $request)
     {
         try {
+
             $request->validate([
                 'num_demande' => 'required|integer',
                 'montant' => 'required',
@@ -58,16 +59,17 @@ class RequeteController extends Controller
                 'motif' => 'required|string',
                 // 'articles' => 'required|array',
                 'articles.*' => 'exists:articles,id',
-                'fichier' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png', // types de fichiers autorisés
+                '_fichier' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png', // types de fichiers autorisés
             ]);
 
             DB::beginTransaction();
 
-            if ($request->hasFile('fichier')) {
-                $filePath = $request->file('fichier')->store('uploads', 'public'); // Stocke le fichier dans le dossier 'uploads'
-                $validated['fichier'] = $filePath;
+            if ($request->hasFile('_fichier')) {
+                $fileName = $request->file('_fichier')->getClientOriginalName();
+                $request->file('_fichier')->move('requeteFiles', $fileName);
+                $validated['fichier'] = asset('requeteFiles/' . $fileName);
             }
-
+            
             // Créer la requête
             $requete = Requete::create([
                 'num_demande' => $request->num_demande,
@@ -80,7 +82,7 @@ class RequeteController extends Controller
                 'client_id' => $request->client_id,
                 'motif' => $request->motif,
                 'motif_content' => $request->autre_motif,
-                'fichier' => $request->hasFile('fichier') ? $request->file('fichier')->store('uploads', 'public') : null,
+                'fichier' => $request->hasFile('_fichier') ? $validated['fichier'] : null,
             ]);
 
             if ($request->motif == 'Articles') {
@@ -88,18 +90,11 @@ class RequeteController extends Controller
             }
 
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Requête enregistrée avec succès',
-            ]);
-            // return redirect()->route('requetes.index')->with('success', 'Requête enregistrée avec succès');
+            return back()->withInput()->with("success", "Requête enregistrée avec succès");
         } catch (ValidationException $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur de validation',
-                'errors' => $e->errors()
-            ], 422);
+            return back()->withInput()
+                ->withErrors($e->errors());
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur lors de la création de la requete:', [
@@ -108,10 +103,8 @@ class RequeteController extends Controller
                 'request_data' => $request->all() // Pour le débogage
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Une erreur est survenue lors de la création du règlement: ' . $e->getMessage()
-            ], 500);
+            return back()->withInput()
+                ->with("error", 'Une erreur est survenue lors de la création du règlement: ' . $e->getMessage());
         }
     }
 

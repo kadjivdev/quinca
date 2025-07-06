@@ -9,6 +9,7 @@ use App\Models\Vente\Client;
 use App\Models\Vente\Transport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -40,15 +41,24 @@ class TransportController extends Controller
                 'montant' => 'required|integer',
                 'date_op' => 'required|date',
                 'client_id' => 'required|string',
+                'documents' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png', // types de fichiers autorisés
             ]);
 
             DB::beginTransaction();
 
+            Log::info("Fichier du transport", ["file" => $request->hasFile('documents')]);
+            if ($request->hasFile('documents')) {
+                $fileName = $request->file('documents')->getClientOriginalName();
+                $request->file('documents')->move('transportFiles', $fileName);
+                $validated['documents'] = asset('transportFiles/' . $fileName);
+            }
+            
             Transport::create([
                 'montant' => $request->montant,
                 'date_op' => $request->date_op,
                 'client_id' => $request->client_id,
-                'observation' => $request->observation
+                'observation' => $request->observation,
+                'documents' => $validated['documents']
             ]);
 
             DB::commit();

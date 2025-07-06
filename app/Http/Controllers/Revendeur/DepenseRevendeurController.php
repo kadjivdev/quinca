@@ -110,7 +110,6 @@ class DepenseRevendeurController extends Controller
                 'observation'=>"nullable"
             ]);
 
-            // dd($validated);
             DB::beginTransaction();
 
             try {
