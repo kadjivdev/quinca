@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Parametre;
 
 use App\Http\Controllers\Controller;
+use App\Models\Catalogue\DetailInventaire;
+use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
 use App\Models\Parametre\TypeDepot;
+use App\Models\Revendeur\FactureRevendeur;
+use App\Models\Stock\StockDepot;
+use App\Models\Vente\FactureClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class DepotController extends Controller
@@ -25,7 +32,6 @@ class DepotController extends Controller
                 $depot->inventaires = $depot->inventaires();
                 return $depot;
             });
-
 
         $typesDepot = TypeDepot::all();
 
@@ -120,12 +126,20 @@ class DepotController extends Controller
             ], 500);
         }
     }
+
     /**
      * Afficher un magasin spécifique
      */
     public function show($id)
     {
-        $depot = Depot::with(['pointsVente', 'stocks', 'typeDepot'])->find($id);
+        $depot = Depot::with([
+            'pointsVente',
+            'stocks',
+            'stocks.article',
+            'stocks.depot',
+            'stocks.uniteMesure',
+            'typeDepot'
+        ])->find($id);
 
         if (!$depot) {
             return response()->json([
@@ -309,5 +323,138 @@ class DepotController extends Controller
 
         // Retourner une réponse JSON
         return response()->json(['exists' => $exists]);
+    }
+
+
+    /**
+     * ============================
+     * GESTION DES INVENTAIRES
+     *=============================     
+     */
+
+    /**
+     * Afficher les inventaires
+     * d'un depot
+     */
+    public function inventaires($depotId)
+    {
+        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+        $depot = Depot::with("stocks")->findOrFail($depotId);
+
+        $inventaires = $depot->inventaires();
+        return view("pages.parametre.depot.partials.inventaires", compact("depot", "inventaires", "date"));
+    }
+
+    /**
+     * Creation d' inventaires
+     * dans un depot
+     */
+    public function inventairesStore(Request $request, $depotId)
+    {
+        $depot = Depot::findOrFail($depotId);
+
+        // Validation des données
+        $validator = Validator::make($request->all(), [
+            "date_inventaire" => "required|date",
+            'stock_depots*' => 'required|array',
+            'stock_depots*id' => 'required|exists:stock_depots,id',
+            'stock_depots*unite_mesure_id' => 'required|exists:unite_mesures,id',
+            'stock_depots*qte_reel' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // On s'assure que c'est une collection
+        $stockDepotCheckeds = collect($request->stock_depots)
+            ->filter(function ($item) {
+                // Si 'checked' doit être true
+                return isset($item['checked']) && $item['checked'] == "on";
+            })
+            ->values(); // Pour réindexer la collection si besoin
+
+
+        // return response()->json($stockDepotCheckeds);
+        try {
+            DB::beginTransaction();
+
+            $inventaire = Inventaire::create([
+                'date_inventaire' => $request->date_inventaire,
+                'user_id' => Auth::id(),
+                'depot_ids' => $stockDepotCheckeds->pluck("depot_id"),
+            ]);
+            /**Init detail */
+            $detailsInventaires = [];
+
+            // Préparation des détails d'inventaire
+            foreach ($stockDepotCheckeds as $stockDepot) {
+                $detailsInventaires[] = [
+                    'qte_stock' => $stockDepot["qte_stock"],
+                    'qte_reel' => $stockDepot["qte_reel"],
+                    'stock_depot_id' => $stockDepot["id"],
+                ];
+
+                // Mise à jour en masse des stocks
+                StockDepot::where('id', $stockDepot["id"])
+                    ->update(['quantite_reelle' => $stockDepot["qte_reel"]]);
+
+                /** Classement des ventes(direction et revendeur) dans l'inventaires | il s'agit bien des ventes 
+                 * qui ne sont pas encore associées à un inventaire
+                 */
+
+                FactureClient::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+                FactureRevendeur::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+
+                DB::commit();
+
+                Log::info('Inventaire créé avec succès', [
+                    'inventaire_id' => $inventaire->id,
+                ]);
+            }
+
+            /** CREATION DES DETAILS INVENTAIRES */
+            $inventaire->details()
+                ->createMany($detailsInventaires);
+
+            DB::commit();
+            return back()->with("success", "Inventaire enregistré avec succès!");
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::info("Erreure d'enregistrement d'inventaire", ["error" => $e->getMessage()]);
+            return back()->with("error", "Erreure d'enregistrement lors de l'inventaire " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Afficher les details
+     * d'un inventaire
+     */
+    public function inventairesDetails($inventaireId)
+    {
+        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+
+        $inventaire = Inventaire::with([
+            "details",
+            "details.stockDepot",
+            "details.stockDepot.article",
+            "details.stockDepot.depot",
+            "details.stockDepot.uniteMesure",
+            "auteur"
+        ])->findOrFail($inventaireId);
+
+        // $inventaire["depots"] = $inventaire->depots();
+
+        if (request()->ajax()) {
+            $data = [
+                "success" => true,
+                "data" => $inventaire
+            ];
+            return response()->json($data);
+        }
+
+        return view("pages.parametre.depot.partials.inventaire-details", compact("inventaire", "date"));
     }
 }

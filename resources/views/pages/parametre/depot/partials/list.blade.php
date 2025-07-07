@@ -68,12 +68,8 @@
                                     </li>
                                     <!-- @can("inventaires.view") -->
                                     <li>
-                                        <a class="dropdown-item" href="#"
-                                            data-bs-toggle="modal" data-bs-target="#inventairesModal"
-                                            onclick="showInventories({{ $depot}})">
-                                            <i
-                                                class="fas fa-eye me-2"></i>
-                                            Inventaires
+                                        <a target="__blank" class="dropdown-item" href="{{route('depot.inventaires',$depot->id)}}">
+                                            <i class="fas fa-eye me-2"></i> Inventaires
                                         </a>
                                     </li>
                                     <!-- @endcan -->

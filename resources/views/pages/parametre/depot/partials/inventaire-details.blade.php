@@ -1,85 +1,86 @@
-<div class="col-12">
-    <div class="card p-3 border-0 shadow-sm">
-        <form action="#" method="post">
-            @csrf
-            @method("PATCH")
-            <!-- depots ids -->
-            <input type="text" name="depotIds" multiple hidden class="form-control" value="{{$depotIds}}">
-            <div class="table-responsive">
-                <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
+@extends('layouts.parametre.point_vente')
+@push('styles')
+@include('pages.parametre.depot.partials.styles')
+@endpush
+
+@section('content')
+
+<div class="content">
+    {{-- En-tête de la page --}}
+    <div class="page-header">
+        <div class="container-fluid p-0">
+            <div class="d-flex align-items-center justify-content-between">
+                {{-- Section gauche --}}
+                <div class="d-flex align-items-center gap-3">
+                    <div class="header-icon">
+                        <i class="fas fa-warehouse fs-4 text-primary"></i>
+                    </div>
+                    <div>
+                        <div class="header-pretitle">{{ $date }}</div>
+                        <h6 class="header-title mb-0">Gestion des Magasins</h6>
+                    </div>
+                </div>
+
+                {{-- Section droite --}}
+                <button disabled type="button" class="btn btn-primary btn-sm d-flex align-items-center">
+                    {{$inventaire->depot?->libelle_depot}} |
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Liste des dépôts --}}
+    <div class="row g-3 list mt-3" id="depotsList">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="modal-title fs-5" id="">Détails de l'inventaire : <span class="badge bg-warning">#{{$inventaire->id}} | {{\Carbon\carbon::parse($inventaire->created_at)->locale('fr')->isoFormat('dddd D MMMM YYYY')}} | {{$inventaire->auteur?->name}}</span></h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover align-middle mb-0" id="example1">
                     <thead class="bg-light">
                         <tr>
-                            <!-- <th class="border-bottom-0 text-nowrap py-3">N°</th> -->
-                            <th class="border-bottom-0">Code</th>
-                            <th class="border-bottom-0 text-center">Désignation</th>
-                            <th class="border-bottom-0">Famille</th>
-                            <th class="border-bottom-0">Unité de mesure</th>
-                            <!-- <th class="border-bottom-0">Stockable</th> -->
-                            <th class="border-bottom-0">Stock total</th>
-                            <th class="border-bottom-0" style="min-width: 150px;">Dépôts</th>
-                            <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
+                            <th class="border-bottom-0 text-nowrap py-3">N°</th>
+                            <th class="border-bottom-0">Date Inventaire</th>
+                            <th class="border-bottom-0">Auteur</th>
+                            <th class="border-bottom-0">Dépôt</th>
+                            <th class="border-bottom-0">Article</th>
+                            <th class="border-bottom-0">Unité</th>
+                            <th class="border-bottom-0">Qte précedente</th>
+                            <th class="border-bottom-0">Qte actuelle</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($articles as $article)
+                    <tbody class="">
+                        @foreach($inventaire->details as $detail)
                         <tr>
-                            <!-- <td class="text-nowrap py-3">
-                                <span class="badge bg-light text-dark numero-bl me-2">{{ $loop->iteration }}</span>
-                            </td> -->
-                            <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
-                            <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
-                            <td><span class="badge bg-light text-dark">{{$article->famille?$article->famille->libelle_famille:'---'}}</span></td>
-                            <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
-                            <td class="text-center">
-                                <span class="badge bg-success">{{number_format($article->stocks->sum("qantiteBase"),3,","," ")}}</span>
+                            <td class="text-nowrap py-3">
+                                <span class="badge bg-light text-dark numero-bl me-2">#{{$loop->iteration}}</span>
                             </td>
-
-                            <td class="border p-0 m-0">
-                                <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
-                                    @forelse($article->stocks as $stock)
-                                    <li class="bg-warning rounded p-2" style="list-style-type: none">
-                                        <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
-                                        <span class="badge d-block d-flex text-dark">Qte base : {{$stock->qantiteBase}} ({{$article->uniteMesure->libelle_unite}}) </span>
-                                        <span class="badge d-block d-flex align-items-center text-dark">
-                                            Qte appro: ({{$stock->uniteMesure->libelle_unite}}) : <input type="number" disabled name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}">
-                                    </span>
-                                        <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVendu,2,'.','')}} ({{$article->uniteMesure->libelle_unite}})</span>
-                                        <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($stock->resteStock,2,'.','')}} ({{$article->uniteMesure->libelle_unite}})</span>
-                                    </li>
-                                    <hr>
-                                    @empty
-                                    <li class="text-center">Ce article n'est disponible dans aucun dépôt!</li>
-                                    @endforelse
-                                </ul>
+                            <td><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($detail->created_at)->locale('fr')->isoFormat('dddd D MMMM YYYY')}}</span></td>
+                            <td class="text-center"><span class="badge bg-light text-dark"> {{$inventaire->auteur?->name}} </span></td>
+                            <td class="border p-2">
+                                <span class="badge bg-light border text-dark"> {{$detail->stockDepot->depot?->libelle_depot}} </span>
                             </td>
-                            <td class="text-end">
-                                <div class="btn-group w-100">
-                                    <button type="button" class="btn btn-outline-primary btn-sm"
-                                        onclick="editArticle({{ $article->id }})">
-                                        <i class="bi bi-pencil me-1"></i>Modifier
-                                    </button>
-                                    <a target="_blank" href="{{route('articles.show',$article->id)}}" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-pencil me-1"></i>Dépôts
-                                    </a>
-                                </div>
+                            <td class="border p-2">
+                                <span class="badge bg-light border text-dark"> {{$detail->stockDepot->article?->designation}} </span>
+                            </td>
+                            <td class="border p-2">
+                                <span class="badge bg-light border text-dark"> {{$detail->stockDepot->uniteMesure?->libelle_unite}} </span>
+                            </td>
+                            <td class="border p-2">
+                                <span class="badge bg-light border text-dark"> {{number_format($detail->qte_stock,2,"."," ") }} </span>
+                            </td>
+                            <td class="border p-2">
+                                <span class="badge bg-light border text-dark"> {{number_format($detail->qte_reel,2,"."," ") }} </span>
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-
-            <!-- @can("inventaires.create")
-            <br>
-            <div class="row d-flex justify-content-center">
-                <div class="col-6">
-                    <button class="btn btn-sm w-100 btn-dark"><i class="bi bi-plus-lg me-2"></i> Enregistrer un eventaire</button>
-                </div>
-            </div>
-            @endcan -->
-        </form>
+        </div>
     </div>
 </div>
+@endsection
 
 <!-- DATATABLES -->
 @push('scripts')

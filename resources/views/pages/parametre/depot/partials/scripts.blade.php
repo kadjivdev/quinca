@@ -139,7 +139,6 @@
             });
     }
 
-
     // Fonction pour générer un code de magasin
     function generateDepotCode() {
         const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';

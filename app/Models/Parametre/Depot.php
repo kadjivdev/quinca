@@ -63,9 +63,10 @@ class Depot extends Model
 
     function inventaires()
     {
-        $inventaires = Inventaire::with(["details","auteur"])->get()->filter(function ($inventaire) {
-            return in_array($this->id,json_decode($inventaire->depot_ids));
-        });
+        $inventaires = Inventaire::with(["details", "auteur"])->get()
+            ->filter(function ($inventaire) {
+                return in_array($this->id, json_decode($inventaire->depot_ids));
+            });
 
         return $inventaires;
     }

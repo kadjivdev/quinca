@@ -17,10 +17,8 @@
 
     {{-- Modals --}}
     @include('pages.parametre.depot.partials.add-modal')
-    @include('pages.parametre.depot.partials.inventories')
     @include('pages.parametre.depot.partials.edit-modal')
 @endsection
-
 
 @push('scripts')
     @include('pages.parametre.depot.partials.scripts')

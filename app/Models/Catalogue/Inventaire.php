@@ -22,7 +22,6 @@ class Inventaire extends Model
     ];
 
     protected $fillable = [
-        'depot_id',
         'date_inventaire',
         'user_id',
         'depot_ids',
@@ -35,8 +34,13 @@ class Inventaire extends Model
     }
 
     // à revoir
-    public function depot() : BelongsTo {
-        return $this->belongsTo(Depot::class, 'depot_id');
+    public function depots() {
+        if ($this->depot_ids) {
+            $inventaires = Depot::whereIn("id",json_decode($this->depot_ids))->get();
+        }else {
+            $inventaires = collect();
+        }
+        return $inventaires;
     }
 
     public function details() : HasMany {

@@ -577,10 +577,11 @@ class ArticleController extends Controller
             // Récupération de tous les stocks concernés en une seule requête
             $stockDepots = StockDepot::whereIn('article_id', $articles->pluck('id'))
                 ->whereIn('depot_id',  $idsToArray)
-                ->get()
-                ->keyBy(function ($stock) {
-                    return $stock->article_id . '_' . $stock->depot_id;
-                });
+                // ->get()
+                // ->keyBy(function ($stock) {
+                //     return $stock->article_id . '_' . $stock->depot_id;
+                // })
+            ;
 
             $detailsInventaire = [];
             $stockUpdates = [];
@@ -593,8 +594,8 @@ class ArticleController extends Controller
                 }
 
                 foreach ($depots as $depotId => $qteReel) {
-                    $stockKey = $articleId . '_' . $depotId;
-                    $stockDepot = $stockDepots->get($stockKey);
+                    // $stockKey = $articleId . '_' . $depotId;
+                    $stockDepot = $stockDepots->firstWhere(["article_id" => $articleId, "depot_id" => $depotId]);
 
                     if (!$stockDepot) {
                         throw new \Exception("Stock non trouvé pour l'article $articleId dans le dépôt $depotId");

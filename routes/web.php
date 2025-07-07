@@ -22,9 +22,8 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Vente\AcompteClient;
-use App\Models\Vente\Client;
-use App\Models\Vente\Requete;
+use App\Models\Revendeur\FactureRevendeur;
+use App\Models\Vente\FactureClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,11 +38,8 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $requete3 = Requete::findOrFail(3);
-    // $requete3->update(["validate_at" => null]);
-
-    // $acompte = AcompteClient::firstWhere("requete_id", 3)->delete();
-    // return response()->json($acompte);
+    FactureClient::query()->update(["inventaire_id" => null]);
+    FactureRevendeur::query()->update(["inventaire_id" => null]);
 
     return "Opération éffectuée avec succès!!";
 });
@@ -125,6 +121,14 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [DepotController::class, 'index'])->name('depot.index');
             Route::post('/', [DepotController::class, 'store'])->name('depot.store');
             Route::get('/{depot}/edit', [DepotController::class, 'edit'])->name('depot.edit');
+            Route::get('/{depot}/show', [DepotController::class, 'show'])->name('depot.show');
+
+            /** GESTION DES INVENTAIRES DANS LES DEPOTS */
+            Route::get('/{depot}/inventaires', [DepotController::class, 'inventaires'])->name('depot.inventaires');
+            Route::get('/inventaires/{id}/details', [DepotController::class, 'inventairesDetails'])->name('depot.inventaire.details');
+            Route::post('/{depot}/inventaires/store', [DepotController::class, 'inventairesStore'])->name('depot.inventairesStore');
+            /** FIN GESTION DES INVENTAIRES DANS LES DEPOTS */
+
             Route::put('/{depot}', [DepotController::class, 'update'])->name('depot.update');
             Route::delete('/{depot}', [DepotController::class, 'destroy'])->name('depot.destroy');
             Route::post('/{depot}/toggle-status', [DepotController::class, 'toggleStatus'])->name('depot.toggle-status');
