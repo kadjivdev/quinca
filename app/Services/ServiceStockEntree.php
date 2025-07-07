@@ -78,7 +78,7 @@ class ServiceStockEntree
             $stock = StockDepot::firstOrNew([
                 'depot_id' => $donnees['depot_id'],
                 'article_id' => $article->id,
-                'unite_mesure_id' => $donnees["unite_mesure_id"],
+                // 'unite_mesure_id' => $donnees["unite_mesure_id"],
             ]);
 
             $ancien_stock = $stock->quantite_reelle ?? 0;
@@ -113,7 +113,7 @@ class ServiceStockEntree
 
             // 8. Mise à jour du stock
             $stock->fill([
-                'quantite_reelle' => $ancien_stock + $donnees['quantite'], //old $quantite_base,
+                'quantite_reelle' => $ancien_stock + $quantite_base, //old $quantite_base,
                 'prix_moyen' => $nouveau_cump ?? 0.00,
                 'date_dernier_mouvement' => $donnees['date_mouvement'],
                 'user_id' => $donnees['user_id'],

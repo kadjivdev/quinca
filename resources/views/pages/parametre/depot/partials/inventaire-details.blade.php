@@ -61,7 +61,7 @@
                                 <span class="badge bg-light border text-dark"> {{$detail->stockDepot->depot?->libelle_depot}} </span>
                             </td>
                             <td class="border p-2">
-                                <span class="badge bg-light border text-dark"> {{$detail->stockDepot->article?->designation}} </span>
+                                <span class="badge bg-light border text-dark">{{$detail->stockDepot->article?->code_article}} - {{$detail->stockDepot->article?->designation}} </span>
                             </td>
                             <td class="border p-2">
                                 <span class="badge bg-light border text-dark"> {{$detail->stockDepot->uniteMesure?->libelle_unite}} </span>

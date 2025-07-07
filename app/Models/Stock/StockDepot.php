@@ -64,11 +64,6 @@ class StockDepot extends Model
         return $this->belongsTo(Depot::class);
     }
 
-    public function mouvements(): HasMany
-    {
-        return $this->hasMany(StockMouvement::class, 'depot_id');
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -41,10 +41,12 @@
                                         <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
                                         <span class="badge d-block d-flex text-dark">Qte base : {{$stock->qantiteBase}} ({{$article->uniteMesure->libelle_unite}}) </span>
                                         <span class="badge d-block d-flex align-items-center text-dark">
-                                            Qte appro: ({{$stock->uniteMesure->libelle_unite}}) : <input type="number" disabled name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}">
-                                    </span>
+                                                Qte appro: ({{$stock->uniteMesure->libelle_unite}}) : <input type="number" disabled name="articles[{{$article->id}}][{{$stock->depot_id}}]" class="form-control" value="{{$stock->quantite_reelle}}">
+                                        </span>
                                         <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVendu,2,'.','')}} ({{$article->uniteMesure->libelle_unite}})</span>
                                         <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($stock->resteStock,2,'.','')}} ({{$article->uniteMesure->libelle_unite}})</span>
+
+                                        <a href="{{route('stock.delete',$stock->id)}}" class="btn btn-sm btn-light border w-100 text-dark bg-white">Supprimer</a>
                                     </li>
                                     <hr>
                                     @empty
