@@ -377,7 +377,10 @@ class DepotController extends Controller
             ->values(); // Pour réindexer la collection si besoin
 
 
-        // return response()->json($stockDepotCheckeds);
+        if (count($stockDepotCheckeds) == 0) {
+            return back()->with("error", "Veuillez choisir au moins un article!");
+        }
+
         try {
             DB::beginTransaction();
 

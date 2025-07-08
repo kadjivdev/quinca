@@ -1,5 +1,5 @@
 <div class="modal fade" id="addInventaireModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-xxl-down bg-white">
+    <div class="modal-dialog modal-xl bg-white">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-light border-bottom-0 py-3">
                 <div class="d-flex align-items-center">
