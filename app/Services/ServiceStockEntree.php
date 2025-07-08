@@ -7,6 +7,7 @@ use App\Models\Catalogue\Article;
 use App\Models\Parametre\{UniteMesure, ConversionUnite, Depot};
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class ServiceStockEntree
 {
@@ -75,11 +76,22 @@ class ServiceStockEntree
             ]);
 
             // 5. Récupération ou création du stock
-            $stock = StockDepot::firstOrNew([
+            $stockExiste = StockDepot::firstWhere([
                 'depot_id' => $donnees['depot_id'],
                 'article_id' => $article->id,
                 // 'unite_mesure_id' => $donnees["unite_mesure_id"],
             ]);
+
+            if ($stockExiste) {
+                $stock = $stockExiste;
+            } else {
+                $stock = StockDepot::create([
+                    'depot_id' => $donnees['depot_id'],
+                    'article_id' => $article->id,
+                    'user_id' => Auth::id(),
+                    'unite_mesure_id' => $donnees["unite_mesure_id"],
+                ]);
+            }
 
             $ancien_stock = $stock->quantite_reelle ?? 0;
             $ancien_cump = $stock->prix_moyen ?? 0;
