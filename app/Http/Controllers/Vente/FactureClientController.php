@@ -909,6 +909,7 @@ class FactureClientController extends Controller
 
     public function print(Request $request, FactureClient $facture)
     {
+
         // Chargement des relations nécessaires
         $facture->load([
             'client',

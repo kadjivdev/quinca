@@ -98,23 +98,6 @@
                                     </div>
                                 </div>
                             </td>
-                            @php
-                            $qte = $facture->lignes()->sum("quantite");
-                            $qteLivre = $facture->lignes()->sum("quantite_livree")
-                            @endphp
-                            <!-- <td>
-                                @if($qte==$qteLivre)
-                                <span class="badge bg-primary"> Livrée </span>
-                                @else
-
-                                @if($qteLivre < 0 || $qteLivre==0)
-                                    <span class="badge bg-danger">Non Livrée </span>
-                                    @else
-                                    <span class="badge bg-info bg-opacity-10 text-info">Livré partiellement({{$qteLivre}})</span>
-                                    @endif
-
-                                    @endif
-                            </td> -->
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
                             <td class="text-end fw-medium">
                                 {{ number_format($facture->montant_ht, 0, ',', ' ') }} F
@@ -212,31 +195,25 @@
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
                                                 <a class="dropdown-item generate-facture-btn" target="blank"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#factureModal"
                                                     data-type="proforma"
-                                                    onclick="showProforma({{$facture->id}})"
-                                                    href="#">
+                                                    data-facture="{{$facture->id}}"
+                                                    onclick="showProforma()">
                                                     <i class="fas fa-file-alt me-2"></i>Proforma
                                                 </a>
                                             </li>
                                             <li>
                                                 <a class="dropdown-item generate-facture-btn" target="blank"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#factureModal"
                                                     data-type="bon-a-livrer"
-                                                    onclick="showBon({{$facture->id}})"
-                                                    href="#">
+                                                    data-facture="{{$facture->id}}"
+                                                    onclick="showProforma()">
                                                     <i class="fas fa-file-alt me-2"></i>Bon à livrer
                                                 </a>
                                             </li>
                                             <li>
                                                 <a class="dropdown-item generate-facture-btn" target="blank"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#factureModal"
                                                     data-type="bordereau-livraison"
-                                                    onclick="showBordereau({{$facture->id}})"
-                                                    href="#">
+                                                    data-facture="{{$facture->id}}"
+                                                    onclick="showProforma()">
                                                     <i class="fas fa-file-alt me-2"></i>Bordereau de livraison
                                                 </a>
                                             </li>
@@ -304,36 +281,36 @@
 
 @push("scripts")
 <script>
+    $(document).on('click', '.generate-facture-btn', function(e) {
+        e.preventDefault(); // Empêche le comportement par défaut du lien
+        var type = $(this).data('type'); // Récupère la valeur de data-type
+        var factureId = $(this).data('facture'); // Récupère la valeur de data-type
+        alert(type); // Affiche la valeur dans la console
+        alert(`facture id: ${factureId}`); // Affiche la valeur dans la console
+        // Tu peux ensuite utiliser la variable 'type' comme tu veux
 
-    $(document).ready(function () {
-        // PROFORMA
-        async function showProforma(factureId) {
-            $("#check-logo").removeClass("d-none")
-            $("#check-entete").addClass("d-none")
+        if (type == 'proforma') {
             $("#modalForm").attr("action", `/vente/factures/${factureId}/print`)
         }
-    
-        // BON DE LIVRAISON
-        async function showBon(factureId) {
-            $("#check-logo").addClass("d-none")
-            $("#check-entete").removeClass("d-none")
+
+        if (type == 'bon-a-livrer') {
             $("#modalForm").attr("action", `/vente/factures/${factureId}/bon-a-livrer`)
         }
-    
-        // BON DE LIVRAISON
-        async function showBordereau(factureId) {
-            $("#check-logo").addClass("d-none")
-            $("#check-entete").removeClass("d-none")
+
+        if (type == 'bordereau-livraison') {
             $("#modalForm").attr("action", `/vente/factures/${factureId}/bordereau-livraison`)
         }
-    
+
+        // Ouvre le modal Bootstrap 5
+        var modal = new bootstrap.Modal(document.getElementById('factureModal'));
+        modal.show();
+
         // 
         $(".select2-form").select2({
             theme: 'bootstrap-5',
             width: '100%',
         })
-    })
-
+    });
 </script>
 @endpush
 

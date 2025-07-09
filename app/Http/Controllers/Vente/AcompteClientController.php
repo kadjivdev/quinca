@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Vente;
-
 use App\Http\Controllers\Controller;
 use App\Models\Vente\{AcompteClient, Client, SessionCaisse};
 use Illuminate\Http\Request;
