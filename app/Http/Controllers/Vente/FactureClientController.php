@@ -49,12 +49,23 @@ class FactureClientController extends Controller
                 ->orderBy('created_at', 'desc');
 
             // Chargement des factures avec les relations nécessaires
-            if ($request->pointVente) {
+            if ($request->point_vente_id && !$request->client_id) {
                 $factures = $query->get()
                     ->filter(function ($facture) use ($request) {
-                        return $facture->createdBy->pointDeVente->id == $request->pointVente;
+                        return $facture->createdBy->point_de_vente_id == $request->point_vente_id;
                     });
-            } else {
+            }elseif ($request->client_id && !$request->point_vente_id) {
+                $factures = $query->get()
+                    ->filter(function ($facture) use ($request) {
+                        return $facture->client_id == $request->client_id;
+                    });
+            }elseif ($request->client_id && $request->point_vente_id) {
+                $factures = $query->get()
+                    ->filter(function ($facture) use ($request) {
+                        return ($facture->createdBy->point_de_vente_id == $request->point_vente_id && $facture->client_id == $request->client_id);
+                    });
+            }
+             else {
                 $factures = $query->get();
             }
 

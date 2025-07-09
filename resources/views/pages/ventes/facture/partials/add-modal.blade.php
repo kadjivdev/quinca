@@ -1,5 +1,5 @@
 <div class="modal fade" id="addFactureModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-xxl-down bg-white">
+    <div class="modal-dialog modal-xl bg-white">
         <div class="modal-content border-0 ">
             {{-- Header du modal avec un nouveau design --}}
             <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
@@ -46,9 +46,6 @@
                                         <div class="col-md-3">
                                             <label class="form-label fw-medium required">Client</label>
                                             <div class="input-group">
-                                                <!-- <span class="input-group-text bg-white">
-                                                    <i class="fas fa-user text-primary"></i>
-                                                </span> -->
                                                 <select class="form-select select2" name="client_id" required>
                                                     <option value="">Sélectionner un client</option>
                                                     @foreach ($clients as $client)
@@ -116,7 +113,7 @@
                                                     <th>Prix</th>
                                                     <th>Remise (%)</th>
                                                     <th>Total TTC</th>
-                                                    <th></th>
+                                                    <!-- <th></th> -->
                                                 </tr>
                                             </thead>
                                             <tbody id="lignesContainer">
@@ -124,23 +121,23 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="5" class="text-end fw-bold">Total HT</td>
+                                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
                                                     <td class="text-end fw-bold" id="totalHT">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="5" class="text-end fw-bold">TVA
+                                                    <td colspan="4" class="text-end fw-bold">TVA
                                                         ({{ $tauxTva }}%)</td>
                                                     <td class="text-end fw-bold" id="totalTVA">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="5" class="text-end fw-bold">AIB</td>
+                                                    <td colspan="4" class="text-end fw-bold">AIB</td>
                                                     <td class="text-end fw-bold" id="totalAIB">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr class="table-light">
-                                                    <td colspan="5" class="text-end fw-bold">Montant TTC</td>
+                                                    <td colspan="4" class="text-end fw-bold">Montant TTC</td>
                                                     <td class="text-end fw-bold" id="totalTTC">0,00 FCFA</td>
                                                     <td></td>
                                                 </tr>
@@ -317,5 +314,6 @@
         width: '100%',
         dropdownParent: $('#addFactureModal'),
     })
+
 </script>
 @endpush

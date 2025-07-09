@@ -3,16 +3,27 @@
 <div class="row d-flex justify-content-center">
     <div class="col-md-6 border bg-light rounded p-3">
         <!-- FILTRAGE PAR DEPOT -->
-        <form action="{{route('vente.facture.index')}}" method="get">
-            <select class="form-select form-control" name="pointVente" id="">
-                <option value="">Sélectionner un point de vente</option>
-                @foreach($pointsVentes as $pointVente)
-                <option value="{{$pointVente->id}}" class="">{{$pointVente->nom_pv}} ({{$pointVente->id}})</option>
-                @endforeach
-            </select>
-            <br>
-
-            <button class="w-100 btn btn-primary px-4">
+        <form action="{{route('vente.facture.index')}}" method="GET">
+            @csrf
+            <div class="row">
+                <div class="col-6">
+                    <select class="form-select form-control select2-form" name="point_vente_id" id="">
+                        <option value="">Sélectionner un point de vente</option>
+                        @foreach($pointsVentes as $pointVente)
+                        <option value="{{$pointVente->id}}" class="">{{$pointVente->nom_pv}} ({{$pointVente->id}})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-6">
+                    <select class="form-select form-control select2-form" name="client_id" id="">
+                        <option value="">Sélectionner un client</option>
+                        @foreach($clients as $client)
+                        <option value="{{$client->id}}" class="">{{$client->raison_sociale}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <button class="w-100 btn btn-primary mt-2 px-4">
                 <i class="fas fa-save me-2"></i>Filtrer
             </button>
         </form>
@@ -292,32 +303,36 @@
 
 @push("scripts")
 <script>
-    // PROFORMA
-    async function showProforma(factureId) {
-        $("#check-logo").removeClass("d-none")
-        $("#check-entete").addClass("d-none")
-        $("#modalForm").attr("action", `/vente/factures/${factureId}/print`)
-    }
 
-    // BON DE LIVRAISON
-    async function showBon(factureId) {
-        $("#check-logo").addClass("d-none")
-        $("#check-entete").removeClass("d-none")
-        $("#modalForm").attr("action", `/vente/factures/${factureId}/bon-a-livrer`)
-    }
-
-    // BON DE LIVRAISON
-    async function showBordereau(factureId) {
-        $("#check-logo").addClass("d-none")
-        $("#check-entete").removeClass("d-none")
-        $("#modalForm").attr("action", `/vente/factures/${factureId}/bordereau-livraison`)
-    }
-
-    // 
-    $(".__select2").select2({
-        theme: 'bootstrap-5',
-        width: '100%',
+    $(document).ready(function () {
+        // PROFORMA
+        async function showProforma(factureId) {
+            $("#check-logo").removeClass("d-none")
+            $("#check-entete").addClass("d-none")
+            $("#modalForm").attr("action", `/vente/factures/${factureId}/print`)
+        }
+    
+        // BON DE LIVRAISON
+        async function showBon(factureId) {
+            $("#check-logo").addClass("d-none")
+            $("#check-entete").removeClass("d-none")
+            $("#modalForm").attr("action", `/vente/factures/${factureId}/bon-a-livrer`)
+        }
+    
+        // BON DE LIVRAISON
+        async function showBordereau(factureId) {
+            $("#check-logo").addClass("d-none")
+            $("#check-entete").removeClass("d-none")
+            $("#modalForm").attr("action", `/vente/factures/${factureId}/bordereau-livraison`)
+        }
+    
+        // 
+        $(".select2-form").select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+        })
     })
+
 </script>
 @endpush
 

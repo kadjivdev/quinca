@@ -24,7 +24,6 @@ class DepotController extends Controller
      * Afficher la liste des dépôts
      */
 
-
     public function index()
     {
         $depots = Depot::with(['pointsVente', 'typeDepot'])->get()
@@ -44,6 +43,7 @@ class DepotController extends Controller
 
         return view('pages.parametre.depot.index', compact('depots', 'typesDepot', 'date', 'pvs'));
     }
+
     /**
      * Charge les données d'un magasin pour modification
      */
@@ -325,7 +325,6 @@ class DepotController extends Controller
         return response()->json(['exists' => $exists]);
     }
 
-
     /**
      * ============================
      * GESTION DES INVENTAIRES
@@ -375,7 +374,6 @@ class DepotController extends Controller
                 return isset($item['checked']) && $item['checked'] == "on";
             })
             ->values(); // Pour réindexer la collection si besoin
-
 
         if (count($stockDepotCheckeds) == 0) {
             return back()->with("error", "Veuillez choisir au moins un article!");
