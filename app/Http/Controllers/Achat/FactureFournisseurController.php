@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Achat;
 use App\Models\Achat\{
     FactureFournisseur,
     LigneFactureFournisseur,
-    BonCommande
+    BonCommande,
+    Fournisseur
 };
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -29,6 +30,12 @@ class FactureFournisseurController extends Controller
             'lignes.article',
             'lignes.uniteMesure'
         ]);
+
+        if ($request->fournisseur_id) {
+            $query->where("fournisseur_id", $request->fournisseur_id);
+        }
+
+        $fournisseurs = Fournisseur::get();
 
         // Filtres
         if ($request->filled('period')) {
@@ -78,7 +85,11 @@ class FactureFournisseurController extends Controller
         $factures = $query->latest('date_facture')->get();
 
         // Calcul des statistiques pour le header
+
         $statsQuery = FactureFournisseur::query();
+        if ($request->fournisseur_id) {
+            $statsQuery->where("fournisseur_id", $request->fournisseur_id);
+        }
 
         // Si un filtre de période est actif, l'appliquer aux stats aussi
         if ($request->filled('period')) {
@@ -113,6 +124,7 @@ class FactureFournisseurController extends Controller
 
         // Retour de la vue avec toutes les données nécessaires
         return view('pages.achat.facture-frs.index', [
+            "fournisseurs" => $fournisseurs,
             // Données principales
             'factures' => $factures,
             'bonsCommande' => $bonsCommande,
@@ -218,12 +230,12 @@ class FactureFournisseurController extends Controller
             'fournisseur',
             'lignes' => function ($query) {
                 /**on recupere seulement les lignes qui disposent encore de quantité */
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->whereNull('quantite_livree_simple')
-                      ->orWhere(function($subQ) {
-                          $subQ->whereNotNull('quantite_livree_simple')
-                               ->where('quantite', '>', DB::raw('quantite_livree_simple'));
-                      });
+                        ->orWhere(function ($subQ) {
+                            $subQ->whereNotNull('quantite_livree_simple')
+                                ->where('quantite', '>', DB::raw('quantite_livree_simple'));
+                        });
                 });
             },
             'lignes.article',
@@ -236,10 +248,10 @@ class FactureFournisseurController extends Controller
         ]);
     }
 
-     /**
+    /**
      * Affiche les détails sans filtre d'une facture
      */
-    
+
     public function show(FactureFournisseur $facture)
     {
         $facture->load([

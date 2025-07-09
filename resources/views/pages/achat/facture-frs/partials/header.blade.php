@@ -33,11 +33,10 @@
                 </button>
 
                 {{-- Bouton de synchronisation --}}
-                <button type="button" class="btn btn-light-secondary btn-sm d-flex align-items-center"
-                    onclick="refreshPage()">
+                <a href="{{route('factures.index')}}" class="btn btn-light-secondary btn-sm d-flex align-items-center">
                     <i class="fas fa-sync-alt me-2 refresh-icon"></i>
                     <span class="refresh-text">Actualiser</span>
-                </button>
+                </a>
             </div>
         </div>
 

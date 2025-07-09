@@ -162,9 +162,10 @@ class Fournisseur extends Model
         $facturesAmount = $this->facture_fournisseurs->sum("montant_ttc");
 
         /** Les règlements */
-        $reglements_amount = $this->facture_fournisseurs->sum(function ($query) {
-            return $query->facture_reglements_amount();
-        });
+        $reglements_amount = $this->facture_fournisseurs
+            ->sum(function ($query) {
+                return $query->facture_reglements_amount();
+            });
 
         /** Les accomptes */
         $fournisseurAccomptesAmount = $this->accomptes
