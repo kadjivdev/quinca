@@ -285,8 +285,6 @@
         e.preventDefault(); // Empêche le comportement par défaut du lien
         var type = $(this).data('type'); // Récupère la valeur de data-type
         var factureId = $(this).data('facture'); // Récupère la valeur de data-type
-        alert(type); // Affiche la valeur dans la console
-        alert(`facture id: ${factureId}`); // Affiche la valeur dans la console
         // Tu peux ensuite utiliser la variable 'type' comme tu veux
 
         if (type == 'proforma') {
