@@ -51,12 +51,24 @@ class AcompteClientController extends Controller
 
         // Statistiques
         $stats = [
-            'total_acomptes' => AcompteClient::count(),
-            'total_montant' => AcompteClient::sum('montant'),
-            'acomptes_mois' => AcompteClient::whereMonth('date', now()->month)
+            'total_acomptes' => $request->filled('client_id') ?
+                AcompteClient::where('client_id', $request->client_id)->count()
+                : AcompteClient::count(),
+            'total_montant' => $request->filled('client_id') ?
+                AcompteClient::where('client_id', $request->client_id)->sum("montant") : AcompteClient::sum('montant'),
+            'acomptes_mois' => $request->filled('client_id') ?
+                AcompteClient::where('client_id', $request->client_id)
+                ->whereYear('date', now()->year)
+                ->count()
+                : AcompteClient::whereMonth('date', now()->month)
                 ->whereYear('date', now()->year)
                 ->count(),
-            'montant_mois' => AcompteClient::whereMonth('date', now()->month)
+            'montant_mois' => $request->filled('client_id') ?
+                AcompteClient::where('client_id', $request->client_id)
+                ->whereMonth('date', now()->month)
+                ->whereYear('date', now()->year)
+                ->sum('montant')
+                : AcompteClient::whereMonth('date', now()->month)
                 ->whereYear('date', now()->year)
                 ->sum('montant')
         ];

@@ -22,6 +22,14 @@ class ReglementFournisseurController extends Controller
         $query = ReglementFournisseur::with(['facture.fournisseur', 'creator'])
             ->orderBy('created_at', 'desc');
 
+        if ($request->fournisseur_id) {
+            $query
+                ->whereHas("facture", function ($facture) use ($request) {
+                    $facture->where("fournisseur_id", $request->fournisseur_id);
+                })
+                ->where("fournisseur_id", $request->fournisseur_id);
+        }
+
         // Filtres
         if ($request->has('search')) {
             $query->search($request->search);
@@ -47,7 +55,6 @@ class ReglementFournisseurController extends Controller
         }
 
         // Récupération des règlements paginés
-        // $reglements = $query->paginate(15);
         $reglements = $query->get();
 
         // Statistiques
@@ -82,8 +89,6 @@ class ReglementFournisseurController extends Controller
                 'facturesPayees' => $stats['facturesPayees'],
                 'factures' => $factures
             ]);
-
-            //    return view('achat.reglements.liste-partielle', compact('reglements', 'stats'))->render();
         }
 
         return view('pages.achat.reglement-frs.index', [
@@ -95,7 +100,6 @@ class ReglementFournisseurController extends Controller
             'factures' => $factures,
             'fournisseurs' => $fournisseurs,
         ]);
-        // return view('pages.achat.reglement-frs.index', compact('date','reglements', 'stats', 'factures'));
     }
 
     public function store(Request $request)

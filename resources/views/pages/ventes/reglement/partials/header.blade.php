@@ -31,10 +31,10 @@
             </div>
 
             <div class="col-auto d-flex gap-2">
-                <button type="button" class="btn btn-light px-3 d-inline-flex align-items-center" onclick="refreshList()">
+                <a href="{{route('vente.reglement.index')}}" class="btn btn-light px-3 d-inline-flex align-items-center">
                     <i class="fas fa-sync-alt me-2"></i>
                     Actualiser
-                </button>
+                </a>
 
                 <button type="button"
                         class="btn btn-primary px-3 d-inline-flex align-items-center"

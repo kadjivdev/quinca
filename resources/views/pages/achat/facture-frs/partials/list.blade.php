@@ -16,7 +16,6 @@
     </div>
 </div>
 
-
 {{-- list.blade.php --}}
 <div class="row g-3">
     {{-- Filtre dropdown --}}

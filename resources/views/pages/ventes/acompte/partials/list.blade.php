@@ -4,60 +4,63 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body p-3">
                 <div class="row g-3">
-                    {{-- Filtre Client --}}
-                    <div class="col-md-3">
-                        <label class="form-label small">Client</label>
-                        <select class="form-select form-select-sm" id="clientFilter" onchange="filterAcomptes()">
-                            <option value="">Tous les clients</option>
-                            @foreach ($clients as $client)
-                            <option value="{{ $client->id }}">{{ $client->code_client }} - {{ $client->raison_sociale }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <form action="{{route('vente.acomptes.index')}}" method="get">
+                        @csrf
+                        <div class="row">
+                            {{-- Filtre Client --}}
+                            <div class="col-md-3">
+                                <label class="form-label small">Client</label>
+                                <select class="form-select form-select-sm" name="client_id" id="clientFilter">
+                                    <option value="">Tous les clients</option>
+                                    @foreach ($clients as $client)
+                                    <option value="{{ $client->id }}">{{ $client->code_client }} - {{ $client->raison_sociale }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                    {{-- Filtre Type de Paiement --}}
-                    <div class="col-md-2">
-                        <label class="form-label small">Type de paiement</label>
-                        <select class="form-select form-select-sm" id="typePaiementFilter" onchange="filterAcomptes()">
-                            <option value="">Tous les types</option>
-                            <option value="espece">Espèce</option>
-                            <option value="cheque">Chèque</option>
-                            <option value="virement">Virement</option>
-                        </select>
-                    </div>
+                            {{-- Filtre Type de Paiement --}}
+                            <div class="col-md-2">
+                                <label class="form-label small">Type de paiement</label>
+                                <select class="form-select form-select-sm" id="typePaiementFilter" name="type_paiement">
+                                    <option value="">Tous les types</option>
+                                    <option value="espece">Espèce</option>
+                                    <option value="cheque">Chèque</option>
+                                    <option value="virement">Virement</option>
+                                </select>
+                            </div>
 
-                    {{-- Filtre Période --}}
-                    <div class="col-md-5">
-                        <label class="form-label small">Période</label>
-                        <div class="input-group input-group-sm">
-                            <input type="date" class="form-control" id="dateDebut" onchange="filterAcomptes()">
-                            <span class="input-group-text">au</span>
-                            <input type="date" class="form-control" id="dateFin" onchange="filterAcomptes()">
+                            {{-- Filtre Période --}}
+                            <div class="col-md-5">
+                                <label class="form-label small">Période</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="date" class="form-control" id="dateDebut" name="date_debut">
+                                    <span class="input-group-text">au</span>
+                                    <input type="date" class="form-control" id="dateFin" name="date_fin">
+                                </div>
+                            </div>
+
+                            {{-- Recherche --}}
+                            <div class="col-md-2">
+                                <label class="form-label small">Recherche</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                    <input type="text"
+                                        class="form-control form-control-sm border-start-0"
+                                        placeholder="Référence...">
+                                </div>
+                            </div>
+
                         </div>
-                    </div>
-
-                    {{-- Recherche --}}
-                    <div class="col-md-2">
-                        <label class="form-label small">Recherche</label>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
-                            <input type="text"
-                                class="form-control form-control-sm border-start-0"
-                                id="searchFilter"
-                                placeholder="Référence..."
-                                onkeyup="filterAcomptes()">
+                        <div class="d-flex justify-content-center">
+                            {{-- Bouton réinitialiser --}}
+                            <button type="submit" class="w-50 mt-3 btn btn-light btn-sm">
+                                <i class="fas fa-undo me-1"></i>
+                                Filtrer
+                            </button>
                         </div>
-                    </div>
-
-                    {{-- Bouton réinitialiser --}}
-                    <div class="col-12 d-flex justify-content-end mt-2">
-                        <button class="btn btn-light btn-sm" onclick="resetFilters()">
-                            <i class="fas fa-undo me-1"></i>
-                            Réinitialiser les filtres
-                        </button>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -259,6 +262,10 @@
 </style>
 
 <script>
+    $(document).ready(function() {
+        $("#form-select-sm").select2()
+    })
+
     function filterAcomptes() {
         // Afficher le loader
         Swal.fire({
@@ -271,52 +278,6 @@
             }
         });
 
-        // Récupérer les valeurs des filtres
-        const filters = {
-            client_id: $('#clientFilter').val(),
-            type_paiement: $('#typePaiementFilter').val(),
-            date_debut: $('#dateDebut').val(),
-            date_fin: $('#dateFin').val(),
-            search: $('#searchFilter').val()
-        };
-
-        // Faire la requête AJAX avec les filtres
-        $.ajax({
-            url: `${apiUrl}/vente/acomptes/refresh-list`,
-            method: 'GET',
-            data: filters,
-            success: function(response) {
-                // Mettre à jour le tableau avec les nouvelles données
-                $('#acomptesTable tbody').html($(response.html).find('#acomptesTable tbody').html());
-
-                // Mettre à jour la pagination si elle existe
-                if ($('.card-footer').length) {
-                    $('.card-footer').html($(response.html).find('.card-footer').html());
-                }
-
-                // Mettre à jour les statistiques
-                if (response.stats) {
-                    $('.stat-total').text(response.stats.total.toLocaleString('fr-FR'));
-                    $('.stat-montant').text(response.stats.montant_total.toLocaleString('fr-FR'));
-                    $('.stat-mois').text(response.stats.acomptes_mois.toLocaleString('fr-FR'));
-                    $('.stat-montant-mois').text(response.stats.montant_mois.toLocaleString('fr-FR'));
-                }
-
-                // Réinitialiser les tooltips
-                $('[data-bs-toggle="tooltip"]').tooltip();
-
-                // Fermer le loader
-                Swal.close();
-            },
-            error: function(xhr, status, error) {
-                Swal.close();
-                Toast.fire({
-                    icon: 'error',
-                    title: 'Erreur lors du filtrage des acomptes'
-                });
-                console.error('Erreur:', error);
-            }
-        });
     }
 
     // Réinitialiser les filtres
@@ -498,6 +459,7 @@
         };
         return types[type] || type;
     }
+
 
     // Initialisation au chargement de la page
     $(document).ready(function() {

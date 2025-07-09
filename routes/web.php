@@ -77,6 +77,7 @@ Route::middleware('auth')->group(function () {
         ->name('acompte-clients.get-clients');
 
     Route::put('/vente/acomptes/{acompte}', [AcompteClientController::class, 'update'])->name('acomptes.update');
+    
     Route::prefix('vente/acomptes')->group(function () {
         Route::post('{acompte}/validate', [AcompteClientController::class, 'validate_acompte'])
             ->name('acomptes.validate');

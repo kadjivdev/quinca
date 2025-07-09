@@ -26,6 +26,7 @@ class ReglementClientController extends Controller
             'validatedBy'
         ])->latest();
 
+
         // Application des filtres
         if ($request->filled('client_id')) {
             $reglements->whereHas('facture', function ($query) use ($request) {
@@ -53,8 +54,6 @@ class ReglementClientController extends Controller
             $reglements->whereDate('date_reglement', '<=', $request->date_fin);
         }
 
-        $reglements = $reglements->paginate(10);
-
         // Données pour les filtres et le modal d'ajout
         $clients = Client::orderBy('raison_sociale')
             ->with(["facturesClient" => function ($query) {
@@ -63,33 +62,63 @@ class ReglementClientController extends Controller
             }])
             ->get();
 
-        // dd($clients->where("id", 2)->facturesClient);
-
         // Statistiques pour le header
         $statsReglements = [
             // Total des règlements du mois
-            'total_mois' => ReglementClient::whereMonth('date_reglement', now()->month)
+            'total_mois' => $request->filled('client_id') ?
+                ReglementClient::whereHas('facture', function ($query) use ($request) {
+                    $query->where('client_id', $request->client_id);
+                })->whereMonth('date_reglement', now()->month)
+                ->whereYear('date_reglement', now()->year)
+                ->where('statut', 'validee')
+                ->sum('montant')
+                :
+                ReglementClient::whereMonth('date_reglement', now()->month)
                 ->whereYear('date_reglement', now()->year)
                 ->where('statut', 'validee')
                 ->sum('montant'),
 
             // Total des règlements
-            'total_reglements' => ReglementClient::where('statut', 'validee')
+            'total_reglements' => $request->filled('client_id') ?
+                ReglementClient::whereHas('facture', function ($query) use ($request) {
+                    $query->where('client_id', $request->client_id);
+                })->where('statut', 'validee')->sum('montant')
+                : ReglementClient::where('statut', 'validee')
                 ->sum('montant'),
 
             // Nombre de règlements en attente
-            'reglements_en_attente' => ReglementClient::where('statut', 'brouillon')->count(),
+            'reglements_en_attente' => $request->filled('client_id') ?
+                ReglementClient::whereHas('facture', function ($query) use ($request) {
+                    $query->where('client_id', $request->client_id);
+                })->where('statut', 'brouillon')->count()
+                :
+                ReglementClient::where('statut', 'brouillon')->count(),
 
             // Montant des règlements en attente
-            'montant_en_attente' => ReglementClient::where('statut', 'brouillon')
+            'montant_en_attente' => $request->filled('client_id') ?
+                ReglementClient::whereHas('facture', function ($query) use ($request) {
+                    $query->where('client_id', $request->client_id);
+                })->where('statut', 'brouillon')->sum('montant')
+                :
+                ReglementClient::where('statut', 'brouillon')
                 ->sum('montant'),
 
             // Répartition par mode de paiement
-            'repartition_modes' => ReglementClient::where('statut', 'valide')
+            'repartition_modes' => $request->filled('client_id') ?
+                ReglementClient::whereHas('facture', function ($query) use ($request) {
+                    $query->where('client_id', $request->client_id);
+                })->where('statut', 'valide')
+                ->select('type_reglement', DB::raw('COUNT(*) as count'), DB::raw('SUM(montant) as total'))
+                ->groupBy('type_reglement')
+                ->get()
+                :
+                ReglementClient::where('statut', 'valide')
                 ->select('type_reglement', DB::raw('COUNT(*) as count'), DB::raw('SUM(montant) as total'))
                 ->groupBy('type_reglement')
                 ->get()
         ];
+
+        $reglements = $reglements->get();
 
         // Récupérer les factures non soldées pour le modal d'ajout
         $factures = FactureClient::with(["reglements"])

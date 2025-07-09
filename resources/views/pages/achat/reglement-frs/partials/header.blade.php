@@ -29,11 +29,10 @@
                     Nouveau règlement
                 </button>
 
-                <button type="button" class="btn btn-light-secondary btn-sm d-flex align-items-center"
-                    onclick="refreshPage()">
+                <a href="{{route('reglements.index')}}" class="btn btn-light-secondary btn-sm d-flex align-items-center">
                     <i class="fas fa-sync-alt me-2 refresh-icon"></i>
                     <span class="refresh-text">Actualiser</span>
-                </button>
+                </a>
 
                 <div class="dropdown">
                     <button class="btn btn-light-warning btn-sm dropdown-toggle d-flex align-items-center"
@@ -45,7 +44,9 @@
                         <li><a class="dropdown-item" href="#" onclick="filterByDate('today')">Aujourd'hui</a></li>
                         <li><a class="dropdown-item" href="#" onclick="filterByDate('week')">Cette semaine</a></li>
                         <li><a class="dropdown-item" href="#" onclick="filterByDate('month')">Ce mois</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li><a class="dropdown-item" href="#" onclick="filterByMode('ESPECE')">Espèces</a></li>
                         <li><a class="dropdown-item" href="#" onclick="filterByMode('CHEQUE')">Chèques</a></li>
                         <li><a class="dropdown-item" href="#" onclick="filterByMode('VIREMENT')">Virements</a></li>
@@ -55,7 +56,7 @@
         </div>
 
         <div class="row g-3 mt-3">
-            <div class="col-12 col-md-auto">
+            <div class="card shadow-sm p-2 col-12 col-md-auto">
                 <div class="quick-stat-card">
                     <div class="d-flex align-items-center">
                         <div class="stat-icon bg-soft-primary">
@@ -72,7 +73,7 @@
                 </div>
             </div>
 
-            <div class="col-12 col-md-auto">
+            <div class="card shadow-sm p-2 mx-2 col-md-auto">
                 <div class="quick-stat-card">
                     <div class="d-flex align-items-center">
                         <div class="stat-icon bg-soft-success">
@@ -89,7 +90,7 @@
                 </div>
             </div>
 
-            <div class="col-12 col-md-auto">
+            <div class="card shadow-sm p-2 col-md-auto">
                 <div class="quick-stat-card">
                     <div class="d-flex align-items-center">
                         <div class="stat-icon bg-soft-info">

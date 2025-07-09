@@ -1,3 +1,21 @@
+<div class="row d-flex justify-content-center">
+    <div class="col-md-6 border bg-light rounded p-3">
+        <!-- FILTRAGE PAR DEPOT -->
+        <form action="{{route('reglements.index')}}" method="GET">
+            @csrf
+            <select class="form-select form-control" name="fournisseur_id">
+                <option value="">Sélectionner un fournisseur</option>
+                @foreach($fournisseurs as $fournisseur)
+                <option value="{{$fournisseur->id}}" class="">{{$fournisseur->raison_sociale}}</option>
+                @endforeach
+            </select>
+            <button class="w-100 btn btn-warning mt-2 px-4">
+                <i class="fas fa-save me-2"></i>Filtrer
+            </button>
+        </form>
+    </div>
+</div>
+
 <div class="row g-3">
     <div class="col-12">
         <div class="card border-0 p-3 shadow-sm">
