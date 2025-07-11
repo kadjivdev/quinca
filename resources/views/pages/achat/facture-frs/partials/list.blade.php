@@ -257,7 +257,6 @@
         // Fonction pour valider une facture
         
         window.validateFacture = function(id) {
-            alert("gogo")
             Swal.fire({
                 title: 'Valider la facture',
                 text: 'Êtes-vous sûr de vouloir valider cette facture ? Cette action est irréversible.',
