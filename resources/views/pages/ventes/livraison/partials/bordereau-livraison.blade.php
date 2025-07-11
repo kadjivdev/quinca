@@ -95,9 +95,9 @@
     <br><br><br><br><br>
     <div class="client-info">
         <h4> <strong class="livraison-number">Cotonou le {{Carbon\Carbon::parse(now())->locale('fr')->isoFormat('D MMMM YYYY')}} </strong></h4>
-        <h3 class="text-center"> <strong class="livraison-number">BORDEREAU DE LIVRAISON : {{str_replace("FAC","BL",$facture->numero)}} </strong></h3>
+        <h3 class="text-center"> <strong class="livraison-number">BORDEREAU DE LIVRAISON : {{$livraison->numero}} </strong></h3>
         <h3 class="text-left"> <strong class="livraison-number">DESTINATION </strong></h3>
-        <p> <strong>Client:</strong>  {{$facture->client?->raison_sociale}} </p>
+        <p> <strong>Client:</strong>  {{$livraison->facture->client?->raison_sociale}} </p>
     </div>
     
     <table>
@@ -109,7 +109,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($facture->lignes as $ligne)
+            @foreach($livraison->lignes as $ligne)
             <tr>
                 <td class="text-center">{{ $ligne->article->designation }}</td>
                 <td class="text-center">{{ number_format($ligne->quantite, 3, ',', ' ') }} </td>

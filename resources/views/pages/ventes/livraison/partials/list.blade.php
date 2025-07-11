@@ -109,11 +109,21 @@
                                     @endif
 
                                     {{-- Imprimer --}}
-                                    <button class="btn btn-sm btn-light-secondary btn-icon ms-1"
-                                        onclick="printLivraison({{ $livraison->id }})" data-bs-toggle="tooltip"
-                                        title="Imprimer">
-                                        <i class="fas fa-print"></i>
-                                    </button>
+                                    <div class="btn-group ms-1">
+                                        <button class="btn btn-sm btn-light-secondary btn-icon"
+                                            data-bs-toggle="dropdown">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item generate-facture-btn" target="blank"
+                                                    data-type="bordereau-livraison"
+                                                    data-facture="{{$livraison->id}}">
+                                                    <i class="fas fa-file-alt me-2"></i>Bordereau de livraison
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -139,6 +149,59 @@
         </div>
     </div>
 </div>
+
+<!-- MODAL -->
+<div class="modal fade" id="livraisonModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="" method="post" id="modalForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-check" id="check-logo">
+                        <input class="form-check-input" name="logo" type="checkbox">
+                        <label class="form-check-label" for="checkIndeterminate">
+                            Voulez-vous afficher le <strong class="text-primary"> logo </strong> kadjiv sur la facture?
+                        </label>
+                        <div class="form-group">
+                            <label class="form-check-label" for="montantTTc">
+                                Montant TTC
+                            </label>
+                            <input type="number" value="0.00" name="montantTTc" id="montantTTc" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-check d-none" id="check-entete">
+                        <input class="form-check-input" name="entete" type="checkbox">
+                        <label class="form-check-label" for="checkIndeterminate">
+                            Voulez-vous afficher <strong class="text-primary"> l'entête </strong> de kadjiv sur la facture?
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary">Génerer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@push("scripts")
+<script>
+    $(document).on('click', '.generate-facture-btn', function(e) {
+        e.preventDefault(); // Empêche le comportement par défaut du lien
+        var type = $(this).data('type'); // Récupère la valeur de data-type
+        var factureId = $(this).data('facture'); // Récupère la valeur de data-type
+        // Tu peux ensuite utiliser la variable 'type' comme tu veux
+
+        if (type == 'bordereau-livraison') {
+            $("#modalForm").attr("action", `/vente/livraisons/${factureId}/bordereau-livraison`)
+        }
+
+        // Ouvre le modal Bootstrap 5
+        var modal = new bootstrap.Modal(document.getElementById('livraisonModal'));
+        modal.show();
+    });
+</script>
+@endpush
 
 <style>
     :root {

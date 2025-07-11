@@ -909,7 +909,6 @@ class FactureClientController extends Controller
 
     public function print(Request $request, FactureClient $facture)
     {
-
         // Chargement des relations nécessaires
         $facture->load([
             'client',
@@ -948,28 +947,6 @@ class FactureClientController extends Controller
         $pdf->setPaper('a4');
 
         return $pdf->stream("bon_a_livrer_{$facture->numero}.pdf");
-    }
-
-    /**
-     * Bordereau de livraison
-     */
-    public function bordereauLivraison(Request $request, FactureClient $facture)
-    {
-        // Chargement des relations nécessaires
-        $facture->load([
-            'client',
-            'lignes.article',
-            'lignes.uniteVente',
-            'createdBy',
-            'validatedBy'
-        ]);
-
-        $entete = $request->get("entete");
-
-        $pdf = PDF::loadView('pages.ventes.facture.partials.bordereau-livraison', compact('facture', 'entete'));
-        $pdf->setPaper('a4');
-
-        return $pdf->stream("bordereau_{$facture->numero}.pdf");
     }
 
     /**

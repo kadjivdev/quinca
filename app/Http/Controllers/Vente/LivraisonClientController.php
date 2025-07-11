@@ -9,6 +9,7 @@ use App\Models\Parametre\{Depot, ConversionUnite};
 use App\Models\Stock\StockDepot;
 use App\Services\ServiceStockSortie;
 use App\Services\ServiceStockEntree;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Codedge\Fpdf\Fpdf\ChiffreEnLettre;
 use Codedge\Fpdf\Fpdf\PDF_MC_Table;
 use Illuminate\Http\Request;
@@ -268,7 +269,7 @@ class LivraisonClientController extends Controller
             $livraisonClient->load(['lignes.article', 'lignes.uniteVente']);
 
             $entrees = [];
-            
+
             /** */
             foreach ($livraisonClient->lignes as $livraisonLigne) {
                 /**Ligne Facture client associée */
@@ -350,6 +351,30 @@ class LivraisonClientController extends Controller
             ], 422);
         }
     }
+
+
+    /**
+     * Bordereau de livraison
+     */
+    public function bordereauLivraison(Request $request, LivraisonClient $livraison)
+    {
+        // Chargement des relations nécessaires
+        $livraison->load([
+            'facture.client',
+            'lignes.article',
+            'lignes.uniteVente',
+            'createdBy',
+            'validatedBy'
+        ]);
+
+        $entete = $request->get("entete");
+
+        $pdf = Pdf::loadView('pages.ventes.livraison.partials.bordereau-livraison', compact('livraison', 'entete'));
+        $pdf->setPaper('a4');
+
+        return $pdf->stream("bordereau_{$livraison->numero}.pdf");
+    }
+
 
     /**
      * Récupère les lignes de facture disponibles pour livraison
@@ -788,7 +813,7 @@ class LivraisonClientController extends Controller
             ],
             'lignes' => $livraisonClient->lignes->map(function ($ligne) {
                 return [
-                    'id'=>$ligne->id,
+                    'id' => $ligne->id,
                     'article' => [
                         'id' => $ligne->article->id,
                         'reference' => $ligne->article->code_article,
@@ -879,6 +904,7 @@ class LivraisonClientController extends Controller
             ]
         );
     }
+
     public function generateBonA5(FactureClient $facture)
     {
         $pdf = new PDF_MC_Table('L', 'mm', 'A5');

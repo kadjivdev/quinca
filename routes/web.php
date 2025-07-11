@@ -77,7 +77,7 @@ Route::middleware('auth')->group(function () {
         ->name('acompte-clients.get-clients');
 
     Route::put('/vente/acomptes/{acompte}', [AcompteClientController::class, 'update'])->name('acomptes.update');
-    
+
     Route::prefix('vente/acomptes')->group(function () {
         Route::post('{acompte}/validate', [AcompteClientController::class, 'validate_acompte'])
             ->name('acomptes.validate');
@@ -790,6 +790,10 @@ Route::middleware('auth')->group(function () {
             // Liste des livraisons
             Route::get('/', [LivraisonClientController::class, 'index'])
                 ->name('vente.livraisons.index');
+
+            // IMPRESSION EN PDF
+            Route::post('/{livraison}/bordereau-livraison', [LivraisonClientController::class, 'bordereauLivraison'])->name('vente.bordereauLivraison');
+
 
             // Créer une nouvelle livraison
             Route::post('/', [LivraisonClientController::class, 'store'])->name('vente.livraisons.store');
