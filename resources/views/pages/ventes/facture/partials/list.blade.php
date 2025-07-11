@@ -207,13 +207,6 @@
                                                     <i class="fas fa-file-alt me-2"></i>Bon à livrer
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a class="dropdown-item generate-facture-btn" target="blank"
-                                                    data-type="bordereau-livraison"
-                                                    data-facture="{{$facture->id}}">
-                                                    <i class="fas fa-file-alt me-2"></i>Bordereau de livraison
-                                                </a>
-                                            </li>
                                         </ul>
                                     </div>
                                 </div>
