@@ -256,7 +256,8 @@
         var apiUrl = "{{ config('app.url_ajax') }}";
         // Fonction pour valider une facture
         
-        function validateFacture(id) {
+        window.validateFacture = function(id) {
+            alert("gogo")
             Swal.fire({
                 title: 'Valider la facture',
                 text: 'Êtes-vous sûr de vouloir valider cette facture ? Cette action est irréversible.',
