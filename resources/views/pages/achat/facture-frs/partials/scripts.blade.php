@@ -126,7 +126,7 @@
         // Afficher les informations de base
         $('#bonCommandeCodeShow').text(data.bon_commande.code);
         $('#pointVenteShow').text(data.point_vente.nom_pv);
-        $('#fournisseurShow').text(data.fournisseur.raison_sociale);
+        $('#fournisseurShow').text(data.fournisseur?.raison_sociale);
         $('#montantTotalShow').text(data.bon_commande.montant_total);
 
         $('#codeFactureShow').val(data.code);
@@ -293,7 +293,7 @@
 
                 $('#bonCommandeCodeMod').text(data.bon_commande.code);
                 $('#pointVenteMod').text(data.point_vente.nom_pv);
-                $('#fournisseurMod').text(data.fournisseur.raison_sociale);
+                $('#fournisseurMod').text(data.fournisseur?.raison_sociale);
                 $('#montantTotalMod').text(data.bon_commande.montant_total);
 
                 $('#codeFactureMod').val(data.code);
