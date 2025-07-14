@@ -261,8 +261,6 @@ class FactureFournisseurController extends Controller
             'lignes.uniteMesure'
         ]);
 
-        return $facture->fournisseur;
-
         return response()->json([
             'success' => true,
             'data' => $facture
