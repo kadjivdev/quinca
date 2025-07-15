@@ -24,6 +24,7 @@ use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\AcompteClient;
 use App\Models\Vente\FactureClient;
 
 /*
@@ -39,10 +40,7 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // FactureClient::query()->update(["inventaire_id" => null]);
-    // FactureRevendeur::query()->update(["inventaire_id" => null]);
-
-    StockDepot::get();
+    AcompteClient::truncate();
     return "Opération éffectuée avec succès!!";
 });
 
