@@ -358,7 +358,7 @@ class ConversionUniteController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la suppression de la conversion',
+                'message' => 'Erreur lors de la suppression de la conversion '.$e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
