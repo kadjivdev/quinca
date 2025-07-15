@@ -40,7 +40,7 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    AcompteClient::truncate();
+    // AcompteClient::truncate();
     return "Opération éffectuée avec succès!!";
 });
 
