@@ -37,6 +37,7 @@ class AcompteClient extends Model
         'requete_id',
         'transport_id',
         'session_caisse_id',
+        'observation'
     ];
 
     protected $casts = [

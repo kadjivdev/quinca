@@ -1447,6 +1447,7 @@ class ClientAccountSeeder extends Seeder
                                 "point_de_vente_id" => 1,
                                 "validated_by" => 1,
                                 "validated_at" => Carbon::now(),
+                                "observation" => "Opération de migration"
                             ]
                         );
                 } else {
