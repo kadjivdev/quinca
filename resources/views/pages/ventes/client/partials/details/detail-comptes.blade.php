@@ -87,7 +87,7 @@
                                     @endif
 
                                     @if($compte->type_op=="AC_CLT")
-                                    Accompte sur le compte du client de facture revendeur <span class="badge bg-light text-dark">{{$compte->accompteClient->reference}}</span>
+                                    Accompte sur le compte du client <span class="badge bg-light text-dark">{{$compte->accompteClient->reference}}</span>
                                     @endif
                                 </td>
                                 <td class="bg-secondary text-white">
