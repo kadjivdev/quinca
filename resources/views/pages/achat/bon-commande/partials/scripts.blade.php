@@ -470,7 +470,7 @@ async function editBonCommande(id) {
                         data-code="${prog.code || ''}"
                         data-point-vente="${prog.point_vente.nom_pv || ''}"
                         data-point-vente-id="${prog.point_de_vente_id || ''}"
-                        data-fournisseur="${prog.fournisseur.raison_sociale || ''}"
+                        data-fournisseur="${prog.fournisseur?.raison_sociale || ''}"
                         data-fournisseur-id="${prog.fournisseur_id || ''}"
                         data-validation="${prog.validated_at ? new Date(prog.validated_at).toLocaleDateString('fr-FR') : ''}">
                         ${prog.code || 'N/A'} - (Validée le ${prog.validated_at ? new Date(prog.validated_at).toLocaleDateString('fr-FR') : 'N/A'})

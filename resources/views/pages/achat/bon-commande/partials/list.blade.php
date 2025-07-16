@@ -10,7 +10,6 @@
                             <th class="border-bottom-0">Date Insertion</th>
                             <th class="border-bottom-0">Date Commande</th>
                             <th class="border-bottom-0">Point de Vente</th>
-                            <!-- <th class="border-bottom-0">Dépôt</th> -->
                             <th class="border-bottom-0">Fournisseur</th>
                             <th class="border-bottom-0 text-end">Montant Total</th>
                             <th class="border-bottom-0 text-center">Programmation</th>
