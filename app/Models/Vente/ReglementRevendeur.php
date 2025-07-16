@@ -7,6 +7,7 @@ use App\Models\Securite\User;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -76,7 +77,12 @@ class ReglementRevendeur extends Model
      *
      * @return array<string, string>
      */
-    
+
+    function compteClient(): HasMany
+    {
+        return $this->hasMany(CompteClient::class, "reglement_rev");
+    }
+
     public static function getTypesReglement(): array
     {
         return [

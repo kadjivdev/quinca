@@ -187,6 +187,34 @@ class ClientController extends Controller
         ));
     }
 
+    public function historiqueComptes(Request $request, $clientId)
+    {
+        if (request()->ajax()) {
+            return response()->json(Client::all());
+        }
+
+        // 
+        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+
+        // Récupération des données avec pagination
+        $user = auth()->user();
+        $client = Client::with([
+            "compteClient.user",
+            "compteClient.factureClient",
+            "compteClient.factureRevendeur",
+            "compteClient.reglementClient",
+            "compteClient.reglementRevendeur",
+            "compteClient.accompteClient"
+        ])->findOrFail($clientId);
+
+        // return response()->json($client);
+
+        return view('pages.ventes.client.partials.details.detail-comptes', compact(
+            'client',
+            'date'
+        ));
+    }
+
     /**
      * Rafraîchit la liste des clients (pour AJAX)
      */

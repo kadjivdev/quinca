@@ -196,6 +196,9 @@
                                             Voir les accomptes
                                         </button> -->
                                         <a target="_blank" href="{{route('vente.clients.detailAccomptes',$client->id) }}" class="btn btn-sm btn-light text-dark border"><i class="fas fa-eye"></i> Voir les accomptes </a>
+
+                                        <!-- /**historiques du compte client */ -->
+                                        <a target="_blank" href="{{route('vente.clients.historiqueComptes',$client->id) }}" class="btn btn-sm btn-light text-dark border"><i class="fas fa-eye"></i> Historiques du comptes </a>
                                     </div>
                                 </div>
                             </td>

@@ -7,6 +7,7 @@ use App\Models\Vente\FactureClient;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -72,6 +73,11 @@ class ReglementClient extends Model
         'effet' => ['reference_preuve', 'banque', 'date_echeance'],
         'avoir' => ['reference_preuve']
     ];
+
+    function compteClient(): HasMany
+    {
+        return $this->hasMany(CompteClient::class, "reglement_clt");
+    }
 
     public function sessionCaisse(): BelongsTo
     {

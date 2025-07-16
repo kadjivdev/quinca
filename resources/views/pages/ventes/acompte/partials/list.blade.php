@@ -645,9 +645,9 @@
         "lengthChange": false,
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
-        "order": [
-            [0, 'asc']
-        ],
+        // "order": [
+        //     [0, 'asc']
+        // ],
         "pageLength": 15,
         language: {
             "emptyTable": "Aucune donnée disponible dans le tableau",

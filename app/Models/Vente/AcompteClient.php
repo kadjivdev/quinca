@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Securite\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AcompteClient extends Model
 {
@@ -45,6 +46,11 @@ class AcompteClient extends Model
         'montant' => 'decimal:3',
         'validated_at' => 'datetime',
     ];
+
+    function compteClient(): HasMany
+    {
+        return $this->hasMany(CompteClient::class, "accompte_client");
+    }
 
     public function sessionCaisse(): BelongsTo
     {

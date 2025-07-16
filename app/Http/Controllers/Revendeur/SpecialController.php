@@ -24,7 +24,7 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Services\ServiceStockEntree;
-
+use Illuminate\Support\Facades\Auth;
 
 // use SimpleSoftwareIO\QrCode\Facades\QrCode;
 // use BaconQrCode\Renderer\ImageRenderer;
@@ -560,6 +560,14 @@ class SpecialController extends Controller
             ];
 
             $facture->update($updateData);
+
+            $facture->compteClient()->create([
+                'date_op' => $facture->date_facture,
+                'montant_op' => $facture->montant_ttc - $facture->montant_remise,
+                'client_id' => $facture->client_id,
+                'user_id' => Auth::user()->id,
+                'type_op' => 'FAC_REV',
+            ]);
 
             DB::commit();
 

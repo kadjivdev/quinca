@@ -127,6 +127,11 @@ class FactureClient extends Model
         });
     }
 
+    function compteClient(): HasMany
+    {
+        return $this->hasMany(CompteClient::class, "facture_client_id");
+    }
+
     public function inventaire(): BelongsTo
     {
         return $this->belongsTo(Inventaire::class);

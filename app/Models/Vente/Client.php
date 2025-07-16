@@ -51,6 +51,11 @@ class Client extends Model
         'taux_aib',
     ];
 
+    public function compteClient(): HasMany
+    {
+        return $this->hasMany(CompteClient::class, "client_id")->with("client");
+    }
+
     // Relations
     public function facturesClient(): HasMany
     {

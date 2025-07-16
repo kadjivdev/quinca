@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 use App\Models\Securite\User;
-use App\Models\Vente\{Client, ReglementClient, ReglementRevendeur};
+use App\Models\Vente\{Client, CompteClient, ReglementClient, ReglementRevendeur};
 
 
 class FactureRevendeur extends Model
@@ -122,11 +122,16 @@ class FactureRevendeur extends Model
         });
     }
 
+    function compteClient(): HasMany
+    {
+        return $this->hasMany(CompteClient::class, "facture_revendeur_id");
+    }
+
     public function inventaire(): BelongsTo
     {
         return $this->belongsTo(Inventaire::class);
     }
-    
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
@@ -144,7 +149,7 @@ class FactureRevendeur extends Model
 
     public function reglements(): HasMany
     {
-        return $this->hasMany(ReglementRevendeur::class,"facture_revendeur_id");
+        return $this->hasMany(ReglementRevendeur::class, "facture_revendeur_id");
     }
 
 
@@ -157,7 +162,7 @@ class FactureRevendeur extends Model
     {
         return $this->reste_a_regler <= 0;
     }
-    
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -169,175 +174,174 @@ class FactureRevendeur extends Model
     }
 
 
-/**
- * Obtient le reste à livrer pour une ligne
- */
-public function getResteALivrerAttribute(): float
-{
-    $totalLivre = $this->lignes()
-        ->join('ligne_livraison_clients', 'ligne_facture_revendeurs.id', '=', 'ligne_livraison_clients.ligne_facture_id')
-        ->join('livraison_clients', 'ligne_livraison_clients.livraison_client_id', '=', 'livraison_clients.id')
-        ->where('livraison_clients.statut', 'valide')
-        ->sum('ligne_livraison_clients.quantite_base');
+    /**
+     * Obtient le reste à livrer pour une ligne
+     */
+    public function getResteALivrerAttribute(): float
+    {
+        $totalLivre = $this->lignes()
+            ->join('ligne_livraison_clients', 'ligne_facture_revendeurs.id', '=', 'ligne_livraison_clients.ligne_facture_id')
+            ->join('livraison_clients', 'ligne_livraison_clients.livraison_client_id', '=', 'livraison_clients.id')
+            ->where('livraison_clients.statut', 'valide')
+            ->sum('ligne_livraison_clients.quantite_base');
 
-    $totalFacture = $this->lignes()->sum('quantite_base');
+        $totalFacture = $this->lignes()->sum('quantite_base');
 
-    return max(0, $totalFacture - $totalLivre);
-}
-
-/**
- * Obtient le pourcentage livré
- */
-public function getPourcentageLivreAttribute(): float
-{
-    $totalFacture = $this->lignes()->sum('quantite_base');
-    if ($totalFacture == 0) return 0;
-
-    $totalLivre = $this->lignes()
-        ->join('ligne_livraison_clients', 'ligne_facture_revendeurs.id', '=', 'ligne_livraison_clients.ligne_facture_id')
-        ->join('livraison_clients', 'ligne_livraison_clients.livraison_client_id', '=', 'livraison_clients.id')
-        ->where('livraison_clients.statut', 'valide')
-        ->sum('ligne_livraison_clients.quantite_base');
-
-    return min(100, ($totalLivre / $totalFacture) * 100);
-}
-
-/**
- * Vérifie si la livraison a commencé
- */
-public function getLivraisonCommenceeAttribute(): bool
-{
-    return $this->livraisons()
-        ->where('statut', 'valide')
-        ->exists();
-}
-
-
-public function estTotalementLivree(): bool
-{
-    // Récupérer toutes les lignes de facture avec leurs quantités livrées
-    $lignes = $this->lignes()->withSum('lignesLivraison as quantite_livree', 'quantite_base')
-        ->whereHas('lignesLivraison', function($query) {
-            $query->whereHas('livraison', function($q) {
-                $q->where('statut', 'valide');
-            });
-        })
-        ->get();
-
-    // Si aucune ligne n'a été livrée, la facture n'est pas totalement livrée
-    if ($lignes->isEmpty()) {
-        return false;
+        return max(0, $totalFacture - $totalLivre);
     }
 
-    // Vérifier chaque ligne
-    foreach ($lignes as $ligne) {
-        $quantiteLivree = $ligne->quantite_livree ?? 0;
-        if ($quantiteLivree < $ligne->quantite_base) {
+    /**
+     * Obtient le pourcentage livré
+     */
+    public function getPourcentageLivreAttribute(): float
+    {
+        $totalFacture = $this->lignes()->sum('quantite_base');
+        if ($totalFacture == 0) return 0;
+
+        $totalLivre = $this->lignes()
+            ->join('ligne_livraison_clients', 'ligne_facture_revendeurs.id', '=', 'ligne_livraison_clients.ligne_facture_id')
+            ->join('livraison_clients', 'ligne_livraison_clients.livraison_client_id', '=', 'livraison_clients.id')
+            ->where('livraison_clients.statut', 'valide')
+            ->sum('ligne_livraison_clients.quantite_base');
+
+        return min(100, ($totalLivre / $totalFacture) * 100);
+    }
+
+    /**
+     * Vérifie si la livraison a commencé
+     */
+    public function getLivraisonCommenceeAttribute(): bool
+    {
+        return $this->livraisons()
+            ->where('statut', 'valide')
+            ->exists();
+    }
+
+
+    public function estTotalementLivree(): bool
+    {
+        // Récupérer toutes les lignes de facture avec leurs quantités livrées
+        $lignes = $this->lignes()->withSum('lignesLivraison as quantite_livree', 'quantite_base')
+            ->whereHas('lignesLivraison', function ($query) {
+                $query->whereHas('livraison', function ($q) {
+                    $q->where('statut', 'valide');
+                });
+            })
+            ->get();
+
+        // Si aucune ligne n'a été livrée, la facture n'est pas totalement livrée
+        if ($lignes->isEmpty()) {
             return false;
         }
-    }
 
-    return true;
-}
-
-
-
-/**
- * Vérifie si la ligne peut encore être livrée
- */
-public function peutEtreLivree(): bool
-{
-    // Si la facture n'est pas validée, elle ne peut pas être livrée
-    if ($this->statut !== 'validee') {
-        return false;
-    }
-
-    $lignes = $this->lignes()
-        ->with(['lignesLivraison' => function($query) {
-            $query->whereHas('livraison', function($q) {
-                $q->where('statut', 'valide');
-            });
-        }])
-        ->get();
-
-    foreach ($lignes as $ligne) {
-        $quantiteLivree = $ligne->lignesLivraison->sum('quantite_base');
-        if ($quantiteLivree < $ligne->quantite_base) {
-            return true; // Il reste au moins une ligne à livrer
+        // Vérifier chaque ligne
+        foreach ($lignes as $ligne) {
+            $quantiteLivree = $ligne->quantite_livree ?? 0;
+            if ($quantiteLivree < $ligne->quantite_base) {
+                return false;
+            }
         }
+
+        return true;
     }
 
-    return false; // Toutes les lignes sont totalement livrées
-}
 
-/**
- * Récupère le reste à livrer pour chaque ligne
- */
-public function getQuantitesRestantes(): array
-{
-    $result = [];
 
-    $lignes = $this->lignes()
-        ->with(['lignesLivraison' => function($query) {
-            $query->whereHas('livraison', function($q) {
-                $q->where('statut', 'valide');
-            });
-        }])
-        ->get();
+    /**
+     * Vérifie si la ligne peut encore être livrée
+     */
+    public function peutEtreLivree(): bool
+    {
+        // Si la facture n'est pas validée, elle ne peut pas être livrée
+        if ($this->statut !== 'validee') {
+            return false;
+        }
 
-    foreach ($lignes as $ligne) {
-        $quantiteLivree = $ligne->lignesLivraison->sum('quantite_base');
-        $resteALivrer = $ligne->quantite_base - $quantiteLivree;
+        $lignes = $this->lignes()
+            ->with(['lignesLivraison' => function ($query) {
+                $query->whereHas('livraison', function ($q) {
+                    $q->where('statut', 'valide');
+                });
+            }])
+            ->get();
 
-        if ($resteALivrer > 0) {
-            $result[$ligne->id] = [
-                'ligne_id' => $ligne->id,
+        foreach ($lignes as $ligne) {
+            $quantiteLivree = $ligne->lignesLivraison->sum('quantite_base');
+            if ($quantiteLivree < $ligne->quantite_base) {
+                return true; // Il reste au moins une ligne à livrer
+            }
+        }
+
+        return false; // Toutes les lignes sont totalement livrées
+    }
+
+    /**
+     * Récupère le reste à livrer pour chaque ligne
+     */
+    public function getQuantitesRestantes(): array
+    {
+        $result = [];
+
+        $lignes = $this->lignes()
+            ->with(['lignesLivraison' => function ($query) {
+                $query->whereHas('livraison', function ($q) {
+                    $q->where('statut', 'valide');
+                });
+            }])
+            ->get();
+
+        foreach ($lignes as $ligne) {
+            $quantiteLivree = $ligne->lignesLivraison->sum('quantite_base');
+            $resteALivrer = $ligne->quantite_base - $quantiteLivree;
+
+            if ($resteALivrer > 0) {
+                $result[$ligne->id] = [
+                    'ligne_id' => $ligne->id,
+                    'article' => $ligne->article->designation,
+                    'quantite_base' => $ligne->quantite_base,
+                    'quantite_livree' => $quantiteLivree,
+                    'reste_a_livrer' => $resteALivrer
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Pour le debug : obtenir l'état détaillé des livraisons
+     */
+    public function getStatutLivraison(): array
+    {
+        $result = [];
+
+        $lignes = $this->lignes()
+            ->with(['lignesLivraison' => function ($query) {
+                $query->whereHas('livraison', function ($q) {
+                    $q->where('statut', 'valide');
+                });
+            }, 'article'])
+            ->get();
+
+        foreach ($lignes as $ligne) {
+            $quantiteLivree = $ligne->lignesLivraison->sum('quantite_base');
+            $result[] = [
                 'article' => $ligne->article->designation,
-                'quantite_base' => $ligne->quantite_base,
+                'reference' => $ligne->article->reference,
+                'quantite_facturee' => $ligne->quantite_base,
                 'quantite_livree' => $quantiteLivree,
-                'reste_a_livrer' => $resteALivrer
+                'reste_a_livrer' => $ligne->quantite_base - $quantiteLivree,
+                'est_totalement_livree' => $quantiteLivree >= $ligne->quantite_base,
+                'lignes_livraison' => $ligne->lignesLivraison->map(function ($ll) {
+                    return [
+                        'livraison' => $ll->livraison->numero,
+                        'quantite' => $ll->quantite_base,
+                        'date' => $ll->livraison->date_livraison->format('d/m/Y')
+                    ];
+                })
             ];
         }
+
+        return $result;
     }
-
-    return $result;
-}
-
-/**
- * Pour le debug : obtenir l'état détaillé des livraisons
- */
-public function getStatutLivraison(): array
-{
-    $result = [];
-
-    $lignes = $this->lignes()
-        ->with(['lignesLivraison' => function($query) {
-            $query->whereHas('livraison', function($q) {
-                $q->where('statut', 'valide');
-            });
-        }, 'article'])
-        ->get();
-
-    foreach ($lignes as $ligne) {
-        $quantiteLivree = $ligne->lignesLivraison->sum('quantite_base');
-        $result[] = [
-            'article' => $ligne->article->designation,
-            'reference' => $ligne->article->reference,
-            'quantite_facturee' => $ligne->quantite_base,
-            'quantite_livree' => $quantiteLivree,
-            'reste_a_livrer' => $ligne->quantite_base - $quantiteLivree,
-            'est_totalement_livree' => $quantiteLivree >= $ligne->quantite_base,
-            'lignes_livraison' => $ligne->lignesLivraison->map(function($ll) {
-                return [
-                    'livraison' => $ll->livraison->numero,
-                    'quantite' => $ll->quantite_base,
-                    'date' => $ll->livraison->date_livraison->format('d/m/Y')
-                ];
-            })
-        ];
-    }
-
-    return $result;
-}
-
 }

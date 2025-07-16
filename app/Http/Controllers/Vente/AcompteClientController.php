@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Vente;
+
 use App\Http\Controllers\Controller;
 use App\Models\Vente\{AcompteClient, Client, SessionCaisse};
 use Illuminate\Http\Request;
@@ -8,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class AcompteClientController extends Controller
@@ -377,6 +379,14 @@ class AcompteClientController extends Controller
                 'statut' => AcompteClient::STATUT_VALIDE,
                 'validated_at' => now(),
                 'validated_by' => auth()->id()
+            ]);
+
+            $acompte->compteClient()->create([
+                'date_op' => $acompte->montant,
+                'montant_op' => $acompte->montant,
+                'client_id' => $acompte->client_id,
+                'user_id' => Auth::user()->id,
+                'type_op' => 'AC_CLT',
             ]);
 
             DB::commit();

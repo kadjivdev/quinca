@@ -8,7 +8,7 @@ use App\Models\Catalogue\{Tarification, Article};
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
-use App\Models\Vente\{FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
+use App\Models\Vente\{CompteClient, FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Stock\StockDepot;
@@ -20,7 +20,7 @@ use Exception;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\ServiceStockEntree;
-
+use Illuminate\Support\Facades\Auth;
 
 class FactureClientController extends Controller
 {
@@ -54,18 +54,17 @@ class FactureClientController extends Controller
                     ->filter(function ($facture) use ($request) {
                         return $facture->createdBy->point_de_vente_id == $request->point_vente_id;
                     });
-            }elseif ($request->client_id && !$request->point_vente_id) {
+            } elseif ($request->client_id && !$request->point_vente_id) {
                 $factures = $query->get()
                     ->filter(function ($facture) use ($request) {
                         return $facture->client_id == $request->client_id;
                     });
-            }elseif ($request->client_id && $request->point_vente_id) {
+            } elseif ($request->client_id && $request->point_vente_id) {
                 $factures = $query->get()
                     ->filter(function ($facture) use ($request) {
                         return ($facture->createdBy->point_de_vente_id == $request->point_vente_id && $facture->client_id == $request->client_id);
                     });
-            }
-             else {
+            } else {
                 $factures = $query->get();
             }
 
@@ -97,7 +96,7 @@ class FactureClientController extends Controller
             $facturesResteAPayer = $factures->filter(function ($facture) {
                 return $facture->reste_a_payer > 0;
             });
-            $montantResteAPyer = $facturesResteAPayer->sum('montant_ttc')-$facturesResteAPayer->sum('montant_remise');
+            $montantResteAPyer = $facturesResteAPayer->sum('montant_ttc') - $facturesResteAPayer->sum('montant_remise');
 
             // Calculer le montant total des factures du mois en cours
             $currentMonth = Carbon::now()->month;
@@ -607,7 +606,7 @@ class FactureClientController extends Controller
                     return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
                     );
-                } 
+                }
             });
 
         return response()->json([
@@ -822,6 +821,16 @@ class FactureClientController extends Controller
             }
 
             $sessionCaisse->mettreAJourTotaux();
+
+            Log::info("La facture concernée ",["facture"=>$facture]);
+
+            $facture->compteClient()->create([
+                'date_op' => $facture->date_facture,
+                'montant_op' => $facture->montant_ttc - $facture->montant_remise,
+                'client_id' => $facture->client_id,
+                'user_id' => Auth::user()->id,
+                'type_op' => 'FAC_CLT',
+            ]);
 
             DB::commit();
 

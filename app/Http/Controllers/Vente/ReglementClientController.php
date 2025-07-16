@@ -7,7 +7,7 @@ use App\Models\Vente\{FactureClient, ReglementClient};
 use App\Models\Vente\{SessionCaisse, Client};
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Facades\{Auth, DB, Log};
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -315,6 +315,14 @@ class ReglementClientController extends Controller
             if (method_exists($sessionCaisse, 'mettreAJourTotaux')) {
                 $sessionCaisse->mettreAJourTotaux();
             }
+
+            $reglement->compteClient()->create([
+                'date_op' => $reglement->date_reglement,
+                'montant_op' => $reglement->montant,
+                'client_id' => $reglement->facture->client_id,
+                'user_id' => Auth::user()->id,
+                'type_op' => 'REG_CLT',
+            ]);
 
             DB::commit();
 

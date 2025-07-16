@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Vente\{ReglementRevendeur};
 use App\Models\Vente\{SessionCaisse, Client};
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Facades\{Auth, DB, Log};
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 
@@ -298,6 +298,14 @@ class ReglementRevendeurController extends Controller
             // if (method_exists($sessionCaisse, 'mettreAJourTotaux')) {
             //     $sessionCaisse->mettreAJourTotaux();
             // }
+
+            $reglement->compteClient()->create([
+                'date_op' => $reglement->date_reglement,
+                'montant_op' => $reglement->montant,
+                'client_id' => $reglement->facture->client_id,
+                'user_id' => Auth::user()->id,
+                'type_op' => 'REG_REV',
+            ]);
 
             DB::commit();
 
