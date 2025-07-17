@@ -1,8 +1,8 @@
 <div class="row g-3">
     <div class="col-12">
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm p-3">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="sessionsTable">
+                <table class="table table-hover mb-0" id="example1">
                     <thead class="bg-light">
                         <tr>
                             <th class="border-bottom-0">Caissier</th>
@@ -17,113 +17,107 @@
                     </thead>
                     <tbody>
                         @foreach($ventes as $vente)
-                            @if ($vente->montant_regle > 0)
-                                
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-user me-2">
-                                            {{ substr($vente->sessionCaisse->utilisateur->name, 0, 2) }}
-                                        </div>
-                                        <div>
-                                            <div class="fw-medium">{{ $vente->sessionCaisse->utilisateur->name }}</div>
-                                            <div class="text-muted small">Caissier</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <i class="fas fa-clock text-success me-2"></i>
-                                        {{ \Carbon\Carbon::parse($vente->created_at)->format('d/m/Y H:i') }}
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        {{$vente->numero}}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        {{$vente->montant_regle}}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        {{$vente->reference_recu}}
-                                    </div>
-                                </td>
-                                <td class="text-end fw-medium">
-                                    <div class="d-flex align-items-center">
-                                        {{$vente->client->raison_sociale}}
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    @switch($vente->statut_reel)
-                                        @case('brouillon')
-                                            <span class="badge bg-warning bg-opacity-10 text-warning px-3">Brouillon</span>
-                                            @break
-                                        @case('validee')
-                                            <span class="badge bg-primary bg-opacity-10 text-primary px-3">Validée</span>
-                                            @break
-                                        @case('payee')
-                                            <span class="badge bg-success bg-opacity-10 text-success px-3">Payée</span>
-                                            @break
-                                        @case('partiellement_payee')
-                                            <span class="badge bg-info bg-opacity-10 text-info px-3">Partiellement payée</span>
-                                            @break
-                                        @default
-                                            <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulée</span>
-                                    @endswitch
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">                                        
-                                        <button class="btn btn-sm btn-light-secondary btn-icon ms-1"
-                                                onclick="showFacture({{ $vente->id }})"
-                                                data-bs-toggle="tooltip"
-                                                title="Voir détails">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        
-                                        @if(is_null($vente->encaissed_at))
-                                            <button class="btn btn-sm btn-light-success btn-icon"
-                                                    onclick="encaisser({{ $vente->id }})"
-                                                    data-bs-toggle="tooltip"
-                                                    title="Encaisser la vente">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        @endif
+                        @if ($vente->montant_regle > 0)
 
-                                        @if (is_null($vente->date_validation))
-                                            <button class="btn btn-sm btn-light-danger btn-icon"
-                                                    onclick="deleteFacture({{ $vente->id }})"
-                                                    data-bs-toggle="tooltip"
-                                                    title="Annuler la vente">
-                                                <i class="fas fa-trash"></i>
-                                            </button>   
-                                        @endif
-
-                                        @if ($vente->statut_reel == 'payee')
-                                            <button class="btn btn-sm btn-light-warning btn-icon print-bon"
-                                                data-url-a4="{{ route('vente.livraisons.pdf.bon-livraison', ['facture' => $vente->id, 'format' => 'a4']) }}"
-                                                data-url-a5="{{ route('vente.livraisons.pdf.bon-livraison', ['facture' => $vente->id, 'format' => 'a5']) }}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#choixFormatModal"
-                                                title="Imprimer le bordereau">
-                                                <i class="fas fa-print"></i>
-                                            </button>                                  
-                                        @endif
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-user me-2">
+                                        {{ substr($vente->sessionCaisse->utilisateur->name, 0, 2) }}
                                     </div>
-                                </td>
-                            </tr>
-                            @endif
+                                    <div>
+                                        <div class="fw-medium">{{ $vente->sessionCaisse->utilisateur->name }}</div>
+                                        <div class="text-muted small">Caissier</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <i class="fas fa-clock text-success me-2"></i>
+                                {{ \Carbon\Carbon::parse($vente->created_at)->format('d/m/Y H:i') }}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {{$vente->numero}}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {{$vente->montant_regle}}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {{$vente->reference_recu}}
+                                </div>
+                            </td>
+                            <td class="text-end fw-medium">
+                                <div class="d-flex align-items-center">
+                                    {{$vente->client->raison_sociale}}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                @switch($vente->statut_reel)
+                                @case('brouillon')
+                                <span class="badge bg-warning bg-opacity-10 text-warning px-3">Brouillon</span>
+                                @break
+                                @case('validee')
+                                <span class="badge bg-primary bg-opacity-10 text-primary px-3">Validée</span>
+                                @break
+                                @case('payee')
+                                <span class="badge bg-success bg-opacity-10 text-success px-3">Payée</span>
+                                @break
+                                @case('partiellement_payee')
+                                <span class="badge bg-info bg-opacity-10 text-info px-3">Partiellement payée</span>
+                                @break
+                                @default
+                                <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulée</span>
+                                @endswitch
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-light-secondary btn-icon ms-1"
+                                        onclick="showFacture({{ $vente->id }})"
+                                        data-bs-toggle="tooltip"
+                                        title="Voir détails">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+
+                                    @if(is_null($vente->encaissed_at))
+                                    <button class="btn btn-sm btn-light-success btn-icon"
+                                        onclick="encaisser({{ $vente->id }})"
+                                        data-bs-toggle="tooltip"
+                                        title="Encaisser la vente">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    @endif
+
+                                    @if (is_null($vente->date_validation))
+                                    <button class="btn btn-sm btn-light-danger btn-icon"
+                                        onclick="deleteFacture({{ $vente->id }})"
+                                        data-bs-toggle="tooltip"
+                                        title="Annuler la vente">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    @endif
+
+                                    @if ($vente->statut_reel == 'payee')
+                                    <button class="btn btn-sm btn-light-warning btn-icon print-bon"
+                                        data-url-a4="{{ route('vente.livraisons.pdf.bon-livraison', ['facture' => $vente->id, 'format' => 'a4']) }}"
+                                        data-url-a5="{{ route('vente.livraisons.pdf.bon-livraison', ['facture' => $vente->id, 'format' => 'a5']) }}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#choixFormatModal"
+                                        title="Imprimer le bordereau">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @endif
                         @endforeach
                     </tbody>
                 </table>
             </div>
-
-            @if($ventes->hasPages())
-                <div class="card-footer border-0 py-3">
-                    {{ $ventes->links() }}
-                </div>
-            @endif
         </div>
     </div>
 
@@ -149,125 +143,341 @@
 </div>
 
 <style>
-:root {
-    --kadjiv-orange: #FFA500;
-    --kadjiv-orange-light: rgba(255, 165, 0, 0.1);
-}
+    :root {
+        --kadjiv-orange: #FFA500;
+        --kadjiv-orange-light: rgba(255, 165, 0, 0.1);
+    }
 
-/* Numéro de session */
-.numero-session {
-    font-family: 'Monaco', 'Consolas', monospace;
-    color: var(--kadjiv-orange);
-    font-weight: 500;
-    padding: 0.3rem 0.6rem;
-    background-color: var(--kadjiv-orange-light);
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-}
+    /* Numéro de session */
+    .numero-session {
+        font-family: 'Monaco', 'Consolas', monospace;
+        color: var(--kadjiv-orange);
+        font-weight: 500;
+        padding: 0.3rem 0.6rem;
+        background-color: var(--kadjiv-orange-light);
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+    }
 
-/* Avatar utilisateur */
-.avatar-user {
-    width: 40px;
-    height: 40px;
-    background-color: var(--kadjiv-orange-light);
-    color: var(--kadjiv-orange);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-}
+    /* Avatar utilisateur */
+    .avatar-user {
+        width: 40px;
+        height: 40px;
+        background-color: var(--kadjiv-orange-light);
+        color: var(--kadjiv-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+    }
 
-/* Table */
-.table thead {
-    background-color: #f8f9fa;
-}
+    /* Table */
+    .table thead {
+        background-color: #f8f9fa;
+    }
 
-.table thead th {
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-    color: #555;
-}
+    .table thead th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: #555;
+    }
 
-/* Badges */
-.badge {
-    padding: 0.5rem 0.75rem;
-    font-weight: 500;
-    border-radius: 30px;
-}
+    /* Badges */
+    .badge {
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        border-radius: 30px;
+    }
 
-.badge.bg-opacity-10 {
-    border: 1px solid currentColor;
-}
+    .badge.bg-opacity-10 {
+        border: 1px solid currentColor;
+    }
 
-/* Boutons d'action */
-.btn-icon {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.5rem;
-}
+    /* Boutons d'action */
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+    }
 
-.btn-light-primary {
-    color: var(--kadjiv-orange);
-    background-color: var(--kadjiv-orange-light);
-}
+    .btn-light-primary {
+        color: var(--kadjiv-orange);
+        background-color: var(--kadjiv-orange-light);
+    }
 
-.btn-light-danger {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-}
+    .btn-light-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
 
-.btn-light-info {
-    background-color: rgba(13, 202, 240, 0.1);
-    color: #0dcaf0;
-}
+    .btn-light-info {
+        background-color: rgba(13, 202, 240, 0.1);
+        color: #0dcaf0;
+    }
 
-.btn-light-secondary {
-    background-color: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
-}
+    .btn-light-secondary {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
 
-/* Hover effects */
-.btn-icon i {
-    transition: transform 0.2s ease;
-}
+    /* Hover effects */
+    .btn-icon i {
+        transition: transform 0.2s ease;
+    }
 
-.btn-icon:hover i {
-    transform: scale(1.1);
-}
+    .btn-icon:hover i {
+        transform: scale(1.1);
+    }
 
-/* État vide */
-.empty-state {
-    text-align: center;
-    padding: 3rem;
-}
+    /* État vide */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
 
-.empty-state i {
-    color: #dee2e6;
-    margin-bottom: 1rem;
-}
+    .empty-state i {
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
 
-/* Card */
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    /* Card */
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08) !important;
-}
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+    }
 
-/* Bouton désactivé */
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
+    /* Bouton désactivé */
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 </style>
+
+@push("scripts")
+<script>
+    $("#example1").DataTable({
+        "responsive": true,
+        "lengthChange": false,
+        "autoWidth": false,
+        "buttons": ["pdf", "print", "csv", "excel"],
+        "order": [
+            [0, 'asc']
+        ],
+        "pageLength": 15,
+        language: {
+            "emptyTable": "Aucune donnée disponible dans le tableau",
+            "lengthMenu": "Afficher _MENU_ éléments",
+            "loadingRecords": "Chargement...",
+            "processing": "Traitement...",
+            "zeroRecords": "Aucun élément correspondant trouvé",
+            "paginate": {
+                "first": "Premier",
+                "last": "Dernier",
+                "previous": "Précédent",
+                "next": "Suiv"
+            },
+            "aria": {
+                "sortAscending": ": activer pour trier la colonne par ordre croissant",
+                "sortDescending": ": activer pour trier la colonne par ordre décroissant"
+            },
+            "select": {
+                "rows": {
+                    "_": "%d lignes sélectionnées",
+                    "1": "1 ligne sélectionnée"
+                },
+                "cells": {
+                    "1": "1 cellule sélectionnée",
+                    "_": "%d cellules sélectionnées"
+                },
+                "columns": {
+                    "1": "1 colonne sélectionnée",
+                    "_": "%d colonnes sélectionnées"
+                }
+            },
+            "autoFill": {
+                "cancel": "Annuler",
+                "fill": "Remplir toutes les cellules avec <i>%d<\/i>",
+                "fillHorizontal": "Remplir les cellules horizontalement",
+                "fillVertical": "Remplir les cellules verticalement"
+            },
+            "searchBuilder": {
+                "conditions": {
+                    "date": {
+                        "after": "Après le",
+                        "before": "Avant le",
+                        "between": "Entre",
+                        "empty": "Vide",
+                        "equals": "Egal à",
+                        "not": "Différent de",
+                        "notBetween": "Pas entre",
+                        "notEmpty": "Non vide"
+                    },
+                    "number": {
+                        "between": "Entre",
+                        "empty": "Vide",
+                        "equals": "Egal à",
+                        "gt": "Supérieur à",
+                        "gte": "Supérieur ou égal à",
+                        "lt": "Inférieur à",
+                        "lte": "Inférieur ou égal à",
+                        "not": "Différent de",
+                        "notBetween": "Pas entre",
+                        "notEmpty": "Non vide"
+                    },
+                    "string": {
+                        "contains": "Contient",
+                        "empty": "Vide",
+                        "endsWith": "Se termine par",
+                        "equals": "Egal à",
+                        "not": "Différent de",
+                        "notEmpty": "Non vide",
+                        "startsWith": "Commence par"
+                    },
+                    "array": {
+                        "equals": "Egal à",
+                        "empty": "Vide",
+                        "contains": "Contient",
+                        "not": "Différent de",
+                        "notEmpty": "Non vide",
+                        "without": "Sans"
+                    }
+                },
+                "add": "Ajouter une condition",
+                "button": {
+                    "0": "Recherche avancée",
+                    "_": "Recherche avancée (%d)"
+                },
+                "clearAll": "Effacer tout",
+                "condition": "Condition",
+                "data": "Donnée",
+                "deleteTitle": "Supprimer la règle de filtrage",
+                "logicAnd": "Et",
+                "logicOr": "Ou",
+                "title": {
+                    "0": "Recherche avancée",
+                    "_": "Recherche avancée (%d)"
+                },
+                "value": "Valeur"
+            },
+            "searchPanes": {
+                "clearMessage": "Effacer tout",
+                "count": "{total}",
+                "title": "Filtres actifs - %d",
+                "collapse": {
+                    "0": "Volet de recherche",
+                    "_": "Volet de recherche (%d)"
+                },
+                "countFiltered": "{shown} ({total})",
+                "emptyPanes": "Pas de volet de recherche",
+                "loadMessage": "Chargement du volet de recherche..."
+            },
+            "buttons": {
+                "copyKeys": "Appuyer sur ctrl ou u2318 + C pour copier les données du tableau dans votre presse-papier.",
+                "collection": "Collection",
+                "colvis": "Visibilité colonnes",
+                "colvisRestore": "Rétablir visibilité",
+                "copy": "Copier",
+                "copySuccess": {
+                    "1": "1 ligne copiée dans le presse-papier",
+                    "_": "%ds lignes copiées dans le presse-papier"
+                },
+                "copyTitle": "Copier dans le presse-papier",
+                "csv": "CSV",
+                "excel": "Excel",
+                "pageLength": {
+                    "-1": "Afficher toutes les lignes",
+                    "_": "Afficher %d lignes"
+                },
+                "pdf": "PDF",
+                "print": "Imprimer"
+            },
+            "decimal": ",",
+            "info": "Affichage de _START_ à _END_ sur _TOTAL_ éléments",
+            "infoEmpty": "Affichage de 0 à 0 sur 0 éléments",
+            "infoThousands": ".",
+            "search": "Rechercher:",
+            "thousands": ".",
+            "infoFiltered": "(filtrés depuis un total de _MAX_ éléments)",
+            "datetime": {
+                "previous": "Précédent",
+                "next": "Suivant",
+                "hours": "Heures",
+                "minutes": "Minutes",
+                "seconds": "Secondes",
+                "unknown": "-",
+                "amPm": [
+                    "am",
+                    "pm"
+                ],
+                "months": [
+                    "Janvier",
+                    "Fevrier",
+                    "Mars",
+                    "Avril",
+                    "Mai",
+                    "Juin",
+                    "Juillet",
+                    "Aout",
+                    "Septembre",
+                    "Octobre",
+                    "Novembre",
+                    "Decembre"
+                ],
+                "weekdays": [
+                    "Dim",
+                    "Lun",
+                    "Mar",
+                    "Mer",
+                    "Jeu",
+                    "Ven",
+                    "Sam"
+                ]
+            },
+            "editor": {
+                "close": "Fermer",
+                "create": {
+                    "button": "Nouveaux",
+                    "title": "Créer une nouvelle entrée",
+                    "submit": "Envoyer"
+                },
+                "edit": {
+                    "button": "Editer",
+                    "title": "Editer Entrée",
+                    "submit": "Modifier"
+                },
+                "remove": {
+                    "button": "Supprimer",
+                    "title": "Supprimer",
+                    "submit": "Supprimer",
+                    "confirm": {
+                        "1": "etes-vous sure de vouloir supprimer 1 ligne?",
+                        "_": "etes-vous sure de vouloir supprimer %d lignes?"
+                    }
+                },
+                "error": {
+                    "system": "Une erreur système s'est produite"
+                },
+                "multi": {
+                    "title": "Valeurs Multiples",
+                    "restore": "Rétablir Modification",
+                    "noMulti": "Ce champ peut être édité individuellement, mais ne fait pas partie d'un groupe. ",
+                    "info": "Les éléments sélectionnés contiennent différentes valeurs pour ce champ. Pour  modifier et "
+                }
+            }
+        },
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+</script>
+@endpush

@@ -103,6 +103,7 @@ class BonCommandeController extends Controller
 
         return view('pages.achat.bon-commande.index', $data);
     }
+    
     /**
      * Enregistre un nouveau bon de commande
      */

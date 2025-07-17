@@ -41,17 +41,6 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $acomptes = AcompteClient::get();
-
-    // foreach ($acomptes as $acompte) {
-    //     $acompte->compteClient()->create([
-    //         'date_op' => $acompte->montant,
-    //         'montant_op' => $acompte->montant,
-    //         'client_id' => $acompte->client_id,
-    //         'user_id' => Auth::user()->id,
-    //         'type_op' => 'AC_CLT',
-    //     ]);
-    // }
     return "Opération éffectuée avec succès!!";
 });
 

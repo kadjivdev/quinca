@@ -367,7 +367,7 @@ class SessionCaisseController extends Controller
             ->where('montant_regle', '>', 0)
             ->with(['sessionCaisse.utilisateur', 'client'])
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->get();
 
         $ventes->transform(function ($facture) {
             // Calcul du reste à payer
