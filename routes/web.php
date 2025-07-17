@@ -22,11 +22,8 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
-use App\Models\Vente\AcompteClient;
 use App\Models\Vente\FactureClient;
-use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +38,17 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
+    $references = [
+        "16223" => "16623",
+        "16209" => "16609",
+        "16210" => "16610",
+        "16222" => "16622"
+    ];
+
+    foreach ($references as $old => $new) {
+        FactureClient::where("reference_recu", "" . $old)
+            ->update(["reference_recu" => $new]);
+    }
     return "Opération éffectuée avec succès!!";
 });
 
