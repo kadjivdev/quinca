@@ -165,7 +165,6 @@ async function encaisser(id){
         if (result.isConfirmed) {
             $("#facture_id").val(id);
             
-
             $("#addReferenceRecuModal").modal('show');
         }
     } catch (error) {

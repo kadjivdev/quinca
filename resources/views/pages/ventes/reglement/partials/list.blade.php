@@ -35,7 +35,7 @@
                             <th class="border-bottom-0">Mode</th>
                             <th class="border-bottom-0 text-end">Montant</th>
                             {{-- <th class="border-bottom-0 text-end">Mode Règlement</th> --}}
-                            <th class="border-bottom-0">Référence</th>
+                            <th class="border-bottom-0">Référence Reg/Référence Fac</th>
                             <th class="border-bottom-0 text-center">Statut</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
@@ -82,7 +82,7 @@
                                     <span class="text-muted small">{{ $reglement->type_reglement }}</span>
                             </td> --}}
                             <td>
-                                <span class="badge bg-dark">{{ $reglement->reference_preuve }}</span>
+                                <span class="badge bg-dark">{{ $reglement->reference_preuve }} / {{ $reglement->facture?->reference_recu }}</span>
                             </td>
                             <td class="text-center">
                                 @switch($reglement->statut)
