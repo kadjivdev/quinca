@@ -10,10 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 use App\Models\Securite\User;
 use App\Models\Vente\{Client, CompteClient, ReglementClient, ReglementRevendeur};
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FactureRevendeur extends Model
 {
+    use SoftDeletes;
+    
     public const STATUT_BROUILLON = 'brouillon';
     public const STATUT_VALIDE = 'valide';
     public const STATUT_ANNULE = 'annulee';

@@ -773,8 +773,6 @@ class FactureRevendeurController extends Controller
                 ], 422);
             }
 
-            // Supprimer les règlements de manière forcée
-
             // Supprimer les lignes
             $facture->lignes()->delete();
 
