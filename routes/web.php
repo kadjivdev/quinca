@@ -38,17 +38,17 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $references = [
-        "16223" => "16623",
-        "16209" => "16609",
-        "16210" => "16610",
-        "16222" => "16622"
-    ];
+    // $references = [
+    //     "16223" => "16623",
+    //     "16209" => "16609",
+    //     "16210" => "16610",
+    //     "16222" => "16622"
+    // ];
 
-    foreach ($references as $old => $new) {
-        FactureClient::where("reference_recu", "" . $old)
-            ->update(["reference_recu" => $new]);
-    }
+    // foreach ($references as $old => $new) {
+    //     FactureClient::where("reference_recu", "" . $old)
+    //         ->update(["reference_recu" => $new]);
+    // }
     return "Opération éffectuée avec succès!!";
 });
 
