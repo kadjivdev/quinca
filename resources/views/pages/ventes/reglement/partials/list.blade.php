@@ -82,6 +82,8 @@
                                     <span class="text-muted small">{{ $reglement->type_reglement }}</span>
                             </td> --}}
                             <td>
+                                <!-- La reference peut être inserée lors de l'encaissement au niveau de la caissière
+                                 ou au cours de l'insertion du reglement -->
                                 <span class="badge bg-dark">{{ $reglement->reference_preuve }} / {{ $reglement->facture?->reference_recu }}</span>
                             </td>
                             <td class="text-center">
