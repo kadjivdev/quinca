@@ -3,7 +3,6 @@
 namespace App\Models\Vente;
 
 use App\Models\Catalogue\Inventaire;
-use App\Models\Parametre\Depot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -72,6 +71,7 @@ class FactureClient extends Model
      * Format: FAC-AAAAMMJJ-XXXX
      * où XXXX est un numéro séquentiel
      */
+    
     public static function generateNumero()
     {
         $prefix = 'FAC';

@@ -883,7 +883,6 @@ class FactureRevendeurController extends Controller
         return $pdf->stream("bordereau_{$facture->numero}.pdf");
     }
 
-
     public function MakevalidationDaily(Request $request)
     {
         $request->validate([

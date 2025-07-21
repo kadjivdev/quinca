@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Models\Securite\User;
 use App\Models\Vente\{Client, CompteClient, ReglementClient, ReglementRevendeur};
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class FactureRevendeur extends Model
 {
@@ -69,29 +70,56 @@ class FactureRevendeur extends Model
      * Génère un numéro de facture unique
      * Format: FAC-AAAAMMJJ-XXXX
      * où XXXX est un numéro séquentiel
+     * @throws \Exception si impossible de générer un numéro unique après plusieurs tentatives
      */
     public static function generateNumero()
     {
-        $prefix = 'FAC';
-        $date = Carbon::now()->format('Ymd');
+        $maxAttempts = 5;
+        $attempt = 0;
 
-        // Recherche de la dernière facture du jour
-        $lastFacture = self::where('numero', 'like', "{$prefix}-{$date}-%")
-            ->orderBy('numero', 'desc')
-            ->first();
+        do {
+            try {
+                return \DB::transaction(function () {
+                    $prefix = 'FAC';
+                    $date = Carbon::now()->format('Ymd');
 
-        if ($lastFacture) {
-            // Extraction du numéro séquentiel et incrémentation
-            $lastNumber = (int) substr($lastFacture->numero, -4);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1;
-        }
+                    // Verrouille la table pendant la lecture pour éviter les race conditions
+                    $lastFacture = self::where('numero', 'like', "{$prefix}-{$date}-%")
+                        ->lockForUpdate()
+                        ->orderBy('numero', 'desc')
+                        ->first();
 
-        // Format du numéro sur 4 chiffres avec des zéros devant
-        $sequence = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                    if ($lastFacture) {
+                        // Extraction du numéro séquentiel et incrémentation
+                        $lastNumber = (int) substr($lastFacture->numero, -4);
+                        if ($lastNumber >= 9999) {
+                            throw new \Exception("Limite de séquence atteinte pour la journée");
+                        }
+                        $nextNumber = $lastNumber + 1;
+                    } else {
+                        $nextNumber = 1;
+                    }
 
-        return "{$prefix}-{$date}-{$sequence}";
+                    // Format du numéro sur 4 chiffres avec des zéros devant
+                    $sequence = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                    $numero = "{$prefix}-{$date}-{$sequence}";
+
+                    // Vérifie une dernière fois que le numéro n'existe pas
+                    if (self::where('numero', $numero)->exists()) {
+                        throw new \Exception("Numéro de facture déjà existant");
+                    }
+
+                    return $numero;
+                });
+            } catch (\Exception $e) {
+                $attempt++;
+                if ($attempt >= $maxAttempts) {
+                    throw new \Exception("Impossible de générer un numéro de facture unique après {$maxAttempts} tentatives");
+                }
+                // Petit délai aléatoire avant de réessayer
+                usleep(random_int(100000, 500000));
+            }
+        } while (true);
     }
 
     /**
