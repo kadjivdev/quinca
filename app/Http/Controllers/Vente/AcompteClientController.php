@@ -382,7 +382,7 @@ class AcompteClientController extends Controller
             ]);
 
             $acompte->compteClient()->create([
-                'date_op' => $acompte->montant,
+                'date_op' => $acompte->date,
                 'montant_op' => $acompte->montant,
                 'client_id' => $acompte->client_id,
                 'user_id' => Auth::user()->id,

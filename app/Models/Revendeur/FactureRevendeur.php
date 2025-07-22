@@ -203,7 +203,6 @@ class FactureRevendeur extends Model
         return $this->belongsTo(User::class, 'validated_by');
     }
 
-
     /**
      * Obtient le reste à livrer pour une ligne
      */

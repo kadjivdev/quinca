@@ -207,8 +207,6 @@ class ClientController extends Controller
             "compteClient.accompteClient"
         ])->findOrFail($clientId);
 
-        // return response()->json($client);
-
         return view('pages.ventes.client.partials.details.detail-comptes', compact(
             'client',
             'date'
@@ -218,6 +216,7 @@ class ClientController extends Controller
     /**
      * Rafraîchit la liste des clients (pour AJAX)
      */
+    
     public function refreshList(Request $request)
     {
         if (!$request->ajax()) {

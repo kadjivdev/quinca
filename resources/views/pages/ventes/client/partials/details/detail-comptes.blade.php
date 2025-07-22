@@ -68,7 +68,7 @@
                                 <td class="text-nowrap py-3">
                                     <span class="code-client">{{ $loop->iteration }}</span>
                                 </td>
-                                <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y H:i:s') }}</td>
+                                <td>{{ Carbon\Carbon::parse($compte->created_at)->format('d/m/Y H:i:s') }}</td>
                                 <td>
                                     @if($compte->type_op=="FAC_CLT")
                                     Facture de vente client <span class="badge bg-light text-dark">{{$compte->factureClient->numero}}</span>
