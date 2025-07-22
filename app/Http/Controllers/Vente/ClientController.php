@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vente\{Client, ReglementClient};
+use App\Models\Vente\{Client, CompteClient, ReglementClient};
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -187,6 +187,7 @@ class ClientController extends Controller
         ));
     }
 
+    /** Historiques d'un compte client */
     public function historiqueComptes(Request $request, $clientId)
     {
         if (request()->ajax()) {
@@ -213,10 +214,33 @@ class ClientController extends Controller
         ));
     }
 
+    /** Historiques de tous les comptes clients */
+    public function allHistoriqueComptes(Request $request)
+    {
+        if (request()->ajax()) {
+            return response()->json(Client::all());
+        }
+
+        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+
+        $compteClients = CompteClient::with(["client","user","factureClient","factureRevendeur","reglementClient",
+        "reglementRevendeur","accompteClient"])
+        ->latest()
+        ->get();
+
+        // Récupération des données avec pagination
+        $user = auth()->user();
+        
+        return view('pages.ventes.client.partials.details.all-detail-comptes', compact(
+            'compteClients',
+            'date'
+        ));
+    }
+
     /**
      * Rafraîchit la liste des clients (pour AJAX)
      */
-    
+
     public function refreshList(Request $request)
     {
         if (!$request->ajax()) {

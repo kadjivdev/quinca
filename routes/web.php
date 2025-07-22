@@ -589,6 +589,7 @@ Route::middleware('auth')->group(function () {
             Route::get('details/{id}/reglements', [ClientController::class, 'detailReglements'])->name('vente.clients.detailReglements');
             Route::get('details/{id}/accomptes', [ClientController::class, 'detailAccomptes'])->name('vente.clients.detailAccomptes');
             Route::get('details/{id}/historique-comptes', [ClientController::class, 'historiqueComptes'])->name('vente.clients.historiqueComptes');
+            Route::get('/all-historique-comptes', [ClientController::class, 'allHistoriqueComptes'])->name('vente.clients.allHistoriqueComptes');
 
             Route::get('/client-revendeur', [ClientController::class, 'clientRevendeur'])->name('vente.clients.clientRevendeur');
             Route::post('/', [ClientController::class, 'store'])->name('vente.clients.store');

@@ -43,54 +43,72 @@
 @section('content')
 <div class="content container">
     <div class="row g-3 list mt-3 " id="stockEntriesList">
-        <div class="col-1"></div>
-        <div class="col-10">
+        <div class="col-12">
             <a href="{{route('vente.clients.index')}}" class="btn btn-sm btn-light border">Retour</a>
             <br>
             <div class="card mt-3 p-3 shadow-sm">
                 <div class="table-responsive">
-                    <h5 class="mb-5">L'historique des opérations du client : <strong class="badge bg-light border text-dark">{{$client->raison_sociale}}</strong></h5>
+                    <h5 class="mb-5">L'historique des opérations de : <strong class="badge bg-light border text-dark">tous les clients</strong></h5>
 
                     <table id="example1" class="table table-hover align-middle mb-0" id="clientsTable">
                         <thead class="bg-light">
                             <tr>
                                 <th class="border-bottom-0 text-nowrap py-3">N°</th>
+                                <th class="border-bottom-0 text-nowrap py-3">Client</th>
                                 <th class="border-bottom-0 text-nowrap py-3">Inséré le</th>
-                                <th class="border-bottom-0 text-nowrap py-3">Date D'opération</th>
+                                <th class="border-bottom-0 text-nowrap py-3">Date Opération</th>
                                 <th class="border-bottom-0">Opération</th>
+                                <th class="border-bottom-0">Réference</th>
                                 <th class="border-bottom-0">Débit</th>
                                 <th class="border-bottom-0">Crédit</th>
                                 <th class="border-bottom-0">Opérateur</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($client->compteClient as $compte)
+                            @forelse($compteClients as $compte)
                             <tr>
                                 <td class="text-nowrap py-3">
                                     <span class="code-client">{{ $loop->iteration }}</span>
                                 </td>
+                                <td><span class="badge bg-light border text-dark">{{$compte->client?->raison_sociale}}</span></td>
                                 <td>{{ Carbon\Carbon::parse($compte->created_at)->format('d/m/Y H:i:s') }}</td>
                                 <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y H:i:s') }}</td>
                                 <td>
                                     @if($compte->type_op=="FAC_CLT")
-                                    Facture de vente client <span class="badge bg-light text-dark">{{$compte->factureClient->numero}}</span>
+                                    Facture client <span class="badge bg-light text-dark">{{$compte->factureClient->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="FAC_REV")
-                                    Facture de vente revendeur <span class="badge bg-light text-dark">{{$compte->factureRevendeur->numero}}</span>
+                                    Facture revendeur <span class="badge bg-light text-dark">{{$compte->factureRevendeur->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="REG_CLT")
-                                    Règlement de facture client <span class="badge bg-light text-dark">{{$compte->reglementClient->numero}}</span>
+                                    Règlement client <span class="badge bg-light text-dark">{{$compte->reglementClient->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="REG_REV")
-                                    Règlement de facture revendeur <span class="badge bg-light text-dark">{{$compte->reglementRevendeur->numero}}</span>
+                                    Règlement revendeur <span class="badge bg-light text-dark">{{$compte->reglementRevendeur->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="AC_CLT")
                                     Accompte sur le compte du client <span class="badge bg-light text-dark">{{$compte->accompteClient->reference}}</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <span class="badge bg-light border text-dark">
+                                        <!-- Facture client -->
+                                        @if($compte->factureClient)
+                                        {{$compte->factureClient->reference_recu}}
+                                        @elseif($compte->reglementClient)
+                                        <!-- Reglement client -->
+                                        {{$compte->reglementClient->reference_preuve??$compte->reglementClient->facture->reference_recu}}
+                                        @elseif($compte->reglementRevendeur)
+                                        <!-- Reglement revendeur -->
+                                        {{$compte->reglementRevendeur?->reference_preuve}}
+                                        @else
+                                        ---
+                                        @endif
+                                    </span>
                                 </td>
                                 <td class="bg-secondary text-white">
                                     @if(in_array($compte->type_op,["FAC_CLT","FAC_REV","AC_CLT"]))
@@ -125,7 +143,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-1"></div>
     </div>
 </div>
 @endsection>

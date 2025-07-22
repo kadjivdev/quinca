@@ -418,11 +418,11 @@
                         </a></li>
                     @endcan
 
-                    <!-- @can('rapports.compte-client.view')
-                    <li><a class="dropdown-item" href="{{ route('rapports.compte-client') }}">
-                            <div class="dropdown-item-wrapper">Compte Client</div>
+                    @can('rapports.compte-client.view')
+                    <li><a class="dropdown-item" href="{{ route('vente.clients.allHistoriqueComptes') }}">
+                            <div class="dropdown-item-wrapper">Historique des Comptes Client</div>
                         </a></li>
-                    @endcan -->
+                    @endcan
                 </ul>
             </li>
             @endcanany

@@ -302,6 +302,8 @@ class ReglementClientController extends Controller
                 // ->where('utilisateur_id', auth()->user()->id)
                 ->first();
 
+            Log::info("La session :", ["session" => $sessionCaisse]);
+
             if (!$sessionCaisse) {
                 throw new Exception('Vous devez avoir une session de caisse ouverte pour valider un règlement');
             }
