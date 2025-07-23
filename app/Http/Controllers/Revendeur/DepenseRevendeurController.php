@@ -38,7 +38,7 @@ class DepenseRevendeurController extends Controller
             // User connecté
             $user = auth()->user();
 
-            $day = $request->day;
+            $day = $request->day ?? Carbon::now();
             // Chargement des factures avec les relations nécessaires
             if ($day) {
                 $query = RevendeurDepense::with(['createdBy', 'validatedBy'])
@@ -62,9 +62,9 @@ class DepenseRevendeurController extends Controller
                     ->get();
                 $depots = $user->pointDeVente->depot;
             }
-            $depenses = $query
-                ->where('created_by', $user->id)
-                ->get();
+            // $depenses = $query
+            //     ->where('created_by', $user->id)
+            //     ->get();
 
             /**Montant total des ventes du jour */
             $totalVenteAmount = FactureRevendeur::whereNotNull("validated_by")
@@ -107,7 +107,7 @@ class DepenseRevendeurController extends Controller
                 'day' => 'required|date',
                 'depot_id' => 'required|exists:depots,id',
                 'amount' => 'required',
-                'observation'=>"nullable"
+                'observation' => "nullable"
             ]);
 
             DB::beginTransaction();
