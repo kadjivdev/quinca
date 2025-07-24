@@ -26,13 +26,9 @@ class AddPermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions_groups = [
-            'Requêtes' => array_merge(
-                $this->createCrudValidatePermissions('requetes', 'requetes', 'Ventes'),
-            ),
-            
-            'Transports' => array_merge(
-                $this->createCrudValidatePermissions('transports', 'transports', 'Ventes'),
-            ),
+            'Accomptes' => array_merge(
+                $this->createCrudValidatePermissions('accomptes', 'accomptes', 'Ventes'),
+            )
         ];
 
         foreach ($permissions_groups as $group => $permissions) {

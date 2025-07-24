@@ -153,6 +153,7 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
 
+                                    @can("accomptes.edit")
                                     {{-- Bouton modifier - visible uniquement si en attente --}}
                                     @if($acompte->isEnAttente())
                                     <button class="btn btn-sm btn-light-warning btn-icon ms-1"
@@ -162,7 +163,9 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     @endif
+                                    @endcan
 
+                                    @can("accomptes.validate")
                                     {{-- Boutons de validation/rejet - visibles uniquement si en attente --}}
                                     @if($acompte->isEnAttente())
                                     <button class="btn btn-sm btn-light-success btn-icon ms-1"
@@ -172,13 +175,15 @@
                                         <i class="fas fa-check-circle"></i>
                                     </button>
 
-                                    {{-- <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                    <!-- <button class="btn btn-sm btn-light-danger btn-icon ms-1"
                                                     onclick="rejectAcompte({{ $acompte->id }})"
                                     data-bs-toggle="tooltip"
                                     title="Rejeter">
                                     <i class="fas fa-times-circle"></i>
-                                    </button> --}}
+                                    </button>  -->
                                     @endif
+                                    @endcan
+
 
                                     {{-- Badge de statut --}}
                                     <span class="ms-1">
@@ -195,15 +200,17 @@
                                         @endif
                                     </span>
 
+                                    @can("accomptes.delete")
                                     {{-- Bouton supprimer - visible si en attente et moins de 24h --}}
                                     @if($acompte->isEnAttente())
-                                        <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                    <button class="btn btn-sm btn-light-danger btn-icon ms-1"
                                         onclick="deleteAcompte({{ $acompte->id }})"
                                         data-bs-toggle="tooltip"
                                         title="Supprimer">
                                         <i class="fas fa-trash"></i>
-                                        </button>
-                                        @endif
+                                    </button>
+                                    @endif
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
