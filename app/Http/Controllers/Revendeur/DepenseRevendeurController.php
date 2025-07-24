@@ -3,17 +3,10 @@
 namespace App\Http\Controllers\Revendeur;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vente\Client;
-use App\Models\Catalogue\{Tarification, Article};
-use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Vente\{FactureClient, SessionCaisse, ReglementClient, RevendeurDepense};
-use App\Models\Parametre\Societe;
-use App\Models\Parametre\UniteMesure;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Revendeur\LigneFactureRevendeur;
-use App\Models\Stock\StockDepot;
-use App\Services\ServiceStockSortie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +14,6 @@ use Illuminate\Support\Facades\Validator;
 use Exception;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
-
 
 class DepenseRevendeurController extends Controller
 {

@@ -275,9 +275,9 @@ class AcompteClientController extends Controller
             DB::beginTransaction();
 
             // Vérifier si l'acompte est récent (moins de 24h)
-            if ($acompte->created_at->diffInHours(now()) > 24) {
-                throw new Exception('Impossible de supprimer un acompte de plus de 24 heures');
-            }
+            // if ($acompte->created_at->diffInHours(now()) > 24) {
+            //     throw new Exception('Impossible de supprimer un acompte de plus de 24 heures');
+            // }
 
             // Supprimer l'acompte (le modèle gère automatiquement la mise à jour du solde client)
             $acompte->delete();

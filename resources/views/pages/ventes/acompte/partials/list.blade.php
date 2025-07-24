@@ -196,7 +196,7 @@
                                     </span>
 
                                     {{-- Bouton supprimer - visible si en attente et moins de 24h --}}
-                                    @if($acompte->isEnAttente() && $acompte->created_at->diffInHours(now()) <= 24)
+                                    @if($acompte->isEnAttente())
                                         <button class="btn btn-sm btn-light-danger btn-icon ms-1"
                                         onclick="deleteAcompte({{ $acompte->id }})"
                                         data-bs-toggle="tooltip"
