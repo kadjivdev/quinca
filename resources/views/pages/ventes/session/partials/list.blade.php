@@ -9,6 +9,7 @@
                             <th class="border-bottom-0">Caissier</th>
                             <th class="border-bottom-0">Ouverture</th>
                             <th class="border-bottom-0">Fermeture</th>
+                            <th class="border-bottom-0">Observation</th>
                             <th class="border-bottom-0 text-end">Montant Initial</th>
                             <th class="border-bottom-0 text-end">Montant Final</th>
                             <th class="border-bottom-0 text-center">Statut</th>
@@ -47,6 +48,11 @@
                                 @else
                                 <span class="text-muted">-</span>
                                 @endif
+                            </td>
+                            <td>
+                                <textarea name="" class="form-control w-100" rows="1" id="">
+                                    {{$session->observations_fermeture}}
+                                </textarea>
                             </td>
                             <td class="text-end fw-medium">
                                 {{ number_format($session->montant_ouverture, 0, ',', ' ') }} F
@@ -108,7 +114,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-cash-register fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucune session trouvée</h6>

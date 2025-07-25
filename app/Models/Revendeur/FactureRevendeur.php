@@ -12,11 +12,12 @@ use App\Models\Securite\User;
 use App\Models\Vente\{Client, CompteClient, ReglementClient, ReglementRevendeur};
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class FactureRevendeur extends Model
 {
     use SoftDeletes;
-    
+
     public const STATUT_BROUILLON = 'brouillon';
     public const STATUT_VALIDE = 'valide';
     public const STATUT_ANNULE = 'annulee';
@@ -99,9 +100,11 @@ class FactureRevendeur extends Model
                     } else {
                         $nextNumber = 1;
                     }
-
+                    // dd(uuid());
                     // Format du numéro sur 4 chiffres avec des zéros devant
-                    $sequence = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                    // $sequence = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                    $sequence = explode("-", Str::uuid())[0];
+                    // dd($sequence);
                     $numero = "{$prefix}-{$date}-{$sequence}";
 
                     // Vérifie une dernière fois que le numéro n'existe pas
