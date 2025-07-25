@@ -55,6 +55,7 @@
                 $('#edit_type_paiement').val(acompte.type_paiement);
                 $('#edit_montant').val(acompte.montant);
                 $('#edit_observation').val(acompte.observation);
+                $('#edit_reference').val(acompte.reference);
 
                 // Afficher le modal
                 $('#editAcompteModal').modal('show');

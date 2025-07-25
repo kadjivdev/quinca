@@ -66,6 +66,15 @@
                                             <div class="invalid-feedback">Le montant est requis</div>
                                         </div>
 
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Reference</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control text-end" name="reference"
+                                                       id="edit_reference">
+                                            </div>
+                                            <div class="invalid-feedback">Le montant est requis</div>
+                                        </div>
+
                                         <div class="col-md-12">
                                             <label class="form-label fw-medium">Observation</label>
                                             <textarea class="form-control" name="observation" id="edit_observation" rows="2"
