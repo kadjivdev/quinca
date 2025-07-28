@@ -89,7 +89,7 @@ class BonCommande extends Model
     protected $hidden = [
         'created_by',
         'updated_by',
-        'validated_by',
+        // 'validated_by',
         'deleted_at'
     ];
 

@@ -52,6 +52,7 @@ class BonCommandeController extends Controller
             ->where('point_de_vente_id', $user->point_de_vente_id)
             ->get();
 
+        
         // Programmations validées du point de vente de l'utilisateur
         $programmationsValidees = ProgrammationAchat::whereNotNull('validated_at')
             ->where('point_de_vente_id', $user->point_de_vente_id)
@@ -103,7 +104,7 @@ class BonCommandeController extends Controller
 
         return view('pages.achat.bon-commande.index', $data);
     }
-    
+
     /**
      * Enregistre un nouveau bon de commande
      */
@@ -527,13 +528,12 @@ class BonCommandeController extends Controller
             $pdf->Text(10, 62, utf8_decode('FOURNISSEUR : ' . $bcde->fournisseur->raison_sociale));
             $pdf->SetFont('Arial', 'B', 12);
             $pdf->Text(10, 69, utf8_decode("OBJET : $bon_object"));
-        }else {
+        } else {
             $pdf->SetFont('Arial', 'B', 12);
             $pdf->Text(10, 30, utf8_decode('FOURNISSEUR : ' . $bcde->fournisseur->raison_sociale));
             $pdf->SetFont('Arial', 'B', 12);
             $pdf->Text(10, 45, utf8_decode("OBJET : $bon_object"));
         }
-
 
         $pdf->SetXY(10, 73);
         $pdf->MultiCell(190, 15, utf8_decode('BON DE COMMANDE : ' . $bcde->code), '', 'C');
@@ -568,7 +568,7 @@ class BonCommandeController extends Controller
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->CheckPageBreak(10);
         $pdf->SetXY(10, 110);
-        $pdf->MultiCell(0,5,utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre .' FCFA'),0,'J');
+        $pdf->MultiCell(0, 5, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre . ' FCFA'), 0, 'J');
         // $pdf->Text($pdf->GetX(), $pdf->GetY() + 10, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre .' FCFA'));
 
         $pdf->CheckPageBreak(45);
