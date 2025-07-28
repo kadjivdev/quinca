@@ -511,7 +511,6 @@ class BonCommandeController extends Controller
         $pdf->AddPage();
         $pdf->SetFont('Arial', 'B', 16);
 
-        // dd($entete==="true");
         //entete du pdf
         if ($entete === "true") {
             $pdf->Image("kadjiv.jpeg", 150, 10, 50, 30);
@@ -567,8 +566,8 @@ class BonCommandeController extends Controller
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->CheckPageBreak(10);
-        $pdf->SetXY(10, 110);
-        $pdf->MultiCell(0, 5, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre . ' FCFA'), 0, 'J');
+        $pdf->SetXY($pdf->GetX(), $pdf->GetY() + 10);
+        $pdf->MultiCell(0,5, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre . ' FCFA'), 0, 'J');
         // $pdf->Text($pdf->GetX(), $pdf->GetY() + 10, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre .' FCFA'));
 
         $pdf->CheckPageBreak(45);
