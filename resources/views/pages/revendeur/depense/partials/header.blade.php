@@ -71,8 +71,20 @@
                         <form action="{{route('revendeur.depenses.index')}}">
                             @csrf
                             <div class="d-flex align-items-baseline">
-                                <input type="date" value="{{$day}}" required name="day" id="day" class="form-control">
-                                <button type="submit" class="form-control w-50 btn btn-sm btn-primary mx-2"> <i class="fas fa-sync-alt me-2"></i> Filtrer par date</button>
+                                <input type="date" value="{{session('day')??$day}}" required name="day" class="form-control">
+                                &nbsp;
+                                @if(auth()->user()->hasRole("Super Administrateur")
+                                || auth()->user()->hasRole("CONTROLE INTERNE")
+                                || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE"))
+                                <select name="point_de_vente_id" class="form-control">
+                                    <option value="">Choisissez un point de vente</option>
+                                    @foreach($pointDeVentes as $pointDeVente)
+                                    @continue($pointDeVente->id==1)
+                                    <option @selected($pointDeVente->id==session('pointDeVente')) value="{{$pointDeVente->id}}">{{$pointDeVente->nom_pv}}</option>
+                                    @endforeach
+                                </select>
+                                @endif
+                                <button type="submit" class="form-control w-50 btn btn-sm btn-primary mx-2"> <i class="fas fa-sync-alt me-2"></i> Filtrer </button>
                             </div>
                         </form>
                     </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Revendeur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Parametre\Depot;
+use App\Models\Parametre\PointDeVente;
 use App\Models\Vente\{FactureClient, SessionCaisse, ReglementClient, RevendeurDepense};
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Revendeur\LigneFactureRevendeur;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Exception;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Session;
 
 class DepenseRevendeurController extends Controller
 {
@@ -31,14 +33,26 @@ class DepenseRevendeurController extends Controller
             $user = auth()->user();
 
             $day = $request->day ?? Carbon::now();
-            // Chargement des factures avec les relations nécessaires
+
+            $query = RevendeurDepense::with(['createdBy', 'validatedBy'])->latest();
+            $queryFacture = FactureRevendeur::whereNotNull("validated_by")->latest();
+
             if ($day) {
-                $query = RevendeurDepense::with(['createdBy', 'validatedBy'])
-                    ->whereDate("day", $day)
-                    ->orderByDesc('id');
-            } else {
-                $query = RevendeurDepense::with(['createdBy', 'validatedBy'])
-                    ->orderByDesc('id');
+                $query->whereDate("day", $day);
+                $queryFacture->whereDate("created_at", $day);
+
+                Session::flash("day",$day);
+            }
+
+            if ($request->point_de_vente_id) {
+                /**Les depenses attachées à ce depot */
+                $pointDeVente = PointDeVente::findOrFail($request->point_de_vente_id);
+                $query->whereIn("depot_id", $pointDeVente->depot?->pluck("id")->toArray());
+
+                /**Factures revendeurs */
+                $queryFacture->where("point_de_vente_id", $request->point_de_vente_id);
+
+                Session::flash("pointDeVente",$request->point_de_vente_id);
             }
 
             if (
@@ -48,21 +62,24 @@ class DepenseRevendeurController extends Controller
             ) {
                 $depenses = $query->get();
                 $depots = Depot::get();
+
+
+                /**Montant total des ventes du jour */
+                $totalVenteAmount = $queryFacture
+                    ->get()->sum(fn($facture) => ($facture->montant_ttc - $facture->montant_remise));
             } else {
                 $depenses = $query
                     ->where('created_by', $user->id)
                     ->get();
                 $depots = $user->pointDeVente->depot;
-            }
-            // $depenses = $query
-            //     ->where('created_by', $user->id)
-            //     ->get();
 
-            /**Montant total des ventes du jour */
-            $totalVenteAmount = FactureRevendeur::whereNotNull("validated_by")
-                ->whereDate("created_at", $day)
-                ->where("point_de_vente_id", $user->point_de_vente_id)
-                ->get()->sum(fn($facture) => ($facture->montant_ttc - $facture->montant_remise));
+                /**Montant total des ventes du jour */
+                $totalVenteAmount = $queryFacture
+                    ->where("point_de_vente_id", $user->point_de_vente_id)
+                    ->get()->sum(fn($facture) => ($facture->montant_ttc - $facture->montant_remise));
+            }
+
+            $pointDeVentes = PointDeVente::get();
 
             /**Total des depenses du jour */
             $totalDepenses = $depenses->sum("amount");
@@ -77,7 +94,8 @@ class DepenseRevendeurController extends Controller
                 'day',
                 'totalVenteAmount',
                 'totalDepenses',
-                'recetteTotale'
+                'recetteTotale',
+                'pointDeVentes'
             ));
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement de la liste des depenses', [
