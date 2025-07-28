@@ -39,8 +39,8 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $bon = BonCommande::firstWhere("code", "BC2507255118")->update(["validated_at" => null, "validated_by" => null]);
-    return BonCommande::firstWhere("code", "BC2507255118");
+    // $bon = BonCommande::firstWhere("code", "BC2507255118")->update(["validated_at" => null, "validated_by" => null]);
+    // return BonCommande::firstWhere("code", "BC2507255118");
     return "Opération éffectuée avec succès!!";
 });
 
