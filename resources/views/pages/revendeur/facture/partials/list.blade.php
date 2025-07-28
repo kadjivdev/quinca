@@ -1,3 +1,29 @@
+<div class="row d-flex justify-content-center">
+    <div class="col-md-6 border bg-light rounded p-3">
+        <!-- FILTRAGE PAR DEPOT -->
+        <form action="{{route('revendeur.facture.index')}}" method="GET">
+            @csrf
+            <div class="row">
+                <div class="col-6">
+                    <select class="form-select form-control select2-form" name="point_vente_id">
+                        <option value="">Sélectionner un point de vente -- {{session('pointDeVente')}} </option>
+                        @foreach($pointsVentes as $pointVente)
+                        @continue($pointVente->id==1)
+                        <option @selected($pointVente->id==session('pointDeVente')) value="{{$pointVente->id}}" class="">{{$pointVente->nom_pv}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-6">
+                    <input type="date" name="day" class="form-control" value="{{session('day')??null}}">
+                </div>
+            </div>
+            <button class="w-100 btn btn-primary mt-2 px-4">
+                <i class="fas fa-save me-2"></i>Filtrer
+            </button>
+        </form>
+    </div>
+</div>
+
 {{-- list-factures.blade.php --}}
 <div class="row g-3">
     {{-- Table des factures --}}
@@ -123,34 +149,34 @@
                                     @endcan
 
                                     @if($facture->statut === 'brouillon')
-                                        @can("vente.facture.edit")
-                                        {{-- Modifier --}}
-                                        <button class="btn btn-sm btn-light-warning btn-icon ms-1"
-                                            onclick="editFactures({{ $facture->id }})"
-                                            data-bs-toggle="tooltip" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        @endcan
+                                    @can("vente.facture.edit")
+                                    {{-- Modifier --}}
+                                    <button class="btn btn-sm btn-light-warning btn-icon ms-1"
+                                        onclick="editFactures({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    @endcan
 
-                                        {{-- Valider --}}
-                                        @can("vente.facture.validate")
-                                            @if(!$facture->validated_by)
-                                            <button class="btn btn-sm btn-light-success btn-icon ms-1"
-                                                onclick="validateFacture({{ $facture->id }})"
-                                                data-bs-toggle="tooltip" title="Valider">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            @endif
-                                        @endcan
+                                    {{-- Valider --}}
+                                    @can("vente.facture.validate")
+                                    @if(!$facture->validated_by)
+                                    <button class="btn btn-sm btn-light-success btn-icon ms-1"
+                                        onclick="validateFacture({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Valider">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    @endif
+                                    @endcan
 
-                                        @can("vente.facture.delete")
-                                        {{-- Supprimer --}}
-                                        <button class="btn btn-sm btn-light-danger btn-icon ms-1"
-                                            onclick="deleteFacture({{ $facture->id }})"
-                                            data-bs-toggle="tooltip" title="Supprimer">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        @endcan
+                                    @can("vente.facture.delete")
+                                    {{-- Supprimer --}}
+                                    <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                        onclick="deleteFacture({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    @endcan
                                     @endif
 
                                     {{-- Imprimer --}}

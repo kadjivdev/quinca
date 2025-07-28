@@ -7,6 +7,7 @@ use App\Models\Vente\Client;
 use App\Models\Catalogue\{Tarification, Article};
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
+use App\Models\Parametre\PointDeVente;
 use App\Models\Vente\{FactureClient, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
@@ -23,6 +24,7 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class FactureRevendeurController extends Controller
 {
@@ -41,7 +43,7 @@ class FactureRevendeurController extends Controller
      * Affiche la liste des factures
      */
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             Log::info('Début du chargement de la liste des factures');
@@ -54,6 +56,16 @@ class FactureRevendeurController extends Controller
                 ->where('type_vente', 'normale')
                 ->orderBy('date_facture', 'desc');
 
+            if ($request->point_vente_id) {
+                $query->where("point_de_vente_id", $request->point_vente_id);
+                Session::flash("pointDeVente",$request->point_vente_id);
+            }
+
+            if ($request->day) {
+                $query->whereDate("created_at", $request->day);
+                Session::flash("day",$request->day);
+            }
+
             if (
                 auth()->user()->hasRole("Super Administrateur")
                 || auth()->user()->hasRole("CONTROLE INTERNE")
@@ -65,7 +77,6 @@ class FactureRevendeurController extends Controller
                     ->get();
             }
 
-            // return response()->json($factures);
             // Ajouter des attributs calculés pour chaque facture
             $factures->transform(function ($facture) {
                 // Calcul du reste à payer
@@ -105,15 +116,21 @@ class FactureRevendeurController extends Controller
             }
 
             $depots = Depot::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->get();
+            $pointsVentes = PointDeVente::all();
 
             // Charger la liste des clients pour le filtre
             $clients =  Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)
                 ->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
 
-            return view('pages.revendeur.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'depots'));
+            return view('pages.revendeur.facture.index', compact(
+                'factures',
+                'clients',
+                'date',
+                'tauxTva',
+                'depots',
+                'pointsVentes'
+            ));
         } catch (Exception $e) {
-            // dd($e->getMessage());
-
             Log::error('Erreur lors du chargement de la liste des factures', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -125,7 +142,6 @@ class FactureRevendeurController extends Controller
                     'message' => 'Une erreur est survenue lors du chargement des factures'
                 ], 500);
             }
-
             return back()->with('error', 'Une erreur est survenue lors du chargement des factures');
         }
     }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vente\{FactureClient, ReglementClient};
+use App\Models\Vente\{CompteClient, FactureClient, ReglementClient};
 use App\Models\Vente\{SessionCaisse, Client};
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;

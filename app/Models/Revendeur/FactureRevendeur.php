@@ -100,11 +100,9 @@ class FactureRevendeur extends Model
                     } else {
                         $nextNumber = 1;
                     }
-                    // dd(uuid());
                     // Format du numéro sur 4 chiffres avec des zéros devant
                     // $sequence = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
                     $sequence = explode("-", Str::uuid())[0];
-                    // dd($sequence);
                     $numero = "{$prefix}-{$date}-{$sequence}";
 
                     // Vérifie une dernière fois que le numéro n'existe pas
