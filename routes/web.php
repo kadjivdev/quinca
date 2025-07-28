@@ -38,8 +38,9 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $bon = BonCommande::firstWhere("code", "BC2507255118")->update(["validated_at" => null, "validated_by" => null]);
-    // BonCommande::firstWhere("code", "BC2507255118")->delete();
+    BonCommande::withTrashed()->firstWhere("code", "BC2507255118")->delete();
+    $bon = BonCommande::firstWhere("code", "BC2507282495")->update(["code" => "BC2507255118"]);
+    return BonCommande::firstWhere("code", "BC2507255118");
     return "Opération éffectuée avec succès!! Bon BC2507255118 supprimé";
 });
 
