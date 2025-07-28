@@ -34,14 +34,13 @@ use App\Models\Vente\FactureClient;
 | Here is where you can register web routes for your application. These
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
-|
 */
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     // $bon = BonCommande::firstWhere("code", "BC2507255118")->update(["validated_at" => null, "validated_by" => null]);
-    // return BonCommande::firstWhere("code", "BC2507255118");
-    return "Opération éffectuée avec succès!!";
+    BonCommande::firstWhere("code", "BC2507255118")->delete();
+    return "Opération éffectuée avec succès!! Bon BC2507255118 supprimé";
 });
 
 /**DETELE A STOCK */
