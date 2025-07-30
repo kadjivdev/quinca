@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vente\{AcompteClient, Client, SessionCaisse};
+use Dotenv\Exception\ValidationException as ExceptionValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -158,6 +159,8 @@ class AcompteClientController extends Controller
             // Validation des données
             $validated = $request->validate(AcompteClient::rules(), [
                 'date.required' => 'La date est obligatoire',
+                'reference.required' => 'La reference est réquise',
+                'reference.unique' => 'La reference existe déjà',
                 'date.date' => 'La date n\'est pas valide',
                 'client_id.required' => 'Le client est obligatoire',
                 'client_id.exists' => 'Le client sélectionné n\'existe pas',
@@ -202,7 +205,7 @@ class AcompteClientController extends Controller
                     'acompte' => $acompte->load(['client', 'createdBy'])
                 ]
             ]);
-        } catch (ValidationException $e) {
+        } catch (ExceptionValidationException $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,

@@ -164,6 +164,7 @@ class AcompteClient extends Model
     public static function rules(): array
     {
         return [
+            'reference'=>"required|unique:acompte_clients,id",
             'date' => 'required|date',
             'type_paiement' => 'required|in:' . implode(',', [
                 self::TYPE_ESPECE,
