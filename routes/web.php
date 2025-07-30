@@ -41,7 +41,7 @@ use App\Models\Vente\FactureClient;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     // AcompteClient::withTrashed()->restore();
-    AcompteClient::withTrashed()->firstWhere("reference", "WV94147 DU 11/07/25")->forceDelete();
+    // AcompteClient::withTrashed()->firstWhere("reference", "WV94147 DU 11/07/25")->forceDelete();
     return "Opération éffectuée avec succès!!";
 });
 
