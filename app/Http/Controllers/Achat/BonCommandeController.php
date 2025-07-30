@@ -52,7 +52,7 @@ class BonCommandeController extends Controller
             ->where('point_de_vente_id', $user->point_de_vente_id)
             ->get();
 
-        
+
         // Programmations validées du point de vente de l'utilisateur
         $programmationsValidees = ProgrammationAchat::whereNotNull('validated_at')
             ->where('point_de_vente_id', $user->point_de_vente_id)
@@ -62,6 +62,7 @@ class BonCommandeController extends Controller
             ->with(['pointVente', 'fournisseur'])
             ->orderBy('validated_at', 'desc')
             ->get();
+
 
         // Statistiques pour le point de vente spécifique
         $totalBonCommandes = BonCommande::where('point_de_vente_id', $user->point_de_vente_id)->count();
@@ -567,7 +568,7 @@ class BonCommandeController extends Controller
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->CheckPageBreak(10);
         $pdf->SetXY($pdf->GetX(), $pdf->GetY() + 10);
-        $pdf->MultiCell(0,5, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre . ' FCFA'), 0, 'J');
+        $pdf->MultiCell(0, 5, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre . ' FCFA'), 0, 'J');
         // $pdf->Text($pdf->GetX(), $pdf->GetY() + 10, utf8_decode('Arrêté le présent bon de commande à la somme de : ' . $prix_lettre .' FCFA'));
 
         $pdf->CheckPageBreak(45);

@@ -85,7 +85,7 @@
                             <td>
                                 <a href="#" class="code-commande"
                                     onclick="showBonCommande({{ $facture->bon_commande_id }})">
-                                    {{ $facture->bonCommande->code }}
+                                    {{ $facture->bonCommande?->code }}
                                 </a>
                             </td>
 

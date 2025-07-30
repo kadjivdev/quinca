@@ -41,7 +41,8 @@
                                                 id="factureSelect" required>
                                                 <option value="">Sélectionner un bon de commande</option>
                                                 @foreach ($factures as $facture)
-                                                <option value="{{ $facture->id }}">{{$facture->bonCommande->code}} -- <b class="text-success">({{ $facture->code }})</b> </option>
+                                                @continue(!$facture->bonCommande)
+                                                <option value="{{ $facture->id }}">{{$facture->bonCommande?->code}} -- <b class="text-success">({{ $facture->code }})</b> </option>
                                                 @endforeach
                                             </select>
                                         </div>

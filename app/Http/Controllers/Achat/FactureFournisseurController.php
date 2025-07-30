@@ -118,6 +118,7 @@ class FactureFournisseurController extends Controller
         // Bons de commande disponibles pour nouvelle facture
         $bonsCommande = BonCommande::whereDoesntHave('factures')
             ->whereNotNull('validated_at')
+            ->whereNotNull("validated_by")
             ->with(['pointVente', 'fournisseur'])
             ->get();
 

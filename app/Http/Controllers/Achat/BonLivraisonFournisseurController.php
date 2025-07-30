@@ -45,6 +45,7 @@ class BonLivraisonFournisseurController extends Controller
         // Récupération des factures validées sans bon de livraison ou partiellement livrées
         $factures = FactureFournisseur::with('fournisseur')
             ->whereNotNull('validated_at')
+            ->whereNotNull("validated_by")
             ->whereNull('rejected_at')
             ->where(function ($query) {
                 $query->where('statut_livraison', 'NON_LIVRE')
