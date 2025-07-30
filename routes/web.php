@@ -40,13 +40,9 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-
-    // return BonCommande::withTrashed()->whereNotNull("deleted_at")->get();
-    // $facture_FAC25074311 = FactureFournisseur::firstWhere("code", "FAC25074311");
-    // dd($facture_FAC25074311->bonCommande);
-
-    FactureFournisseur::where("bon_commande_id",84)->update(["bon_commande_id"=>89]);
-    return "Opération éffectuée avec succès!! Factures du bon BC2507255118_old en  89 supprimé";
+    // AcompteClient::withTrashed()->restore();
+    AcompteClient::withTrashed()->firstWhere("reference", "WV94147 DU 11/07/25")->forceDelete();
+    return "Opération éffectuée avec succès!!";
 });
 
 /**DETELE A STOCK */

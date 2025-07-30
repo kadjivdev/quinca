@@ -155,12 +155,13 @@ class AcompteClientController extends Controller
                     'message' => 'Session de caisse requise.'
                 ], 422);
             }
+            Log::info("Les intrées", $request->all());
 
             // Validation des données
             $validated = $request->validate(AcompteClient::rules(), [
                 'date.required' => 'La date est obligatoire',
-                'reference.required' => 'La reference est réquise',
-                'reference.unique' => 'La reference existe déjà',
+                // 'reference.required' => 'La reference est réquise',
+                // 'reference.unique' => 'La reference existe déjà',
                 'date.date' => 'La date n\'est pas valide',
                 'client_id.required' => 'Le client est obligatoire',
                 'client_id.exists' => 'Le client sélectionné n\'existe pas',
@@ -192,7 +193,9 @@ class AcompteClientController extends Controller
             $acompte->fill($data);
 
             $acompte->created_by = auth()->id();
-            // $acompte->reference = $request->reference?->reference;
+            if ($request->reference) {
+                $acompte->reference = $request->reference;
+            }
             $acompte->point_de_vente_id = auth()->user()->point_de_vente_id;
             $acompte->save();
 
