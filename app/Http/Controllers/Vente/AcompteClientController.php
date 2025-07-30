@@ -285,6 +285,8 @@ class AcompteClientController extends Controller
             //     throw new Exception('Impossible de supprimer un acompte de plus de 24 heures');
             // }
 
+            $acompte->update(["reference" => $acompte->reference . '_old']);
+
             // Supprimer l'acompte (le modèle gère automatiquement la mise à jour du solde client)
             $acompte->delete();
 
