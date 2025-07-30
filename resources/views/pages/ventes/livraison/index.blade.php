@@ -38,7 +38,6 @@
 @endpush
 
 @section('content')
-
     <div class="content">
         @include('pages.ventes.livraison.partials.header')
         <div class="row g-3 list mt-3" id="stockEntriesList">

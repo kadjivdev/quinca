@@ -286,32 +286,32 @@
         });
 
         // Vérification dynamique des stocks
-        function verifierStock(articleId, depotId, quantite, callback) {
-            $.ajax({
-                url: `${apiUrl}/vente/livraisons/verifier-stock`,
-                type: 'GET',
-                data: {
-                    article_id: articleId,
-                    depot_id: depotId
-                },
-                success: function(response) {
-                    if (response.success) {
-                        const stockDisponible = parseFloat(response.quantite);
-                        callback(stockDisponible >= quantite, stockDisponible, response.prix_moyen);
-                    } else {
-                        Toast.fire({
-                            icon: 'error',
-                            title: response.message
-                        });
-                    }
-                },
-                error: function() {
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Erreur lors de la vérification du stock'
-                    });
-                }
-            });
-        }
+        // function verifierStock(articleId, depotId, quantite, callback) {
+        //     $.ajax({
+        //         url: `${apiUrl}/vente/livraisons/verifier-stock`,
+        //         type: 'GET',
+        //         data: {
+        //             article_id: articleId,
+        //             depot_id: depotId
+        //         },
+        //         success: function(response) {
+        //             if (response.success) {
+        //                 const stockDisponible = parseFloat(response.quantite);
+        //                 callback(stockDisponible >= quantite, stockDisponible, response.prix_moyen);
+        //             } else {
+        //                 Toast.fire({
+        //                     icon: 'error',
+        //                     title: response.message
+        //                 });
+        //             }
+        //         },
+        //         error: function() {
+        //             Toast.fire({
+        //                 icon: 'error',
+        //                 title: 'Erreur lors de la vérification du stock'
+        //             });
+        //         }
+        //     });
+        // }
     });
 </script>
