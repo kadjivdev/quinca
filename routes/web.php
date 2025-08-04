@@ -22,11 +22,8 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Achat\BonCommande;
-use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\AcompteClient;
-use App\Models\Vente\FactureClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +37,15 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
+    AcompteClient::withTrashed()->where("reference", "WS28111 DU 11/07/2025")
+        ->update(["reference" => "WS28111 DU 11/07/2025 old"]);
+
+    AcompteClient::withTrashed()->where("reference", "WR78671 DU 08/07/2025")
+        ->update(["reference" => "WR78671 DU 08/07/2025 old"]);
+
+    $accomptes = AcompteClient::withTrashed()->get();
+
+    return response()->json($accomptes);
     return "Opération éffectuée avec succès!!";
 });
 
