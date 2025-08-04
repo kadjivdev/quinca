@@ -17,8 +17,6 @@ class CaisseController extends Controller
         $pointsVente = PointDeVente::where('actif', true)->get();
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
-        // dd($caisses);
-
         return view('pages.parametre.caisse.index', compact('caisses', 'pointsVente', 'date'));
     }
 

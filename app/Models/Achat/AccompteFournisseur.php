@@ -7,6 +7,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class AccompteFournisseur extends Model
 {
@@ -38,7 +39,8 @@ class AccompteFournisseur extends Model
         'rejected_by',
         'rejected_at',
         'point_de_vente_id',
-        'requete_id'
+        'requete_id',
+        'deleted_by'
     ];
 
     protected $casts = [
@@ -54,7 +56,7 @@ class AccompteFournisseur extends Model
         return $this->belongsTo(Fournisseur::class);
     }
 
-     public function requete()
+    public function requete()
     {
         return $this->belongsTo(RequeteFournisseur::class, 'requete_id');
     }
@@ -82,9 +84,9 @@ class AccompteFournisseur extends Model
 
     public function scopeSearch($query, $search)
     {
-        return $query->where(function($q) use ($search) {
+        return $query->where(function ($q) use ($search) {
             $q->where('reference', 'like', '%' . $search . '%')
-                ->orWhereHas('fournisseur', function($q) use ($search) {
+                ->orWhereHas('fournisseur', function ($q) use ($search) {
                     $q->where('raison_sociale', 'like', '%' . $search . '%');
                 });
         });
@@ -148,8 +150,7 @@ class AccompteFournisseur extends Model
         });
 
         static::deleted(function ($acompte) {
-            // Annuler l'effet sur le solde du client lors de la suppression
-            // $acompte->fournisseur->updateSolde($acompte->montant, 'debit');
+            $acompte->update(["deleted_by" => Auth::id()]);
         });
     }
 

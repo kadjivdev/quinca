@@ -22,10 +22,10 @@
                         <tr>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
-                                    <span class="code-commande me-2">{{ $appro->fournisseur->code_fournisseur }}</span>
+                                    <span class="code-commande me-2">{{ $appro->fournisseur?->code_fournisseur }}</span>
                                 </div>
                             </td>
-                            <td> <span class="badge bg-dark">{{$appro->fournisseur->raison_sociale }} </span> </td>
+                            <td> <span class="badge bg-dark">{{$appro->fournisseur?->raison_sociale }} </span> </td>
                             <td><span class="fw-bold">{{ number_format($appro->montant, 2) }} F
                                     CFA</span></td>
                             <td>{{ Carbon\Carbon::parse($appro->date)->format('d/m/Y H:i:s') }}</td>

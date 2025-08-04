@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Catalogue\Article;
 
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class ConversionUnite extends Model
 {
@@ -19,7 +20,8 @@ class ConversionUnite extends Model
         'unite_dest_id',
         'article_id',
         'coefficient',
-        'statut'
+        'statut',
+        'deleted_by'
     ];
 
     protected $casts = [
@@ -161,7 +163,7 @@ class ConversionUnite extends Model
                 Rule::unique('conversion_unites')
                     ->where(function ($query) {
                         return $query->where('unite_source_id', request('unite_source_id'))
-                                    ->where('article_id', request('article_id'));
+                            ->where('article_id', request('article_id'));
                     })
                     ->ignore($id)
             ]
@@ -197,6 +199,10 @@ class ConversionUnite extends Model
             if ($existingConversion) {
                 throw new Exception("Une conversion entre ces unités existe déjà");
             }
+        });
+
+        static::deleted(function ($conversion) {
+            $conversion->update(["deleted_by" => Auth::id()]);
         });
     }
 }

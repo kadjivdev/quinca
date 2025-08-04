@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class BonLivraisonFournisseur
@@ -68,7 +69,8 @@ class BonLivraisonFournisseur extends Model
         'validated_by',
         'validated_at',
         'rejected_by',
-        'rejected_at'
+        'rejected_at',
+        'deleted_by'
     ];
 
     /**
@@ -76,7 +78,7 @@ class BonLivraisonFournisseur extends Model
      *
      * @var array<string, string>
      */
-    
+
     public static $rules = [
         'code' => 'required|unique:bon_livraisons,code',
         'date_livraison' => 'required|date',
@@ -210,5 +212,15 @@ class BonLivraisonFournisseur extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**Boot */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleted(function ($model) {
+            $model->update(["deleted_by" => Auth::id()]);
+        });
     }
 }

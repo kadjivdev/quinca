@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Securite\User;
 use App\Models\Vente\{LivraisonClient, ReglementClient};
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class FactureClient extends Model
 {
@@ -46,7 +47,8 @@ class FactureClient extends Model
         'encaissed_at',
         'reference_recu',
         'moyen_reglement',
-        'inventaire_id'
+        'inventaire_id',
+        'deleted_by'
     ];
 
     protected $casts = [
@@ -71,7 +73,7 @@ class FactureClient extends Model
      * Format: FAC-AAAAMMJJ-XXXX
      * où XXXX est un numéro séquentiel
      */
-    
+
     public static function generateNumero()
     {
         $prefix = 'FAC';
@@ -124,6 +126,10 @@ class FactureClient extends Model
             if ($facture->montant_regle > $facture->montant_ttc) {
                 $facture->montant_regle = $facture->montant_ttc;
             }
+        });
+
+        static::deleted(function ($facture) {
+            $facture->update(["deleted_by" => Auth::id()]);
         });
     }
 

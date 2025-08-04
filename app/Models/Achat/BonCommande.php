@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class BonCommande
@@ -64,6 +65,7 @@ class BonCommande extends Model
         'motif_rejet',
         'rejected_by',
         'rejected_at',
+        'deleted_by'
     ];
 
     /**
@@ -266,6 +268,10 @@ class BonCommande extends Model
             if (auth()->check()) {
                 $model->updated_by = auth()->id();
             }
+        });
+
+        static::deleted(function ($model) {
+            $model->update(["deleted_by" => Auth::id()]);
         });
     }
 }

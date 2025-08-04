@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers\Achat;
 
-use App\Models\Achat\BonLivraisonFournisseur;
-use App\Models\Achat\{FactureFournisseur, LigneBonLivraisonFournisseur, LigneFactureFournisseur};
+use App\Models\Achat\{BonLivraisonFournisseur, FactureFournisseur, LigneBonLivraisonFournisseur, LigneFactureFournisseur};
 use App\Models\Parametre\{PointDeVente, Vehicule, Chauffeur, Depot};
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

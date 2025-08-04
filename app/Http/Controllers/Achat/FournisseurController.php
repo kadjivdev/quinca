@@ -174,21 +174,21 @@ class FournisseurController extends Controller
     public function destroy($id)
     {
         try {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
-            ]);
+            // return response()->json([
+            //     'success' => false,
+            //     'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
+            // ]);
 
             $fournisseur = Fournisseur::findOrFail($id);
 
             // Vérification des relations avant suppression
             // À adapter selon vos besoins
-            // if ($fournisseur->commandes->count() > 0) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Impossible de supprimer un fournisseur qui a des commandes associées'
-            //     ], 422);
-            // }
+            if (!is_null($fournisseur->commandes)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Impossible de supprimer un fournisseur qui a des commandes associées'
+                ], 422);
+            }
 
             $fournisseur->delete();
 

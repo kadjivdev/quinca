@@ -17,6 +17,7 @@ use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Vente\DevisDetail;
 use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class Article
@@ -80,6 +81,7 @@ class Article extends Model
         'statut',
         'photo',
         'unite_mesure_id',
+        'deleted_by'
     ];
 
     /**
@@ -182,8 +184,8 @@ class Article extends Model
             ->where("depot", $depotId)
             ->whereHas("factureClient", function ($query) {
                 $query
-                ->whereNotNull("validated_by")
-                ->whereNull("inventaire_id");//les ventes qui n'appartiennent à aucun inventaire
+                    ->whereNotNull("validated_by")
+                    ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
             })->get();
     }
 
@@ -196,8 +198,8 @@ class Article extends Model
             ->where("depot", $depotId)
             ->whereHas("factureRevendeur", function ($query) {
                 $query
-                ->whereNotNull("validated_by")
-                ->whereNull("inventaire_id");//les ventes qui n'appartiennent à aucun inventaire
+                    ->whereNotNull("validated_by")
+                    ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
             })->get();
     }
 
@@ -290,7 +292,7 @@ class Article extends Model
         // on recupere le stock de cet article dans ce dépot
         $stock = $this->stocks->firstWhere("depot_id", $depotId);
         // $stock = $this->stocks->Where("depot_id", $depotId)->sum("quantite_reelle");
-        return $stock->quantite_reelle??00 - $this->qteVendu($depotId);
+        return $stock->quantite_reelle ?? 00 - $this->qteVendu($depotId);
     }
 
     /**
@@ -408,5 +410,15 @@ class Article extends Model
     public function canUpdateStock(): bool
     {
         return $this->stockable && $this->statut === self::STATUT_ACTIF;
+    }
+
+    /**Boot */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleted(function ($article) {
+            $article->update(["deleted_by" => Auth::id()]);
+        });
     }
 }

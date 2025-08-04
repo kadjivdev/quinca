@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class FactureFournisseur
@@ -63,6 +64,7 @@ class FactureFournisseur extends Model
         'motif_rejet',
         'rejected_by',
         'rejected_at',
+        'deleted_by'
     ];
 
     public static $rules = [
@@ -113,7 +115,7 @@ class FactureFournisseur extends Model
         'deleted_at'
     ];
 
-   
+
     // RESTE DU MONTANT D'UNE FACTURE
     public function facture_amont()
     {
@@ -373,6 +375,10 @@ class FactureFournisseur extends Model
                 $model->updated_by = auth()->id();
             }
             $model->updated_at = now();
+        });
+
+        static::deleted(function ($model) {
+            $model->update(["deleted_by" => Auth::id()]);
         });
     }
 }

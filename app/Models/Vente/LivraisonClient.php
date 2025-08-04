@@ -37,7 +37,8 @@ class LivraisonClient extends Model
         'notes',
         'created_by',
         'validated_by',
-        'validated_at'
+        'validated_at',
+        'deleted_by'
     ];
 
     protected $casts = [
@@ -149,6 +150,12 @@ class LivraisonClient extends Model
 
             if (empty($livraison->created_by)) {
                 $livraison->created_by = auth()->id();
+            }
+        });
+
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->update(["deleted_by" => Auth::id()]);
             }
         });
     }

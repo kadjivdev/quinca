@@ -10,6 +10,7 @@ use App\Models\Stock\StockDepot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Depot extends Model
 {
@@ -23,7 +24,8 @@ class Depot extends Model
         'depot_principal',
         'actif',
         'type_depot_id',
-        'point_de_vente_id'
+        'point_de_vente_id',
+        'deleted_by'
     ];
 
     protected $casts = [
@@ -143,5 +145,15 @@ class Depot extends Model
     public function isOfType($type)
     {
         return $this->typeDepot && $this->typeDepot->code_type_depot === $type;
+    }
+
+    /**Boot */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleted(function ($depot) {
+            $depot->update(["deleted_by" => Auth::id()]);
+        });
     }
 }

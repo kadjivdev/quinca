@@ -121,7 +121,8 @@
                                             <i class="fas fa-times"></i>
                                         </button>
 
-                                        <button class="btn btn-link btn-sm text-danger p-2 btn-delete-livraison"
+                                        <button class="btn btn-link btn-sm text-danger p-2"
+                                            onclick="deleteLivraison({{ $livraison->id }})"
                                             data-id="{{ $livraison->id }}" data-bs-toggle="tooltip"
                                             title="Supprimer">
                                             <i class="fas fa-trash"></i>
@@ -129,7 +130,6 @@
                                         @endcan
 
                                         @endif
-
                                         <button class="btn btn-link btn-sm text-secondary p-2"
                                             onclick="printLivraisonFournisseur({{ $livraison->id }})"
                                             data-bs-toggle="tooltip" title="Imprimer">
@@ -206,6 +206,68 @@
 
 @push("scripts")
 <script>
+    function deleteLivraison(id) {
+        Swal.fire({
+            title: 'Êtes-vous sûr ?',
+            text: "Cette action est irréversible !",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+            text: "Voulez-vous vraiment supprimer ce bon de livraison ?"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Envoi de la requête AJAX de suppression
+                $.ajax({
+                    url: `${apiUrl}/achat/livraisons/${id}`,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: (response) => {
+                        if (response.success) {
+                            // Notification de succès
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Succès',
+                                title: response.message || 'Bon de livraison supprimé avec succès'
+                            })
+
+                            // Rafraîchir la page après suppression
+                            window.location.reload();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erreur',
+                                text: response.message || 'Une erreur est survenue lors de la suppression',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: (xhr) => {
+                        console.error('Erreur lors de la suppression:', xhr);
+
+                        let message = 'Une erreur est survenue lors de la suppression';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erreur',
+                            text: message,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    /**Datatables */
     $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,

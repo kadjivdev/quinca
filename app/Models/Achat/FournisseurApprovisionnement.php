@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class FournisseurApprovisionnement extends Model
 {
@@ -22,6 +23,7 @@ class FournisseurApprovisionnement extends Model
         "rejected_by",
         "validated_by",
         "date",
+        'deleted_by'
     ];
 
     static function rules()
@@ -67,6 +69,12 @@ class FournisseurApprovisionnement extends Model
         static::creating(function ($model) {
             if (auth()->check()) {
                 $model->user_id = auth()->id();
+            }
+        });
+
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->update(["deleted_by" => Auth::id()]);
             }
         });
     }

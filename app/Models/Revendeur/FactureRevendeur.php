@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Models\Securite\User;
 use App\Models\Vente\{Client, CompteClient, ReglementClient, ReglementRevendeur};
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -48,7 +49,8 @@ class FactureRevendeur extends Model
         'encaissed_at',
         'created_by',
         'validated_by',
-        'inventaire_id'
+        'inventaire_id',
+        'deleted_by'
     ];
 
     protected $casts = [
@@ -151,6 +153,10 @@ class FactureRevendeur extends Model
                 $facture->montant_regle = $facture->montant_ttc;
             }
         });
+
+        static::deleted(function ($facture) {
+            $facture->update(["deleted_by" => Auth::id()]);
+        });
     }
 
     function compteClient(): HasMany
@@ -247,7 +253,6 @@ class FactureRevendeur extends Model
             ->exists();
     }
 
-
     public function estTotalementLivree(): bool
     {
         // Récupérer toutes les lignes de facture avec leurs quantités livrées
@@ -274,8 +279,6 @@ class FactureRevendeur extends Model
 
         return true;
     }
-
-
 
     /**
      * Vérifie si la ligne peut encore être livrée

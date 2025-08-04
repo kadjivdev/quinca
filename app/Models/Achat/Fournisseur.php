@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class Fournisseur
@@ -50,7 +51,8 @@ class Fournisseur extends Model
         'email',
         'created_by',
         'updated_by',
-        'statut'
+        'statut',
+        'deleted_by'
     ];
 
     /**
@@ -192,6 +194,13 @@ class Fournisseur extends Model
         static::updating(function ($model) {
             if (auth()->check()) {
                 $model->updated_by = auth()->id();
+            }
+        });
+
+        //
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->update(["deleted_by" => Auth::id()]);
             }
         });
     }

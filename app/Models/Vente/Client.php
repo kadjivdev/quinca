@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Securite\User;
 use App\Models\Vente\SoldeInitialClient;
+use Illuminate\Support\Facades\Auth;
 
 class Client extends Model
 {
@@ -38,7 +39,8 @@ class Client extends Model
         'notes',
         'created_by',
         'taux_aib',
-        'point_de_vente_id'
+        'point_de_vente_id',
+        'deleted_by'
     ];
 
     protected $casts = [
@@ -285,6 +287,10 @@ class Client extends Model
             if (empty($client->code_client)) {
                 $client->code_client = self::genererCodeClient();
             }
+        });
+
+        static::deleted(function ($client) {
+            $client->update(["deleted_by" => Auth::id()]);
         });
     }
 

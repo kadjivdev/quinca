@@ -5,6 +5,7 @@ namespace App\Models\Parametre;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Vente\SessionCaisse;
+use Illuminate\Support\Facades\Auth;
 
 class Caisse extends Model
 {
@@ -14,7 +15,8 @@ class Caisse extends Model
         'code_caisse',
         'point_de_vente_id',
         'libelle',
-        'actif'
+        'actif',
+        'deleted_by'
     ];
 
     // Définir les types de casting
@@ -78,5 +80,16 @@ class Caisse extends Model
     public function getCodeLibelleAttribute()
     {
         return "{$this->code_caisse} - {$this->libelle}";
+    }
+
+    /** Boot */
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleted(function ($caisse) {
+            $caisse->update(["deleted_by" => Auth::id()]);
+        });
     }
 }

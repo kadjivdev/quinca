@@ -5,6 +5,7 @@ namespace App\Models\Catalogue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class FamilleArticle extends Model
 {
@@ -16,7 +17,8 @@ class FamilleArticle extends Model
         'code_famille',
         'libelle_famille',
         'description',
-        'statut'
+        'statut',
+        'deleted_by'
     ];
 
     protected $dates = ['deleted_at'];
@@ -52,8 +54,13 @@ class FamilleArticle extends Model
         return $this->code_famille . ' - ' . $this->libelle_famille;
     }
 
+    /**Boot */
+    protected static function boot()
+    {
+        parent::boot();
 
-
-
-
+        static::deleted(function ($model) {
+            $model->update(["deleted_by" => Auth::id()]);
+        });
+    }
 }

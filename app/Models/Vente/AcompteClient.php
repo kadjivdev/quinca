@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Securite\User;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class AcompteClient extends Model
 {
@@ -38,7 +39,8 @@ class AcompteClient extends Model
         'requete_id',
         'transport_id',
         'session_caisse_id',
-        'observation'
+        'observation',
+        'deleted_by'
     ];
 
     protected $casts = [
@@ -155,8 +157,7 @@ class AcompteClient extends Model
         });
 
         static::deleted(function ($acompte) {
-            // Annuler l'effet sur le solde du client lors de la suppression
-            $acompte->client->updateSolde($acompte->montant, 'debit');
+            $acompte->update(["deleted_by" => Auth::id()]);
         });
     }
 
