@@ -23,7 +23,7 @@ class FournisseurController extends Controller
         $fournisseurs->map(function ($fournisseur) {
             $fournisseur->totalAppro = $fournisseur->approvisionnements()->sum("montant");
             $fournisseur->reste_solde = $fournisseur->reste_solde();
-            
+
             $fournisseur->factureAchatAmount = $fournisseur->facture_fournisseurs->sum("montant_ttc");
 
             $fournisseur->reglementsAmount = $fournisseur->facture_fournisseurs->sum(function ($query) {
@@ -32,7 +32,7 @@ class FournisseurController extends Controller
 
             $fournisseur->accompteAmount = $fournisseur->accomptes->sum("montant");
 
-            $fournisseur->articles = collect( $fournisseur->facture_fournisseurs->map(function ($factureFournisseur) {
+            $fournisseur->articles = collect($fournisseur->facture_fournisseurs->map(function ($factureFournisseur) {
                 foreach ($factureFournisseur->lignes as $ligne) {
                     return $ligne->article;
                 }
@@ -174,6 +174,11 @@ class FournisseurController extends Controller
     public function destroy($id)
     {
         try {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
+            ]);
+
             $fournisseur = Fournisseur::findOrFail($id);
 
             // Vérification des relations avant suppression

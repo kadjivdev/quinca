@@ -223,14 +223,21 @@ class ClientController extends Controller
 
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
-        $compteClients = CompteClient::with(["client","user","factureClient","factureRevendeur","reglementClient",
-        "reglementRevendeur","accompteClient"])
-        ->latest()
-        ->get();
+        $compteClients = CompteClient::with([
+            "client",
+            "user",
+            "factureClient",
+            "factureRevendeur",
+            "reglementClient",
+            "reglementRevendeur",
+            "accompteClient"
+        ])
+            ->latest()
+            ->get();
 
         // Récupération des données avec pagination
         $user = auth()->user();
-        
+
         return view('pages.ventes.client.partials.details.all-detail-comptes', compact(
             'compteClients',
             'date'
@@ -571,6 +578,11 @@ class ClientController extends Controller
      */
     public function destroy(Request $request, Client $client)
     {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
+        ], 422);
+
         if (!$request->ajax()) {
             return response()->json(['error' => 'Requête non autorisée'], 403);
         }

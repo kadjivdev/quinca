@@ -64,18 +64,16 @@ class ChauffeurController extends Controller
                 'message' => 'Chauffeur créé avec succès',
                 'data' => $chauffeur
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'errors' => $e->errors(),
             ], 422);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Une erreur est survenue lors de la création du fournisseur'.$e->getMessage()
+                'message' => 'Une erreur est survenue lors de la création du fournisseur' . $e->getMessage()
             ], 500);
         }
     }
@@ -89,7 +87,6 @@ class ChauffeurController extends Controller
                 'success' => true,
                 'data' => $chauffeur
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -131,24 +128,27 @@ class ChauffeurController extends Controller
                 'message' => 'Chauffeur mis à jour avec succès',
                 'data' => $chauffeur
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'errors' => $e->errors(),
             ], 422);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Une erreur est survenue lors de la mise à jour '.$e->getMessage()
+                'message' => 'Une erreur est survenue lors de la mise à jour ' . $e->getMessage()
             ], 500);
         }
     }
 
     public function destroy($id)
     {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
+        ], 403);
+
         try {
             $chauffeur = Chauffeur::findOrFail($id);
 
@@ -167,7 +167,6 @@ class ChauffeurController extends Controller
                 'success' => true,
                 'message' => 'Chauffeur supprimé avec succès'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -280,7 +279,6 @@ class ChauffeurController extends Controller
             return response()->download($tempFile, 'modele_import_fournisseurs.xlsx', [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             ])->deleteFileAfterSend(true);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -358,7 +356,6 @@ class ChauffeurController extends Controller
                     ]);
 
                     $imported++;
-
                 } catch (\Exception $e) {
                     $errors[] = "Ligne $rowNumber : Une erreur est survenue lors de l'import de cette ligne";
                     $skipped++;
@@ -392,14 +389,12 @@ class ChauffeurController extends Controller
                 'message' => 'Aucun fournisseur n\'a été importé.',
                 'errors' => $errors
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Le fichier fourni est invalide.',
                 'errors' => $e->errors()
             ], 422);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([

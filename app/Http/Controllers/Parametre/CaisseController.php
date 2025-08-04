@@ -139,6 +139,11 @@ class CaisseController extends Controller
      */
     public function destroy($id)
     {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
+        ], 403);
+
         try {
             $caisse = Caisse::findOrFail($id);
 
@@ -167,8 +172,8 @@ class CaisseController extends Controller
     }
 
     /**
- * Activer/Désactiver une caisse
- */
+     * Activer/Désactiver une caisse
+     */
     public function toggleStatus($id)
     {
         try {
@@ -194,7 +199,6 @@ class CaisseController extends Controller
                 'message' => "Caisse {$status} avec succès",
                 'data' => $caisse
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -204,7 +208,8 @@ class CaisseController extends Controller
         }
     }
 
-    public function uniqueCode(Request $request) {
+    public function uniqueCode(Request $request)
+    {
         // Valider que "code_depot" est présent
         $request->validate([
             'code_caisse' => 'required|string|max:255',
@@ -218,7 +223,5 @@ class CaisseController extends Controller
 
         // Retourner une réponse JSON
         return response()->json(['exists' => $exists]);
-    
     }
-
 }

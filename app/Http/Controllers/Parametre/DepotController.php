@@ -232,6 +232,11 @@ class DepotController extends Controller
      */
     public function destroy($id)
     {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
+        ], 403);
+
         try {
             $depot = Depot::findOrFail($id);
 
