@@ -93,11 +93,11 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-client me-2">
-                                        {{ substr($acompte->fournisseur->raison_sociale, 0, 2) }}
+                                        {{ substr($acompte->fournisseur?->raison_sociale, 0, 2) }}
                                     </div>
                                     <div>
-                                        <div class="fw-medium">{{ $acompte->fournisseur->raison_sociale }}</div>
-                                        <div class="text-muted small">{{ $acompte->fournisseur->code_fournisseur }}</div>
+                                        <div class="fw-medium">{{ $acompte->fournisseur?->raison_sociale }}</div>
+                                        <div class="text-muted small">{{ $acompte->fournisseur?->code_fournisseur }}</div>
                                     </div>
                                 </div>
                             </td>
