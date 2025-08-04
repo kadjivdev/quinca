@@ -37,14 +37,7 @@ use App\Models\Vente\AcompteClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    AcompteClient::withTrashed()->where("reference", "WS28111 DU 11/07/2025")
-        ->update(["reference" => "WS28111 DU 11/07/2025 old"]);
-
-    AcompteClient::withTrashed()->where("reference", "WR78671 DU 08/07/2025")
-        ->update(["reference" => "WR78671 DU 08/07/2025 old"]);
-
     $accomptes = AcompteClient::withTrashed()->get();
-
     return response()->json($accomptes);
     return "Opération éffectuée avec succès!!";
 });
