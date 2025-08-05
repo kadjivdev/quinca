@@ -392,11 +392,14 @@ class DepotController extends Controller
                 'user_id' => Auth::id(),
                 'depot_ids' => $stockDepotCheckeds->pluck("depot_id"),
             ]);
+            
             /**Init detail */
             $detailsInventaires = [];
 
             // Préparation des détails d'inventaire
             foreach ($stockDepotCheckeds as $stockDepot) {
+                Log::info("Les infos du stock du depot :", ["data" => $stockDepot]);
+
                 $detailsInventaires[] = [
                     'qte_stock' => $stockDepot["qte_stock"],
                     'qte_reel' => $stockDepot["qte_reel"],
@@ -415,10 +418,6 @@ class DepotController extends Controller
                 FactureRevendeur::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
 
                 DB::commit();
-
-                Log::info('Inventaire créé avec succès', [
-                    'inventaire_id' => $inventaire->id,
-                ]);
             }
 
             /** CREATION DES DETAILS INVENTAIRES */
@@ -426,10 +425,15 @@ class DepotController extends Controller
                 ->createMany($detailsInventaires);
 
             DB::commit();
+
+            Log::info('Inventaire créé avec succès', [
+                'inventaire_id' => $inventaire->id,
+            ]);
+
             return back()->with("success", "Inventaire enregistré avec succès!");
         } catch (\Exception $e) {
             DB::rollback();
-            Log::info("Erreure d'enregistrement d'inventaire", ["error" => $e->getMessage()]);
+            Log::info("Erreure d'enregistrement d'inventaire", ["error" => $e->getMessage(), "ligne" => $e->getLine()]);
             return back()->with("error", "Erreure d'enregistrement lors de l'inventaire " . $e->getMessage());
         }
     }

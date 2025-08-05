@@ -24,6 +24,16 @@
                             <div class="card-header d-flex justify-content-center">
                                 <input type="search" placeholder="Rechercher ....." name="" class="form-control border bordered w-50" id="search">
                             </div>
+                            <div class="d-flex justify-content-center">
+                                <div class="form-check">
+                                    <input type="checkbox" name="check_all_article" id="check_all_article" />
+                                    <label class="form-check-label" for="check_all_article">
+                                        Ramener tous les stocks à zéro(0)
+                                    </label>
+                                </div>
+                                <!-- &nbsp;
+                                <input type="number" name="all_qte_reel" id="all_qte_reel_input" class="form-control d-none"> -->
+                            </div>
                             <div class="card-body">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="bg-light">
@@ -91,7 +101,7 @@
                                 bodyHtml += `
                                         <tr class="stock-row">
                                             <td class="text-nowrap py-3" style="width: 10%;">
-                                                <input type="checkbox" name="stock_depots[${stock.id}][checked]"/>
+                                                <input type="checkbox" name="stock_depots[${stock.id}][checked]" class='article-check'/>
                                                 <input hidden name="stock_depots[${stock.id}][depot_id]" value="${stock.depot.id}"/>
                                                 <input hidden name="stock_depots[${stock.id}][id]" value="${stock.id}"/>
                                                 <small>${stock.article.code_article}</small><br>
@@ -106,7 +116,9 @@
                                                 <span class="badge bg-light text-dark"> ${stock.quantite_reelle}</span>
                                             </td>
                                             <td class="text-center"> 
-                                                <input type="text" class="form-control" name="stock_depots[${stock.id}][qte_reel]" value="${stock.quantite_reelle}"/> 
+                                                <input type="text" class="form-control article_quantite_reelle_primitive" hidden value="${stock.quantite_reelle}"/> 
+                                                <input type="text" class="form-control article_qte_reel_hidden" hidden name="stock_depots[${stock.id}][qte_reel]" value="${stock.quantite_reelle}"/> 
+                                                <input type="text" class="form-control article_qte_reel" name="stock_depots[${stock.id}][qte_reel]" value="${stock.quantite_reelle}"/> 
                                             </td>
                                         </tr>
                                     `
@@ -142,6 +154,31 @@
                 }
             });
         });
+
+        //Inventorier tous les articles
+        $(document).on("click", '#check_all_article', function() {
+            if ($(this).is(':checked')) {
+                $("#all_qte_reel_input").removeClass("d-none")
+                $(".article-check").prop("checked", true)
+
+                //On fixe le champ reel à 0 et on le bloque 
+                $(".article_qte_reel").val(0)
+                $(".article_qte_reel").attr("disabled", true)
+
+                //c'est la valeur cachée qui sera considérée
+                $(".article_qte_reel_hidden").val(0)
+            } else {
+                $(".article-check").prop("checked", false)
+
+                $(".article_qte_reel_hidden").val()
+                //On restitue la quantité primitive
+                $(".article_qte_reel").val($(".article_quantite_reelle_primitive").val())
+                $(".article_qte_reel").attr("disabled", false)
+
+                //on retire la valeur cachée, elle n'a plus d'importance
+                $(".article_qte_reel_hidden").addClass("d-none")
+            }
+        })
 
         function showError(msg) {
             Swal.fire({

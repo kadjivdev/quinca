@@ -39,14 +39,14 @@
                                         @foreach ($factures as $facture)
                                         <option value="{{ $facture->id }}"
                                             data-code="{{ $facture->code }}"
-                                            data-fournisseur="{{ $facture->fournisseur->raison_sociale }}"
+                                            data-fournisseur="{{ $facture->fournisseur?->raison_sociale }}"
                                             data-montant="{{ $facture->montant_ttc }}"
                                             data-solde="{{ $facture->montant_ttc - $facture->reglements->sum('montant_reglement') }}"
                                             @if(count($facture->reglements->whereNull("validated_by"))>0 || count($facture->reglements_grouped()->whereNull("validated_by"))>0) disabled @endif
                                             >
                                             <!-- {{count($facture->reglements->whereNull("validated_by"))}} - {{count($facture->reglements_grouped()->whereNull("validated_by"))}} -->
                                             {{ $facture->code }} [ Montant: {{ number_format($facture->montant_ttc, 2) }}; Reste: {{ number_format($facture->facture_amont(), 2) }} FCFA] <br>
-                                            - {{ $facture->fournisseur->raison_sociale }} [ Solde: {{ number_format($facture->fournisseur->approvisionnements()->sum("montant"),2) }}; Reste: {{ number_format( $facture->fournisseur->reste_solde(),2) }} ]
+                                            - {{ $facture->fournisseur?->raison_sociale }} [ Solde: {{ number_format($facture->fournisseur?->approvisionnements()->sum("montant"),2) }}; Reste: {{ number_format( $facture->fournisseur?->reste_solde(),2) }} ]
                                         </option>
                                         @endforeach
                                     </select>
