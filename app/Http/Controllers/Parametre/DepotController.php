@@ -410,7 +410,6 @@ class DepotController extends Controller
 
             if ($request->check_all_article) {
                 // Préparation des détails d'inventaire
-                // dd($depot->stocks->count());
                 foreach ($depot->stocks as $stockDepot) {
                     Log::info("Les infos du stock du depot :", ["data" => $stockDepot]);
 

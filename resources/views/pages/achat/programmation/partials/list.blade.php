@@ -33,7 +33,7 @@
                                 <span class="badge bg-warning">{{ $programmation->_depot?$programmation->_depot->libelle_depot:"--" }}</span>
                             </td> -->
                             <td class="text-center">
-                                <span class="badge bg-light text-dark">{{ $programmation->fournisseur->raison_sociale }}
+                                <span class="badge bg-light text-dark">{{ $programmation->fournisseur?->raison_sociale }}
                                 </span>
                             </td>
                             <td class="text-center">

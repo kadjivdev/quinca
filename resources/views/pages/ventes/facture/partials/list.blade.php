@@ -93,28 +93,28 @@
                                         {{ substr($facture->client->raison_sociale, 0, 2) }}
                                     </div>
                                     <div>
-                                        <div class="fw-medium">{{ $facture->client->raison_sociale }}</div>
-                                        <div class="text-muted small">{{ $facture->client->telephone }}</div>
+                                        <div class="fw-medium">{{ $facture->client?->raison_sociale }}</div>
+                                        <div class="text-muted small">{{ $facture->client?->telephone }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
                             <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_ht, 0, ',', ' ') }} F
+                                {{ number_format($facture->montant_ht, 0, ',', ' ') }}
                             </td>
                             <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_tva, 0, ',', ' ') }} F
+                                {{ number_format($facture->montant_tva, 0, ',', ' ') }}
                             </td>
                             <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_aib, 0, ',', ' ') }} F
+                                {{ number_format($facture->montant_aib, 0, ',', ' ') }}
                             </td>
                             <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_ttc-$facture->montant_remise, 0, ',', ' ') }} F
+                                {{ number_format($facture->montant_ttc-$facture->montant_remise, 0, ',', ' ') }}
                             </td>
                             <td class="text-end">
                                 @if ($facture->reste_a_payer > 0)
                                 <span class="text-danger fw-medium">
-                                    {{ number_format($facture->reste_a_payer, 0, ',', ' ') }} F
+                                    {{ number_format($facture->reste_a_payer, 0, ',', ' ') }}
                                 </span>
                                 @else
                                 <span class="badge bg-success bg-opacity-10 text-success">Soldée</span>

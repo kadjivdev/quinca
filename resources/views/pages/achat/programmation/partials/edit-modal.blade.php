@@ -65,7 +65,8 @@
                                                     required>
                                                     <option value="">Sélectionner un fournisseur</option>
                                                     @foreach ($fournisseurs as $fournisseur)
-                                                    <option value="{{ $fournisseur->id }}">
+                                                    <option value="{{ $fournisseur?->id }}">
+                                                        @continue(!$fournisseur)
                                                         {{ $fournisseur->raison_sociale }}
                                                     </option>
                                                     @endforeach
