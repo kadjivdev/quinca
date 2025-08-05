@@ -392,7 +392,7 @@ class DepotController extends Controller
                 'user_id' => Auth::id(),
                 'depot_ids' => $stockDepotCheckeds->pluck("depot_id"),
             ]);
-            
+
             /**Init detail */
             $detailsInventaires = [];
 
@@ -437,7 +437,7 @@ class DepotController extends Controller
             return back()->with("error", "Erreure d'enregistrement lors de l'inventaire " . $e->getMessage());
         }
     }
-
+ 
     /**
      * Afficher les details
      * d'un inventaire
