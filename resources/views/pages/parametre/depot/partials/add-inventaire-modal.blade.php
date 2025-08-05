@@ -31,8 +31,8 @@
                                         Ramener tous les stocks à zéro(0)
                                     </label>
                                 </div>
-                                <!-- &nbsp;
-                                <input type="number" name="all_qte_reel" id="all_qte_reel_input" class="form-control d-none"> -->
+                                &nbsp;
+                                <input type="number" name="all_qte_reel" id="all_qte_reel_input" class="form-control d-none">
                             </div>
                             <div class="card-body">
                                 <table class="table table-hover align-middle mb-0">
@@ -101,6 +101,7 @@
                                 bodyHtml += `
                                         <tr class="stock-row">
                                             <td class="text-nowrap py-3" style="width: 10%;">
+                                                <small>${data.stocks.length}</small>
                                                 <input type="checkbox" name="stock_depots[${stock.id}][checked]" class='article-check'/>
                                                 <input hidden name="stock_depots[${stock.id}][depot_id]" value="${stock.depot.id}"/>
                                                 <input hidden name="stock_depots[${stock.id}][id]" value="${stock.id}"/>
@@ -159,24 +160,9 @@
         $(document).on("click", '#check_all_article', function() {
             if ($(this).is(':checked')) {
                 $("#all_qte_reel_input").removeClass("d-none")
-                $(".article-check").prop("checked", true)
 
-                //On fixe le champ reel à 0 et on le bloque 
-                $(".article_qte_reel").val(0)
-                $(".article_qte_reel").attr("disabled", true)
-
-                //c'est la valeur cachée qui sera considérée
-                $(".article_qte_reel_hidden").val(0)
             } else {
-                $(".article-check").prop("checked", false)
-
-                $(".article_qte_reel_hidden").val()
-                //On restitue la quantité primitive
-                $(".article_qte_reel").val($(".article_quantite_reelle_primitive").val())
-                $(".article_qte_reel").attr("disabled", false)
-
-                //on retire la valeur cachée, elle n'a plus d'importance
-                $(".article_qte_reel_hidden").addClass("d-none")
+                $("#all_qte_reel_input").addClass("d-none")
             }
         })
 

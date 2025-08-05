@@ -357,13 +357,15 @@ class DepotController extends Controller
     {
         $depot = Depot::findOrFail($depotId);
 
-        // Validation des données
+        /** Validation des données*/
         $validator = Validator::make($request->all(), [
             "date_inventaire" => "required|date",
             'stock_depots*' => 'required|array',
             'stock_depots*id' => 'required|exists:stock_depots,id',
+            'stock_depots*depot_id' => 'required|exists:depots,id',
             'stock_depots*unite_mesure_id' => 'required|exists:unite_mesures,id',
             'stock_depots*qte_reel' => 'required',
+            'stock_depots*qte_stock' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -372,17 +374,25 @@ class DepotController extends Controller
                 ->withInput();
         }
 
-        // On s'assure que c'est une collection
-        $stockDepotCheckeds = collect($request->stock_depots)
-            ->filter(function ($item) {
-                // Si 'checked' doit être true
-                return isset($item['checked']) && $item['checked'] == "on";
-            })
-            ->values(); // Pour réindexer la collection si besoin
-
-        if (count($stockDepotCheckeds) == 0) {
-            return back()->with("error", "Veuillez choisir au moins un article!");
+        /** */
+        if ($request->check_all_article) {
+            $request->validate(["all_qte_reel" => "required"], ["all_qte_reel.required" => "Veuillez préciser la quantité à laquelle vous voulez réinitialiser les inventaires"]);
         }
+
+        if (!$request->check_all_article) {
+            // On s'assure que c'est une collection
+            $stockDepotCheckeds = collect($request->stock_depots)
+                ->filter(function ($item) {
+                    // Si 'checked' doit être true
+                    return isset($item['checked']) && $item['checked'] == "on";
+                })
+                ->values(); // Pour réindexer la collection si besoin
+
+            if (count($stockDepotCheckeds) == 0) {
+                return back()->with("error", "Veuillez choisir au moins un article!");
+            }
+        }
+
 
         try {
             DB::beginTransaction();
@@ -390,34 +400,59 @@ class DepotController extends Controller
             $inventaire = Inventaire::create([
                 'date_inventaire' => $request->date_inventaire,
                 'user_id' => Auth::id(),
-                'depot_ids' => $stockDepotCheckeds->pluck("depot_id"),
+                'depot_ids' => $request->check_all_article ?
+                    $depot->stocks->pluck("depot_id") :
+                    $stockDepotCheckeds->pluck("depot_id"),
             ]);
 
             /**Init detail */
             $detailsInventaires = [];
 
-            // Préparation des détails d'inventaire
-            foreach ($stockDepotCheckeds as $stockDepot) {
-                Log::info("Les infos du stock du depot :", ["data" => $stockDepot]);
+            if ($request->check_all_article) {
+                // Préparation des détails d'inventaire
+                // dd($depot->stocks->count());
+                foreach ($depot->stocks as $stockDepot) {
+                    Log::info("Les infos du stock du depot :", ["data" => $stockDepot]);
 
-                $detailsInventaires[] = [
-                    'qte_stock' => $stockDepot["qte_stock"],
-                    'qte_reel' => $stockDepot["qte_reel"],
-                    'stock_depot_id' => $stockDepot["id"],
-                ];
+                    $detailsInventaires[] = [
+                        'qte_stock' => $stockDepot->quantite_reelle,
+                        'qte_reel' => $request->all_qte_reel ?? 0,
+                        'stock_depot_id' => $stockDepot->id,
+                    ];
 
-                // Mise à jour en masse des stocks
-                StockDepot::where('id', $stockDepot["id"])
-                    ->update(['quantite_reelle' => $stockDepot["qte_reel"]]);
+                    // Mise à jour en masse des stocks
+                    StockDepot::where('id', $stockDepot->id)
+                        ->update(['quantite_reelle' => $request->all_qte_reel ?? 0]);
 
-                /** Classement des ventes(direction et revendeur) dans l'inventaires | il s'agit bien des ventes 
-                 * qui ne sont pas encore associées à un inventaire
-                 */
+                    /** Classement des ventes(direction et revendeur) dans l'inventaires | il s'agit bien des ventes 
+                     * qui ne sont pas encore associées à un inventaire
+                     */
 
-                FactureClient::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
-                FactureRevendeur::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+                    FactureClient::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+                    FactureRevendeur::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+                }
+            } else {
+                // Préparation des détails d'inventaire
+                foreach ($stockDepotCheckeds as $stockDepot) {
+                    Log::info("Les infos du stock du depot :", ["data" => $stockDepot]);
 
-                DB::commit();
+                    $detailsInventaires[] = [
+                        'qte_stock' => $stockDepot["qte_stock"] ?? 0,
+                        'qte_reel' => $stockDepot["qte_reel"] ?? 0,
+                        'stock_depot_id' => $stockDepot["id"],
+                    ];
+
+                    // Mise à jour en masse des stocks
+                    StockDepot::where('id', $stockDepot["id"])
+                        ->update(['quantite_reelle' => $stockDepot["qte_reel"] ?? 0]);
+
+                    /** Classement des ventes(direction et revendeur) dans l'inventaires | il s'agit bien des ventes 
+                     * qui ne sont pas encore associées à un inventaire
+                     */
+
+                    FactureClient::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+                    FactureRevendeur::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+                }
             }
 
             /** CREATION DES DETAILS INVENTAIRES */
@@ -437,7 +472,7 @@ class DepotController extends Controller
             return back()->with("error", "Erreure d'enregistrement lors de l'inventaire " . $e->getMessage());
         }
     }
- 
+
     /**
      * Afficher les details
      * d'un inventaire
