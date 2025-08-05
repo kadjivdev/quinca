@@ -106,7 +106,7 @@
                                                 <span class="badge bg-light text-dark"> ${stock.quantite_reelle}</span>
                                             </td>
                                             <td class="text-center"> 
-                                                <input type="number" class="form-control" name="stock_depots[${stock.id}][qte_reel]" value="${stock.quantite_reelle}"/> 
+                                                <input type="text" class="form-control" name="stock_depots[${stock.id}][qte_reel]" value="${stock.quantite_reelle}"/> 
                                             </td>
                                         </tr>
                                     `
