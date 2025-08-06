@@ -344,39 +344,39 @@ function showAddTarificationModal(articleId, typeTarifId) {
 }
 
 
-// Voir toutes les tarifications d'un article
-function showAllTarifications(articleId) {
-    fetch(`/catalogue/tarifications/by-article/${articleId}`)
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                // Construire le HTML pour afficher les tarifications
-                let html = '<div class="table-responsive"><table class="table">';
-                html += '<thead><tr><th>Type</th><th>Prix</th><th>Statut</th></tr></thead><tbody>';
+// // Voir toutes les tarifications d'un article
+// function showAllTarifications(articleId) {
+//     fetch(`/catalogue/tarifications/by-article/${articleId}`)
+//         .then(response => response.json())
+//         .then(result => {
+//             if (result.success) {
+//                 // Construire le HTML pour afficher les tarifications
+//                 let html = '<div class="table-responsive"><table class="table">';
+//                 html += '<thead><tr><th>Type</th><th>Prix</th><th>Statut</th></tr></thead><tbody>';
 
-                result.data.tarifications.forEach(tarif => {
-                    html += `
-                        <tr>
-                            <td>${tarif.type_tarif.libelle_type_tarif}</td>
-                            <td>${tarif.prix}</td>
-                            <td>${tarif.statut ? 'Actif' : 'Inactif'}</td>
-                        </tr>
-                    `;
-                });
+//                 result.data.tarifications.forEach(tarif => {
+//                     html += `
+//                         <tr>
+//                             <td>${tarif.type_tarif.libelle_type_tarif}</td>
+//                             <td>${tarif.prix}</td>
+//                             <td>${tarif.statut ? 'Actif' : 'Inactif'}</td>
+//                         </tr>
+//                     `;
+//                 });
 
-                html += '</tbody></table></div>';
+//                 html += '</tbody></table></div>';
 
-                // Afficher dans un modal de détails
-                Swal.fire({
-                    title: `Tarifications - ${result.data.article.code_article}`,
-                    html: html,
-                    width: '600px',
-                    showCloseButton: true,
-                    showConfirmButton: false
-                });
-            }
-        });
-}
+//                 // Afficher dans un modal de détails
+//                 Swal.fire({
+//                     title: `Tarifications - ${result.data.article.code_article}`,
+//                     html: html,
+//                     width: '600px',
+//                     showCloseButton: true,
+//                     showConfirmButton: false
+//                 });
+//             }
+//         });
+// }
 
 // Toggle du statut d'une tarification
 async function toggleTarificationStatus(id) {
@@ -409,6 +409,7 @@ async function toggleTarificationStatus(id) {
 
 // Fonction pour afficher tous les tarifs d'un article
 function showAllTarifications(articleId) {
+    
     // Afficher un indicateur de chargement
     Toast.fire({
         icon: 'info',

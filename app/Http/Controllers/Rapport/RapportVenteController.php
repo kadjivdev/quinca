@@ -450,6 +450,7 @@ class RapportVenteController extends Controller
                             'date_vente' => $facture->date_facture->format('d/m/Y'),
                             'reference' => $facture->numero ?? 'N/A',
                             'type_vente' => $type_vente,
+                            'moyen_reglement' => $facture->moyen_reglement,
                             'revendeur' => $facture->revendeur,
                             'createdBy' => $facture->createdBy,
                             'categorie_vente' => $facture->client->categorie ?? 'N/A',

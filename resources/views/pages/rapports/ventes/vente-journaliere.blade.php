@@ -72,6 +72,7 @@
                                     <th>Date vente</th>
                                     <th>Référence</th>
                                     <th>Type vente</th>
+                                    <th>Moyen de règlement</th>
                                     <th>Catégorie vente</th>
                                     <th>Statut</th>
                                     <th>Client</th>
@@ -97,6 +98,9 @@
                                         <span class="badge bg-danger">Crédit</span>
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-dark">{{$vente["moyen_reglement"]}}</span>
+                                    </td>
                                     <td>{{ $vente['categorie_vente'] }}</td>
                                     <td><span class="badge border text-dark @if($vente['statut']=='valide') bg-success @elseif($vente['statut']=='annulee') bg-danger @else bg-dark text-white @endif"> {{ $vente['statut'] }}</span></td>
                                     <td>{{ $vente['client'] }}</td>
@@ -115,7 +119,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">
+                                    <td colspan="7" class="text-center py-4">
                                         <i class="fas fa-info-circle me-2"></i>Aucune vente pour cette date
                                     </td>
                                 </tr>

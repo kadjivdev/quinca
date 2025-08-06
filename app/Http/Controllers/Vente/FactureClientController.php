@@ -224,6 +224,18 @@ class FactureClientController extends Controller
                             'message' => "Le dépôt ($depot->libelle_depot) ne vous appartient pas! Vous ne pouvez pas y passer une ecriture "
                         ], 500);
                     }
+
+                    /**Verification de la tarification */
+                    $articleTarifStandard = $article->tarifications
+                        ->firstWhere("type_tarif_id", env("TYPE_STANDARD_ID"));
+
+                    if (!$articleTarifStandard) {
+                        throw new \Exception("Larticle $article->designation ne dispose pas de tarification standard", 1);
+                    }
+
+                    if ($articleTarifStandard->prix > $ligne["total-ligne"]) {
+                        throw new \Exception("Le montant de vente de l'article $article->designation est en dessous de son prix standard de tarification qui est : $articleTarifStandard->prix", 1);
+                    }
                 }
             }
 
@@ -822,7 +834,7 @@ class FactureClientController extends Controller
 
             $sessionCaisse->mettreAJourTotaux();
 
-            Log::info("La facture concernée ",["facture"=>$facture]);
+            Log::info("La facture concernée ", ["facture" => $facture]);
 
             $facture->compteClient()->create([
                 'date_op' => $facture->date_facture,

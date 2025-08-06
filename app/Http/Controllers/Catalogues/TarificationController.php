@@ -131,7 +131,7 @@ class TarificationController extends Controller
     public function edit($id)
     {
         try {
-            $tarification = Tarification::with(['article', 'typeTarif','depotTarif'])
+            $tarification = Tarification::with(['article', 'typeTarif', 'depotTarif'])
                 ->findOrFail($id);
 
             return response()->json([
@@ -287,6 +287,8 @@ class TarificationController extends Controller
                 $query->with('typeTarif'); // Charger la relation typeTarif
             }])->findOrFail($articleId);
 
+            // return response()->json($article->tarifications);
+
             return response()->json([
                 'success' => true,
                 'article' => [
@@ -304,8 +306,8 @@ class TarificationController extends Controller
                             'libelle_type_tarif' => $tarif->typeTarif->libelle_type_tarif
                         ],
                         'depot_tarif' => [
-                            'id' => $tarif->depotTarif->id,
-                            'libelle_depot_tarif' => $tarif->depotTarif->libelle_depot
+                            'id' => $tarif->depotTarif?->id,
+                            'libelle_depot_tarif' => $tarif->depotTarif?->libelle_depot
                         ]
                     ];
                 })
@@ -313,12 +315,16 @@ class TarificationController extends Controller
         } catch (\Exception $e) {
             Log::error('Erreur lors de la récupération des tarifications:', [
                 'message' => $e->getMessage(),
+                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors du chargement des tarifications'
+                // 'message' => 'Erreur lors du chargement des tarifications',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
             ], 500);
         }
     }
