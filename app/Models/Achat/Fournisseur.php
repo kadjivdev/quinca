@@ -161,6 +161,11 @@ class Fournisseur extends Model
         return $this->hasMany(Avance::class, "fournisseur_id");
     }
 
+    function requetes(): HasMany
+    {
+        return $this->hasMany(RequeteFournisseur::class, "fournisseur_id");
+    }
+
     function reste_solde()
     {
         $appro_solde = $this->approvisionnements()->sum("montant");

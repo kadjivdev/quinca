@@ -18,7 +18,7 @@
         <tbody>
             @foreach($fournisseurs as $fournisseur)
             <tr>
-                <td><span class="badge bg-light text-dark"> {{ $fournisseur->code_fournisseur }}</span></td>
+                <td><span class="badge bg-light text-dark">{{$fournisseur->id}} {{ $fournisseur->code_fournisseur }}</span></td>
                 <td><span class="badge bg-light text-dark"> {{ $fournisseur->raison_sociale }}</span></td>
                 <td> <span class="badge bg-light text-dark"> {{ $fournisseur->telephone }}/{{ $fournisseur->adresse }}</span></td>
                 <td><span class="badge bg-light text-dark text-center"> {{ number_format($fournisseur->totalAppro, 2, ',', ' ') }}</span></td>
