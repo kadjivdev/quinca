@@ -184,7 +184,7 @@ class FournisseurController extends Controller
 
             // Vérification des relations avant suppression
             // À adapter selon vos besoins
-            $ops = $fournisseur->facture_fournisseurs || $fournisseur->approvisionnements || $fournisseur->avances || $fournisseur->factures || $fournisseur->accomptes->sum("montant") > 0;
+            $ops = $fournisseur->facture_fournisseurs->isNotEmpty() || $fournisseur->approvisionnements->isNotEmpty() || $fournisseur->avances->isNotEmpty() || $fournisseur->factures->isNotEmpty() || $fournisseur->accomptes->sum("montant") > 0;
             if ($ops) {
                 return response()->json([
                     'success' => false,

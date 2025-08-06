@@ -275,6 +275,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{fournisseur}/edit', [FournisseurController::class, 'edit'])->name('fournisseur.edit');
             Route::put('/{fournisseur}', [FournisseurController::class, 'update'])->name('fournisseur.update');
             Route::delete('/{fournisseur}', [FournisseurController::class, 'destroy'])->name('fournisseur.destroy');
+            Route::get('/{fournisseur}', [FournisseurController::class, 'destroy'])->name('fournisseur.destroy');
             Route::get('/template/download', [FournisseurController::class, 'downloadTemplate'])->name('fournisseur.template');
             Route::post('/import', [FournisseurController::class, 'import'])->name('fournisseur.import');
         });
