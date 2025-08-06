@@ -184,13 +184,13 @@ class FournisseurController extends Controller
 
             // Vérification des relations avant suppression
             // À adapter selon vos besoins
-            // $ops = $fournisseur->facture_fournisseurs || $fournisseur->approvisionnements || $fournisseur->avances || $fournisseur->factures;
-            // if ($ops) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Ce fournisseur dispose des opérations associées! Impossible de supprimer ce fournisseur'
-            //     ], 422);
-            // }
+            $ops = $fournisseur->facture_fournisseurs || $fournisseur->approvisionnements || $fournisseur->avances || $fournisseur->factures;
+            if ($ops) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ce fournisseur dispose des opérations associées! Impossible de supprimer ce fournisseur'
+                ], 422);
+            }
 
             $fournisseur->delete();
 
