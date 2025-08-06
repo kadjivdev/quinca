@@ -156,12 +156,18 @@ class Fournisseur extends Model
             ->whereNotNull("validated_by");
     }
 
+    function avances(): HasMany
+    {
+        return $this->hasMany(Avance::class, "fournisseur_id");
+    }
+
     function reste_solde()
     {
         $appro_solde = $this->approvisionnements()->sum("montant");
 
         /** Les factures */
-        $facturesAmount = $this->facture_fournisseurs->sum("montant_ttc");
+        $facturesAmount = $this->facture_fournisseurs
+            ->sum("montant_ttc");
 
         /** Les règlements */
         $reglements_amount = $this->facture_fournisseurs
@@ -169,11 +175,16 @@ class Fournisseur extends Model
                 return $query->facture_reglements_amount();
             });
 
+        /**Les avances */
+        $avancesAmount = $this->avances
+            ->whereNotNull("validated_by")
+            ->sum("montant");
+
         /** Les accomptes */
         $fournisseurAccomptesAmount = $this->accomptes
             ->sum("montant");
 
-        return $appro_solde - ($facturesAmount + $fournisseurAccomptesAmount);
+        return ($reglements_amount +  $avancesAmount) - ($facturesAmount + $fournisseurAccomptesAmount);
     }
 
     /**

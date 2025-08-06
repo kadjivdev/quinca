@@ -9,6 +9,7 @@
                 <th class="text-center">Payé au fournisseur</th>
                 <th class="text-center">Factures</th>
                 <th class="text-center">Règlement</th>
+                <th class="text-center">Avances</th>
                 <th class="text-center">Accompte</th>
                 <th class="text-center">Solde fournisseur</th>
                 <th class="text-center">Action</th>
@@ -23,6 +24,7 @@
                 <td><span class="badge bg-light text-dark text-center"> {{ number_format($fournisseur->totalAppro, 2, ',', ' ') }}</span></td>
                 <td><span class="badge bg-light text-dark text-center"> {{ number_format($fournisseur->factureAchatAmount, 2, ',', ' ') }}</span></td>
                 <td><span class="badge bg-light text-warning text-center"> {{ number_format($fournisseur->reglementsAmount, 2, ',', ' ') }}</span></td>
+                <td><span class="badge bg-light text-warning text-center"> {{ number_format($fournisseur->avancesAmount, 2, ',', ' ') }}</span></td>
                 <td><span class="badge bg-light text-warning text-center"> {{ number_format($fournisseur->accompteAmount, 2, ',', ' ') }}</span></td>
                 <td><span class="badge @if($fournisseur->reste_solde>0) bg-success @elseif($fournisseur->reste_solde<0) bg-danger @else bg-light text-dark @endif  text-center"> {{ number_format($fournisseur->reste_solde, 2, ',', ' ') }}</span></td>
                 <td class="border p-1 m-0">

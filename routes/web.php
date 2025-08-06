@@ -11,7 +11,7 @@ use App\Http\Controllers\Parametre\UniteMesureController;
 use App\Http\Controllers\Parametre\ConversionUniteController;
 
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
-use App\Http\Controllers\Achat\{AccompteFournisseurController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
+use App\Http\Controllers\Achat\{AccompteFournisseurController, AvanceController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
 use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, TransportController};
 use App\Http\Controllers\Parametre\ChauffeurController;
@@ -566,6 +566,44 @@ Route::middleware('auth')->group(function () {
             //Rejeter accompte
             Route::post('{acompte}/reject', [AccompteFournisseurController::class, 'reject'])
                 ->name('acomptes.reject');
+        });
+
+        /** GESTION DES AVANCES FOURNISSEUR */
+        Route::prefix('avances-frs')->group(function () {
+            // Liste des avances
+            Route::get('/', [AvanceController::class, 'index'])
+                ->name('achat.avances.index');
+
+            // Rafraîchissement de la liste des avances (pour AJAX)
+            Route::get('/refresh-list', [AvanceController::class, 'refreshList'])
+                ->name('achat.avances.refresh-list');
+
+            // Création d'un nouvel avance
+            Route::post('/', [AvanceController::class, 'store'])
+                ->name('achat.avances.store');
+
+            // Update d'un avance
+            Route::patch('/{avance}/update', [AvanceController::class, 'update'])
+                ->name('achat.avances.update')
+                ->where('avance', '[0-9]+');
+
+            // Voir les détails d'un avance
+            Route::get('/{avance}', [AvanceController::class, 'show'])
+                ->name('achat.avances.show')
+                ->where('avance', '[0-9]+');
+
+            // Supprimer un avance
+            Route::delete('/{avance}', [AvanceController::class, 'destroy'])
+                ->name('achat.avances.destroy')
+                ->where('avance', '[0-9]+');
+
+            // Valider avance
+            Route::post('{avance}/validate', [AvanceController::class, 'validate_acompte'])
+                ->name('avances.validate');
+
+            //Rejeter avance
+            Route::post('{avance}/reject', [AvanceController::class, 'reject'])
+                ->name('avances.reject');
         });
     });
 

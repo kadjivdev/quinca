@@ -180,6 +180,10 @@
                     <li><a class="dropdown-item" href="{{ route('achat.acomptes.index') }}">
                             <div class="dropdown-item-wrapper">Accomptes Fourniseurs</div>
                         </a></li>
+
+                    <li><a class="dropdown-item" href="{{ route('achat.avances.index') }}">
+                            <div class="dropdown-item-wrapper">Avances aux Fourniseurs</div>
+                        </a></li>
                     @endcan
 
                     @can("requetes.view")

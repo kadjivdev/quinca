@@ -283,7 +283,6 @@ class ReglementFournisseurController extends Controller
         }
     }
 
-
     public function validateReglement(ReglementFournisseur $reglement)
     {
         // if ($reglement->facture) {

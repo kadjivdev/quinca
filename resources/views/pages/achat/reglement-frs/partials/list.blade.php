@@ -70,16 +70,10 @@
                             <td>{{ $reglement->reference_reglement ?? '-' }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-fournisseur me-2 text-center">
-                                        {{ $reglement->facture?->fournisseur->raison_sociale }} <br>
-                                        @foreach($reglement->multiple_factures() as $facture)
-                                        <span class="badge bg-dark">{{ $facture?->fournisseur->raison_sociale }} </span>
-                                        <hr>
-                                        @endforeach
-                                    </div>
+                                   
                                     <div>
                                         <div class="fw-medium">
-                                            {{ $reglement->facture?->fournisseur->raison_sociale }}
+                                            {{ $reglement->facture?->fournisseur?->raison_sociale }}
                                         </div>
                                     </div>
                                 </div>
