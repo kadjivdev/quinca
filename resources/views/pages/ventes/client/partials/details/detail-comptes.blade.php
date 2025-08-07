@@ -93,14 +93,14 @@
                                     @endif
                                 </td>
                                 <td class="bg-secondary text-white">
-                                    @if(in_array($compte->type_op,["FAC_CLT","FAC_REV","AC_CLT"]))
+                                    @if(in_array($compte->type_op,["FAC_CLT","FAC_REV"]))
                                     {{number_format($compte->montant_op,3,","," ")}} FCFA
                                     @else
                                     -
                                     @endif
                                 </td>
                                 <td class="bg-light text-dark">
-                                    @if(in_array($compte->type_op,["REG_CLT","REG_REV"]))
+                                    @if(in_array($compte->type_op,["REG_CLT","REG_REV","AC_CLT"]))
                                     {{number_format($compte->montant_op,3,","," ")}} FCFA
                                     @else
                                     -
