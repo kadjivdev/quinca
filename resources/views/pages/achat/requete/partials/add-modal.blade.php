@@ -19,7 +19,7 @@
                 @csrf
                 <div class="col-6 mb-3">
                     <label for="num_demande">N° demande</label>
-                    <input type="number" readonly required class="form-control" name="num_demande" id="num_demande" value="{{ $requetes->count()+1}}">
+                    <input type="number" readonly required class="form-control" name="num_demande" id="num_demande" value="{{ $requetesMax}}">
                 </div>
 
                 <div class="col-6 mb-3">
@@ -74,7 +74,7 @@
                         <option value="">Choisir l'article </option>
                         @foreach ($articles as $article)
                         <option value="{{ $article->id }}" {{ in_array($article->id, old('articles', [])) ? 'selected' : '' }}>
-                           <span class="badge">{{ $article->designation }}</span>
+                            <span class="badge">{{ $article->designation }}</span>
                         </option>
                         @endforeach
                     </select>

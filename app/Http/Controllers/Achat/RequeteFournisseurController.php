@@ -7,7 +7,7 @@ use App\Models\Achat\AccompteFournisseur;
 use App\Models\Achat\Fournisseur;
 use App\Models\Achat\RequeteFournisseur;
 use App\Models\Catalogue\Article;
-use App\Models\Vente\Client;
+use App\Models\Vente\Requete;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,10 +22,13 @@ class RequeteFournisseurController extends Controller
         $requetes = RequeteFournisseur::with('fournisseur')->with('articles')->get();
         $fournisseurs = Fournisseur::get(["id", "code_fournisseur", "raison_sociale"]);
         $articles = Article::all();
+
+        $requetesMax = RequeteFournisseur::withTrashed()->count() + 1;
         return view('pages.achat.requete.index', compact([
             'requetes',
             'fournisseurs',
             'articles',
+            'requetesMax'
         ]));
     }
 
@@ -216,7 +219,7 @@ class RequeteFournisseurController extends Controller
                 'statut' => AccompteFournisseur::STATUT_VALIDE,
                 'validated_at' => now(),
                 'validated_by' => auth()->id(),
-                'created_by'=>auth()->id()
+                'created_by' => auth()->id()
             ]);
 
             DB::commit();

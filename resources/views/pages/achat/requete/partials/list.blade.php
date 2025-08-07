@@ -19,7 +19,7 @@
                     <tbody>
                         @foreach ($requetes as $requete)
                         <tr>
-                            <td>{{$requete->id}} - {{ $requete->num_demande }} </td>
+                            <td>{{ $requete->num_demande }} </td>
                             <td>{{ $requete->fournisseur->raison_sociale }}</td>
                             <td>{{ $requete->date_demande }}</td>
                             <td>{{ $requete->mention }}</td>
