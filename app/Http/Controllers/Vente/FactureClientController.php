@@ -233,8 +233,8 @@ class FactureClientController extends Controller
                         throw new \Exception("Larticle $article->designation ne dispose pas de tarification détaillant", 1);
                     }
 
-                    if ($articleTarif->prix < $ligne["total-ligne"]) {
-                        throw new \Exception("Le montant TTC de vente de l'article ($article->designation) dépasse le prix détaillant de tarification qui est : $articleTarif->prix FCFA");
+                    if ($articleTarif->prix > $ligne["total-ligne"]) {
+                        throw new \Exception("Le montant TTC de vente de l'article ($article->designation) est en dessous du prix détaillant de tarification qui est : $articleTarif->prix FCFA");
                     }
                 }
             }

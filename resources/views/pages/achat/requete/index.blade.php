@@ -63,7 +63,6 @@
 @push('scripts')
 
 @include('pages.achat.requete.partials.js-add-modal')
-
 <script>
     // Initialisation des filtres Select2
     $(document).ready(function() {

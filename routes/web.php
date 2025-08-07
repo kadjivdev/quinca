@@ -22,6 +22,8 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\AccompteFournisseur;
+use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\AcompteClient;
 
@@ -37,8 +39,13 @@ use App\Models\Vente\AcompteClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $accomptes = AcompteClient::withTrashed()->get();
-    return response()->json($accomptes);
+    $requete = RequeteFournisseur::find(3);
+    // suppression des accomptes attachés
+    $requete->accompteFournisseurs()->delete();
+
+    // suppression de la requete
+    $requete->delete();
+
     return "Opération éffectuée avec succès!!";
 });
 
