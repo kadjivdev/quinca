@@ -226,15 +226,15 @@ class FactureClientController extends Controller
                     }
 
                     /**Verification de la tarification */
-                    $articleTarifStandard = $article->tarifications
-                        ->firstWhere("type_tarif_id", env("TYPE_STANDARD_ID"));
+                    $articleTarif = $article->tarifications
+                        ->firstWhere("type_tarif_id", env("TYPE_DETAILLANT_ID"));
 
-                    if (!$articleTarifStandard) {
-                        throw new \Exception("Larticle $article->designation ne dispose pas de tarification standard", 1);
+                    if (!$articleTarif) {
+                        throw new \Exception("Larticle $article->designation ne dispose pas de tarification détaillant", 1);
                     }
 
-                    if ($articleTarifStandard->prix > $ligne["total-ligne"]) {
-                        throw new \Exception("Le montant de vente de l'article $article->designation est en dessous de son prix standard de tarification qui est : $articleTarifStandard->prix", 1);
+                    if ($articleTarif->prix < $ligne["total-ligne"]) {
+                        throw new \Exception("Le montant TTC de vente de l'article ($article->designation) dépasse le prix détaillant de tarification qui est : $articleTarif->prix FCFA");
                     }
                 }
             }
