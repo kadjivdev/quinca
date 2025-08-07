@@ -22,6 +22,7 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\Fournisseur;
 use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
 
@@ -37,14 +38,11 @@ use App\Models\Stock\StockDepot;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $requete = RequeteFournisseur::find(3);
-    // // suppression des accomptes attachés
-    // $requete->accompteFournisseurs()->delete();
+    $fournisseursToDelete = Fournisseur::whereIn("id", [1, 17, 82]);
 
-    // // suppression de la requete
-    // $requete->delete();
+    $fournisseursToDelete->delete();
 
-    return "Opération éffectuée avec succès!!";
+    return "Fournisseurs supprimés avec succès!!";
 });
 
 /**DETELE A STOCK */
