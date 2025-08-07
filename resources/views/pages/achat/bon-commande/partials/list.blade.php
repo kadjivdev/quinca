@@ -409,8 +409,8 @@
                                 <tr>
                                     <th>Référence</th>
                                     <th>Désignation</th>
-                                    <th>Unité</th>
                                     <th class="text-end" style="width: 120px;">Quantité</th>
+                                    <th class="text-end" style="width: 120px;">Quantité Base</th>
                                     <th class="text-end" style="width: 150px;">Prix Unitaire</th>
                                     <th class="text-end" style="width: 150px;">Total HT</th>
                                 </tr>
@@ -422,7 +422,6 @@
                 <tr>
                     <td>${ligne.article.code_article || ''}</td>
                     <td>${ligne.article.designation || ''}</td>
-                    <td>${ligne.unite_mesure.libelle_unite || ''}</td>
                     <td class="text-end">
                         <input type="hidden" name="articles[${index}][article_id]" value="${ligne.article.id}">
                         <input type="number"
@@ -430,6 +429,15 @@
                                name="articles[${index}][quantite]"
                                value="${ligne.quantite}"
                                readonly>
+                        <span class='badge bg-light border text-dark'>${ligne.unite_mesure.libelle_unite || ''}</span>
+                    </td>
+                    <td class="text-end">
+                        <input type="number"
+                               class="form-control form-control-sm text-end"
+                               name="articles[${index}][quantite_base]"
+                               value="${ligne.quantite_base}"
+                               readonly>
+                               <span class='badge bg-light border text-dark'>${ligne.unite_mesure_base.libelle_unite || ''}</span>
                     </td>
                     <td>
                         <input type="number"

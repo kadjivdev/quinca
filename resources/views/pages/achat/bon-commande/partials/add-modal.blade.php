@@ -41,8 +41,7 @@
                                             data-point-vente-id="{{ $prog->point_de_vente_id }}"
                                             data-fournisseur="{{ $prog->fournisseur?->raison_sociale }}"
                                             data-fournisseur-id="{{ $prog->fournisseur_id }}"
-                                            data-validation="{{ $prog->validated_at->format('d/m/Y') }}"
-                                            >
+                                            data-validation="{{ $prog->validated_at->format('d/m/Y') }}">
                                             {{ $prog->code }} - {{ $prog->fournisseur?->raison_sociale }}
                                             (Validée le {{ $prog->validated_at->format('d/m/Y') }})
                                         </option>
@@ -86,7 +85,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            
                             {{-- Section informations bon de commande --}}
                             <div class="col-12">
                                 <div class="card border border-light-subtle">

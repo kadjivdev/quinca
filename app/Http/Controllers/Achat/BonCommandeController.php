@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Achat;
 
 use App\Models\Catalogue\Article;
-use App\Models\Parametre\UniteMesure;
 use App\Models\Achat\BonCommande;
 use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\ProgrammationAchat;
 use App\Http\Controllers\Controller;
-use App\Models\Stock\StockDepot;
+use App\Models\Parametre\UniteMesure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -18,10 +17,16 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
-use TCPDF;
+use App\Services\ServiceStockEntree;
 
 class BonCommandeController extends Controller
 {
+    private $serviceStockEntree;
+
+    public function __construct(ServiceStockEntree $serviceStockEntree)
+    {
+        $this->serviceStockEntree = $serviceStockEntree;
+    }
     /**
      * Affiche la liste des bons de commande
      */
@@ -114,6 +119,8 @@ class BonCommandeController extends Controller
         try {
             DB::beginTransaction();
 
+            Log::info("Début de l'enregistrement d'un bon de commande", ["data" => $request->all()]);
+
             // Récupérer le point de vente de l'utilisateur connecté
             $user = auth()->user();
             if (!$user->point_de_vente_id) {
@@ -132,10 +139,17 @@ class BonCommandeController extends Controller
                 'cout_transport' => 'nullable|integer',
                 'cout_chargement' => 'nullable|integer',
                 'autre_cout' => 'nullable|integer',
+
                 'lignes' => 'required|array|min:1',
                 'lignes.*.article_id' => 'required|exists:articles,id',
+
+                'lignes.*.unite_mesure_id' => 'required|exists:unite_mesures,id',
+                'lignes.*.quantite' => 'required|numeric|min:0.1',
+
+                'lignes.*.unite_mesure_base_id' => 'required|exists:unite_mesures,id',
+                // 'lignes.*.quantite_base' => 'required|numeric|min:0.1',
+
                 'lignes.*.prix_unitaire' => 'required|numeric|min:0',
-                'lignes.*.quantite' => 'required|numeric|min:0',
             ]);
 
             if ($validator->fails()) {
@@ -150,13 +164,6 @@ class BonCommandeController extends Controller
 
             // Récupérer la programmation et ses lignes
             $programmation = ProgrammationAchat::with('lignes')->findOrFail($validated['programmation_id']);
-
-            // if (!$programmation->depot) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => "Cette programmation n'appartient à aucun dépôt",
-            //     ]);
-            // }
 
             // Création du bon de commande
             $bonCommande = BonCommande::create([
@@ -174,6 +181,8 @@ class BonCommandeController extends Controller
 
             // Création des lignes
             foreach ($validated['lignes'] as $ligne) {
+                Log::info("Ligne d'article", ["data" => $ligne]);
+
                 // Trouver la ligne de programmation correspondante pour obtenir l'unite_mesure_id
                 $ligneProgrammation = $programmation->lignes
                     ->where('article_id', $ligne['article_id'])
@@ -183,21 +192,49 @@ class BonCommandeController extends Controller
                     throw new \Exception('Article non trouvé dans la programmation');
                 }
 
+
+                // Les bases
+                $conversion = $this->serviceStockEntree->rechercherConversion(
+                    $ligne["unite_mesure_base_id"],
+                    // $ligneProgrammation->article->unite_mesure_id,
+                    $ligne["unite_mesure_id"],
+                    $ligne['article_id']
+                );
+
+                Log::info("La conversion retrouvée ", ["data" => $conversion]);
+
+                if (!$conversion) {
+                    $uniteSource = UniteMesure::find($ligne["unite_mesure_id"]);
+                    throw new Exception(sprintf(
+                        "Aucune conversion trouvée de l'unité (%s) vers (%s) pour l'article %s ni l'inverse! Veuillez créer la conversion avant de continuer",
+                        $uniteSource->libelle_unite,
+                        $ligneProgrammation->article->libelle_unite,
+                        $ligneProgrammation->article->code_article
+                    ));
+                }
+
+                $quantite_base = $this->serviceStockEntree->convertirQuantite(
+                    $ligne['quantite'],
+                    $conversion,
+                    $ligne["unite_mesure_id"]
+                );
+
+                /** */
                 $ligneBonCommande = new LigneBonCommande();
                 $ligneBonCommande->article_id = $ligne['article_id'];
-                $ligneBonCommande->unite_mesure_id = $ligneProgrammation->unite_mesure_id; // Utilisation de l'unité de mesure de la programmation
+
+                $ligneBonCommande->unite_mesure_id = $ligne['unite_mesure_id'];
+                $ligneBonCommande->unite_mesure_base_id = $ligne['unite_mesure_base_id'];
+
                 $ligneBonCommande->quantite = $ligne['quantite'];
+                $ligneBonCommande->quantite_base = $quantite_base;
+
+                Log::info("Unité", ["unité" => $ligne["unite_mesure_id"], "unite_base" => $ligne["unite_mesure_base_id"]]);
+                Log::info("Quantites", ["qte" => $ligne['quantite'], "qte_base" => $quantite_base]);
+
                 $ligneBonCommande->prix_unitaire = $ligne['prix_unitaire'];
                 $ligneBonCommande->bon_commande_id = $bonCommande->id;
                 $ligneBonCommande->save();
-
-
-                // // On ajoute les quantités saisies au stock des articles
-                // $stock = StockDepot::where(["depot_id" => $programmation->depot, "article_id" => $ligne['article_id']])->first();
-
-                // if ($stock) {
-                //     $stock->update(["quantite_reelle" => $stock->quantite_reelle + $ligne['quantite']]);
-                // }
             }
 
             // Mise à jour du montant total
@@ -214,6 +251,7 @@ class BonCommandeController extends Controller
             DB::rollBack();
             Log::error('Erreur lors de la création du bon de commande', [
                 'error' => $e->getMessage(),
+                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
 
@@ -229,7 +267,7 @@ class BonCommandeController extends Controller
      */
     public function show(BonCommande $bonCommande)
     {
-        $bonCommande->load(['pointVente', 'fournisseur', 'lignes.article', 'lignes.uniteMesure', 'programmation']);
+        $bonCommande->load(['pointVente', 'fournisseur', 'lignes.article', 'lignes.uniteMesure','lignes.uniteMesureBase', 'programmation']);
 
         return response()->json([
             'success' => true,

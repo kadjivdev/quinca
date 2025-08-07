@@ -29,7 +29,7 @@
                                 </div>
                                 <div class="card-body">
                                     <select class="form-select" name="programmation_id" id="programmationSelectMod" disabled>
-                                        
+
                                     </select>
                                     <div class="invalid-feedback">Veuillez sélectionner une programmation</div>
                                 </div>
@@ -217,7 +217,7 @@
                     <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Annuler
                     </button>
-                    <button type="submit" class="btn btn-primary px-4" id="btnSaveMod" >
+                    <button type="submit" class="btn btn-primary px-4" id="btnSaveMod">
                         <i class="fas fa-save me-2"></i>Enregistrer
                     </button>
                 </div>
@@ -228,50 +228,50 @@
 
 @push('styles')
 <style>
-.modal-dialog {
-    max-width: 95%;
-    margin: 1.75rem auto;
-}
+    .modal-dialog {
+        max-width: 95%;
+        margin: 1.75rem auto;
+    }
 
-.invalid-feedback {
-    font-size: 80%;
-}
+    .invalid-feedback {
+        font-size: 80%;
+    }
 
-.prix-unitaire {
-    min-width: 100px;
-}
+    .prix-unitaire {
+        min-width: 100px;
+    }
 
-.select2-container--bootstrap-5 .select2-selection {
-    min-height: calc(1.5em + 0.75rem + 2px);
-}
+    .select2-container--bootstrap-5 .select2-selection {
+        min-height: calc(1.5em + 0.75rem + 2px);
+    }
 
-.table > :not(caption) > * > * {
-    padding: 0.5rem;
-}
+    .table> :not(caption)>*>* {
+        padding: 0.5rem;
+    }
 
-.form-control-sm {
-    min-height: calc(1.5em + 0.5rem + 2px);
-}
+    .form-control-sm {
+        min-height: calc(1.5em + 0.5rem + 2px);
+    }
 
-.card {
-    margin-bottom: 0;
-}
+    .card {
+        margin-bottom: 0;
+    }
 
-.modal-content {
-    border-radius: 0.5rem;
-}
+    .modal-content {
+        border-radius: 0.5rem;
+    }
 
-.modal-header {
-    border-radius: 0.5rem 0.5rem 0 0;
-}
+    .modal-header {
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
 
-.btn-icon {
-    padding: 0.25rem 0.5rem;
-}
+    .btn-icon {
+        padding: 0.25rem 0.5rem;
+    }
 
-.table th {
-    font-weight: 600;
-    background-color: #f8f9fa;
-}
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
 </style>
 @endpush

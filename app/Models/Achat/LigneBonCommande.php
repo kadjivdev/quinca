@@ -47,11 +47,16 @@ class LigneBonCommande extends Model
     protected $fillable = [
         'bon_commande_id',
         'article_id',
+
         'unite_mesure_id',
         'quantite',
+        
         'prix_unitaire',
         'taux_remise',
         'montant_ligne',
+
+        'quantite_base',
+        'unite_mesure_base_id'
     ];
 
     /**
@@ -62,8 +67,13 @@ class LigneBonCommande extends Model
     public static $rules = [
         'bon_commande_id' => 'required|exists:bon_commandes,id',
         'article_id' => 'required|exists:articles,id',
+
         'unite_mesure_id' => 'required|exists:unite_mesures,id',
         'quantite' => 'required|numeric|gt:0',
+
+        'quantite_base' => 'required|numeric|gt:0',
+        'unite_mesure_base_id' => 'required|exists:unite_mesures,id',
+
         'prix_unitaire' => 'required|numeric|gt:0',
         'taux_remise' => 'required|numeric|between:0,100',
     ];
@@ -121,6 +131,15 @@ class LigneBonCommande extends Model
     public function uniteMesure()
     {
         return $this->belongsTo(UniteMesure::class, 'unite_mesure_id');
+    }
+
+    /**
+     * Relation avec l'unité de mesure
+     * de base
+     */
+    public function uniteMesureBase()
+    {
+        return $this->belongsTo(UniteMesure::class, 'unite_mesure_base_id');
     }
 
     /**

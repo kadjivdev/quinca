@@ -60,6 +60,7 @@ class ProgrammationAchatController extends Controller
 
         return view('pages.achat.programmation.index', $data);
     }
+
     /**
      * Enregistre une nouvelle programmation
      */
@@ -83,7 +84,7 @@ class ProgrammationAchatController extends Controller
                 'code' => 'required|unique:programmation_achats,code',
                 'date_programmation' => 'required|date',
                 'fournisseur_id' => 'required|exists:fournisseurs,id',
-                'commentaire' => 'nullable|string',
+                // 'commentaire' => 'nullable|string',
                 // 'depot' => 'required'
             ]);
 
@@ -116,7 +117,6 @@ class ProgrammationAchatController extends Controller
                     'quantite' => $request->quantites[$index],
                     // 'depot' => $request->depot,
                 ]);
-
             }
 
             DB::commit();
@@ -128,9 +128,11 @@ class ProgrammationAchatController extends Controller
             ]);
         } catch (Exception $e) {
             DB::rollBack();
+            Log::error("Erreur lors de la création de la programmation", ["data" => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(). 'Erreur lors de la création de la programmation: ' . $e->getMessage()
+                'message' => 'Erreur lors de la création de la programmation: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -397,8 +399,10 @@ class ProgrammationAchatController extends Controller
                             'reference' => $ligne->article->code_article,
                             'designation' => $ligne->article->designation,
                             'unite' => $ligne->uniteMesure->libelle_unite,
+                            'unite_mesure' => $ligne->uniteMesure,
                             'quantite' => $ligne->quantite,
-                            'prix_unitaire' => $ligne->article->prix_unitaire ?? 0
+                            'prix_unitaire' => $ligne->article->prix_unitaire ?? 0,
+                            'unite_mesures' => UniteMesure::all()
                         ];
                     })
                 ]
