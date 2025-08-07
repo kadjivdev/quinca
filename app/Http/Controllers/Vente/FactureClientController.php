@@ -225,17 +225,17 @@ class FactureClientController extends Controller
                         ], 500);
                     }
 
-                    /**Verification de la tarification */
-                    $articleTarif = $article->tarifications
-                        ->firstWhere("type_tarif_id", env("TYPE_DETAILLANT_ID"));
+                    // /**Verification de la tarification */
+                    // $articleTarif = $article->tarifications
+                    //     ->firstWhere("type_tarif_id", env("TYPE_DETAILLANT_ID"));
 
-                    if (!$articleTarif) {
-                        throw new \Exception("Larticle $article->designation ne dispose pas de tarification détaillant", 1);
-                    }
+                    // if (!$articleTarif) {
+                    //     throw new \Exception("Larticle $article->designation ne dispose pas de tarification détaillant", 1);
+                    // }
 
-                    if ($articleTarif->prix > $ligne["total-ligne"]) {
-                        throw new \Exception("Le montant TTC de vente de l'article ($article->designation) est en dessous du prix détaillant de tarification qui est : $articleTarif->prix FCFA");
-                    }
+                    // if ($articleTarif->prix > $ligne["total-ligne"]) {
+                    //     throw new \Exception("Le montant TTC de vente de l'article ($article->designation) est en dessous du prix détaillant de tarification qui est : $articleTarif->prix FCFA");
+                    // }
                 }
             }
 
