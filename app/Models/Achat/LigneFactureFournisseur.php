@@ -66,7 +66,10 @@ class LigneFactureFournisseur extends Model
         'montant_ttc',
         'created_by',
         'updated_by',
-        'validated_by'
+        'validated_by',
+
+        'unite_mesure_base_id',
+        'quantite_base'
     ];
 
     /**
@@ -159,6 +162,15 @@ class LigneFactureFournisseur extends Model
     public function uniteMesure()
     {
         return $this->belongsTo(UniteMesure::class, 'unite_mesure_id');
+    }
+
+    /**
+     * Relation avec l'unité de mesure
+     * de base
+     */
+    public function uniteMesureBase()
+    {
+        return $this->belongsTo(UniteMesure::class, 'unite_mesure_base_id');
     }
 
     /**

@@ -435,9 +435,9 @@
                         <input type="number"
                                class="form-control form-control-sm text-end"
                                name="articles[${index}][quantite_base]"
-                               value="${ligne.quantite_base}"
+                               value="${ligne.quantite_base || ''}"
                                readonly>
-                               <span class='badge bg-light border text-dark'>${ligne.unite_mesure_base.libelle_unite || ''}</span>
+                               <span class='badge bg-light border text-dark'>${ligne.unite_mesure_base?.libelle_unite || ''}</span>
                     </td>
                     <td>
                         <input type="number"

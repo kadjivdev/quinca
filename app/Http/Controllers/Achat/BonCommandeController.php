@@ -267,7 +267,14 @@ class BonCommandeController extends Controller
      */
     public function show(BonCommande $bonCommande)
     {
-        $bonCommande->load(['pointVente', 'fournisseur', 'lignes.article', 'lignes.uniteMesure','lignes.uniteMesureBase', 'programmation']);
+        $bonCommande->load([
+            'pointVente',
+            'fournisseur',
+            'lignes.article',
+            'lignes.uniteMesure',
+            'lignes.uniteMesureBase',
+            'programmation'
+        ]);
 
         return response()->json([
             'success' => true,
@@ -466,16 +473,21 @@ class BonCommandeController extends Controller
     {
         try {
             $articles = $bonCommande->lignes()
-                ->with(['article', 'uniteMesure'])
+                ->with(['article', 'uniteMesure','uniteMesureBase'])
                 ->get()
                 ->map(function ($ligne) {
                     return [
                         'id' => $ligne->article->id,
                         'reference' => $ligne->article->code_article,
                         'designation' => $ligne->article->designation,
+
                         'unite_mesure' => $ligne->uniteMesure->libelle_unite,
                         'unite_mesure_id' => $ligne->unite_mesure_id,
                         'quantite' => $ligne->quantite,
+
+                        'unite_mesure_base' => $ligne->uniteMesureBase,
+                        'quantite_base' => $ligne->quantite_base,
+
                         'prix_unitaire' => $ligne->prix_unitaire,
                         'montant_ligne' => $ligne->montant_ligne,
                         'taux_remise' => $ligne->taux_remise

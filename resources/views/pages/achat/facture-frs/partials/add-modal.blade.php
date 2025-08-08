@@ -138,7 +138,7 @@
                                                     <tr>
                                                         <th>Référence</th>
                                                         <th>Désignation</th>
-                                                        <th>Unité</th>
+                                                        <th>Quantité base</th>
                                                         <th class="text-end">Quantité</th>
                                                         <th class="text-end">Prix Unitaire</th>
                                                         <th class="text-end">Montant HT</th>
@@ -334,12 +334,23 @@
             <tr>
                 <td>${article.reference}</td>
                 <td>${article.designation}</td>
-                <td>${article.unite_mesure}</td>
+                <td class="text-center">
+                    <input type="number" class="form-control form-control-sm text-end quantite"
+                           name="articles[${article.id}][unite_mesure_base_id]"
+                           value="${article.unite_mesure_base?.id}"
+                           hidden>
+                    <input type="number" class="form-control form-control-sm text-end quantite"
+                           name="articles[${article.id}][quantite_base]"
+                           value="${article.quantite_base}"
+                           readonly>
+                    ${article.unite_mesure_base?.libelle_unite || ""}
+                </td>
                 <td class="text-end">
                     <input type="number" class="form-control form-control-sm text-end quantite"
                            name="articles[${article.id}][quantite]"
                            value="${article.quantite}"
                            readonly>
+                    ${article.unite_mesure}
                 </td>
                 <td class="text-end">
                     <input type="number" class="form-control form-control-sm text-end prix"

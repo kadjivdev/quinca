@@ -155,6 +155,8 @@ class FactureFournisseurController extends Controller
         try {
             DB::beginTransaction();
 
+            Log::info("Début du chargement des lignes", ["data" => $request->articles]);
+
             // Validation de base
             $request->validate([
                 'code' => 'required|unique:facture_fournisseurs,code',
@@ -164,9 +166,16 @@ class FactureFournisseurController extends Controller
                 'fournisseur_id' => 'required|exists:fournisseurs,id',
                 'type_facture' => 'required|in:SIMPLE,NORMALISE',
                 'articles' => 'required|array',
+
+                'articles.*.unite_mesure_id' => 'required|numeric',
                 'articles.*.quantite' => 'required|numeric|min:0',
+
+                'articles.*.unite_mesure_base_id' => 'nullable|numeric',
+                'articles.*.quantite_base' => 'required|numeric|min:0',
+
                 'articles.*.prix_unitaire' => 'required|numeric|min:0',
             ]);
+            Log::info("Fin du chargement des lignes", ["data" => $request->articles]);
 
             // Création de la facture avec les montants par défaut
             $facture = new FactureFournisseur();
@@ -180,10 +189,13 @@ class FactureFournisseurController extends Controller
             $facture->taux_tva = $request->type_facture === 'NORMALISE' ? ($request->taux_tva ?? 0) : 0;
             $facture->taux_aib = $request->type_facture === 'NORMALISE' ? ($request->taux_aib ?? 0) : 0;
             // $facture->montant_tva = $request->commentaire;
+
             $facture->save();
 
             // Création des lignes
             foreach ($request->articles as $articleId => $data) {
+                Log::info("Base unité ID :", ["data" => $data['unite_mesure_base_id']]);
+
                 $ligne = new LigneFactureFournisseur();
                 $ligne->facture_id = $facture->id;
                 $ligne->article_id = $articleId;
@@ -192,8 +204,19 @@ class FactureFournisseurController extends Controller
                 $ligne->prix_unitaire = $data['prix_unitaire'];
                 $ligne->taux_tva = $request->type_facture === 'NORMALISE' ? ($request->taux_tva ?? 0) : 0;;
                 $ligne->taux_aib = $request->type_facture === 'NORMALISE' ? ($request->taux_aib ?? 0) : 0;
+
+                /** */
+                $ligne->unite_mesure_base_id = $data['unite_mesure_base_id'];
+                $ligne->quantite_base = $data['quantite_base'];
+                /** */
+
+                Log::info("Unité", ["unité" => $ligne["unite_mesure_id"], "unite_base" => $ligne["unite_mesure_base_id"]]);
+                Log::info("Quantites", ["qte" => $ligne['quantite'], "qte_base" => $ligne['quantite_base']]);
+
                 $ligne->save();
             }
+
+            Log::info("La ligne", ["data" => $ligne]);
 
             // Mise à jour des montants
             $facture->updateMontants();
@@ -228,18 +251,47 @@ class FactureFournisseurController extends Controller
             'bonCommande',
             'pointVente',
             'fournisseur',
+            // 'lignes' => function ($query) {
+            //     /**on recupere seulement les lignes qui disposent encore de quantité */
+            //     $query->where(function ($q) {
+            //         if ($q->quantite_base) {
+            //             $q->whereNull('quantite_livree_simple')
+            //                 ->orWhere(function ($subQ) {
+            //                     $subQ->whereNotNull('quantite_livree_simple')
+            //                         ->where('quantite_base', '>', DB::raw('quantite_livree_simple'));
+            //                 });
+            //         } else {
+            //             $q->whereNull('quantite_livree_simple')
+            //                 ->orWhere(function ($subQ) {
+            //                     $subQ->whereNotNull('quantite_livree_simple')
+            //                         ->where('quantite', '>', DB::raw('quantite_livree_simple'));
+            //                 });
+            //         }
+            //     });
+            // },
             'lignes' => function ($query) {
-                /**on recupere seulement les lignes qui disposent encore de quantité */
                 $query->where(function ($q) {
-                    $q->whereNull('quantite_livree_simple')
+                    /**quantite_base */
+                    $q->where(function ($subQ) {
+                        $subQ->whereNotNull('quantite_base')
+                            ->where(function ($x) {
+                                $x->whereNull('quantite_livree_simple')
+                                    ->orWhereColumn('quantite_base', '>', 'quantite_livree_simple');
+                            });
+                    })
+                        /**quantite */
                         ->orWhere(function ($subQ) {
-                            $subQ->whereNotNull('quantite_livree_simple')
-                                ->where('quantite', '>', DB::raw('quantite_livree_simple'));
+                            $subQ->whereNull('quantite_base')
+                                ->where(function ($x) {
+                                    $x->whereNull('quantite_livree_simple')
+                                        ->orWhereColumn('quantite', '>', 'quantite_livree_simple');
+                                });
                         });
                 });
             },
             'lignes.article',
-            'lignes.uniteMesure'
+            'lignes.uniteMesure',
+            'lignes.uniteMesureBase',
         ]);
 
         return response()->json([
@@ -258,6 +310,7 @@ class FactureFournisseurController extends Controller
             'bonCommande',
             'pointVente',
             'fournisseur',
+            'lignes.uniteMesureBase',
             'lignes.article',
             'lignes.uniteMesure'
         ]);

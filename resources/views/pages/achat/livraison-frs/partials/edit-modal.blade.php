@@ -103,8 +103,8 @@
                                     <tr class="bg-light">
                                         <th class="py-3 px-4" style="width: 30%">Article</th>
                                         <th class="py-3 text-center">Unité</th>
-                                        <th class="py-3 text-center">Quantité facturée</th>
-                                        <th class="py-3 text-center">Déjà reçue</th>
+                                        <th class="py-3 text-center">Unité à recevoir(si elle n'existe pas, elle est remplacée par l'unité simple)</th>
+                                        <!-- <th class="py-3 text-center">Déjà reçue</th> -->
                                         <th class="py-3 text-center">À recevoir</th>
                                         <th class="py-3 text-center" style="width: 150px;">Quantité</th>
                                         <th class="py-3 text-center">Qté supplémentaire</th>

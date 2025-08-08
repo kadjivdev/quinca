@@ -149,8 +149,8 @@
                                 <tr>
                                     <th>Référence</th>
                                     <th>Désignation</th>
-                                    <th>Unité</th>
-                                    <th class="text-end" style="width: 120px;">Quantité</th>
+                                    <th class="text-center">Unité Base</th>
+                                    <th class="text-end" style="width: 120px;">Unité</th>
                                     <th class="text-end" style="width: 150px;">Prix Unitaire</th>
                                     <th class="text-end" style="width: 150px;">Montant HT</th>
                                 </tr>
@@ -163,10 +163,15 @@
                 <tr>
                     <td>${article.code_article || ''}</td>
                     <td>${article.designation || ''}</td>
-                    <td>${ligne.unite_mesure.libelle_unite || ''}</td>
                     <td>
-                        <input type="number" class="form-control form-control-sm text-end" name="articles[${index}][quantite]" value="${ligne.quantite}" readonly>
+                        <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite_base]" value="${ligne.quantite_base}" readonly>
+                        <span class="badge bg-light border text-dark bordered">${ligne.unite_mesure_base?.libelle_unite || ""}</span>
                     </td>
+                    <td class="text-end">
+                        <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite]" value="${ligne.quantite || 0}" readonly>
+                        <span class="badge bg-light border text-dark bordered">${ligne.unite_mesure.libelle_unite || ""}</span>
+                    </td>
+                    
                     <td>
                         <input type="number" value="${ligne.prix_unitaire || ''}"  readonly>
                     </td>
@@ -265,7 +270,7 @@
                 }
             });
 
-            const response = await fetch(`${apiUrl}/achat/factures/${id}`, {  // URL mise à jour
+            const response = await fetch(`${apiUrl}/achat/factures/${id}`, { // URL mise à jour
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -286,7 +291,7 @@
 
                 const data = result.data;
 
-                editForm.action = `${apiUrl}/achat/factures/${id}`;  // URL mise à jour
+                editForm.action = `${apiUrl}/achat/factures/${id}`; // URL mise à jour
 
                 $("#factIdMod").html(data.code);
                 $("#bonCommandeSelectMod").html(data.bon_commande.code);
@@ -313,12 +318,12 @@
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Référence</th>
-                                            <th>Désignation</th>
-                                            <th>Unité</th>
-                                            <th class="text-end">Quantité</th>
-                                            <th class="text-end">Prix Unitaire</th>
-                                            <th class="text-end">Total HT</th>
+                                            <th class="text-center">Référence</th>
+                                            <th class="text-center">Désignation</th>
+                                            <th class="text-center">Unité Base</th>
+                                            <th class="text-center">Unité</th>
+                                            <th class="text-center">Prix Unitaire</th>
+                                            <th class="text-center">Total HT</th>
                                         </tr>
                                     </thead>
                                     <tbody id="articlesTableBodyMod">`;
@@ -329,10 +334,14 @@
                             <tr>
                                 <td>${ligne.article.code_article || ""}</td>
                                 <td>${ligne.article.designation || ""}</td>
-                                <td>${ligne.unite_mesure.libelle_unite || ""}</td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite_base]" value="${ligne.quantite_base}" readonly>
+                                    <span class="badge bg-light border text-dark bordered">${ligne.unite_mesure_base?.libelle_unite || ""}</span>
+                                </td>
                                 <td class="text-end">
                                     <input type="hidden" name="articles[${index}][article_id]" value="${ligne.article.id}">
                                     <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite]" value="${ligne.quantite || 0}" readonly>
+                                    <span class="badge bg-light border text-dark bordered">${ligne.unite_mesure.libelle_unite || ""}</span>
                                 </td>
                                 <td>
                                     <input type="number" class="form-control form-control-sm text-end prix-unitaire" name="articles[${index}][prix_unitaire]" step="0.01" min="0" value="${ligne.prix_unitaire || ""}" data-index="${index}" readonly>
@@ -362,16 +371,16 @@
 
                     $("#articlesSectionMod").html(articlesHtml);
                     calculateTotalsMod(data);
-                }      
+                }
 
-                if($('select[name="type_facture"]').val() === 'NORMALISE') {
+                if ($('select[name="type_facture"]').val() === 'NORMALISE') {
                     $('.tva-aib-section').show();
                 }
-                
+
                 editForm.querySelector('[name="commentaireMod"]').value = data.commentaire;
 
                 const modal = new bootstrap.Modal(editModal);
-                modal.show();                
+                modal.show();
                 Swal.close();
             } else {
                 throw new Error(result.message || 'Erreur lors du chargement des données');

@@ -241,9 +241,14 @@
 
             return lignes.map(ligne => {
                 console.log(ligne)
+
+                /**Unite de mesure & Qte de mesure */
+                const unite_mesure = ligne.unite_mesure_base ?? ligne.unite_mesure;
+                const quantite_base = ligne.quantite_base ?? ligne.quantite;
+
                 // S'assurer que la quantité livrée est un nombre
                 const quantiteLivree = parseFloat(ligne.quantite_livree_simple) || 0;
-                const quantiteTotale = parseFloat(ligne.quantite) || 0;
+                const quantiteTotale = parseFloat(quantite_base) || 0;
                 const resteALivrer = Math.max(0, quantiteTotale - quantiteLivree);
 
                 // Formater les nombres pour l'affichage
@@ -260,10 +265,15 @@
                             <input type="hidden" name="lignes[${ligne.id}][ligne_id]" value="${ligne.id}">
                         </td>
                         <td class="text-center">
-                            <span>${ligne.unite_mesure.libelle_unite}</span>
-                            <input type="hidden" name="lignes[${ligne.id}][unite_mesure_id]" value="${ligne.unite_mesure.id}">
+                            ${ligne.quantite}
+                            <span class="badge bg-light text-dark bordered">${ligne.unite_mesure?.libelle_unite}</span>
                         </td>
-                        <td class="text-center">${quantiteTotaleFormatted}</td>
+                        <td class="text-center">
+                            ${quantite_base}
+                            <input type="hidden" class="" name="lignes[${ligne.id}][unite_mesure_id]" 
+                                value="${unite_mesure?.id}">
+                            <span class="badge bg-light text-dark bordered">${unite_mesure?.libelle_unite}</span>
+                        </td>
                         <td class="text-center">${quantiteLivreeFormatted}</td>
                         <td class="text-center">${resteALivrerFormatted}</td>
                         <td class="text-center">
@@ -516,8 +526,12 @@
                 let articles = ``;
                 const unites = await LivraisonFournisseur.getUnitesOptions();
                 livraison.facture.lignes.forEach((ligne, index) => {
+                    /**Unite de mesure & Qte de mesure */
+                    const unite_mesure = ligne.unite_mesure_base ?? ligne.unite_mesure;
+                    const quantite_base = ligne.quantite_base ?? ligne.quantite;
+
                     const quantiteLivree = parseFloat(ligne.quantite_livree) || 0;
-                    const quantiteTotale = parseFloat(ligne.quantite) || 0;
+                    const quantiteTotale = parseFloat(quantite_base) || 0;
                     const resteALivrer = Math.max(0, quantiteTotale - quantiteLivree);
 
                     // Formater les nombres pour l'affichage
@@ -532,10 +546,15 @@
                                 <input type="hidden" name="lignes[${ligne.article_id}][article_id]" value="${ligne.article_id}">
                             </td>
                             <td class="text-center">
-                                <span></span>
-                                <input type="hidden" name="lignes[${ligne.article_id}][unite_mesure_id]" value="${ligne.article_id}">
+                                ${ligne.quantite}
+                                <span class="badge bg-light text-dark bordered">${ligne.unite_mesure?.libelle_unite}</span>
                             </td>
-                            <td class="text-center">${quantiteTotaleFormatted}</td>
+                            <td class="text-center">
+                                ${quantite_base}
+                                <input type="hidden" class="" name="lignes[${ligne.id}][unite_mesure_id]" 
+                                    value="${unite_mesure?.id}">
+                                <span class="badge bg-light text-dark bordered">${unite_mesure?.libelle_unite}</span>
+                            </td>
                             <td class="text-center">${quantiteLivreeFormatted}</td>
                             <td class="text-center">${resteALivrerFormatted}</td>
                             <td class="text-center">

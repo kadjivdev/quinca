@@ -1,5 +1,5 @@
 <div class="modal fade" id="addLivraisonFournisseurModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl ">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content border-0 shadow-lg rounded-4 modal-dialog-scrollable" style="overflow-y: scroll!important;">
             {{-- Header du modal --}}
             <div class="modal-header border-0 bg-gradient-light py-4">
@@ -100,17 +100,20 @@
                         </div>
                         <div class="table-responsive">
                             <table class="table align-middle mb-0 p-3" id="modalArticlesTable">
+
                                 <thead>
                                     <tr class="bg-light">
-                                        <th class="py-3 px-4" style="width: 30%">Article</th>
-                                        <th class="py-3 text-center">Unité</th>
-                                        <th class="py-3 text-center">Quantité facturée</th>
+                                        <th class="py-3 px-4" style="width: 10%">Article</th>
+                                        <th class="py-3 text-center">Unité </th>
+                                        <th class="py-3 text-center">Unité à recevoir(si elle n'existe pas, elle est remplacée par l'unité simple)</th>
+                                        <!-- <th class="py-3 text-center">Quantité facturée</th> -->
                                         <th class="py-3 text-center">Déjà reçue</th>
                                         <th class="py-3 text-center">À recevoir</th>
-                                        <th class="py-3 text-center" style="width: 150px;">Quantité</th>
+                                        <th class="py-3 text-center" >Quantité</th>
                                         <th class="py-3 text-center">Qté supplémentaire</th>
                                     </tr>
                                 </thead>
+
                                 <tbody id="modalLignesFacture">
                                     <tr>
                                         <td colspan="7" class="text-center py-5">
