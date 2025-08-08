@@ -179,7 +179,9 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <input type="hidden" name="articles[${index}][article_id]" value="${article.id}">
-                                                        <select name="articles[${index}][unite_mesure_base_id]" class="form-control">
+                                                        <select name="articles[${index}][unite_mesure_base_id]" class="form-control" required>
+                                                            <option>Choississez une unité de livraison</option>
+                                                            
                                                             ${
                                                                 article.unite_mesures.map(uniteMesure =>
                                                                     `<option value="${uniteMesure.id}">${uniteMesure.libelle_unite}</option>`

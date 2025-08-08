@@ -401,6 +401,7 @@
     function fillLivraisonDetails(data) {
         console.log('Données à afficher:', data);
 
+        // alert("Données à afficher")
         // Réinitialiser le contenu précédent
         $('#modalLignesFactureShow').empty();
 

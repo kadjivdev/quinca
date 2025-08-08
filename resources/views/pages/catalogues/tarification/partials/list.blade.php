@@ -64,45 +64,46 @@
                             <td>
                                 <span class="article-libelle">{{ $article->designation }}</span>
                             </td>
-                            @foreach($typesTarifs as $typeTarif)
-                            @php
-                            $tarification = $article->tarifications
-                            ->where('type_tarif_id', $typeTarif->id)
-                            ->where('statut', true)
-                            ->first();
-                            @endphp
 
-                            <td class="text-end">
-                                <div class="d-flex align-items-center justify-content-end gap-2">
-                                    @if($tarification)
-                                    <div class="tarif-value d-flex align-items-center justify-content-between">
-                                        <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA</span>
-                                        <div class="btn-group btn-group-sm ms-3 action-buttons">
-                                            @can("tarification.edit")
-                                            <button class="btn btn-link p-0 text-warning btn-animated"
-                                                onclick="editTarification({{ $tarification->id }})"
-                                                title="Modifier ce tarif">
-                                                <i class="far fa-edit"></i>
-                                            </button>
-                                            @endcan
-                                            <button class="btn btn-link p-0 text-danger ms-2 btn-animated"
-                                                onclick="toggleTarificationStatus({{ $tarification->id }})"
-                                                title="{{ $tarification->statut ? 'Désactiver' : 'Activer' }} ce tarif">
-                                                <i class="fas {{ $tarification->statut ? 'fa-ban' : 'fa-check' }}"></i>
-                                            </button>
+                            @foreach($typesTarifs as $typeTarif)
+                                @php
+                                    $tarification = $article->tarifications
+                                        ->where('type_tarif_id', $typeTarif->id)
+                                        ->where('statut', true)
+                                        ->first();
+                                @endphp
+
+                                <td class="text-end">
+                                    <div class="d-flex align-items-center justify-content-end gap-2">
+                                        @if($tarification)
+                                        <div class="tarif-value d-flex align-items-center justify-content-between">
+                                            <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA</span>
+                                            <div class="btn-group btn-group-sm ms-3 action-buttons">
+                                                @can("tarification.edit")
+                                                <button class="btn btn-link p-0 text-warning btn-animated"
+                                                    onclick="editTarification({{ $tarification->id }})"
+                                                    title="Modifier ce tarif">
+                                                    <i class="far fa-edit"></i>
+                                                </button>
+                                                @endcan
+                                                <button class="btn btn-link p-0 text-danger ms-2 btn-animated"
+                                                    onclick="toggleTarificationStatus({{ $tarification->id }})"
+                                                    title="{{ $tarification->statut ? 'Désactiver' : 'Activer' }} ce tarif">
+                                                    <i class="fas {{ $tarification->statut ? 'fa-ban' : 'fa-check' }}"></i>
+                                                </button>
+                                            </div>
                                         </div>
+                                        @else
+                                        @can("tarification.create")
+                                        <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
+                                            onclick="showAddTarificationModal({{ $article->id }}, {{ $typeTarif->id }})"
+                                            title="Ajouter un tarif">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                        @endcan
+                                        @endif
                                     </div>
-                                    @else
-                                    @can("tarification.create")
-                                    <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
-                                        onclick="showAddTarificationModal({{ $article->id }}, {{ $typeTarif->id }})"
-                                        title="Ajouter un tarif">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                    @endcan
-                                    @endif
-                                </div>
-                            </td>
+                                </td>
                             @endforeach
                             <td class="text-end">
                                 <div class="btn-group action-buttons">

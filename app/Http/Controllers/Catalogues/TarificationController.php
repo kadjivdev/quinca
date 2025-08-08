@@ -148,7 +148,9 @@ class TarificationController extends Controller
 
     /**
      * Mettre à jour une tarification
+     *
      */
+    
     public function update(Request $request, $id)
     {
         $tarification = Tarification::find($id);
@@ -227,7 +229,6 @@ class TarificationController extends Controller
         }
     }
 
-
     /**
      * Supprimer une tarification
      */
@@ -286,8 +287,6 @@ class TarificationController extends Controller
             $article = Article::with(['tarifications' => function ($query) {
                 $query->with('typeTarif'); // Charger la relation typeTarif
             }])->findOrFail($articleId);
-
-            // return response()->json($article->tarifications);
 
             return response()->json([
                 'success' => true,

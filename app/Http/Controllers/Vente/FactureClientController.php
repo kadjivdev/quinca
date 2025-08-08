@@ -227,14 +227,14 @@ class FactureClientController extends Controller
 
                     // /**Verification de la tarification */
                     // $articleTarif = $article->tarifications
-                    //     ->firstWhere("type_tarif_id", env("TYPE_DETAILLANT_ID"));
+                    //     ->firstWhere("type_tarif_id", env("TYPE_GROSSISTE_ID")); // TYPE GROSSISTE
 
                     // if (!$articleTarif) {
-                    //     throw new \Exception("Larticle $article->designation ne dispose pas de tarification détaillant", 1);
+                    //     throw new \Exception("Larticle $article->designation ne dispose pas de tarif grossiste");
                     // }
 
                     // if ($articleTarif->prix > $ligne["total-ligne"]) {
-                    //     throw new \Exception("Le montant TTC de vente de l'article ($article->designation) est en dessous du prix détaillant de tarification qui est : $articleTarif->prix FCFA");
+                    //     throw new \Exception("Le montant TTC de vente de l'article ($article->designation) est en dessous du prix grossiste de tarification qui est : $articleTarif->prix FCFA");
                     // }
                 }
             }

@@ -23,7 +23,8 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\Fournisseur;
-use App\Models\Achat\RequeteFournisseur;
+use App\Models\Catalogue\Tarification;
+// use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
 
 /*
@@ -38,9 +39,10 @@ use App\Models\Stock\StockDepot;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $fournisseursToDelete = Fournisseur::whereIn("id", [1, 17, 82]);
-
-    $fournisseursToDelete->delete();
+    $tarifications = Tarification::where("article_id", 1042)
+    ->with(["article","typeTarif"])
+    ->get();
+    return response()->json($tarifications);
 
     return "Fournisseurs supprimés avec succès!!";
 });

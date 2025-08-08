@@ -131,26 +131,52 @@ class BonCommandeController extends Controller
             }
 
             // Validation des données de base
-            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'code' => 'required|unique:bon_commandes,code',
-                'date_commande' => 'required|date',
-                'programmation_id' => 'required|exists:programmation_achats,id',
-                'commentaire' => 'nullable|string',
-                'cout_transport' => 'nullable|integer',
-                'cout_chargement' => 'nullable|integer',
-                'autre_cout' => 'nullable|integer',
+            $validator = \Illuminate\Support\Facades\Validator::make(
+                $request->all(),
+                [
+                    'code' => 'required|unique:bon_commandes,code',
+                    'date_commande' => 'required|date',
+                    'programmation_id' => 'required|exists:programmation_achats,id',
+                    'commentaire' => 'nullable|string',
+                    'cout_transport' => 'nullable|integer',
+                    'cout_chargement' => 'nullable|integer',
+                    'autre_cout' => 'nullable|integer',
 
-                'lignes' => 'required|array|min:1',
-                'lignes.*.article_id' => 'required|exists:articles,id',
+                    'lignes' => 'required|array|min:1',
+                    'lignes.*.article_id' => 'required|exists:articles,id',
 
-                'lignes.*.unite_mesure_id' => 'required|exists:unite_mesures,id',
-                'lignes.*.quantite' => 'required|numeric|min:0.1',
+                    'lignes.*.unite_mesure_id' => 'required|exists:unite_mesures,id',
+                    'lignes.*.quantite' => 'required|numeric|min:0.1',
 
-                'lignes.*.unite_mesure_base_id' => 'required|exists:unite_mesures,id',
-                // 'lignes.*.quantite_base' => 'required|numeric|min:0.1',
+                    'lignes.*.unite_mesure_base_id' => 'required|exists:unite_mesures,id',
+                    // 'lignes.*.quantite_base' => 'required|numeric|min:0.1',
 
-                'lignes.*.prix_unitaire' => 'required|numeric|min:0',
-            ]);
+                    'lignes.*.prix_unitaire' => 'required|numeric|min:0',
+                ],
+                [
+                    // Messages généraux
+                    'lignes.required' => 'Vous devez ajouter au moins une ligne.',
+                    'lignes.min' => 'Vous devez ajouter au moins une ligne.',
+
+                    // Messages pour chaque champ des lignes
+                    'lignes.*.article_id.required' => 'L’article est obligatoire pour la ligne :position.',
+                    'lignes.*.article_id.exists'   => 'L’article sélectionné est invalide pour la ligne :position.',
+
+                    'lignes.*.unite_mesure_id.required' => 'L’unité de mesure est obligatoire pour la ligne :position.',
+                    'lignes.*.unite_mesure_id.exists'   => 'L’unité de mesure sélectionnée est invalide pour la ligne :position.',
+
+                    'lignes.*.quantite.required' => 'La quantité est obligatoire pour la ligne :position.',
+                    'lignes.*.quantite.numeric'  => 'La quantité doit être un nombre pour la ligne :position.',
+                    'lignes.*.quantite.min'      => 'La quantité doit être au moins de 0.1 pour la ligne :position.',
+
+                    'lignes.*.unite_mesure_base_id.required' => 'L’unité de mesure de base est obligatoire pour la ligne :position.',
+                    'lignes.*.unite_mesure_base_id.exists'   => 'L’unité de mesure de base sélectionnée est invalide pour la ligne :position.',
+
+                    'lignes.*.prix_unitaire.required' => 'Le prix unitaire est obligatoire pour la ligne :position.',
+                    'lignes.*.prix_unitaire.numeric'  => 'Le prix unitaire doit être un nombre pour la ligne :position.',
+                    'lignes.*.prix_unitaire.min'      => 'Le prix unitaire doit être positif pour la ligne :position.',
+                ]
+            );
 
             if ($validator->fails()) {
                 return response()->json([
@@ -473,7 +499,7 @@ class BonCommandeController extends Controller
     {
         try {
             $articles = $bonCommande->lignes()
-                ->with(['article', 'uniteMesure','uniteMesureBase'])
+                ->with(['article', 'uniteMesure', 'uniteMesureBase'])
                 ->get()
                 ->map(function ($ligne) {
                     return [
