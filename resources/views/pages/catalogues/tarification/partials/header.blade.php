@@ -34,6 +34,15 @@
                     <span class="refresh-text">Actualiser</span>
                 </button>
 
+                <!-- Importation -->
+                <button type="button"
+                    class="btn btn-dark btn-sm d-flex align-items-center"
+                    data-bs-toggle="modal"
+                    data-bs-target="#importArticleModal">
+                    <i class="fas fa-plus me-2"></i>
+                    Importer
+                </button>
+
                 {{-- Bouton d'ajout avec modal --}}
                 @can("tarification.create")
                 <button

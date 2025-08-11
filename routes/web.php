@@ -40,8 +40,8 @@ use App\Models\Stock\StockDepot;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     $tarifications = Tarification::where("article_id", 1042)
-    ->with(["article","typeTarif"])
-    ->get();
+        ->with(["article", "typeTarif"])
+        ->get();
     return response()->json($tarifications);
 
     return "Fournisseurs supprimés avec succès!!";
@@ -238,6 +238,9 @@ Route::middleware('auth')->group(function () {
             Route::post('{article}/update-all', [TarificationController::class, 'updateAll'])->name('tarification.update-all');
             // Routes supplémentaires
             Route::get('/by-article/{article}', [TarificationController::class, 'getByArticle'])->name('tarification.by-article');
+
+            // Iportation des tarifications
+            Route::post('/import', [TarificationController::class, 'import'])->name('tarification.import');
         });
 
         Route::prefix('articles')->group(function () {

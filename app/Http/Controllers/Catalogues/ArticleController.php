@@ -150,7 +150,6 @@ class ArticleController extends Controller
         $depots = Depot::get();
         $unites = UniteMesure::all();
 
-
         return view("pages.catalogues.article.affect-depot", compact([
             "depots",
             "article",

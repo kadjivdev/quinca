@@ -14,6 +14,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
+
 class TarificationController extends Controller
 {
     /**
@@ -126,6 +131,237 @@ class TarificationController extends Controller
     }
 
     /**
+     * Importation des tarifications
+     */
+    public function import(Request $request)
+    {
+        try {
+            $request->validate([
+                'file' => 'required|file|mimes:xlsx,xls|max:5120' // 5MB max
+            ]);
+
+            $file = $request->file('file');
+
+            $reader = IOFactory::createReaderForFile($file->getPathname());
+
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getPathname());
+            $worksheet = $spreadsheet->getActiveSheet();
+            // $rows = $worksheet->toArray();
+            $rows = $worksheet->toArray(null, true, true, true); //ceci permet de ne pas considerer le header
+
+            // Supprimer l'en-tête
+            array_shift($rows);
+
+            $errors = [];
+            $imported = 0;
+            $skipped = 0;
+
+            DB::beginTransaction();
+
+            Log::info("Début traitements", ["data" => $request->all()]);
+
+            foreach ($rows as $index => $row) {
+                if ($index == 0) {
+                    continue;
+                }
+                // Log::info("Index", ["data" => $index]);
+                Log::info("Row", ["data" => $row]);
+                $rowNumber = $index + 2;
+
+                // Ignorer les lignes vides
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+
+                try {
+                    // Validation des données de base
+                    if (empty($row["A"])) {
+                        $errors[] = "Ligne $rowNumber : Le code article est réquis";
+                        $skipped++;
+                        continue;
+                    }
+
+                    /**
+                     * 0=A
+                     * 1=B
+                     * 2=C
+                     * 3=D
+                     * 4=E
+                     * 5=F
+                     * 6=G
+                     * 7=H
+                     */
+
+                    // Validation des tarifs
+                    if (empty($row["C"]) && empty($row["D"]) && empty($row["E"]) && empty($row["F"]) && empty($row["G"]) && empty($row["H"])) {
+                        $errors[] = "Ligne $rowNumber : Précisez au moins un prix de tarification";
+                        $skipped++;
+                        continue;
+                    }
+
+                    // Vérifier l'existence de l'article
+                    $article = Article::firstWhere('code_article', $row["A"]);
+                    if (!$article) {
+                        $errors[] = "Ligne $rowNumber : L'article avec le code {{$row['A']}} n'existe pas";
+                        $skipped++;
+                        continue;
+                    }
+
+                    $type_tarif_id = null;
+
+                    if ($row['C']) {
+                        $type_tarif_id = 1; //tarif special
+                    } elseif ($row['D']) {
+                        $type_tarif_id = 2; //tarif Hyper Grossiste
+                    } elseif ($row['E']) {
+                        $type_tarif_id = 3; //tarif Grossiste
+                    } elseif ($row['F']) {
+                        $type_tarif_id = 4; //tarif Semi Grossiste
+                    } elseif ($row['G']) {
+                        $type_tarif_id = 5; //tarif Particulier
+                    } elseif ($row['H']) {
+                        $type_tarif_id = 7; //tarif BTP
+                    };
+
+                    $type = TypeTarif::find($type_tarif_id);
+
+                    if (!$type) {
+                        $errors[] = "Ligne $rowNumber : Ce type de tarification n'existe pas!";
+                        $skipped++;
+                        continue;
+                    }
+
+                    // Vérifier l'existence de la tarification
+                    $tarification = Tarification::firstWhere(['article_id' => $article->id, "type_tarif_id" => $type_tarif_id]);
+                    if ($tarification) {
+                        $errors[] = "Ligne $rowNumber : Un prix existe déjà pour la tarification {{$tarification->typeTarif?->libelle_type_tarif}} : $tarification->prix";
+                        $skipped++;
+                        continue;
+                    }
+
+                    // Log pour debug
+                    Log::info("Tentative de création de tarification", [
+                        'ligne' => $rowNumber,
+                        'donnees' => [
+                            'code_article' => $row['A'],
+                            'type_tarification' => $type->libelle_type_tarif,
+                            'prix_special' => $row['C'],
+                            'prix_hyper_grossiste' => $row['D'],
+                            'prix_grossiste' => $row['E'],
+                            'prix_semi_grossiste' => $row['F'],
+                            'prix_particulier' => $row['G'],
+                            'prix_btp' => $row['H'],
+                        ]
+                    ]);
+
+                    // Création de l'article
+                    try {
+
+                        foreach (TypeTarif::get(["id",]) as $type) {
+                            $data = [
+                                'article_id' => $article->id,
+                                'type_tarif_id' => $type->id,
+                                'statut' => 1,
+                                'prix' => 0,
+                            ];
+
+                            Log::info("Data debut", ["data" => $data]);
+
+                            switch ($type->id) {
+                                case 1: //prix special
+                                    $data["prix"] = $row['C'] ?? 0;
+                                    break;
+
+                                case 2: //prix hyper grossiste
+                                    $data["prix"] = $row['D'] ?? 0;
+                                    break;
+
+                                case 3: //prix grossiste
+                                    $data["prix"] = $row['E'] ?? 0;
+                                    break;
+
+                                case 4: //prix semi grossiste
+                                    $data["prix"] = $row['F'] ?? 0;
+                                    break;
+
+                                case 5: //prix particulier
+                                    $data["prix"] = $row['G'] ?? 0;
+                                    break;
+
+                                case 6: //prix BTP
+                                    $data["prix"] = $row['H'] ?? 0;
+                                    break;
+
+                                default:
+                                    break;
+                            };
+
+                            /** */
+                            Log::info("Data fin", ["data" => $data]);
+                            Tarification::create($data);
+                        }
+                    } catch (\Exception $e) {
+                        throw new \Exception("Erreur lors de la création de l'article : " . $e->getMessage());
+                    }
+
+                    $imported++;
+                } catch (\Exception $e) {
+                    $errors[] = "Ligne $rowNumber : " . $e->getMessage();
+                    Log::error("Erreur d'import à la ligne $rowNumber", [
+                        'erreur' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                        'donnees' => $row
+                    ]);
+                    $skipped++;
+                    continue;
+                }
+            }
+
+            if ($imported > 0) {
+                DB::commit();
+
+                $message = "$imported tarification(s) importé(s) avec succès.";
+                if ($skipped > 0) {
+                    $message .= " $skipped ligne(s) ignorée(s).";
+                }
+
+                return back()
+                    ->with("success", $message);
+
+                // return response()->json([
+                //     'success' => true,
+                //     'message' => $message,
+                //     'errors' => $errors,
+                // ]);
+            } else {
+                DB::rollBack();
+
+                return back()
+                    ->withErrors(["errors" => $errors]);
+
+                // return response()->json([
+                //     'success' => false,
+                //     'message' => 'Aucun article n\'a été importé.',
+                //     'errors' => $errors,
+                // ]);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Erreur générale lors de l'import", [
+                'erreur' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'import',
+                'error_details' => $e->getMessage(),
+                'errors' => [$e->getMessage()],
+            ], 500);
+        }
+    }
+
+    /**
      * Charger les données d'une tarification pour modification
      */
     public function edit($id)
@@ -150,7 +386,7 @@ class TarificationController extends Controller
      * Mettre à jour une tarification
      *
      */
-    
+
     public function update(Request $request, $id)
     {
         $tarification = Tarification::find($id);
