@@ -34,6 +34,8 @@
                                         required>
                                         <option value="">Sélectionner un bon de commande</option>
                                         @foreach ($bonsCommande as $bc)
+                                        @continue(!$bc->fournisseur)
+
                                         <option value="{{ $bc->id }}" data-code="{{ $bc->code }}"
                                             data-point-vente="{{ $bc->pointVente->nom_pv }}"
                                             data-point-vente-id="{{ $bc->point_de_vente_id }}"

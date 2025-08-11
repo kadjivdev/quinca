@@ -171,7 +171,7 @@ class FactureFournisseurController extends Controller
                 'articles.*.quantite' => 'required|numeric|min:0',
 
                 'articles.*.unite_mesure_base_id' => 'nullable|numeric',
-                'articles.*.quantite_base' => 'required|numeric|min:0',
+                'articles.*.quantite_base' => 'nullable|numeric|min:0',
 
                 'articles.*.prix_unitaire' => 'required|numeric|min:0',
             ]);

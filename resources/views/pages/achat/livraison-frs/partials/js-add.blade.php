@@ -90,10 +90,13 @@
                 return;
             }
 
+
             const facture = response.data;
 
+            console.log("Les données de la facture", facture);
+
             // Mise à jour des informations de la facture
-            $('#fournisseurName').text(facture.fournisseur.raison_sociale);
+            $('#fournisseurName').text(facture.fournisseur?.raison_sociale);
             $('#factureInfo').text(
                 `Facture N° ${facture.code} du ${moment(facture.date_facture).format('DD/MM/YYYY')}`);
 
@@ -406,7 +409,7 @@
         $('#modalLignesFactureShow').empty();
 
         $('#codeBon').text(data.livraison.code);
-        $('#fournisseurNameShow').text(data.livraison.fournisseur.raison_sociale);
+        $('#fournisseurNameShow').text(data.livraison.fournisseur?.raison_sociale);
         $('#factureCode').text(data.livraison.facture.code);
         $("[name='date_livraison']").text(data.livraison.date_livraison.split('T')[0]);
         $('#depotId').text(data.livraison.depot.libelle_depot);
@@ -490,7 +493,7 @@
                 // Mettre à jour l'action du formulaire
                 editForm.action = `${apiUrl}/achat/livraisons/${id}`; // Changement ici
 
-                $("#fournisseurNameMod").text(result.livraison.fournisseur.raison_sociale);
+                $("#fournisseurNameMod").text(result.livraison.fournisseur?.raison_sociale);
                 $("[name='date_livraison']").val(result.livraison.date_livraison.split('T')[0]);
                 $("[name='point_de_vente_id']").val(result.livraison.point_de_vente_id);
 
