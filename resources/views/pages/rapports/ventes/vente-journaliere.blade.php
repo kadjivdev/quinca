@@ -225,7 +225,7 @@
         let total = 0;
         
         // Parcourir toutes les lignes visibles et additionner les montants
-        table.column(8, {search: 'applied'}).data().each(function(value) {
+        table.column(9, {search: 'applied'}).data().each(function(value) {
             // Nettoyer la valeur (enlever "FCFA" et les espaces, puis convertir en nombre)
             let montant = parseInt(value.replace(/[^0-9-]/g, ''));
             total += montant;

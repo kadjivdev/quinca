@@ -326,6 +326,8 @@ class AcompteClientController extends Controller
     {
         try {
             // Validation des données
+            Log::info("Data to update",["data"=>$request->get("montant")]);
+
             $validated = $request->validate(AcompteClient::rules(), [
                 'date.required' => 'La date est obligatoire',
                 'date.date' => 'La date n\'est pas valide',
@@ -336,6 +338,7 @@ class AcompteClientController extends Controller
                 'montant.required' => 'Le montant est obligatoire',
                 'montant.numeric' => 'Le montant doit être un nombre'
             ]);
+            Log::info("Data validated",["data"=>$validated]);
 
             DB::beginTransaction();
 

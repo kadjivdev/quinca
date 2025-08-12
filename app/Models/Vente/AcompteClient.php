@@ -179,6 +179,7 @@ class AcompteClient extends Model
                 self::STATUT_VALIDE,
                 self::STATUT_REJETE
             ]),
+            'montant' => 'required|numeric'
         ];
     }
 
