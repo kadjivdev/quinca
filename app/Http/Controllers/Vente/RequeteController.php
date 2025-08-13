@@ -217,7 +217,7 @@ class RequeteController extends Controller
                 'user_id' => Auth::user()->id,
                 'type_op' => 'AC_CLT',
             ]);
-            
+
             DB::commit();
             return back()->with("success", "Requête validée avec succès!");
         } catch (\Exception $e) {

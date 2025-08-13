@@ -48,9 +48,24 @@ class ServiceStockEntree
             $uniteSource = UniteMesure::findOrFail($unite_origine_id);
             $uniteBase = $article->uniteMesure;
 
-            //pour une livraison ou un approvisionnement direct, on prends l'unité à l'origine(entrante)
-            if (isset($donnees["livraison"]) || isset($donnees["appro"])) {
+            // Récupération ou 
+            $stockExiste = StockDepot::firstWhere([
+                'depot_id' => $donnees['depot_id'],
+                'article_id' => $article->id,
+                // 'unite_mesure_id' => $donnees["unite_mesure_id"],
+            ]);
+
+            ## determination de l'unité de destination
+            if (isset($donnees["livraison"])) {
+                //pour une livraison ou un approvisionnement direct, on prends l'unité à l'origine(entrante)
                 $unite_dest_id = $unite_origine_id;
+            } elseif (isset($donnees["appro"])) {
+                // quand le stock existe déjà, l'approvisionnement se fera en l'unité de mesure existante déjà
+                if ($stockExiste) {
+                    $unite_dest_id = $stockExiste->unite_mesure_id;
+                } else {
+                    $unite_dest_id = $article->unite_mesure_id;
+                }
             } else {
                 $unite_dest_id = $article->unite_mesure_id;
             }
@@ -85,13 +100,7 @@ class ServiceStockEntree
                 'unite_base' => $uniteBase->id
             ]);
 
-            // 5. Récupération ou création du stock
-            $stockExiste = StockDepot::firstWhere([
-                'depot_id' => $donnees['depot_id'],
-                'article_id' => $article->id,
-                // 'unite_mesure_id' => $donnees["unite_mesure_id"],
-            ]);
-
+            // 5. création du stock
             if ($stockExiste) {
                 $stock = $stockExiste;
             } else {
