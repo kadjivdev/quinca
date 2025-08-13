@@ -42,7 +42,7 @@
 
 @section('content')
 <div class="content container">
-    <div class="row g-3 list mt-3 " id="stockEntriesList">
+    <div class="row g-3 list mt-3" id="stockEntriesList">
         <div class="col-1"></div>
         <div class="col-10">
             <div class="card p-3">
@@ -64,7 +64,7 @@
                                 <td>{{$reglement->numero}}</td>
                                 <td>{{$reglement->date_reglement}}</td>
                                 <td>{{$reglement->type_reglement}}</td>
-                                <td>{{$reglement->numero}}</td>
+                                <td>{{$reglement->facture?->numero}}</td>
                                 <td class="text-end">{{$reglement->montant}} FCFA</td>
                             </tr>
                             @endforeach
