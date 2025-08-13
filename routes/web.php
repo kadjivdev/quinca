@@ -22,10 +22,10 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Achat\Fournisseur;
 use App\Models\Catalogue\Tarification;
 // use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\Requete;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,12 +39,9 @@ use App\Models\Stock\StockDepot;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $tarifications = Tarification::where("article_id", 1042)
-        ->with(["article", "typeTarif"])
-        ->get();
-    return response()->json($tarifications);
-
-    return "Fournisseurs supprimés avec succès!!";
+    $requestes = Requete::whereIn("id", [24, 25])->delete();
+    // return response()->json($requestes->pluck("accompte"));
+    return "Requetes supprimés avec succès!!";
 });
 
 /**DETELE A STOCK */

@@ -124,8 +124,6 @@ class RequeteController extends Controller
         $clients = Client::all();
         $articles = Article::all();
 
-        // dd($requete->articles->pluck("id"));
-
         return view('pages.ventes.requete.edit', compact(['clients', 'articles', 'requete']));
     }
 

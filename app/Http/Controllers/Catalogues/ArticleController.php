@@ -191,7 +191,8 @@ class ArticleController extends Controller
                     'prix_unitaire' => 0,
                     'date_mouvement' => now(),
                     'notes' => "Entrée en stock via attachement direct aux dépôts",
-                    'user_id' => Auth::id()
+                    'user_id' => Auth::id(),
+                    'appro' => true,
                 ];
             }
 

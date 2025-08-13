@@ -60,6 +60,24 @@
 @include('pages.ventes.facture.partials.js-delete')
 
 <script type="text/javascript">
+    let table;
+    $(document).ready(function() {
+        alert("gogogog")
+        // Initialize DataTable but don't calculate widths yet
+        table = $('#exampleModalShow').DataTable({
+            responsive: true,
+            dom: 'Bfrtip', // Buttons layout
+            buttons: [
+                'copy', 'excel', 'pdf', 'print'
+            ]
+        });
+
+        // When modal is shown, adjust the table layout
+        $('#showFactureModal').on('shown.bs.modal', function() {
+            table.columns.adjust().draw();
+        });
+    });
+
     // Attendre que jQuery soit chargé
     $(function() {
         console.log('Initialisation du gestionnaire de factures');

@@ -48,10 +48,16 @@ class ServiceStockEntree
             $uniteSource = UniteMesure::findOrFail($unite_origine_id);
             $uniteBase = $article->uniteMesure;
 
+            //pour une livraison ou un approvisionnement direct, on prends l'unité à l'origine(entrante)
+            if (isset($donnees["livraison"]) || isset($donnees["appro"])) {
+                $unite_dest_id = $unite_origine_id;
+            } else {
+                $unite_dest_id = $article->unite_mesure_id;
+            }
+
             $conversion = $this->rechercherConversion(
                 $unite_origine_id,
-                isset($donnees["livraison"]) ?
-                    $unite_origine_id : $article->unite_mesure_id,//pour une livraison, on prends l'unité à l'origine demeure l'unité à l'origine
+                $unite_dest_id,
                 $article->id
             );
 
@@ -137,6 +143,8 @@ class ServiceStockEntree
             ]);
 
             $stock->save();
+
+            Log::debug("Le stock crée :", ["data" => $stock]);
 
             DB::commit();
 

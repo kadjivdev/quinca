@@ -160,7 +160,7 @@
                            Articles
                        </h6>
                        <div class="table-responsive">
-                           <table class="table table-bordered table-hover mb-0">
+                           <table id="exampleModalShow" class="table table-bordered table-hover mb-0">
                                <thead class="bg-light">
                                    <tr>
                                        <th>Article</th>

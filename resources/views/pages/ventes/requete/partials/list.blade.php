@@ -32,8 +32,8 @@
                     <tbody>
                         @foreach ($requetes as $requete)
                         <tr>
-                            <td>{{ $requete->num_demande }} </td>
-                            <td>{{ $requete->client?->raison_sociale }}</td>
+                            <td>{{$requete->id}}-- {{ $requete->num_demande }} </td>
+                            <td> {{ $requete->client?->raison_sociale }}</td>
                             <td>{{ $requete->date_demande }}</td>
                             <td>{{ $requete->mention }}</td>
 
