@@ -39,9 +39,9 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $requestes = Requete::whereIn("id", [24, 25])->delete();
+    Requete::whereIn("id", [24, 25])->delete();
     // return response()->json($requestes->pluck("accompte"));
-    return "Requetes supprimés avec succès!!";
+    return "Requetes 24,25 supprimés avec succès!!";
 });
 
 /**DETELE A STOCK */
