@@ -82,7 +82,7 @@
                                                 <tr>
                                                     <th>Article</th>
                                                     <th>Quantité</th>
-                                                    <th>Prix</th>
+                                                    <!-- <th>Prix</th> -->
                                                     <!-- <th>Total TTC</th> -->
                                                     <th></th>
                                                 </tr>
@@ -159,10 +159,10 @@
                                         <input type="number" name="lignes[${ligne.id}][quantite]" value="${ligne.quantite}">
                                         <input type="hidden" name="lignes[${ligne.id}][unite_vente_id]" value="${ligne.unite_id}">
                                         ${ligne.unite}
+
+                                        <input type="hidden" name="lignes[${ligne.id}][prix_unitaire]" value="${ligne.prix_unitaire}">
                                     </td>
-                                    <td class="text-center">
-                                        <input type="number" name="lignes[${ligne.id}][prix_unitaire]" value="${ligne.prix_unitaire}">
-                                    </td>
+                                   
                                     <td class="text-center">
                                         <button type="button" class="btn btn-outline-danger btn-sm remove-ligne">
                                             <i class="fas fa-times"></i>
