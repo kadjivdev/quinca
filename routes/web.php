@@ -22,6 +22,7 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Catalogue\Tarification;
 // use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
@@ -39,9 +40,16 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    Requete::whereIn("id", [24, 25])->delete();
-    // return response()->json($requestes->pluck("accompte"));
-    return "Requetes 24,25 supprimés avec succès!!";
+    // Revu du stock
+    $stock = StockDepot::firstWhere(["article_id" => 1418, "depot_id" => 4, "unite_mesure_id" => 5]);
+    $stock->update(["quantite_reelle" => 0.1]);
+
+    BonLivraisonFournisseur::where(["code" => "BLF2508120003"])->update([
+        'validated_at' => null,
+        'validated_by' => null
+    ]);
+
+    return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
 
 /**DETELE A STOCK */
