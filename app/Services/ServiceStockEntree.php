@@ -8,6 +8,7 @@ use App\Models\Parametre\{UniteMesure, ConversionUnite, Depot};
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ServiceStockEntree
 {
@@ -49,9 +50,12 @@ class ServiceStockEntree
 
             $conversion = $this->rechercherConversion(
                 $unite_origine_id,
-                $article->unite_mesure_id,
+                isset($donnees["livraison"]) ?
+                    $unite_origine_id : $article->unite_mesure_id,//pour une livraison, on prends l'unité à l'origine demeure l'unité à l'origine
                 $article->id
             );
+
+            Log::debug('Convertion retrouvée:', ["data" => $conversion]);
 
             if (!$conversion) {
                 throw new Exception(sprintf(
@@ -70,9 +74,9 @@ class ServiceStockEntree
 
             \Log::debug("Conversion effectuée", [
                 'quantite_origine' => $donnees['quantite'],
-                'unite_origine' => $uniteSource->libelle_unite,
+                'unite_origine' => $uniteSource->id,
                 'quantite_base' => $quantite_base,
-                'unite_base' => $uniteBase->code_unite
+                'unite_base' => $uniteBase->id
             ]);
 
             // 5. Récupération ou création du stock
@@ -136,7 +140,7 @@ class ServiceStockEntree
 
             DB::commit();
 
-            \Log::debug("Entrée en stock réussie", [
+            Log::debug("Entrée en stock réussie", [
                 'mouvement_id' => $mouvement->id,
                 'nouveau_stock' => $stock->quantite_reelle,
                 'nouveau_cump' => $nouveau_cump

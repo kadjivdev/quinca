@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Services\ServiceStockEntree;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class BonLivraisonFournisseurController extends Controller
@@ -389,7 +390,7 @@ class BonLivraisonFournisseurController extends Controller
                 ]);
 
                 // Log des prix unitaires
-                \Log::debug("Prix unitaire pour article {$ligneFact->article_id}: {$ligneFact->prix_unitaire}");
+                Log::debug("Prix unitaire pour article {$ligneFact->article_id}: {$ligneFact->prix_unitaire}");
             }
 
             // Préparer les entrées en stock
@@ -410,7 +411,7 @@ class BonLivraisonFournisseurController extends Controller
                 }
 
                 // Log des données de conversion
-                \Log::debug("Données de ligne:", [
+                Log::debug("Données de ligne:", [
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
                     'unite_base_id' => $ligne->article->unite_mesure_id,
@@ -428,17 +429,18 @@ class BonLivraisonFournisseurController extends Controller
                     'document_type' => 'BON_LIVRAISON_FOURNISSEUR',
                     'document_id' => $bonLivraison->id,
                     'notes' => $bonLivraison->commentaire,
-                    'user_id' => Auth::id()
+                    'user_id' => Auth::id(),
+                    'livraison' => $bonLivraison->id,
                 ];
             }
 
             // Log des entrées préparées
-            \Log::debug('Entrées préparées:', ['entrees' => $entrees]);
+            Log::debug('Entrées préparées:', ['entrees' => $entrees]);
 
             // Traiter les entrées en stock
             $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
 
-            \Log::debug('Résultat traitement stock:', $resultatStock);
+            Log::debug('Résultat traitement stock:', ["resultatStock" => $resultatStock]);
 
             if (!$resultatStock['succes']) {
                 throw new Exception("Erreur lors de la mise à jour du stock : " . $resultatStock['message']);
