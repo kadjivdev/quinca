@@ -224,18 +224,6 @@ class FactureClientController extends Controller
                             'message' => "Le dépôt ($depot->libelle_depot) ne vous appartient pas! Vous ne pouvez pas y passer une ecriture "
                         ], 500);
                     }
-
-                    // /**Verification de la tarification */
-                    // $articleTarif = $article->tarifications
-                    //     ->firstWhere("type_tarif_id", env("TYPE_GROSSISTE_ID")); // TYPE GROSSISTE
-
-                    // if (!$articleTarif) {
-                    //     throw new \Exception("Larticle $article->designation ne dispose pas de tarif grossiste");
-                    // }
-
-                    // if ($articleTarif->prix > $ligne["total-ligne"]) {
-                    //     throw new \Exception("Le montant TTC de vente de l'article ($article->designation) est en dessous du prix grossiste de tarification qui est : $articleTarif->prix FCFA");
-                    // }
                 }
             }
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Catalogue\Article;
 use App\Models\Vente\AcompteClient;
 use App\Models\Vente\Client;
+use App\Models\Vente\CompteClient;
 use App\Models\Vente\Requete;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -194,7 +195,7 @@ class RequeteController extends Controller
                 'validate_at' => now()
             ]);
 
-            AcompteClient::create([
+            $acompte = AcompteClient::create([
                 'date' => $requete->date_demande,
                 'montant' =>  $requete->montant,
                 'facture_id' => null,
@@ -209,6 +210,14 @@ class RequeteController extends Controller
                 'point_de_vente_id' => Auth::user()->point_de_vente_id
             ]);
 
+            $acompte->compteClient()->create([
+                'date_op' => $acompte->date,
+                'montant_op' => $acompte->montant,
+                'client_id' => $acompte->client_id,
+                'user_id' => Auth::user()->id,
+                'type_op' => 'AC_CLT',
+            ]);
+            
             DB::commit();
             return back()->with("success", "Requête validée avec succès!");
         } catch (\Exception $e) {
