@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Achat;
 use App\Models\Achat\{BonLivraisonFournisseur, FactureFournisseur, LigneBonLivraisonFournisseur, LigneFactureFournisseur};
 use App\Models\Parametre\{PointDeVente, Vehicule, Chauffeur, Depot};
 use App\Http\Controllers\Controller;
+use App\Models\Catalogue\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -162,8 +163,26 @@ class BonLivraisonFournisseurController extends Controller
                 'created_by' => Auth::id()
             ]);
 
+            Log::debug("Les lignes entrante", ["data" => $validated['lignes']]);
+
+            Log::debug("Les lignes de la facture avant conversion", ["data" => $bonLivraison->facture->lignes]);
+
             // Création des lignes du bon de livraison
             foreach ($validated['lignes'] as $ligne) {
+                /**
+                 * Verification de la quantité supplementaire
+                 * et l'unité de mesure du supplement
+                 */
+                if ($ligne['quantite_supplementaire'] && !$ligne['unite_id']) {
+                    $article = Article::find($ligne["article_id"]);
+                    throw new Exception("Ligne concernée $article->code_article : Pour une valeur non nulle de la quantité supplementaire, l'unité de mesure du supplement est réquise!");
+                }
+
+                if (!$ligne['quantite_supplementaire'] && $ligne['unite_id']) {
+                    $article = Article::find($ligne["article_id"]);
+                    throw new Exception("Ligne concernée $article->code_article : Pour une valeur non nulle de l'unité de mesure du supplement, la quantité supplementaire est réquise!");
+                }
+
                 if (($ligne['quantite'] + ($ligne['quantite_supplementaire'] ?? 0)) > 0) {
                     LigneBonLivraisonFournisseur::create([
                         'livraison_id' => $bonLivraison->id,  // C'était 'bon_livraison_id', la bonne colonne est 'livraison_id'
@@ -171,7 +190,7 @@ class BonLivraisonFournisseurController extends Controller
                         'unite_mesure_id' => $ligne['unite_mesure_id'],
                         'quantite' => $ligne['quantite'],
                         'quantite_supplementaire' => $ligne['quantite_supplementaire'] ?? 0,
-                        'unite_supplementaire_id' => $ligne['unite_id']??null,
+                        'unite_supplementaire_id' => $ligne['unite_id'] ?? null,
                         'created_by' => Auth::id()
                     ]);
                 }
@@ -180,10 +199,37 @@ class BonLivraisonFournisseurController extends Controller
                 if (!$ligneFacture) {
                     throw new Exception(sprintf("Le détail d'ID %s de la facture concernée n'existe pas", $ligne['ligne_id']));
                 }
-                $ligneFacture->update(["quantite_livree_simple" => $ligneFacture->quantite_livree_simple + $ligne['quantite']]);
+
+                /**
+                 * Quantité supplementaire convertie en 
+                 * unité de base de la ligne
+                 */
+
+                $QteBaseSupplementaire = 0;
+                if (isset($ligne['unite_id'])) {
+                    $QteBaseSupplementaire = $ligneFacture
+                        ->getQuantiteTotaleSupplement(
+                            $ligne['unite_id'], //unité de supplement entrant
+                            $ligne['unite_mesure_id'], //unité de destination(unite de base)
+                            $ligne['quantite_supplementaire']
+                        );
+                }
+
+                /**
+                 * Actualisation de la quantite_livree_simple
+                 */
+                $QteLivreSimple = $ligneFacture->quantite_livree_simple + $ligne['quantite'] + $QteBaseSupplementaire;
+                Log::info("Qte totale livre simple", ["data" => $QteLivreSimple]);
+
+                /**
+                 * 
+                 */
+                $ligneFacture->update(["quantite_livree_simple" => $QteLivreSimple]);
             }
 
             $facture->save();
+
+            Log::debug("Les lignes de la facture après conversion", ["data" => $bonLivraison->facture->lignes]);
 
             DB::commit();
 
@@ -377,17 +423,22 @@ class BonLivraisonFournisseurController extends Controller
                 $prixUnitaires[$ligneFact->article_id] = $ligneFact->prix_unitaire;
 
                 // Vérifier si une ligne correspondante existe dans $bonLivraison->lignes
-                $ligneBonLivraison = $bonLivraison->lignes->where('article_id', $ligneFact->article_id)->first();
+                // $ligneBonLivraison = $bonLivraison->lignes->where('article_id', $ligneFact->article_id)->first();
 
                 // Mettre à jour les données de la ligne de facture avec la quantité livrée
-                $QteTotal = 0;
-                if ($ligneBonLivraison) {
-                    $QteTotal += $ligneBonLivraison->getQuantiteTotale();
-                }
+                // $QteTotal = 0;
+                // if ($ligneBonLivraison) {
+                //     $QteTotal += $ligneBonLivraison->getQuantiteTotale();
+                // }
 
+                Log::info("Ligne facture avant update", ["data" => $ligneFact]);
+                /**Qte total livré dans l'unité de base de la ligne de facture */
+                
                 $ligneFact->update([
-                    'quantite_livree' => $ligneFact->quantite_livree + $QteTotal,
+                    'quantite_livree' => $ligneFact->quantite_livree + $ligneFact->quantite_livree_simple,
                 ]);
+
+                Log::info("Ligne facture après update", ["data" => $ligneFact]);
 
                 // Log des prix unitaires
                 Log::debug("Prix unitaire pour article {$ligneFact->article_id}: {$ligneFact->prix_unitaire}");
@@ -415,14 +466,16 @@ class BonLivraisonFournisseurController extends Controller
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
                     'unite_base_id' => $ligne->article->unite_mesure_id,
-                    'quantite' => $ligne->getQuantiteTotale()
+                    // 'quantite' => $ligne->getQuantiteTotale(),
+                    'quantite' => $ligneFact->quantite_livree,
                 ]);
 
                 $entrees[] = [
                     'depot_id' => $bonLivraison->depot_id,
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
-                    'quantite' => $ligne->getQuantiteTotale(),
+                    // 'quantite' => $ligne->getQuantiteTotale(),
+                    'quantite' => $ligneFact->quantite_livree,
                     'prix_unitaire' => $prixUnitaires[$ligne->article_id],
                     'date_mouvement' => $bonLivraison->date_livraison,
                     'reference_mouvement' => $bonLivraison->code,
@@ -433,6 +486,7 @@ class BonLivraisonFournisseurController extends Controller
                     'livraison' => $bonLivraison->id,
                 ];
             }
+
             // Log des entrées préparées
             Log::debug('Entrées préparées:', ['entrees' => $entrees]);
 

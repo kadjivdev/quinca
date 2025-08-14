@@ -306,6 +306,7 @@
                 `;
             }).join('');
         },
+
         // Réinitialisation du formulaire
         resetForm: function() {
             $('#addLivraisonFournisseurForm')[0].reset();

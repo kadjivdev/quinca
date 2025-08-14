@@ -9,6 +9,8 @@ if (typeof Toast === "undefined") {
 }
 
 $(document).ready(function () {
+    
+
     // Vérification de l'existence des éléments
     if (!$("#programmationSelect").length) {
         console.error("Select programmation non trouvé");
@@ -161,21 +163,18 @@ function afficherDetailsProgrammation(programmation) {
                     <td>${article.designation || ""}</td>
                     <td>${article.unite || ""}</td>
                     <td class="text-end">
-                        <input type="hidden" name="articles[${index}][article_id]" value="${
-                article.id
-            }">
+                        <input type="hidden" name="articles[${index}][article_id]" value="${article.id
+                }">
                         <input type="number" class="form-control form-control-sm text-end"
-                               name="articles[${index}][quantite]" value="${
-                article.quantite || 0
-            }"
+                               name="articles[${index}][quantite]" value="${article.quantite || 0
+                }"
                                readonly>
                     </td>
                     <td>
                         <input type="number" class="form-control form-control-sm text-end prix-unitaire"
                                name="articles[${index}][prix_unitaire]" step="0.01" min="0"
-                               value="${
-                                   article.prix_unitaire || ""
-                               }" data-index="${index}"
+                               value="${article.prix_unitaire || ""
+                }" data-index="${index}"
                                required>
                         <div class="invalid-feedback">Le prix unitaire est requis</div>
                     </td>
