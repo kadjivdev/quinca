@@ -11,11 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        //suppression de la contrainte
         Schema::table('ligne_bon_livraison_fournisseurs', function (Blueprint $table) {
-            $table->foreignId('unite_supplementaire_id')
-                ->nullable()
-                ->after('quantite_supplementaire')
-                ->constrained('ligne_bon_livraison_fournisseurs');
+            $table->dropForeign(['unite_supplementaire_id']);
+        });
+
+        //recreation 
+        Schema::table('ligne_bon_livraison_fournisseurs', function (Blueprint $table) {
+            $table->foreign('unite_supplementaire_id')
+                ->references('id')
+                ->on('unite_mesures') // nom correct ici
+                ->nullOnDelete(); // ou cascadeOnDelete() selon ton besoin
         });
     }
 
@@ -25,8 +31,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ligne_bon_livraison_fournisseurs', function (Blueprint $table) {
-            $table->dropForeign("unite_supplementaire_id");
-            $table->dropColumn("unite_supplementaire_id");
+            //
         });
     }
 };

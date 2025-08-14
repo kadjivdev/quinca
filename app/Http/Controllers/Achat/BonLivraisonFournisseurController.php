@@ -171,7 +171,7 @@ class BonLivraisonFournisseurController extends Controller
                         'unite_mesure_id' => $ligne['unite_mesure_id'],
                         'quantite' => $ligne['quantite'],
                         'quantite_supplementaire' => $ligne['quantite_supplementaire'] ?? 0,
-                        'unite_supplementaire_id' => $ligne['unite_id'],
+                        'unite_supplementaire_id' => $ligne['unite_id']??null,
                         'created_by' => Auth::id()
                     ]);
                 }
@@ -193,7 +193,7 @@ class BonLivraisonFournisseurController extends Controller
                 'data' => $bonLivraison->load(['pointDeVente', 'fournisseur', 'depot', 'vehicule', 'chauffeur', 'lignes'])
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Erreur de validation:', ['errors' => $e->errors()]);
+            Log::error('Erreur de validation:', ['errors' => $e->errors()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
@@ -201,7 +201,7 @@ class BonLivraisonFournisseurController extends Controller
             ], 422);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur création bon livraison:', [
+            Log::error('Erreur création bon livraison:', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
@@ -432,8 +432,12 @@ class BonLivraisonFournisseurController extends Controller
                     'user_id' => Auth::id(),
                     'livraison' => $bonLivraison->id,
                 ];
-            }
 
+                // Qte supplementaire & unité supplementaire
+                
+            }
+// (`livraison_id`, `article_id`, `unite_mesure_id`, `quantite`, `quantite_supplementaire`, `unite_supplementaire_id`, `created_by`, `updated_at`, `created_at`) values 
+// (154,                 355,             13,           1125,              10,                           13,                1,     2025-08-14 09:09:13, 2025-08-14 09:09:13))
             // Log des entrées préparées
             Log::debug('Entrées préparées:', ['entrees' => $entrees]);
 

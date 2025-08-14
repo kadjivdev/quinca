@@ -103,25 +103,19 @@ class LigneBonLivraisonFournisseur extends Model
      */
     public function getQuantiteTotale()
     {
-
         if ($this->unite_supplementaire_id) {
-            if ($this->unite_supplementaire_id != $this->article->unite_mesure_id) {
-                $conversion = $this->rechercherConversion(
-                    $this->unite_supplementaire_id,
-                    $this->article->unite_mesure_id,
-                    $this->article->id
-                );
+            $conversion = $this->rechercherConversion(
+                $this->unite_supplementaire_id,
+                $this->unite_mesure_id,
+                $this->article->id
+            );
 
-                $quantite_base = $this->convertirQuantite(
-                    $this->quantite_supplementaire,
-                    $conversion,
-                    $this->unite_supplementaire_id
-                );
-            } else {
-                // Si les unités sont les mêmes, pas besoin de conversion
-                $quantite_base = $this->quantite_supplementaire;
-            }
-        }else{
+            $quantite_base = $this->convertirQuantite(
+                $this->quantite_supplementaire,
+                $conversion,
+                $this->unite_supplementaire_id
+            );
+        } else {
             $quantite_base = $this->quantite_supplementaire;
         }
 

@@ -189,7 +189,7 @@ class Fournisseur extends Model
         $fournisseurAccomptesAmount = $this->accomptes
             ->sum("montant");
 
-        return ($reglements_amount +  $avancesAmount) - ($facturesAmount + $fournisseurAccomptesAmount);
+        return ($facturesAmount + $fournisseurAccomptesAmount) - ($reglements_amount +  $avancesAmount);
     }
 
     /**
