@@ -22,11 +22,8 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\LigneFactureFournisseur;
-use App\Models\Catalogue\Tarification;
-// use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\Requete;
 
