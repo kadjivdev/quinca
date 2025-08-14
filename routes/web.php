@@ -52,10 +52,11 @@ Route::get("/debug", function () {
     // ]);
     // return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 
-    // $facture = FactureFournisseur::with(["lignes.article", "lignes.uniteMesure"])->firstWhere(["code" => "FAC25088515"]);
-    $ligneToChange = LigneFactureFournisseur::find(294);
-    $ligneToChange->update(["unite_mesure_id" => 6]);
-    return response()->json($ligneToChange);
+    $facture = FactureFournisseur::with(["lignes.article", "lignes.uniteMesure"])->firstWhere(["code" => "FAC25088515"]);
+    $lignes = LigneFactureFournisseur::whereIn("id", $facture->lignes->pluck("id")
+        ->toArray());
+    $lignes->update(["quantite_livree_simple" => 0]);
+    return response()->json($lignes->get());
 
     return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
