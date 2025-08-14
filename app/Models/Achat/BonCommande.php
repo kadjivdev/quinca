@@ -92,7 +92,7 @@ class BonCommande extends Model
         'created_by',
         'updated_by',
         // 'validated_by',
-        'deleted_at'
+        // 'deleted_at'
     ];
 
     /**

@@ -22,7 +22,10 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\BonCommande;
+use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
+use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\Requete;
@@ -49,11 +52,36 @@ Route::get("/debug", function () {
     // ]);
     // return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 
-    $facture = FactureFournisseur::with(["lignes.article", "lignes.uniteMesure"])->firstWhere(["code" => "FAC25088515"]);
-    $lignes = LigneFactureFournisseur::whereIn("id", $facture->lignes->pluck("id")
-        ->toArray());
-    $lignes->update(["quantite_livree_simple" => 0]);
-    return response()->json($lignes->get());
+    // $facture = FactureFournisseur::with(["lignes.article", "lignes.uniteMesure"])->firstWhere(["code" => "FAC25088515"]);
+    // $lignes = LigneFactureFournisseur::whereIn("id", $facture->lignes->pluck("id")
+    //     ->toArray());
+
+    // $lignes->update(["quantite_livree_simple" => 0]);
+    // return response()->json($lignes->get());
+
+    $bcF_BC2507255118 = BonCommande::firstWhere(["code" => "BC2507255118"]);
+    // return $bcF_BC2507255118->lignes;
+
+    $bFacturesLignes = LigneFactureFournisseur::whereIn("id", $bcF_BC2507255118->factures->flatMap->lignes
+        ->pluck("id")->toArray());
+
+    foreach ($bcF_BC2507255118->lignes as $bonLigne) {
+        $bFacturesLignes->where("article_id", $bonLigne->article_id)
+            ->update([
+                "prix_unitaire" => $bonLigne->prix_unitaire,
+                "montant_ht" => $bonLigne->montant_ligne,
+                "montant_ttc" => $bonLigne->montant_ligne,
+            ]);
+    }
+
+    $bcF_BC2507255118
+        ->factures()
+        ->update(["montant_ttc" => $bcF_BC2507255118->montant_total]);
+
+    return response()->json([
+        "bonLignes" => $bcF_BC2507255118->lignes,
+        "FacturesLignes" => $bFacturesLignes,
+    ]);
 
     return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
