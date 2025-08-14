@@ -459,7 +459,7 @@ class BonLivraisonFournisseurController extends Controller
                 'statut_livraison' => $totalQuantiteLivree >= $totalQuantiteFacture ? 'LIVRE' : 'PARTIELLEMENT_LIVRE'
             ]);
 
-            DB::commit();
+            // DB::commit();
             return response()->json([
                 'success' => true,
                 'message' => 'Bon de livraison validé et stocks mis à jour avec succès',
