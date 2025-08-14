@@ -432,12 +432,7 @@ class BonLivraisonFournisseurController extends Controller
                     'user_id' => Auth::id(),
                     'livraison' => $bonLivraison->id,
                 ];
-
-                // Qte supplementaire & unité supplementaire
-                
             }
-// (`livraison_id`, `article_id`, `unite_mesure_id`, `quantite`, `quantite_supplementaire`, `unite_supplementaire_id`, `created_by`, `updated_at`, `created_at`) values 
-// (154,                 355,             13,           1125,              10,                           13,                1,     2025-08-14 09:09:13, 2025-08-14 09:09:13))
             // Log des entrées préparées
             Log::debug('Entrées préparées:', ['entrees' => $entrees]);
 
