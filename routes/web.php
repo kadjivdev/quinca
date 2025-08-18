@@ -43,7 +43,6 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // Revu du stock
     // $stock = StockDepot::firstWhere(["article_id" => 1418, "depot_id" => 4, "unite_mesure_id" => 5]);
     // $stock->update(["quantite_reelle" => 0.1]);
 
@@ -92,7 +91,6 @@ Route::get("/debug", function () {
     /**revu du stock */
     $stock = StockDepot::firstWhere(["article_id" => 394, "depot_id" => 4]);
     $stock->update(["quantite_reelle" => 294]);
-    // return response()->json($stock);
 
     /** update de la livraison */
     $BLF2508140003->update([
