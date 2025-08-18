@@ -105,7 +105,7 @@ class Client extends Model
             ->whereNotNull("validated_by")
             ->sum("montant");
 
-        if ($facturesAmount == 0 && $reglementsAmount == 0) {
+        if ($facturesAmount == 0 && $reglementsAmount == 0 && $clientTransportAmount == 0) {
             return $clientAccomptesAmount;
         }
 

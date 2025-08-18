@@ -95,8 +95,13 @@ class ClientController extends Controller
                     ->whereNotNull("validated_by")
                     ->sum("montant");
 
+                /**Transports amount */
+                $transportAmount = $client->transports
+                    ->whereNotNull("validate_at")
+                    ->sum("montant");
+
                 /** SOLDE = SOLDE CLIENT + SOLDE REVENDEUR*/
-                $client->soldeClient = $client->solde();
+                // $client->soldeClient = $client->solde();
                 $client->soldeRevendeur = $client->soldeRevendeur();
                 $client->solde = $client->solde() + $client->soldeRevendeur();
 

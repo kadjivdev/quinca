@@ -97,7 +97,7 @@
                         @forelse($clients as $client)
                         <tr>
                             <td class="text-nowrap py-3">
-                                <span class="code-client">{{ $client->code_client }}</span>
+                                <span class="code-client">{{$client->transports->sum("montant")}}</span>
                             </td>
                             <td>{{ Carbon\Carbon::parse($client->created_at)->format('d/m/Y H:i:s') }}</td>
                             <td>
