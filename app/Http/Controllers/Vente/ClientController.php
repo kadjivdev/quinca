@@ -595,13 +595,13 @@ class ClientController extends Controller
         try {
             DB::beginTransaction();
 
-            // $ops = $client->compteClient->isNotEmpty() || $client->facturesClient->isNotEmpty() || $client->facturesRevendeur->isNotEmpty() || $client->transports->isNotEmpty();
-            // if ($ops) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Ce fournisseur dispose des opérations associées! Impossible de supprimer ce fournisseur'
-            //     ], 422);
-            // }
+            $ops = $client->compteClient->isNotEmpty() || $client->facturesClient->isNotEmpty() || $client->facturesRevendeur->isNotEmpty() || $client->transports->isNotEmpty();
+            if ($ops) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ce fournisseur dispose des opérations associées! Impossible de supprimer ce fournisseur'
+                ], 422);
+            }
 
             // Supprimer le client
             $client->delete();
