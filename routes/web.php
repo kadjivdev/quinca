@@ -27,6 +27,7 @@ use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\LigneFactureFournisseur;
+use App\Models\Catalogue\Article;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\Requete;
 
@@ -81,6 +82,13 @@ Route::get("/debug", function () {
     //     "bonLignes" => $bcF_BC2507255118->lignes,
     //     "FacturesLignes" => $bFacturesLignes,
     // ]);
+
+    $article_ART_1417 = Article::firstWhere("code_article","ART-1417");
+    dd($article_ART_1417);
+
+    $ventes = $article_ART_1417->qteVendu(4);
+
+    dd($ventes);
 
     return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });

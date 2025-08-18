@@ -66,26 +66,32 @@ class ArticleController extends Controller
                     );
 
                 /** Conersion de toute quantité en unité de base */
-                $stock->qteTotalVendu = $conversion ? $this->serviceStockEntree
-                    ->convertirQuantite(
-                        $article->qteVendu($stock->depot_id), //$article->reste($stock->depot_id),
-                        $conversion,
-                        $stock->unite_mesure_id
-                    ) : 00;
+                // $stock->qteTotalVendu = $conversion ? $this->serviceStockEntree
+                //     ->convertirQuantite(
+                //         $article->qteVendu($stock->depot_id), //$article->reste($stock->depot_id),
+                //         $conversion,
+                //         $stock->unite_mesure_id
+                //     ) : 00;
 
-                $stock->resteStock = $conversion ? $this->serviceStockEntree
-                    ->convertirQuantite(
-                        $stock->quantite_reelle - $stock->qteTotalVendu, //$article->reste($stock->depot_id),
-                        $conversion,
-                        $stock->unite_mesure_id
-                    ) : 00;
-
+                /**Qte de Base */
                 $stock->qantiteBase = $conversion ? $this->serviceStockEntree
                     ->convertirQuantite(
                         $stock->quantite_reelle,
                         $conversion,
                         $stock->unite_mesure_id
                     ) : 00;
+
+                /**Qte Vendue */
+                $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
+
+                // $stock->resteStock = $conversion ? $this->serviceStockEntree
+                //     ->convertirQuantite(
+                //         $stock->quantite_reelle - $stock->qteTotalVendu, //$article->reste($stock->depot_id),
+                //         $conversion,
+                //         $stock->unite_mesure_id
+                //     ) : 00;
+
+                $stock->resteStock = $stock->qantiteBase - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
             });
         });
 

@@ -62,7 +62,6 @@
 <script type="text/javascript">
     let table;
     $(document).ready(function() {
-        alert("gogogog")
         // Initialize DataTable but don't calculate widths yet
         table = $('#exampleModalShow').DataTable({
             responsive: true,

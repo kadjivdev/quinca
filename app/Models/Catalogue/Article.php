@@ -18,6 +18,7 @@ use App\Models\Vente\DevisDetail;
 use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ServiceStockEntree;
 
 /**
  * Class Article
@@ -212,8 +213,12 @@ class Article extends Model
         //Vente à la directeur
         $factureVentes = $this->facturesVente($depotId);
 
-        //Vente revendeur (ventes speciales et autres)
         $factureRevendeurs = $this->facturesVenteRevendeur($depotId);
+        // if ($this->id == 1418 && $depotId == 4) {
+        //     // dd(Depot::find($depotId));
+        //     dd($factureVentes);
+        // }
+        //Vente revendeur (ventes speciales et autres)
 
         $qteVenteConvertie = 0;
         if ($factureVentes->isEmpty() && $factureRevendeurs->isEmpty()) {
@@ -224,12 +229,12 @@ class Article extends Model
         if ($factureVentes->isNotEmpty()) {
             $qteVenteConvertie += $factureVentes->sum("quantite_base");
             // foreach ($factureVentes as $vente) {
-            //     $conversion = $serviceStockEntree
-            //         ->rechercherConversion(
-            //             $vente->unite_vente_id,
-            //             $stock->unite_mesure_id,
-            //             $stock->article_id
-            //         );
+            // $conversion = $serviceStockEntree
+            //     ->rechercherConversion(
+            //         $vente->unite_vente_id,
+            //         $stock->unite_mesure_id,
+            //         $stock->article_id
+            //     );
 
             //     $qteVenteConvertie += $serviceStockEntree
             //         ->convertirQuantite($factureVentes->sum("quantite"), $conversion, $stock->unite_mesure_id);
@@ -292,6 +297,7 @@ class Article extends Model
         // on recupere le stock de cet article dans ce dépot
         $stock = $this->stocks->firstWhere("depot_id", $depotId);
         // $stock = $this->stocks->Where("depot_id", $depotId)->sum("quantite_reelle");
+
         return $stock->quantite_reelle ?? 00 - $this->qteVendu($depotId);
     }
 
