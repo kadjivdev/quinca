@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class LigneBonLivraisonFournisseur
@@ -96,31 +97,79 @@ class LigneBonLivraisonFournisseur extends Model
         'deleted_at' => 'datetime'
     ];
 
+   
+    private function rechercherConversion(int $unite_source_id, int $unite_base_id, int $article_id): ?ConversionUnite
+    {
+        Log::info("Unité de mesure de base(destination) rechercherConversion", ["data" => $unite_base_id]);
+        Log::info("Unité de mesure entrante rechercherConversion", ["data" => $unite_source_id]);
+        Log::info("Article", ["data" => Article::find($article_id)->code_article]);
+
+        $firstConversion = ConversionUnite::firstWhere([
+            'unite_source_id' => $unite_source_id,
+            'unite_dest_id' => $unite_base_id,
+            'article_id' => $article_id,
+        ]);
+
+        $secondConversion = ConversionUnite::firstWhere([
+            'unite_source_id' => $unite_base_id,
+            'unite_dest_id' => $unite_source_id,
+            'article_id' => $article_id,
+        ]);
+
+        return $firstConversion ? $firstConversion : $secondConversion;
+    }
+
     /**
-     * Obtenir la quantité totale (normale + supplémentaire)
+     * Convertit une quantité selon le sens de la conversion
+     * @param $current_unite_id l'unité actuelle (ou entrante)
+     */
+    public function convertirQuantite(float $quantite, ConversionUnite $conversion, int $current_unite_id): float
+    {
+        // return $conversion->convertToBase($quantite);
+
+        return $conversion->unite_dest_id === $current_unite_id //$conversion->unite_source_id === $current_unite_id
+            ? $conversion->convertirInverse($quantite)
+            : $conversion->convertir($quantite);
+    }
+
+    /**
+     * Obtenir la quantité totale (normale livré + supplémentaire livré)
      *
      * @return float
      */
-    public function getQuantiteTotale()
+    public function getQuantiteTotaleSupplement($unite_entrante, $unite_dest, $quantite)
     {
-        if ($this->unite_supplementaire_id) {
-            $conversion = $this->rechercherConversion(
-                $this->unite_supplementaire_id,
-                $this->unite_mesure_id,
-                $this->article->id
-            );
+        $conversion = $this->rechercherConversion(
+            $unite_entrante, //entrante
+            $unite_dest, //destination
+            $this->article_id
+        );
 
-            $quantite_base = $this->convertirQuantite(
-                $this->quantite_supplementaire,
-                $conversion,
-                $this->unite_supplementaire_id
-            );
-        } else {
-            $quantite_base = $this->quantite_supplementaire;
+        Log::info("Unité de mesure de base(destination) getQuantiteTotaleSupplement", ["data" => $unite_dest]);
+        Log::info("Unité de mesure entrante getQuantiteTotaleSupplement", ["data" => $unite_entrante]);
+
+        if (!$conversion) {
+            $uniteEntrante = UniteMesure::find($unite_entrante);
+            $uniteDest = UniteMesure::find($this->unite_mesure_id);
+            $article = Article::find($this->article_id);
+
+            Log::info("Aucune conversion existante entre les unités $uniteEntrante->libelle_unite et $uniteDest->libelle_unite ");
+            throw new \Exception("Ligne concernée $article->code_article : Aucune conversion existante entre les unités $uniteEntrante->libelle_unite et $uniteDest->libelle_unite pour l'article");
         }
 
-        return $this->quantite + ($quantite_base ?? 0);
+        Log::info("Conversion retrouvée", ["data" => $conversion]);
+
+        $quantite_base = $this->convertirQuantite(
+            $quantite,
+            $conversion,
+            $unite_entrante
+        );
+
+        Log::info("Qte supplementaire convertie en unite de base", ["data" => $quantite_base]);
+
+        return $quantite_base ?? 0;
     }
+
 
     /**
      * Relation avec le bon de livraison
@@ -165,32 +214,6 @@ class LigneBonLivraisonFournisseur extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
-    }
-
-    private function rechercherConversion(int $unite_source_id, int $unite_base_id, int $article_id): ?ConversionUnite
-    {
-        return ConversionUnite::where(function ($query) use ($unite_source_id, $unite_base_id) {
-            $query->where([
-                'unite_source_id' => $unite_source_id,
-                'unite_dest_id' => $unite_base_id
-            ])->orWhere([
-                'unite_source_id' => $unite_base_id,
-                'unite_dest_id' => $unite_source_id
-            ]);
-        })
-            ->where(function ($query) use ($article_id) {
-                $query->where('article_id', $article_id)
-                    ->orWhereNull('article_id');
-            })
-            ->where('statut', true)
-            ->first();
-    }
-
-    private function convertirQuantite(float $quantite, ConversionUnite $conversion, int $unite_source_id): float
-    {
-        return $conversion->unite_source_id === $unite_source_id
-            ? $conversion->convertir($quantite)
-            : $conversion->convertirInverse($quantite);
     }
 
     /**

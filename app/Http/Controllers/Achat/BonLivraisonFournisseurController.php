@@ -433,7 +433,7 @@ class BonLivraisonFournisseurController extends Controller
 
                 Log::info("Ligne facture avant update", ["data" => $ligneFact]);
                 /**Qte total livré dans l'unité de base de la ligne de facture */
-                
+
                 $ligneFact->update([
                     'quantite_livree' => $ligneFact->quantite_livree + $ligneFact->quantite_livree_simple,
                 ]);
@@ -447,6 +447,13 @@ class BonLivraisonFournisseurController extends Controller
             // Préparer les entrées en stock
             $entrees = [];
             foreach ($bonLivraison->lignes as $ligne) {
+
+                $ligneFact = $bonLivraison->facture
+                    ->lignes()
+                    ->firstWhere("article_id", $ligne->article_id);
+
+                // Log::debug("Ligne facture concernée", ["data" => $ligneFact]);
+
                 // Vérifier les données de l'article
                 if (!$ligne->article) {
                     throw new Exception("Article non trouvé pour la ligne ID: {$ligne->id}");
@@ -461,21 +468,36 @@ class BonLivraisonFournisseurController extends Controller
                     throw new Exception("Prix unitaire non trouvé pour l'article : " . $ligne->article->code_article);
                 }
 
+                // // Unité supplementaire
+                // $QteBaseSupplementaire = 0;
+                // if ($ligne->unite_supplementaire_id) {
+                //     $QteBaseSupplementaire = $ligne
+                //         ->getQuantiteTotaleSupplement(
+                //             $ligne->unite_supplementaire_id, //unité de supplement entrant
+                //             $ligne->unite_mesure_id, //unité de destination(unite de base)
+                //             $ligne->quantite_supplementaire
+                //         );
+                // }
+
+                /**
+                 * Quantité total à livrer(quantité + QteBaseSupplementaire)
+                 */
+
+                // $qteTotal = $ligne->quantite + $QteBaseSupplementaire;
+
                 // Log des données de conversion
                 Log::debug("Données de ligne:", [
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
                     'unite_base_id' => $ligne->article->unite_mesure_id,
-                    // 'quantite' => $ligne->getQuantiteTotale(),
-                    'quantite' => $ligneFact->quantite_livree,
+                    'quantite' => $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                 ]);
 
                 $entrees[] = [
                     'depot_id' => $bonLivraison->depot_id,
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
-                    // 'quantite' => $ligne->getQuantiteTotale(),
-                    'quantite' => $ligneFact->quantite_livree,
+                    'quantite' => $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                     'prix_unitaire' => $prixUnitaires[$ligne->article_id],
                     'date_mouvement' => $bonLivraison->date_livraison,
                     'reference_mouvement' => $bonLivraison->code,
@@ -513,7 +535,7 @@ class BonLivraisonFournisseurController extends Controller
                 'statut_livraison' => $totalQuantiteLivree >= $totalQuantiteFacture ? 'LIVRE' : 'PARTIELLEMENT_LIVRE'
             ]);
 
-            // DB::commit();
+            DB::commit();
             return response()->json([
                 'success' => true,
                 'message' => 'Bon de livraison validé et stocks mis à jour avec succès',
@@ -526,7 +548,7 @@ class BonLivraisonFournisseurController extends Controller
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur validation bon livraison:', [
+            Log::error('Erreur validation bon livraison:', [
                 'bon_livraison_id' => $bonLivraison->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

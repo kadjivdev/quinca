@@ -57,9 +57,9 @@
             message += '<strong>Détails des mouvements :</strong><br>';
             response.details.mouvements.forEach(mvt => {
                 message += `- ${mvt.quantite_origine} ${mvt.unite_origine} `;
-                if (mvt.quantite_origine !== mvt.quantite_base) {
-                    message += `(converti en ${mvt.quantite_base} ${mvt.unite_base}) `;
-                }
+                // if (mvt.quantite_origine !== mvt.quantite_base) {
+                //     message += `(converti en ${mvt.quantite_base} ${mvt.unite_base}) `;
+                // }
                 message += `<br>`;
             });
         }
