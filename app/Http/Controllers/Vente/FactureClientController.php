@@ -615,31 +615,31 @@ class FactureClientController extends Controller
                  * @param $resteStock Reste du stock dans le depot
                  */
 
-                // $resteStock = $stock->article
-                //     ->reste($stock->depot_id);
+                $resteStock = $stock->article
+                    ->reste($stock->depot_id);
 
-                $conversion = $this->serviceStockEntree
-                    ->rechercherConversion(
-                        $stock->unite_mesure_id,
-                        $stock->article->unite_mesure_id,
-                        $stock->article_id
-                    );
-
-
-                /**Qte de Base */
-                $qantiteBase = $conversion ? $this->serviceStockEntree
-                    ->convertirQuantite(
-                        $stock->quantite_reelle,
-                        $conversion,
-                        $stock->unite_mesure_id
-                    ) : 00;
-
-                /**Qte Vendue */
-                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+                // $conversion = $this->serviceStockEntree
+                //     ->rechercherConversion(
+                //         $stock->unite_mesure_id,
+                //         $stock->article->unite_mesure_id,
+                //         $stock->article_id
+                //     );
 
 
-                /**Qte Reste */
-                $resteStock = $qantiteBase - $qteTotalVendu;
+                // /**Qte de Base */
+                // $qantiteBase = $conversion ? $this->serviceStockEntree
+                //     ->convertirQuantite(
+                //         $stock->quantite_reelle,
+                //         $conversion,
+                //         $stock->unite_mesure_id
+                //     ) : 00;
+
+                // /**Qte Vendue */
+                // $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+
+
+                // /**Qte Reste */
+                // $resteStock = $qantiteBase - $qteTotalVendu;
 
                 return [
                     'id' => $stock->article->id,
