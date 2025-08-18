@@ -583,10 +583,10 @@ class ClientController extends Controller
      */
     public function destroy(Request $request, Client $client)
     {
-        return response()->json([
-            'success' => false,
-            'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
-        ], 422);
+        // return response()->json([
+        //     'success' => false,
+        //     'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
+        // ], 422);
 
         if (!$request->ajax()) {
             return response()->json(['error' => 'Requête non autorisée'], 403);
@@ -595,19 +595,13 @@ class ClientController extends Controller
         try {
             DB::beginTransaction();
 
-            // Vérifier si le client peut être supprimé
-            if ($client->facturesClient()->count() > 0) {
-                throw new \Exception('Impossible de supprimer ce client car il a des factures associées');
-            }
-
-            if ($client->facturesClient()->count() > 0) {
-                throw new \Exception('Impossible de supprimer ce client car il a des règlements associés');
-            }
-
-            // Vérifier le solde
-            if ($client->solde_courant != 0) {
-                throw new \Exception('Impossible de supprimer ce client car son solde n\'est pas nul');
-            }
+            // $ops = $client->compteClient->isNotEmpty() || $client->facturesClient->isNotEmpty() || $client->facturesRevendeur->isNotEmpty() || $client->transports->isNotEmpty();
+            // if ($ops) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Ce fournisseur dispose des opérations associées! Impossible de supprimer ce fournisseur'
+            //     ], 422);
+            // }
 
             // Supprimer le client
             $client->delete();
