@@ -70,6 +70,12 @@ class Client extends Model
         return $this->hasMany(FactureRevendeur::class)->with(["client", 'reglements']);
     }
 
+    // Transports
+    public function transports(): HasMany
+    {
+        return $this->hasMany(Transport::class, "client_id");
+    }
+
     /** SOLDE DU CLIENT */
     public function solde()
     {
@@ -79,6 +85,11 @@ class Client extends Model
             ->sum("montant_ttc") - $this->facturesClient()
             ->whereNotNull('validated_by')
             ->sum("montant_remise");
+
+        /** Les transports */
+        $clientTransportAmount = $this->transports
+            ->whereNotNull("validate_at")
+            ->sum("montant");
 
         //sum des règlements de chaque factures
 
@@ -98,7 +109,7 @@ class Client extends Model
             return $clientAccomptesAmount;
         }
 
-        return ($reglementsAmount + $clientAccomptesAmount) - $facturesAmount;
+        return ($reglementsAmount + $clientAccomptesAmount) - ($facturesAmount + $clientTransportAmount);
     }
 
     /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */
