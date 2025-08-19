@@ -82,25 +82,12 @@ Route::get("/debug", function () {
     //     "FacturesLignes" => $bFacturesLignes,
     // ]);
 
-    $BLF2508140003 = BonLivraisonFournisseur::with(["facture.lignes", "lignes.article"])->firstWhere(["code" => "BLF2508140003"]);
+    // $BLF2508140002 = BonLivraisonFournisseur::with(["facture.lignes", "lignes.article"])->firstWhere(["code" => "BLF2508140002"]);
 
     /**Update du quantite_livree_simple de la ligne de la facture */
-    $BLF2508140003->facture->lignes()->first()->update(["quantite_livree" => 2.02150537634, "quantite_livree_simple" => 2.02150537634]);
-    // return response()->json($BLF2508140003);
+    // $BLF2508140002->facture->lignes()->first()->update(["quantite_livree" => 0, "quantite_livree_simple" => null]);
+    // return response()->json($BLF2508140002);
 
-    /**revu du stock */
-    $stock = StockDepot::firstWhere(["article_id" => 394, "depot_id" => 4]);
-    $stock->update(["quantite_reelle" => 188]);
-
-    // return response()->json($stock);
-
-    return response()->json([
-        "stock"=>$stock,
-        "bonLivraison"=>$BLF2508140003,
-    ]);
-
-    // return response()->json($BLF2508140003);
-    // dd($BLF2508140002);
     return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
 

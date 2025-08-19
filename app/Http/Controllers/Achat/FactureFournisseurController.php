@@ -175,6 +175,7 @@ class FactureFournisseurController extends Controller
 
                 'articles.*.prix_unitaire' => 'required|numeric|min:0',
             ]);
+            
             Log::info("Fin du chargement des lignes", ["data" => $request->articles]);
 
             // Création de la facture avec les montants par défaut

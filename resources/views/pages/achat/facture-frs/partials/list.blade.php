@@ -71,6 +71,14 @@
                     </thead>
                     <tbody>
                         @forelse($factures as $facture)
+                            @php
+                                $totalReglements = $facture
+                                    ->reglements()
+                                    ->whereNotNull('validated_at')
+                                    ->sum('montant_reglement');
+
+                                $statut = $totalReglements>=$facture->montant_ttc?'PAYE':'PARTIELLEMENT_PAYE';
+                            @endphp
                         <tr>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
@@ -116,8 +124,9 @@
                                     <span class="badge bg-{{ $facture->statut_livraison === 'LIVRE' ? 'success' : ($facture->statut_livraison === 'PARTIELLEMENT_LIVRE' ? 'warning' : 'danger') }}">
                                         {{ str_replace('_', ' ', $facture->statut_livraison) }}
                                     </span>
-                                    <span class="badge bg-{{ $facture->statut_paiement === 'PAYE' ? 'success' : ($facture->statut_paiement === 'PARTIELLEMENT_PAYE' ? 'warning' : 'danger') }}">
-                                        {{ str_replace('_', ' ', $facture->statut_paiement) }}
+
+                                    <span class="badge bg-{{ $statut === 'PAYE' ? 'success' : ($statut === 'PARTIELLEMENT_PAYE' ? 'warning' : 'danger') }}">
+                                        {{ str_replace('_', ' ', $statut) }}
                                     </span>
                                 </div>
                                 <small class="text-muted">
@@ -255,7 +264,7 @@
 
         var apiUrl = "{{ config('app.url_ajax') }}";
         // Fonction pour valider une facture
-        
+
         window.validateFacture = function(id) {
             Swal.fire({
                 title: 'Valider la facture',
@@ -521,6 +530,5 @@
             },
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     })
-
 </script>
 @endpush
