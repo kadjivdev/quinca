@@ -65,20 +65,25 @@
                             <th class="border-bottom-0">Fournisseur</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
                             <th class="border-bottom-0 text-end">Montant TTC</th>
+                            <th class="border-bottom-0 text-end">Reglements</th>
                             <th class="border-bottom-0 text-center">Statut</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($factures as $facture)
-                            @php
+                            <?php
                                 $totalReglements = $facture
-                                    ->reglements()
-                                    ->whereNotNull('validated_at')
-                                    ->sum('montant_reglement');
+                                    ->facture_reglements_amount();
 
-                                $statut = $totalReglements>=$facture->montant_ttc?'PAYE':'PARTIELLEMENT_PAYE';
-                            @endphp
+                                if ($totalReglements==0) {
+                                    $statut = 'NON PAYE';
+                                }elseif ($totalReglements>=$facture->montant_ttc) {
+                                    $statut = 'PAYE';
+                                }else {
+                                    $statut = 'PARTIELLEMENT_PAYE';
+                                }
+                            ;?>
                         <tr>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
@@ -118,6 +123,9 @@
                                 <small class="text-muted">
                                     AIB: {{ number_format($facture->montant_aib, 2) }} FCFA
                                 </small>
+                            </td>
+                            <td class="text-end">
+                                <div class="fw-bold">{{ number_format($totalReglements, 2) }} FCFA</div>
                             </td>
                             <td class="text-center">
                                 <div class="d-flex gap-2 justify-content-center">
@@ -204,7 +212,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucune facture trouvée</h6>

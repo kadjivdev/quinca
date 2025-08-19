@@ -37,25 +37,6 @@ class FactureFournisseurController extends Controller
 
         $fournisseurs = Fournisseur::get();
 
-        // Filtres
-        if ($request->filled('period')) {
-            switch ($request->period) {
-                case 'today':
-                    $query->whereDate('date_facture', Carbon::today());
-                    break;
-                case 'week':
-                    $query->whereBetween('date_facture', [
-                        Carbon::now()->startOfWeek(),
-                        Carbon::now()->endOfWeek()
-                    ]);
-                    break;
-                case 'month':
-                    $query->whereYear('date_facture', Carbon::now()->year)
-                        ->whereMonth('date_facture', Carbon::now()->month);
-                    break;
-            }
-        }
-
         // FILTRE PAR TYPE DE FACTURE
         if ($request->filled('type')) {
             switch ($request->type) {
@@ -175,7 +156,7 @@ class FactureFournisseurController extends Controller
 
                 'articles.*.prix_unitaire' => 'required|numeric|min:0',
             ]);
-            
+
             Log::info("Fin du chargement des lignes", ["data" => $request->articles]);
 
             // Création de la facture avec les montants par défaut
