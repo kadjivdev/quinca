@@ -65,7 +65,7 @@
                                 </td>
                                 <td class="text-center">
                                     ${ligne.reste_a_livrer}
-                                    <small class="text-muted">gogo ${uniteVenteLibelle}</small>
+                                    <small class="text-muted">${uniteVenteLibelle}</small>
                                 </td>
                                 <td>
                                     <input type="hidden" name="lignes[${ligne.id}][ligne_facture_id]" value="${ligne.id}">
