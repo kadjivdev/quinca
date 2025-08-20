@@ -446,6 +446,7 @@ class LivraisonClientController extends Controller
                     'quantite_livree_simple' => number_format($ligne->quantite_livree_simple, 2, ".", " "),
                     'depot' => $ligne->facturedepot->libelle_depot,
                     'reste_a_livrer' => number_format($ligne->quantite - $quantiteLivree, 2, ".", " "),
+                    'reste_max' => $ligne->quantite - $quantiteLivree,
                     'stock_disponible' => number_format($stockDisponible, 2, ".", " "),
                     'prix_unitaire' => $ligne->prix_unitaire_ht
                 ];

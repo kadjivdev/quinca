@@ -47,6 +47,7 @@
                                 .reste_a_livrer ? 'stock-danger' : '';
 
                             const uniteVenteLibelle = ligne.unite_vente.libelle
+                            const max = ligne.reste_max
 
                             html += `
                             <tr class='px-2'>
@@ -64,7 +65,7 @@
                                 </td>
                                 <td class="text-center">
                                     ${ligne.reste_a_livrer}
-                                    <small class="text-muted">${uniteVenteLibelle}</small>
+                                    <small class="text-muted">gogo ${uniteVenteLibelle}</small>
                                 </td>
                                 <td>
                                     <input type="hidden" name="lignes[${ligne.id}][ligne_facture_id]" value="${ligne.id}">
@@ -76,7 +77,7 @@
                                             class="form-control quantite-input"
                                             name="lignes[${ligne.id}][quantite]"
                                             min="0"
-                                            max="${ligne.reste_a_livrer}"
+                                            max="${max}"
                                             step="0.001"
                                             value="0">
                                     </div>
@@ -115,7 +116,7 @@
                     $(this).val(max);
                     Toast.fire({
                         icon: 'warning',
-                        title: 'La quantité saisie dépasse le reste à livrer'
+                        title: 'gogo La quantité saisie dépasse le reste à livrer'
                     });
                 }
 
