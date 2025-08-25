@@ -29,6 +29,7 @@ use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Stock\StockDepot;
+use App\Models\Stock\StockMouvement;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\Requete;
 
@@ -89,9 +90,20 @@ Route::get("/debug", function () {
     // $BLF2508140002->facture->lignes()->first()->update(["quantite_livree" => 0, "quantite_livree_simple" => null]);
     // return response()->json($BLF2508140002);
 
-    $vente = FactureClient::firstWhere("numero","FAC-20250822-0002");
+    $article_ART_T9NM77LN = Article::with(["stocks"])->firstWhere("code_article", "ART-T9NM77LN");
+    $article_ART_T9NM77LN->stocks->first()
+        ->update(["quantite_reelle" => 501.12]);
 
-    return response()->json($vente);
+    $articleMouvement = StockMouvement::firstWhere(["article_id" => 1935, "depot_id" => 4, "id" => 3814]);
+
+    $articleMouvement->update(["quantite" => 116.64]);
+    $articleMouvement->refresh();
+
+    return response()->json([
+        "stock" => $article_ART_T9NM77LN,
+        "articleMouvement" => $articleMouvement,
+    ]);
+
     return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
 

@@ -93,7 +93,7 @@ class ServiceStockEntree
                 $unite_origine_id
             );
 
-            \Log::debug("Conversion effectuée", [
+            Log::debug("Conversion effectuée", [
                 'quantite_origine' => $donnees['quantite'],
                 'unite_origine' => $uniteSource->id,
                 'quantite_base' => $quantite_base,
@@ -179,7 +179,7 @@ class ServiceStockEntree
             ];
         } catch (Exception $e) {
             DB::rollBack();
-            \Log::error("Erreur traitement entrée stock", [
+            Log::error("Erreur traitement entrée stock", [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'donnees' => $donnees

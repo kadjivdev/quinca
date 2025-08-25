@@ -74,6 +74,11 @@ class StockDepot extends Model
         return $this->belongsTo(UniteMesure::class, "unite_mesure_id");
     }
 
+    // mouvements
+    public function mouvements() : HasMany {
+        return $this->hasMany(StockMouvement::class,"");
+    }
+
     // Accesseurs
     public function getQuantiteDisponibleAttribute(): float
     {
