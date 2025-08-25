@@ -273,7 +273,7 @@ class ProgrammationAchatController extends Controller
 
             // Obtenir les 3 premières lettres du nom d'utilisateur
             $user = auth()->user();
-            $userInitials = substr(strtoupper($user->name), 0, 3);
+            $userInitials = substr(strtoupper($user->name), 0, 2);
 
             // Générer un UUID unique
             do {
@@ -288,6 +288,8 @@ class ProgrammationAchatController extends Controller
 
                 // Construire le code final
                 $newCode = "{$date}-{$userInitials}-{$uniqueId}";
+
+                Log::info("Nex code : " . $newCode);
 
                 // Vérifier si le code existe déjà
                 $exists = ProgrammationAchat::where('code', $newCode)->exists();
