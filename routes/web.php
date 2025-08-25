@@ -45,6 +45,7 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
+
     // $stock = StockDepot::firstWhere(["article_id" => 1418, "depot_id" => 4, "unite_mesure_id" => 5]);
     // $stock->update(["quantite_reelle" => 0.1]);
 
@@ -90,19 +91,33 @@ Route::get("/debug", function () {
     // $BLF2508140002->facture->lignes()->first()->update(["quantite_livree" => 0, "quantite_livree_simple" => null]);
     // return response()->json($BLF2508140002);
 
-    $article_ART_T9NM77LN = Article::with(["stocks"])->firstWhere("code_article", "ART-T9NM77LN");
-    $article_ART_T9NM77LN->stocks->first()
-        ->update(["quantite_reelle" => 501.12]);
+    // $article_ART_T9NM77LN = Article::with(["stocks"])->firstWhere("code_article", "ART-T9NM77LN");
+    // $article_ART_T9NM77LN->stocks->first()
+    //     ->update(["quantite_reelle" => 501.12]);
 
-    $articleMouvement = StockMouvement::firstWhere(["article_id" => 1935, "depot_id" => 4, "id" => 3814]);
+    // $articleMouvement = StockMouvement::firstWhere(["article_id" => 1935, "depot_id" => 4, "id" => 3814]);
 
-    $articleMouvement->update(["quantite" => 116.64]);
-    $articleMouvement->refresh();
+    // $articleMouvement->update(["quantite" => 116.64]);
+    // $articleMouvement->refresh();
 
-    return response()->json([
-        "stock" => $article_ART_T9NM77LN,
-        "articleMouvement" => $articleMouvement,
-    ]);
+    // return response()->json([
+    //     "stock" => $article_ART_T9NM77LN,
+    //     "articleMouvement" => $articleMouvement,
+    // ]);
+
+    $article_ART_459 = Article::with(["stocks"])->firstWhere("code_article", "ART-459");
+    $stockIds = $article_ART_459->stocks
+        ->where("unite_mesure_id", 25)
+        ->whereIn("depot_id", [3, 4])
+        ->pluck("id")
+        ->toArray();
+    // ->update(["unite_mesure_id" => 7])
+
+    StockDepot::whereIn("id", $stockIds)
+        ->update(["unite_mesure_id" => 7]);
+
+    return $article_ART_459->stocks
+        ->whereIn("depot_id", [3, 4]);
 
     return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
