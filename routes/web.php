@@ -105,19 +105,25 @@ Route::get("/debug", function () {
     //     "articleMouvement" => $articleMouvement,
     // ]);
 
-    $article_ART_459 = Article::with(["stocks"])->firstWhere("code_article", "ART-459");
-    $stockIds = $article_ART_459->stocks
-        ->where("unite_mesure_id", 25)
-        ->whereIn("depot_id", [3, 4])
-        ->pluck("id")
-        ->toArray();
-    // ->update(["unite_mesure_id" => 7])
+    // $article_ART_459 = Article::with(["stocks"])->firstWhere("code_article", "ART-459");
+    // $stockIds = $article_ART_459->stocks
+    //     ->where("unite_mesure_id", 25)
+    //     ->whereIn("depot_id", [3, 4])
+    //     ->pluck("id")
+    //     ->toArray();
+    // // ->update(["unite_mesure_id" => 7])
 
-    StockDepot::whereIn("id", $stockIds)
-        ->update(["unite_mesure_id" => 7]);
+    // StockDepot::whereIn("id", $stockIds)
+    //     ->update(["unite_mesure_id" => 7]);
 
-    return $article_ART_459->stocks
-        ->whereIn("depot_id", [3, 4]);
+    // return $article_ART_459->stocks
+    //     ->whereIn("depot_id", [3, 4]);
+
+    $stocksTodelete = StockDepot::where("quantite_reelle", "<", 0.00000000000000001);
+    if ($stocksTodelete->get()->isNotEmpty()) {
+        $stocksTodelete->delete();
+    }
+    return "Stock vide supprimés avec succès!";
 
     return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
