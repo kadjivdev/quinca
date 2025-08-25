@@ -12,7 +12,7 @@ use App\Services\ServiceStockEntree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Faker\Provider\Lorem;
+use Illuminate\Support\Facades\Log;
 
 class RapportVenteController extends Controller
 {
@@ -424,12 +424,17 @@ class RapportVenteController extends Controller
                         ])
                         ->with('date', $date);
                 }
-
                 // Mapping des données
                 $ventesFormatted = $ventes->map(function ($facture) {
                     try {
                         $type_vente = 'Crédit';
-                        if ($facture->montant_ttc <= $facture->montant_regle) {
+                        /**
+                         * On rajoute une marge de 5F 
+                         * au montant réglé
+                         * avant de le comparer au montant de la vente à solder
+                         */
+
+                        if ($facture->montant_regle + 5 >= $facture->montant_ttc) {
                             $type_vente = 'Comptant';
                         }
 
@@ -462,7 +467,7 @@ class RapportVenteController extends Controller
                             'lignes' => $lignes, // Ajout des lignes de détail
                         ];
                     } catch (\Exception $e) {
-                        \Log::error('Erreur lors du mapping de la facture #' . $facture->id . ': ' . $e->getMessage());
+                        Log::error('Erreur lors du mapping de la facture #' . $facture->id . ': ' . $e->getMessage());
                         return null;
                     }
                 })->filter();

@@ -410,7 +410,6 @@
                 // }
             });
 
-
             // Arrondir les totaux
             totalTTC = FactureUtils.roundNumber(totalTTC);
             totalHT += totalTTC / 1.19; //calcul du total HT à partir de totalTTC
@@ -421,7 +420,7 @@
             $(UpdateConfig.selectors.totalHT).text(this.formatMoney(totalHT) + ' FCFA');
             $(UpdateConfig.selectors.totalTVA).text(this.formatMoney(totalTVA) + ' FCFA');
             $(UpdateConfig.selectors.totalAIB).text(this.formatMoney(totalAIB) + ' FCFA');
-            $(UpdateConfig.selectors.totalTTC).text(this.formatMoney(totalTTC) + ' FCFA');
+            // $(UpdateConfig.selectors.totalTTC).text(this.formatMoney(totalTTC) + ' FCFA');
 
             // Mettre à jour le montant restant
             this.updateMontantRestant(totalTTC);
@@ -605,6 +604,7 @@
                     $('[name="observations"]').val(facture.observations || '');
                     $('#update_type_facture').val(facture.taux_tva > 0 ? 'normaliser' : 'simple').trigger('change');
                     $('#updateMontantRegle').val(facture.montant_regle).trigger('input');
+                    $('#updateTotalTTC').text(facture.montant_ttc);
 
                     // Vider et remplir les lignes
                     $('#updateLinesContainer').empty();

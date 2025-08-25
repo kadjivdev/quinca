@@ -153,6 +153,7 @@
                                         <i class="fas fa-money-bill-wave me-2"></i>Règlement
                                     </h6>
                                 </div>
+                                
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-md-6">

@@ -230,6 +230,7 @@ class FactureClientController extends Controller
             // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
             foreach ($request->lignes as $ligne) {
                 $depot = Depot::find($ligne["depot_id"]);
+                
                 // 
                 $stock = StockDepot::where('depot_id', $ligne["depot_id"])
                     ->where('article_id', $ligne['article_id'])
@@ -248,6 +249,7 @@ class FactureClientController extends Controller
                         $stock->unite_mesure_id,
                         $stock->article_id
                     );
+
                 if (!$conversion) {
                     return response()->json([
                         'status' => false,
@@ -793,6 +795,7 @@ class FactureClientController extends Controller
                     'tauxAIB' => $facture->taux_aib
                 ]
             ]);
+            
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement des détails de la facture', [
                 'facture_id' => $id,

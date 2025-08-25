@@ -90,7 +90,7 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-client me-2">
-                                        {{ substr($facture->client->raison_sociale, 0, 2) }}
+                                        {{ substr($facture->client?->raison_sociale, 0, 2) }}
                                     </div>
                                     <div>
                                         <div class="fw-medium">{{ $facture->client?->raison_sociale }}</div>
