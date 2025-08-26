@@ -434,10 +434,14 @@ class BonLivraisonFournisseurController extends Controller
                 Log::info("Ligne facture avant update", ["data" => $ligneFact]);
                 /**Qte total livré dans l'unité de base de la ligne de facture */
 
+                $stockToAdd = $ligneFact->quantite_livree ?
+                    $ligneFact->quantite_livree_simple - $ligneFact->quantite_livree : $ligneFact->quantite_livree_simple;
+
                 $ligneFact->update([
-                    'quantite_livree' => $ligneFact->quantite_livree + $ligneFact->quantite_livree_simple,
+                    'quantite_livree' => $stockToAdd,
                 ]);
 
+                Log::info("QTe restante", ["data" => $stockToAdd]);
                 Log::info("Ligne facture après update", ["data" => $ligneFact]);
 
                 // Log des prix unitaires
@@ -528,7 +532,7 @@ class BonLivraisonFournisseurController extends Controller
             ]);
 
             // Mise à jour du statut de la facture
-            $totalQuantiteFacture = $bonLivraison->facture->lignes->sum('quantite');
+            $totalQuantiteFacture = $bonLivraison->facture->lignes->sum('quantite_base');
             $totalQuantiteLivree = $bonLivraison->facture->lignes->sum('quantite_livree');
 
             $bonLivraison->facture->update([
@@ -536,6 +540,7 @@ class BonLivraisonFournisseurController extends Controller
             ]);
 
             DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Bon de livraison validé et stocks mis à jour avec succès',

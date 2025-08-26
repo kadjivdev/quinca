@@ -187,12 +187,20 @@ class ArticleController extends Controller
                 'unite_mesure_id.required' => "L'unité de mesure est réquise!"
             ]);
 
+
             // 
             foreach ($request->depots as $depotId) {
+                $stockExiste = StockDepot::firstWhere([
+                    'depot_id' => $depotId,
+                    'article_id' => $article->id,
+                    // 'unite_mesure_id' => $donnees["unite_mesure_id"],
+                ]);
+
                 $entrees[] = [
                     'depot_id' => $depotId,
                     'article_id' => $article->id,
                     'unite_mesure_id' => $request->unite_mesure_id,
+                    // 'unite_dest_id' => $unite_dest_id,
                     'quantite' => $request->quantite_reelle,
                     'prix_unitaire' => 0,
                     'date_mouvement' => now(),

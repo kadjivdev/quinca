@@ -7,6 +7,8 @@
                         <thead>
                             <tr class="bg-light">
                                 <th class="px-4 py-3 text-secondary small text-uppercase">Code BL</th>
+                                <th class="px-4 py-3 text-secondary small text-uppercase">Bon Commande</th>
+                                <th class="px-4 py-3 text-secondary small text-uppercase">Facture</th>
                                 <th class="py-3 text-secondary small text-uppercase">Date Insertion</th>
                                 <th class="py-3 text-secondary small text-uppercase">Date</th>
                                 <th class="py-3 text-secondary small text-uppercase">Fournisseur</th>
@@ -22,6 +24,12 @@
                             <tr class="border-bottom">
                                 <td class="px-4 py-3">
                                     <span class="fw-semibold text-warning">{{ $livraison->code }}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="fw-semibold text-warning">{{ $livraison->facture?->bonCommande->code }}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="fw-semibold text-warning">{{ $livraison->facture?->code }}</span>
                                 </td>
                                 <td>{{ Carbon\Carbon::parse($livraison->created_at)->format('d/m/Y H:i:s') }}</td>
                                 <td class="py-3 text-muted">{{ $livraison->date_livraison->format('d/m/Y') }}</td>
@@ -140,7 +148,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8" class="text-center py-5">
+                                <td colspan="10" class="text-center py-5">
                                     <div class="empty-state">
                                         <div
                                             class="rounded-circle bg-warning bg-opacity-10 p-4 mx-auto mb-4 d-inline-flex">
