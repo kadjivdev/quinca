@@ -176,7 +176,7 @@
                     @endcan
 
                     <hr>
-                    @can("accompte.client")
+                    @can("accomptes.view")
                     <li><a class="dropdown-item" href="{{ route('achat.acomptes.index') }}">
                             <div class="dropdown-item-wrapper">Accomptes Fourniseurs</div>
                         </a></li>

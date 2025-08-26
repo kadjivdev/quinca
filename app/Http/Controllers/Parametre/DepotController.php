@@ -376,7 +376,7 @@ class DepotController extends Controller
 
         /** */
         if ($request->check_all_article) {
-            $request->validate(["all_qte_reel" => "required"], ["all_qte_reel.required" => "Veuillez préciser la quantité à laquelle vous voulez réinitialiser les inventaires"]);
+            $request->validate(["all_qte_reel" => "required"], ["all_qte_reel.required" => "Veuillez préciser la quantité à laquelle vous voullez réinitialiser les inventaires"]);
         }
 
         if (!$request->check_all_article) {

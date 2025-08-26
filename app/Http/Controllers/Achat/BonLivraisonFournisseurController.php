@@ -460,12 +460,12 @@ class BonLivraisonFournisseurController extends Controller
                 }
 
                 if (!$ligne->article->uniteMesure) {
-                    throw new Exception("Unité de mesure non définie pour l'article: {$ligne->article->code_article}");
+                    throw new Exception("Unité de mesure non définie pour l'article: {$ligne->article?->code_article}");
                 }
 
                 // Vérifier si le prix unitaire existe
                 if (!isset($prixUnitaires[$ligne->article_id])) {
-                    throw new Exception("Prix unitaire non trouvé pour l'article : " . $ligne->article->code_article);
+                    throw new Exception("Prix unitaire non trouvé pour l'article : " . $ligne->article?->code_article);
                 }
 
                 // // Unité supplementaire
@@ -489,7 +489,7 @@ class BonLivraisonFournisseurController extends Controller
                 Log::debug("Données de ligne:", [
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
-                    'unite_base_id' => $ligne->article->unite_mesure_id,
+                    'unite_base_id' => $ligne->article?->unite_mesure_id,
                     'quantite' => $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                 ]);
 
