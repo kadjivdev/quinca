@@ -105,7 +105,7 @@ class ServiceStockEntree
                     'depot_id' => $donnees['depot_id'],
                     'article_id' => $article->id,
                     'user_id' => Auth::id(),
-                    'unite_mesure_id' => $donnees["unite_mesure_id"],
+                    'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
                 ]);
             }
 
