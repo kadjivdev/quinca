@@ -56,10 +56,7 @@ class ServiceStockEntree
             ]);
 
             ## determination de l'unité de destination
-            if (isset($donnees["livraison"])) {
-                //pour une livraison ou un approvisionnement direct, on prends l'unité à l'origine(entrante)
-                $unite_dest_id = $unite_origine_id;
-            } elseif (isset($donnees["appro"])) {
+            if (isset($donnees["appro"]) || isset($donnees["livraison"])) {
                 // quand le stock existe déjà, l'approvisionnement se fera en l'unité de mesure existante déjà
                 if ($stockExiste) {
                     $unite_dest_id = $stockExiste->unite_mesure_id;
@@ -108,7 +105,7 @@ class ServiceStockEntree
                     'depot_id' => $donnees['depot_id'],
                     'article_id' => $article->id,
                     'user_id' => Auth::id(),
-                    'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
+                    'unite_mesure_id' => $donnees["unite_mesure_id"],
                 ]);
             }
 
