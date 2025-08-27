@@ -119,11 +119,11 @@ Route::get("/debug", function () {
     // return $article_ART_459->stocks
     //     ->whereIn("depot_id", [3, 4]);
 
-    $stocksTodelete = StockDepot::where("quantite_reelle", "<", 0.00000000000000001);
-    if ($stocksTodelete->get()->isNotEmpty()) {
-        $stocksTodelete->delete();
-    }
-    return "Stock vide supprimés avec succès!";
+    $ligneToChange = LigneBonCommande::find(600);
+    $ligneToChange->update(["prix_unitaire"=>800,"montant_ligne"=>80000]);
+
+    $BC2508274299 = BonCommande::with("lignes")->firstWhere("code", "BC2508274299");
+    return response()->json($BC2508274299->lignes->firstWhere("id", 600));
 
     return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
