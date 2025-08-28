@@ -75,36 +75,39 @@
                                 <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y H:i:s') }}</td>
                                 <td>
                                     @if($compte->type_op=="FAC_CLT")
-                                    Facture client <span class="badge bg-light text-dark">{{$compte->factureClient->numero}}</span>
+                                    Facture client <span class="badge bg-light text-dark">{{$compte->factureClient?->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="FAC_REV")
-                                    Facture revendeur <span class="badge bg-light text-dark">{{$compte->factureRevendeur->numero}}</span>
+                                    Facture revendeur <span class="badge bg-light text-dark">{{$compte->factureRevendeur?->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="REG_CLT")
-                                    Règlement client <span class="badge bg-light text-dark">{{$compte->reglementClient->numero}}</span>
+                                    Règlement client <span class="badge bg-light text-dark">{{$compte->reglementClient?->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="REG_REV")
-                                    Règlement revendeur <span class="badge bg-light text-dark">{{$compte->reglementRevendeur->numero}}</span>
+                                    Règlement revendeur <span class="badge bg-light text-dark">{{$compte->reglementRevendeur?->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="AC_CLT")
-                                    Accompte sur le compte du client <span class="badge bg-light text-dark">{{$compte->accompteClient->reference}}</span>
+                                    Accompte sur le compte du client <span class="badge bg-light text-dark">{{$compte->accompteClient?->reference}}</span>
                                     @endif
                                 </td>
                                 <td>
                                     <span class="badge bg-light border text-dark">
                                         <!-- Facture client -->
                                         @if($compte->factureClient)
-                                        {{$compte->factureClient->reference_recu}}
+                                        {{$compte->factureClient?->reference_recu}}
                                         @elseif($compte->reglementClient)
                                         <!-- Reglement client -->
                                         {{$compte->reglementClient->reference_preuve??$compte->reglementClient->facture->reference_recu}}
                                         @elseif($compte->reglementRevendeur)
                                         <!-- Reglement revendeur -->
                                         {{$compte->reglementRevendeur?->reference_preuve}}
+                                        @elseif($compte->accompteClient)
+                                        <!-- client accompte -->
+                                        {{$compte->accompteClient?->reference}}
                                         @else
                                         ---
                                         @endif
