@@ -182,7 +182,8 @@ class LivraisonClientController extends Controller
                     $ligneFacture = LigneFacture::find($data['ligne_facture_id']);
 
                     /**Update du ligne facture */
-                    $ligneFacture->update(["quantite_livree_simple" => $ligneFacture->quantite_livree_simple + $data['quantite']]);
+                    $ligneFacture
+                        ->update(["quantite_livree_simple" => $ligneFacture->quantite_livree_simple + $data['quantite']]);
 
                     // Vérifier les quantités par rapport à la facture
                     $quantiteLivree = $ligneFacture->lignesLivraison()
@@ -352,7 +353,6 @@ class LivraisonClientController extends Controller
         }
     }
 
-
     /**
      * Bordereau de livraison
      */
@@ -374,7 +374,6 @@ class LivraisonClientController extends Controller
 
         return $pdf->stream("bordereau_{$livraison->numero}.pdf");
     }
-
 
     /**
      * Récupère les lignes de facture disponibles pour livraison

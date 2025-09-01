@@ -581,7 +581,7 @@ class BonCommandeController extends Controller
 
     public function generatePDF(Request $request, $id, $bon_object, $entete = false)
     {
-        $bcde = BonCommande::with(['fournisseur'])->where('id', $id)->first();
+        $bcde = BonCommande::with(['fournisseur', 'lignes.uniteMesure','lignes.article'])->where('id', $id)->first();
 
         $pdf = new PDF_MC_Table();
         $pdf->AliasNbPages();  // To use the total number of pages
@@ -616,9 +616,9 @@ class BonCommandeController extends Controller
 
         $pdf->SetXY(10, 85);
         $pdf->SetFont('Arial', 'B', 12);
-        $pdf->SetWidths(array(100, 20, 30, 40));
-        $pdf->SetAligns(array('L', 'C', 'R', 'R'));
-        $pdf->Row(array(utf8_decode('Désignation'), utf8_decode('Quantité'), utf8_decode('PU'), utf8_decode('Montant')));
+        $pdf->SetWidths(array(70, 20, 30, 30, 40));
+        $pdf->SetAligns(array('L', 'C', 'C', 'R', 'R'));
+        $pdf->Row(array(utf8_decode('Désignation'), utf8_decode('Quantité'), utf8_decode('Unité'), utf8_decode('PU'), utf8_decode('Montant')));
 
         $ligne_commandes = DB::table('ligne_bon_commandes')
             ->join('articles', 'articles.id', '=', 'ligne_bon_commandes.article_id')
@@ -626,11 +626,14 @@ class BonCommandeController extends Controller
             ->select('*')
             ->get();
 
-        $tot_ht = 0;
-        foreach ($ligne_commandes  as $ligne_commande) {
-            $art = Article::find($ligne_commande->article_id);
 
-            $pdf->Row(array($art->designation, number_format($ligne_commande->quantite, 2, ',', ' '), number_format($ligne_commande->prix_unitaire, 2, ',', ' '), number_format($ligne_commande->quantite * $ligne_commande->prix_unitaire, 2, ',', ' ')));
+        $tot_ht = 0;
+        foreach ($bcde->lignes  as $ligne_commande) {
+            // return $ligne_commande;
+            $art = $ligne_commande->article;
+
+            // dd($ligne_commande);
+            $pdf->Row(array($art->designation, number_format($ligne_commande->quantite, 2, ',', ' '), $ligne_commande->uniteMesure?->libelle_unite, number_format($ligne_commande->prix_unitaire, 2, ',', ' '), number_format($ligne_commande->quantite * $ligne_commande->prix_unitaire, 2, ',', ' ')));
             $tot_ht += $ligne_commande->quantite * $ligne_commande->prix_unitaire;
         }
 
