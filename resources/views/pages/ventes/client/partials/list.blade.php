@@ -75,6 +75,8 @@
     <div class="col-12">
         <div class="card border-0 p-3 shadow-sm">
             <div class="table-responsive">
+                <h5 class="">Montant Total: <span class="badge bg-success" id="montantTotal">{{ number_format($clients->sum('solde'), 0, ',', ' ') }} FCFA</span></h5>
+
                 <table id="example1" class="table table-hover align-middle mb-0" id="clientsTable">
                     <thead class="bg-light">
                         <tr>
@@ -144,14 +146,14 @@
                             <td>
                                 <span class="badge bg-warning bg-opacity-10 text-dark">{{number_format($client->clientAccomptesAmount,2,',',' ')}}</span>
                             </td>
-                             <td>
+                            <td>
                                 <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->soldeClient,2,',',' ')}}</span>
                             </td>
-                             <td>
+                            <td>
                                 <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->soldeRevendeur,2,',',' ')}}</span>
                             </td>
                             <td>
-                                <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->solde,2,',',' ')}}</span>
+                                {{number_format($client->solde,2,',',' ')}}
                             </td>
 
                             <td class="text-end">
@@ -690,6 +692,32 @@
 
 @push("scripts")
 <script>
+    const search = document.querySelector('input[type="search"]')
+
+    // Fonction pour calculer le total
+    function calculateTotal() {
+        let table = $('#example1').DataTable();
+        let total = 0;
+
+        // Parcourir toutes les lignes visibles et additionner les montants
+        table.column(11, {
+            search: 'applied'
+        }).data().each(function(value) {
+            // Nettoyer la valeur (enlever "FCFA" et les espaces, puis convertir en nombre)
+            let montant = parseInt(value.replace(/[^0-9-]/g, ''));
+            // alert(montant)
+            // console.log(`Montant total :${montant}`)
+            total += montant;
+        });
+
+        // Afficher le total formaté
+        $("#montantTotal").html(total.toLocaleString() + " FCFA");
+    }
+
+    // Recalculer lors de la recherche
+    $('#example1').on('search.dt', calculateTotal);
+
+    //
     $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,

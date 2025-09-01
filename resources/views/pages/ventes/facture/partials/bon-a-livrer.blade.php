@@ -61,7 +61,7 @@
         td {
             padding: 8px;
             font-size: 11px;
-            border: 2px solid #2c3e50!important;
+            border: 2px solid #2c3e50 !important;
         }
 
         tr:nth-child(even) {
@@ -94,10 +94,10 @@
 
     <br><br><br><br><br>
     <div class="client-info">
-        <h3> <strong class="livraison-number">BON A LIVRER : {{str_replace("FAC","BON",$facture->numero) }} </strong>  | <strong class="livraison-date"> DATE : {{Carbon\Carbon::parse(now())->locale('fr')->isoFormat('D MMMM YYYY')}} </strong></h3>
-        <p> <strong>Client:</strong>  {{$facture->client?->raison_sociale}} </p>
+        <h3> <strong class="livraison-number">BON A LIVRER : {{str_replace("FAC","BON",$facture->numero) }} </strong> | <strong class="livraison-date"> DATE : {{Carbon\Carbon::parse(now())->locale('fr')->isoFormat('D MMMM YYYY')}} </strong></h3>
+        <p> <strong>Client:</strong> {{$facture->client?->raison_sociale}} </p>
     </div>
-    
+
     <table>
         <thead>
             <tr>
@@ -123,7 +123,7 @@
         <tfoot class="mt-5">
             <tr>
                 <td class="text-center">CLIENT</td>
-                <td class="text-center" colspan="3" >CONTROLEUR</td>
+                <td class="text-center" colspan="3">CONTROLEUR</td>
                 <td class="text-center">COMMERCIAL</td>
             </tr>
         </tfoot>

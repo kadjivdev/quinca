@@ -480,7 +480,6 @@ class RapportVenteController extends Controller
                     'total_credit' => $ventesFormatted->where('type_vente', 'Crédit')->sum('montant_ttc'),
                 ];
 
-
                 return view('pages.rapports.ventes.vente-journaliere', [
                     'ventes' => $ventesFormatted,
                     'totaux' => $totaux,
