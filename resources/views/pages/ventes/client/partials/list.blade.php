@@ -104,9 +104,6 @@
                             <td>{{ Carbon\Carbon::parse($client->created_at)->format('d/m/Y H:i:s') }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-client me-2">
-                                        {{ substr($client->raison_sociale, 0, 2) }}
-                                    </div>
                                     <div>
                                         <div class="fw-medium">{{ $client->raison_sociale }}</div>
                                         <div class="text-muted small">
