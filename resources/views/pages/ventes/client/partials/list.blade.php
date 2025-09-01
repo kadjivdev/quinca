@@ -89,7 +89,7 @@
                             <th class="border-bottom-0">Factures</th>
                             <th class="border-bottom-0">Reglements</th>
                             <th class="border-bottom-0">Accounts</th>
-                            <th class="border-bottom-0">Solde Direction</th>
+                            <!-- <th class="border-bottom-0">Solde Direction</th> -->
                             <th class="border-bottom-0">Solde Revendeur</th>
                             <th class="border-bottom-0">Solde Total</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
@@ -143,9 +143,9 @@
                             <td>
                                 <span class="badge bg-warning bg-opacity-10 text-dark">{{number_format($client->clientAccomptesAmount,2,',',' ')}}</span>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->soldeClient,2,',',' ')}}</span>
-                            </td>
+                            </td> -->
                             <td>
                                 <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->soldeRevendeur,2,',',' ')}}</span>
                             </td>
@@ -204,7 +204,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucun client trouvé</h6>
@@ -697,7 +697,7 @@
         let total = 0;
 
         // Parcourir toutes les lignes visibles et additionner les montants
-        table.column(11, {
+        table.column(10, {
             search: 'applied'
         }).data().each(function(value) {
             // Nettoyer la valeur (enlever "FCFA" et les espaces, puis convertir en nombre)
