@@ -46,86 +46,15 @@ use App\Models\Vente\Requete;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    // $stock = StockDepot::firstWhere(["article_id" => 1418, "depot_id" => 4, "unite_mesure_id" => 5]);
-    // $stock->update(["quantite_reelle" => 0.1]);
+    $facture = FactureFournisseur::with("lignes")->firstWhere("code", "FAC25083551");
 
-    // BonLivraisonFournisseur::where(["code" => "BLF2508120003"])->update([
-    //     'validated_at' => null,
-    //     'validated_by' => null
-    // ]);
+    $ligneToUpdate = LigneFactureFournisseur::find(428);
+    $ligneToUpdate->update(["quantite_livree_simple" => 10, "quantite_livree" => 0]);
+
+    $facture->update(["statut_livraison" => "LIVRE"]);
+
+    return response()->json($facture);
     // return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
-
-    // $facture = FactureFournisseur::with(["lignes.article", "lignes.uniteMesure"])->firstWhere(["code" => "FAC25088515"]);
-    // $lignes = LigneFactureFournisseur::whereIn("id", $facture->lignes->pluck("id")
-    //     ->toArray());
-
-    // $lignes->update(["quantite_livree_simple" => 0]);
-    // return response()->json($lignes->get());
-
-    // $bcF_BC2507255118 = BonCommande::firstWhere(["code" => "BC2507255118"]);
-
-    // $bFacturesLignes = LigneFactureFournisseur::whereIn("id", $bcF_BC2507255118->factures->flatMap->lignes
-    //     ->pluck("id")->toArray());
-
-    // foreach ($bcF_BC2507255118->lignes as $bonLigne) {
-    //     $bFacturesLignes->where("article_id", $bonLigne->article_id)
-    //         ->update([
-    //             "prix_unitaire" => $bonLigne->prix_unitaire,
-    //             "montant_ht" => $bonLigne->montant_ligne,
-    //             "montant_ttc" => $bonLigne->montant_ligne,
-    //         ]);
-    // }
-
-    // $bcF_BC2507255118
-    //     ->factures()
-    //     ->update(["montant_ttc" => $bcF_BC2507255118->montant_total]);
-
-    // return response()->json([
-    //     "bonLignes" => $bcF_BC2507255118->lignes,
-    //     "FacturesLignes" => $bFacturesLignes,
-    // ]);
-
-    // $BLF2508140002 = BonLivraisonFournisseur::with(["facture.lignes", "lignes.article"])->firstWhere(["code" => "BLF2508140002"]);
-
-    /**Update du quantite_livree_simple de la ligne de la facture */
-    // $BLF2508140002->facture->lignes()->first()->update(["quantite_livree" => 0, "quantite_livree_simple" => null]);
-    // return response()->json($BLF2508140002);
-
-    // $article_ART_T9NM77LN = Article::with(["stocks"])->firstWhere("code_article", "ART-T9NM77LN");
-    // $article_ART_T9NM77LN->stocks->first()
-    //     ->update(["quantite_reelle" => 501.12]);
-
-    // $articleMouvement = StockMouvement::firstWhere(["article_id" => 1935, "depot_id" => 4, "id" => 3814]);
-
-    // $articleMouvement->update(["quantite" => 116.64]);
-    // $articleMouvement->refresh();
-
-    // return response()->json([
-    //     "stock" => $article_ART_T9NM77LN,
-    //     "articleMouvement" => $articleMouvement,
-    // ]);
-
-    // $article_ART_459 = Article::with(["stocks"])->firstWhere("code_article", "ART-459");
-    // $stockIds = $article_ART_459->stocks
-    //     ->where("unite_mesure_id", 25)
-    //     ->whereIn("depot_id", [3, 4])
-    //     ->pluck("id")
-    //     ->toArray();
-    // // ->update(["unite_mesure_id" => 7])
-
-    // StockDepot::whereIn("id", $stockIds)
-    //     ->update(["unite_mesure_id" => 7]);
-
-    // return $article_ART_459->stocks
-    //     ->whereIn("depot_id", [3, 4]);
-
-    $ligneToChange = LigneBonCommande::find(600);
-    $ligneToChange->update(["prix_unitaire"=>800,"montant_ligne"=>80000]);
-
-    $BC2508274299 = BonCommande::with("lignes")->firstWhere("code", "BC2508274299");
-    return response()->json($BC2508274299->lignes->firstWhere("id", 600));
-
-    return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
 
 /**DETELE A STOCK */

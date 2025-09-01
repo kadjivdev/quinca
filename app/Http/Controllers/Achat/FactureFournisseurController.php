@@ -434,6 +434,7 @@ class FactureFournisseurController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
+    
     /**
      * Met à jour le statut de livraison
      */
