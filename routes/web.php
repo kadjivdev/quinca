@@ -42,7 +42,25 @@ use App\Models\Stock\StockDepot;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $bc_BC2508139629 = BonCommande::with("lignes.article")->firstWhere("code", "BC2508139629");
+    $bc_BC2508139629 = BonCommande::with("factures.lignes.article", "lignes.article")->firstWhere("code", "BC2508139629");
+
+    foreach ($bc_BC2508139629->factures->flatMap->lignes as $ligne) {
+
+        switch ($ligne->id) {
+            case 329:
+                $ligne->update(["quantite" => 514.08, "quantite_base" => 514.08, "montant_ht" => $ligne->prix_unitaire * 514.08]);
+                break;
+
+            case 330:
+                $ligne->update(["quantite" => 516.96, "quantite_base" => 516.96, "montant_ht" => $ligne->prix_unitaire * 516.96]);
+                break;
+
+            case 331:
+                $ligne->update(["quantite" => 514.08, "quantite_base" => 514.08, "montant_ht" => $ligne->prix_unitaire * 514.08]);
+                break;
+        }
+    }
+    return response()->json($bc_BC2508139629);
 
     foreach ($bc_BC2508139629->lignes as $ligne) {
         $ligne = LigneBonCommande::find($ligne->id);
