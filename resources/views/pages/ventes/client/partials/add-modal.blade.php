@@ -27,14 +27,14 @@
                                         <i class="fas fa-info-circle me-2"></i>Informations principales
                                     </h6>
                                     <div class="row g-3">
-                                        <div class="col-md-8">
+                                        <div class="col-md-6">
                                             <label class="form-label fw-medium required">Nom ou Raison sociale</label>
                                             <input type="text" class="form-control" name="raison_sociale"
                                                 required placeholder="Nom du client ou de l'entreprise">
                                             <div class="invalid-feedback">La raison sociale est requise</div>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label class="form-label fw-medium required">Catégorie</label>
                                             <select class="form-select" name="categorie" required>
                                                 <option value="">Sélectionner une catégorie</option>
@@ -62,6 +62,16 @@
                                             <label class="form-label fw-medium">Taux AIB</label>
                                             <input type="number" step="0.01" min="0" class="form-control" name="taux_aib"
                                                 placeholder="Taux AIB">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Agent</label>
+                                            <select class="form-select" name="agent_id" required>
+                                                @foreach($agents as $agent)
+                                                <option value="{{$agent->id}}">{{$agent->nom}}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">Veuillez sélectionner un agent</div>
                                         </div>
                                     </div>
                                 </div>

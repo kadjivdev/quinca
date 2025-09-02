@@ -40,7 +40,8 @@ class Client extends Model
         'created_by',
         'taux_aib',
         'point_de_vente_id',
-        'deleted_by'
+        'deleted_by',
+        "agent_id"
     ];
 
     protected $casts = [
@@ -323,6 +324,7 @@ class Client extends Model
             'statut' => 'required|boolean',
             'notes' => 'nullable|string',
             'taux_aib' => 'nullable|numeric|min:0|max:100',
+            'agent_id' => 'required|integer',
         ];
     }
 }

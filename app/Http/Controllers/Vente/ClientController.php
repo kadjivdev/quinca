@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
+use App\Models\Parametre\Agent;
 use App\Models\Vente\{Client, CompteClient, ReglementClient};
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -66,6 +67,10 @@ class ClientController extends Controller
             $clients->where('statut', $request->statut);
         }
 
+        if ($request->filled("agent_id")) {
+            $clients->where("agent_id", $request->agent_id);
+        }
+
         if ($request->filled('search')) {
             $clients->search($request->search);
         }
@@ -109,6 +114,7 @@ class ClientController extends Controller
             });
 
         // Statistiques pour le header
+
         $stats = [
             'total_clients' => Client::count(),
             'clients_actifs' => Client::where('statut', true)->count(),
@@ -123,11 +129,14 @@ class ClientController extends Controller
         // Liste des villes pour le filtre
         $villes = Client::distinct()->pluck('ville')->filter();
 
+        $agents = Agent::all();
+
         return view('pages.ventes.client.index', compact(
             'clients',
             'stats',
             'villes',
-            'date'
+            'date',
+            'agents'
         ));
     }
 
@@ -315,6 +324,9 @@ class ClientController extends Controller
                 'telephone.required' => 'Le numéro de téléphone est obligatoire',
                 'categorie.required' => 'La catégorie du client est obligatoire',
                 'categorie.in' => 'La catégorie sélectionnée n\'est pas valide',
+
+                'agent_id.required' => "Choisissez un agent",
+
                 'email.email' => 'L\'adresse email n\'est pas valide',
                 'plafond_credit.required' => 'Le plafond de crédit est obligatoire',
                 'plafond_credit.numeric' => 'Le plafond de crédit doit être un nombre',
@@ -373,6 +385,7 @@ class ClientController extends Controller
             ], 500);
         }
     }
+
     /**
      * Affiche les détails d'un client
      */
@@ -384,6 +397,7 @@ class ClientController extends Controller
 
         // Charger les relations nécessaires
         $client->load([
+            'agent',
             'facturesClient.lignes.article',
             'facturesRevendeur.lignes.article',
             'acomptes.client',
@@ -399,6 +413,7 @@ class ClientController extends Controller
         $data = [
             'client' => [
                 'id' => $client->id,
+                'agent' => $client->agent,
                 'code_client' => $client->code_client,
                 'raison_sociale' => $client->raison_sociale,
                 'categorie' => $client->categorie,

@@ -61,6 +61,17 @@
                         </select>
                     </div>
 
+                    {{-- Filtre Ville --}}
+                    <div class="col-md-2">
+                        <label class="form-label small">Agent</label>
+                        <select name="agent_id" class="form-select form-select-sm" id="agentFilter" onchange="filterClients()">
+                            <option value="">Toutes les agents</option>
+                            @foreach ($agents as $agent)
+                            <option value="{{ $agent->id }}">{{ $agent->nom }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     {{-- Bouton réinitialiser --}}
                     <button class="col-md-2 btn btn-light btn-sm mt-3" onclick="resetFilters()">
                         <i class="fas fa-undo me-1"></i>
@@ -588,7 +599,8 @@
             search: $('#searchFilter').val(),
             statut: $('#statutFilter').val(),
             ville: $('#villeFilter').val(),
-            credit: $('#creditFilter').val()
+            credit: $('#creditFilter').val(),
+            agent_id: $("#agent_id").val()
         };
 
         // Faire la requête AJAX avec les filtres

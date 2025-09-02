@@ -65,6 +65,16 @@
                                             <input type="number" step="0.01" min="0" class="form-control" name="taux_aibMob" id="edit_aib"
                                                 placeholder="Taux AIB">
                                         </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Agent</label>
+                                            <select class="form-select" name="agent_id" id="agent_id" required>
+                                                <option value="">Choisissez un agent</option>
+                                                <!-- gerer avec du js -->
+                                            </select>
+                                            <div class="invalid-feedback">Veuillez sélectionner un agent</div>
+                                            
+                                        </div>
                                     </div>
                                 </div>
                             </div>
