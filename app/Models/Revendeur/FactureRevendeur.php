@@ -92,16 +92,16 @@ class FactureRevendeur extends Model
                         ->orderBy('numero', 'desc')
                         ->first();
 
-                    if ($lastFacture) {
-                        // Extraction du numéro séquentiel et incrémentation
-                        $lastNumber = (int) substr($lastFacture->numero, -4);
-                        if ($lastNumber >= 9999) {
-                            throw new \Exception("Limite de séquence atteinte pour la journée");
-                        }
-                        $nextNumber = $lastNumber + 1;
-                    } else {
-                        $nextNumber = 1;
-                    }
+                    // if ($lastFacture) {
+                    //     // Extraction du numéro séquentiel et incrémentation
+                    //     $lastNumber = (int) substr($lastFacture->numero, -4);
+                    //     if ($lastNumber >= 9999) {
+                    //         throw new \Exception("Limite de séquence atteinte pour la journée");
+                    //     }
+                    //     $nextNumber = $lastNumber + 1;
+                    // } else {
+                    //     $nextNumber = 1;
+                    // }
                     // Format du numéro sur 4 chiffres avec des zéros devant
                     // $sequence = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
                     $sequence = explode("-", Str::uuid())[0];
@@ -109,18 +109,21 @@ class FactureRevendeur extends Model
 
                     // Vérifie une dernière fois que le numéro n'existe pas
                     if (self::where('numero', $numero)->exists()) {
-                        throw new \Exception("Numéro de facture déjà existant");
+                        self::generateNumero();
+                        // throw new \Exception("Numéro de facture déjà existant");
                     }
 
                     return $numero;
                 });
             } catch (\Exception $e) {
-                $attempt++;
-                if ($attempt >= $maxAttempts) {
-                    throw new \Exception("Impossible de générer un numéro de facture unique après {$maxAttempts} tentatives");
-                }
+                // $attempt++;
+                // if ($attempt >= $maxAttempts) {
+                //     throw new \Exception("Impossible de générer un numéro de facture unique après {$maxAttempts} tentatives");
+                // }
+                throw new \Exception("Erreure lors de la generation du numero de la facture");
+
                 // Petit délai aléatoire avant de réessayer
-                usleep(random_int(100000, 500000));
+                // usleep(random_int(100000, 500000));
             }
         } while (true);
     }
