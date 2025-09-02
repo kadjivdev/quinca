@@ -27,11 +27,7 @@ use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\LigneFactureFournisseur;
-use App\Models\Catalogue\Article;
 use App\Models\Stock\StockDepot;
-use App\Models\Stock\StockMouvement;
-use App\Models\Vente\FactureClient;
-use App\Models\Vente\Requete;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,14 +42,26 @@ use App\Models\Vente\Requete;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $facture = FactureFournisseur::with("lignes")->firstWhere("code", "FAC25083551");
+    $bc_BC2508139629 = BonCommande::with("lignes.article")->firstWhere("code", "BC2508139629");
 
-    $ligneToUpdate = LigneFactureFournisseur::find(428);
-    $ligneToUpdate->update(["quantite_livree_simple" => 10, "quantite_livree" => 0]);
+    foreach ($bc_BC2508139629->lignes as $ligne) {
+        $ligne = LigneBonCommande::find($ligne->id);
 
-    $facture->update(["statut_livraison" => "LIVRE"]);
+        switch ($ligne->id) {
+            case 495:
+                $ligne->update(["quantite" => 514.08, "quantite_base" => 514.08, "montant_ligne" => $ligne->prix_unitaire * 514.08]);
+                break;
 
-    return response()->json($facture);
+            case 496:
+                $ligne->update(["quantite" => 516.96, "quantite_base" => 516.96, "montant_ligne" => $ligne->prix_unitaire * 516.96]);
+                break;
+
+            case 497:
+                $ligne->update(["quantite" => 514.08, "quantite_base" => 514.08, "montant_ligne" => $ligne->prix_unitaire * 514.08]);
+                break;
+        }
+    }
+    return response()->json($bc_BC2508139629);
     // return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
 
