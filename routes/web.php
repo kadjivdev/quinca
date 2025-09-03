@@ -44,23 +44,10 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    
-    // $reglements = ReglementClient::where("statut", "validee")
-    //     ->get()
-    //     ->where(fn($reglement) => $reglement->compteClient->isEmpty())
-    //     ->flatten();
-    
-    // foreach ($reglements as $reglement) {
-    //     $reglement->compteClient()->create([
-    //         'date_op' => $reglement->date_reglement,
-    //         'montant_op' => $reglement->montant,
-    //         'client_id' => $reglement->facture->client_id,
-    //         'user_id' => Auth::user()->id,
-    //         'type_op' => 'REG_CLT',
-    //     ]);
-    // }
+    $BLF2509030004 = BonLivraisonFournisseur::firstWhere("code", "BLF2509030004");
 
-    // return response()->json($reglements);
+    $BLF2509030004->update(["depot_id" => 6]);
+    return response()->json($BLF2509030004);
     // return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
 
