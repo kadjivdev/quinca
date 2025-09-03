@@ -53,7 +53,7 @@
                             <tr>
                                 <th>Numéro</th>
                                 <th>Date</th>
-                                <th>Type</th>
+                                <th>status</th>
                                 <th>Facture</th>
                                 <th class="text-end">Montant</th>
                             </tr>
@@ -63,9 +63,9 @@
                             <tr>
                                 <td><span class="badge bg-light text-dark border">{{$accompte->reference}}</span></td>
                                 <td>{{$accompte->created_at}}</td>
-                                <td class="text-end">{{$accompte->montant}} FCFA</td>
                                 <td>{{$accompte->statut}}</td>
                                 <td>{{$accompte->requete_id?'Requete':''}} {{$accompte->transport_id?'Transport':''}} {{($accompte->requete_id && $accompte->transport_id)?'---':'' }} </td>
+                                <td class="text-end">{{$accompte->montant}} FCFA</td>
                             </tr>
                             @endforeach
                         </tbody>
