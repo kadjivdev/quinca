@@ -56,6 +56,7 @@
                                 <th>Type</th>
                                 <th>Facture</th>
                                 <th class="text-end">Montant</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,6 +67,15 @@
                                 <td>{{$reglement->type_reglement}}</td>
                                 <td>{{$reglement->facture?->numero}}</td>
                                 <td class="text-end">{{$reglement->montant}} FCFA</td>
+                                <td class="text-end">
+                                    <span class="badge bg-light text-dark border">{{$reglement->statut}}</span>
+                                    <br>
+                                    @forelse($reglement->compteClient as $compte)
+                                    <li>{{$compte->type_op}}</li>
+                                    @empty
+                                    no compte
+                                    @endforelse
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

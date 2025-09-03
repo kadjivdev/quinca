@@ -28,6 +28,9 @@ use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\Client;
+use App\Models\Vente\ReglementClient;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,45 +44,23 @@ use App\Models\Stock\StockDepot;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-
-    $bc_BC2508139629 = BonCommande::with("factures.lignes.article", "lignes.article")->firstWhere("code", "BC2508139629");
-
-    foreach ($bc_BC2508139629->factures->flatMap->lignes as $ligne) {
-
-        switch ($ligne->id) {
-            case 329:
-                $ligne->update(["quantite" => 514.08, "quantite_base" => 514.08, "montant_ht" => $ligne->prix_unitaire * 514.08]);
-                break;
-
-            case 330:
-                $ligne->update(["quantite" => 516.96, "quantite_base" => 516.96, "montant_ht" => $ligne->prix_unitaire * 516.96]);
-                break;
-
-            case 331:
-                $ligne->update(["quantite" => 514.08, "quantite_base" => 514.08, "montant_ht" => $ligne->prix_unitaire * 514.08]);
-                break;
-        }
+    
+    $reglements = ReglementClient::where("statut", "validee")
+        ->get()
+        ->where(fn($reglement) => $reglement->compteClient->isEmpty())
+        ->flatten();
+    
+    foreach ($reglements as $reglement) {
+        $reglement->compteClient()->create([
+            'date_op' => $reglement->date_reglement,
+            'montant_op' => $reglement->montant,
+            'client_id' => $reglement->facture->client_id,
+            'user_id' => Auth::user()->id,
+            'type_op' => 'REG_CLT',
+        ]);
     }
-    return response()->json($bc_BC2508139629);
 
-    foreach ($bc_BC2508139629->lignes as $ligne) {
-        $ligne = LigneBonCommande::find($ligne->id);
-
-        switch ($ligne->id) {
-            case 495:
-                $ligne->update(["quantite" => 514.08, "quantite_base" => 514.08, "montant_ligne" => $ligne->prix_unitaire * 514.08]);
-                break;
-
-            case 496:
-                $ligne->update(["quantite" => 516.96, "quantite_base" => 516.96, "montant_ligne" => $ligne->prix_unitaire * 516.96]);
-                break;
-
-            case 497:
-                $ligne->update(["quantite" => 514.08, "quantite_base" => 514.08, "montant_ligne" => $ligne->prix_unitaire * 514.08]);
-                break;
-        }
-    }
-    return response()->json($bc_BC2508139629);
+    return response()->json($reglements);
     // return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
 });
 
