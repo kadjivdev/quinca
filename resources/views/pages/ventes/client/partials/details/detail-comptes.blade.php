@@ -107,7 +107,11 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge bg-light text-dark">{{$compte->user->name}}</span>
+                                    <!-- <span class="badge bg-light text-dark">{{$compte->user->name}}</span> -->
+
+                                    <!-- quand le réglement est validé par l'admin, on affiche le créateur du reglement
+                                     autrement on affiche celui qui a validé le règlement -->
+                                    <span class="badge bg-light text-dark">{{($compte->user_id==1 && $compte->type_op=="REG_CLT")?$compte->reglementClient?->createdBy->name:$compte->user?->name}}</span>
                                 </td>
                             </tr>
                             @empty
