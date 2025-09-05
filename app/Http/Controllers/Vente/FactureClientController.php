@@ -261,14 +261,33 @@ class FactureClientController extends Controller
                 $QteConvertie = $this->serviceStockEntree
                     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
-                $QteStockConvertie = $this->serviceStockEntree
-                    ->convertirQuantite($stock->article->reste($stock->depot_id), $conversion, $ligne['unite_vente_id']);
+                // $QteStockConvertie = $this->serviceStockEntree
+                //     ->convertirQuantite($stock->article->reste($stock->depot_id), $conversion, $ligne['unite_vente_id']);
 
+
+                /**Qte de Base */
+                $qantiteBase = $conversion ? $this->serviceStockEntree
+                    ->convertirQuantite(
+                        $stock->quantite_reelle,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    ) : 00;
+
+
+                /**Qte Vendue */
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+
+                /**Qte Reste */
+                $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
+
+                if ($resteStock < 0) {
+                    throw new Exception("Le stock est négatif! Veuillez approvisionne le stock");
+                }
                 // on verifie la quantité restante de l'article dans le depot est suffisante
-                if ($QteStockConvertie < $QteConvertie) {
+                if ($resteStock < $QteConvertie) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Le reste du stock de l'article ($article->designation) est de $QteStockConvertie $venteUnite->libelle_unite dans le depôt ({$stock->depot->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
+                        'message' => "Le reste du stock de l'article ($article->designation) est de $resteStock $venteUnite->libelle_unite dans le depôt ({$stock->depot?->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
                     ], 500);
                 }
             }
