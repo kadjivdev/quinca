@@ -14,7 +14,7 @@
 
     // Fonction principale pour afficher la facture
     function showFacture(id) {
-        alert(id)
+        // alert(id)
         // Vérification de l'ID
         if (!id) {
             showError('ID de facture invalide');
