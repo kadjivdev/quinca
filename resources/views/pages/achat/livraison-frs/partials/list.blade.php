@@ -105,11 +105,11 @@
                                         @if (!$livraison->validated_at && !$livraison->rejected_at)
 
                                         @can("livraisons.edit")
-                                        <!-- <button class="btn btn-link btn-sm text-warning p-2"
+                                        <button class="btn btn-link btn-sm text-warning p-2"
                                             onclick="editLivraisonFournisseur({{ $livraison->id }})"
                                             data-bs-toggle="tooltip" title="Modifier">
                                             <i class="fas fa-edit"></i>
-                                        </button> -->
+                                        </button>
                                         @endcan
 
                                         <!-- <a target="_blank" href="{{route('livraisons.validate',$livraison->id)}}">Valider</a> -->

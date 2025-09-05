@@ -240,6 +240,7 @@
 
         // Génération du HTML des lignes
         generateLignesHtml: function(lignes, unites) {
+            // alert("gogo")
             if (!lignes || lignes.length === 0) return '<p class="text-center">Aucun élement disponible! Les articles concernés sont déjà livrés</p>';
 
             return lignes.map(ligne => {
@@ -485,7 +486,6 @@
 
             const result = await response.json();
 
-            console.log(result)
 
             if (result.success) {
                 const editModal = document.getElementById('editLivraisonFournisseurModal');
@@ -530,25 +530,30 @@
 
                 let articles = ``;
                 const unites = await LivraisonFournisseur.getUnitesOptions();
+
                 livraison.facture.lignes.forEach((ligne, index) => {
                     /**Unite de mesure & Qte de mesure */
                     const unite_mesure = ligne.unite_mesure_base ?? ligne.unite_mesure;
                     const quantite_base = ligne.quantite_base ?? ligne.quantite;
 
-                    const quantiteLivree = parseFloat(ligne.quantite_livree) || 0;
+                    // S'assurer que la quantité livrée est un nombre
+                    // const quantiteLivree = parseFloat(ligne.quantite_livree_simple) || 0;
+                    const quantiteLivree = 0;
                     const quantiteTotale = parseFloat(quantite_base) || 0;
                     const resteALivrer = Math.max(0, quantiteTotale - quantiteLivree);
 
                     // Formater les nombres pour l'affichage
-                    const quantiteLivreeFormatted = formatNumber(quantiteLivree);
-                    const quantiteTotaleFormatted = formatNumber(quantiteTotale);
-                    const resteALivrerFormatted = formatNumber(resteALivrer);
+                    const quantiteLivreeFormatted = this.formatNumber(quantiteLivree);
+                    const quantiteTotaleFormatted = this.formatNumber(quantiteTotale);
+                    const resteALivrerFormatted = this.formatNumber(resteALivrer);
+
                     articles += `
                         <tr>
                             <td>
                                 <div class="fw-medium">${ligne.article.designation}</div>
                                 <div class="small text-muted">${ligne.article.code_article}</div>
-                                <input type="hidden" name="lignes[${ligne.article_id}][article_id]" value="${ligne.article_id}">
+                                <input type="hidden" name="lignes[${ligne.id}][article_id]" value="${ligne.article_id}">
+                                <input type="hidden" name="lignes[${ligne.id}][ligne_id]" value="${ligne.id}">
                             </td>
                             <td class="text-center">
                                 ${ligne.quantite}
@@ -565,8 +570,8 @@
                             <td class="text-center">
                                 <input type="number"
                                     class="form-control form-control-sm quantite-input text-end"
-                                    name="lignes[${ligne.article_id}][quantite]"
-                                    value="${livraison.lignes[index]?.quantite ?? 0}"
+                                    name="lignes[${ligne.id}][quantite]"
+                                    value="0"
                                     min="0"
                                     step="0.01"
                                     max="${resteALivrer}"
@@ -576,11 +581,11 @@
                             <td class="text-center">
                                 <input type="number"
                                     class="form-control form-control-sm quantite-supp-input text-end"
-                                    name="lignes[${ligne.article_id}][quantite_supplementaire]"
-                                    value="${livraison.lignes[index]?.quantite_supplementaire ?? 0}"
+                                    name="lignes[${ligne.id}][quantite_supplementaire]"
+                                    value="0"
                                     min="0"
                                     ${resteALivrer <= 0 ? 'readonly' : ''}>
-                                <select class="form-select" name="lignes[${ligne.article_id}][unite_id]">
+                                <select class="form-select" name="lignes[${ligne.id}][unite_id]">
                                     <option value="">Sélectionner...</option>
                                     ${unites}
                                 </select>

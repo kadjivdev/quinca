@@ -41,7 +41,7 @@
                                                 id="factureSelectMod" readonly>
                                                 <option value="">Sélectionner une facture</option>
                                                 @foreach ($factures as $facture)
-                                                    <option value="{{ $facture->id }}">{{ $facture->code }}</option>
+                                                <option value="{{ $facture->id }}">{{ $facture->code }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -56,8 +56,8 @@
                                             <select class="form-select rounded-pill" name="depot_id" required>
                                                 <option value="">Sélectionner un magasin</option>
                                                 @foreach ($depots as $depot)
-                                                    <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
-                                                    </option>
+                                                <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                             <input name="point_de_vente_id" hidden>
@@ -75,7 +75,7 @@
                             <select class="form-select rounded-pill" name="vehicule_id" required>
                                 <option value="">Sélectionner un véhicule</option>
                                 @foreach ($vehicules as $vehicule)
-                                    <option value="{{ $vehicule->id }}">{{ $vehicule->matricule }}</option>
+                                <option value="{{ $vehicule->id }}">{{ $vehicule->matricule }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -84,7 +84,7 @@
                             <select class="form-select rounded-pill" name="chauffeur_id" required>
                                 <option value="">Sélectionner un chauffeur</option>
                                 @foreach ($chauffeurs as $chauffeur)
-                                    <option value="{{ $chauffeur->id }}">{{ $chauffeur->nom_chauf }}</option>
+                                <option value="{{ $chauffeur->id }}">{{ $chauffeur->nom_chauf }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -101,12 +101,13 @@
                             <table class="table align-middle mb-0" id="modalArticlesTable">
                                 <thead>
                                     <tr class="bg-light">
-                                        <th class="py-3 px-4" style="width: 30%">Article</th>
-                                        <th class="py-3 text-center">Unité</th>
+                                        <th class="py-3 px-4" style="width: 10%">Article</th>
+                                        <th class="py-3 text-center">Unité </th>
                                         <th class="py-3 text-center">Unité à recevoir(si elle n'existe pas, elle est remplacée par l'unité simple)</th>
-                                        <!-- <th class="py-3 text-center">Déjà reçue</th> -->
+                                        <!-- <th class="py-3 text-center">Quantité facturée</th> -->
+                                        <th class="py-3 text-center">Déjà reçue</th>
                                         <th class="py-3 text-center">À recevoir</th>
-                                        <th class="py-3 text-center" style="width: 150px;">Quantité</th>
+                                        <th class="py-3 text-center">Quantité</th>
                                         <th class="py-3 text-center">Qté supplémentaire</th>
                                     </tr>
                                 </thead>

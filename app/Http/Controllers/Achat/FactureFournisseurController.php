@@ -103,7 +103,8 @@ class FactureFournisseurController extends Controller
             ->with(['pointVente', 'fournisseur'])
             ->get();
 
-        // Retour de la vue avec toutes les données nécessaires
+        
+            // Retour de la vue avec toutes les données nécessaires
         return view('pages.achat.facture-frs.index', [
             "fournisseurs" => $fournisseurs,
             // Données principales
@@ -216,6 +217,7 @@ class FactureFournisseurController extends Controller
             Log::error("Erreur lors de la création de la facture", [
                 "message" => $e->getMessage()
             ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création de la facture',
@@ -227,12 +229,14 @@ class FactureFournisseurController extends Controller
     /**
      * Affiche les détails avec filtre d'une facture
      */
+    
     public function details(FactureFournisseur $facture)
     {
         $facture->load([
             'bonCommande',
             'pointVente',
             'fournisseur',
+
             // 'lignes' => function ($query) {
             //     /**on recupere seulement les lignes qui disposent encore de quantité */
             //     $query->where(function ($q) {
@@ -251,6 +255,7 @@ class FactureFournisseurController extends Controller
             //         }
             //     });
             // },
+
             'lignes' => function ($query) {
                 $query->where(function ($q) {
                     /**quantite_base */

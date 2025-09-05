@@ -52,6 +52,7 @@
                         <thead>
                             <tr>
                                 <th>Numéro</th>
+                                <th>Reference</th>
                                 <th>Date</th>
                                 <th>Type</th>
                                 <th>Facture</th>
@@ -63,6 +64,7 @@
                             @foreach($reglements as $reglement)
                             <tr>
                                 <td>{{$reglement->numero}}</td>
+                                <td> <span class="badge bg-light text-dark border rounded"> {{ $reglement->reference_preuve }} / {{ $reglement->facture?->reference_recu }}</span> </td>
                                 <td>{{$reglement->date_reglement}}</td>
                                 <td>{{$reglement->type_reglement}}</td>
                                 <td>{{$reglement->facture?->numero}}</td>

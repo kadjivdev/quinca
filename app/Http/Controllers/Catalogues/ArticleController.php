@@ -233,7 +233,7 @@ class ArticleController extends Controller
         }
     }
 
-    public function searchArticles(Request $request)
+    public function _searchArticles(Request $request)
     {
         try {
             $search = $request->get('q');
@@ -283,8 +283,35 @@ class ArticleController extends Controller
             return response()->json([
                 'items' => $articles->map(function ($article) use ($depot_id) {
                     // Récupérer le stock du magasin
-                    $stockDepot = $article->stocks->first();
-                    $stockDisponible = $stockDepot ? $stockDepot->quantite : 0;
+                    $stockDepot = $article
+                        ->stocks
+                        ->where("depot_id", $depot_id)
+                        ->first();
+
+                    $conversion = $this->serviceStockEntree
+                        ->rechercherConversion(
+                            $stockDepot->unite_mesure_id,
+                            $stockDepot->article->unite_mesure_id,
+                            $stockDepot->article_id
+                        );
+
+                    /**Qte de Base */
+                    $stockDepot->qantiteBase = $conversion ? $this->serviceStockEntree
+                        ->convertirQuantite(
+                            $stockDepot->quantite_reelle,
+                            $conversion,
+                            $stockDepot->unite_mesure_id
+                        ) : 00;
+
+
+                    /**Qte Vendue */
+                    $stockDepot->qteTotalVendu = $article->qteVendu($stockDepot->depot_id);
+
+                    $stockDepot->resteStock = $stockDepot->qantiteBase - $stockDepot->qteTotalVendu; //$article->reste($stock->depot_id);
+
+                    $stockDisponible = $stockDepot ?
+                        $stockDepot->resteStock
+                        : 0;
 
                     // Récupérer toutes les unités disponibles pour cet article
                     $unites = collect();
