@@ -104,6 +104,14 @@
                                     <button class="btn btn-sm btn-light"
                                         data-bs-toggle="tooltip" title="Détails"
                                         onclick="showFactureRev({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @elseif($compte->factureClient)
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFacture({{$compte->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @elseif($compte->factureRevendeur)
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFactureRev({{$compte->facture_revendeur_id}})"><i class="fas fa-eye"></i></button>
                                     @else
                                     --
                                     @endif

@@ -57,8 +57,8 @@
                                 <th class="border-bottom-0 text-nowrap py-3">N°</th>
                                 <th class="border-bottom-0 text-nowrap py-3">Inséré le</th>
                                 <th class="border-bottom-0 text-nowrap py-3">Date D'opération</th>
-                                <th class="border-bottom-0">Détail facture</th>
                                 <th class="border-bottom-0">Opération</th>
+                                <th class="border-bottom-0">Détail facture</th>
                                 <th class="border-bottom-0">Débit</th>
                                 <th class="border-bottom-0">Crédit</th>
                                 <th class="border-bottom-0">Opérateur</th>
@@ -72,19 +72,7 @@
                                 </td>
                                 <td>{{ Carbon\Carbon::parse($compte->created_at)->format('d/m/Y H:i:s') }}</td>
                                 <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y H:i:s') }}</td>
-                                <td class="text-center">
-                                    @if($compte->type_op=="REG_CLT")
-                                    <button class="btn btn-sm btn-light"
-                                        data-bs-toggle="tooltip" title="Détails"
-                                        onclick="showFacture({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
-                                    @elseif($compte->type_op=="REG_REV")
-                                    <button class="btn btn-sm btn-light"
-                                        data-bs-toggle="tooltip" title="Détails"
-                                        onclick="showFactureRev({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
-                                    @else
-                                    --
-                                    @endif
-                                </td>
+
                                 <td>
                                     @if($compte->type_op=="FAC_CLT")
                                     Facture de vente client <span class="badge bg-light text-dark">{{$compte->factureClient->numero}}</span>
@@ -104,6 +92,27 @@
 
                                     @if($compte->type_op=="AC_CLT")
                                     Accompte sur le compte du client <span class="badge bg-light text-dark">{{$compte->accompteClient->reference}}</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if($compte->type_op=="REG_CLT")
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFacture({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @elseif($compte->type_op=="REG_REV")
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFactureRev({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @elseif($compte->factureClient)
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFacture({{$compte->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @elseif($compte->factureRevendeur)
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFactureRev({{$compte->facture_revendeur_id}})"><i class="fas fa-eye"></i></button>
+                                    @else
+                                    --
                                     @endif
                                 </td>
                                 <td class="bg-secondary text-white">
