@@ -57,6 +57,7 @@
                                 <th class="border-bottom-0 text-nowrap py-3">N°</th>
                                 <th class="border-bottom-0 text-nowrap py-3">Inséré le</th>
                                 <th class="border-bottom-0 text-nowrap py-3">Date D'opération</th>
+                                <th class="border-bottom-0">Détail facture</th>
                                 <th class="border-bottom-0">Opération</th>
                                 <th class="border-bottom-0">Débit</th>
                                 <th class="border-bottom-0">Crédit</th>
@@ -71,6 +72,19 @@
                                 </td>
                                 <td>{{ Carbon\Carbon::parse($compte->created_at)->format('d/m/Y H:i:s') }}</td>
                                 <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y H:i:s') }}</td>
+                                <td class="text-center">
+                                    @if($compte->type_op=="REG_CLT")
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFacture({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @elseif($compte->type_op=="REG_REV")
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFactureRev({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @else
+                                    --
+                                    @endif
+                                </td>
                                 <td>
                                     @if($compte->type_op=="FAC_CLT")
                                     Facture de vente client <span class="badge bg-light text-dark">{{$compte->factureClient->numero}}</span>
@@ -107,8 +121,6 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <!-- <span class="badge bg-light text-dark">{{$compte->user->name}}</span> -->
-
                                     <!-- quand le réglement est validé par l'admin, on affiche le créateur du reglement
                                      autrement on affiche celui qui a validé le règlement -->
                                     <span class="badge bg-light text-dark">{{($compte->user_id==1 && $compte->type_op=="REG_CLT")?$compte->reglementClient?->createdBy->name:$compte->user?->name}}</span>
@@ -133,6 +145,8 @@
     </div>
 </div>
 @endsection>
+
+@include('pages.ventes.client.partials.show-facture-modal')
 
 <style>
     :root {

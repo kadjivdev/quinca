@@ -56,6 +56,7 @@
                                 <th>Date</th>
                                 <th>Type</th>
                                 <th>Facture</th>
+                                <th>Détail facture</th>
                                 <th class="text-end">Montant</th>
                                 <th>Status</th>
                             </tr>
@@ -68,6 +69,11 @@
                                 <td>{{$reglement->date_reglement}}</td>
                                 <td>{{$reglement->type_reglement}}</td>
                                 <td>{{$reglement->facture?->numero}}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFacture({{$reglement->facture?->id}})"><i class="fas fa-eye"></i></button>
+                                </td>
                                 <td class="text-end">{{$reglement->montant}} FCFA</td>
                                 <td class="text-end">
                                     <span class="badge bg-light text-dark border">{{$reglement->statut}}</span>
@@ -89,6 +95,8 @@
     </div>
 </div>
 @endsection
+
+@include('pages.ventes.client.partials.show-facture-modal')
 
 @push("scripts")
 <script>

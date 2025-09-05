@@ -58,6 +58,7 @@
                                 <th class="border-bottom-0 text-nowrap py-3">Inséré le</th>
                                 <th class="border-bottom-0 text-nowrap py-3">Date Opération</th>
                                 <th class="border-bottom-0">Opération</th>
+                                <th class="border-bottom-0 text-nowrap py-3">Detail facture</th>
                                 <th class="border-bottom-0">Réference</th>
                                 <th class="border-bottom-0">Débit</th>
                                 <th class="border-bottom-0">Crédit</th>
@@ -92,6 +93,19 @@
 
                                     @if($compte->type_op=="AC_CLT")
                                     Accompte sur le compte du client <span class="badge bg-light text-dark">{{$compte->accompteClient?->reference}}</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if($compte->type_op=="REG_CLT")
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFacture({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @elseif($compte->type_op=="REG_REV")
+                                    <button class="btn btn-sm btn-light"
+                                        data-bs-toggle="tooltip" title="Détails"
+                                        onclick="showFactureRev({{$compte->reglementClient?->facture_client_id}})"><i class="fas fa-eye"></i></button>
+                                    @else
+                                    --
                                     @endif
                                 </td>
                                 <td>
@@ -149,6 +163,8 @@
     </div>
 </div>
 @endsection>
+
+@include('pages.ventes.client.partials.show-facture-modal')
 
 <style>
     :root {

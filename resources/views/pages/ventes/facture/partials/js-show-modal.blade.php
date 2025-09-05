@@ -1,4 +1,5 @@
 <script>
+    // alert("ggogog")
     // Initialisation des variables globales
     let factureModal;
 
@@ -13,6 +14,7 @@
 
     // Fonction principale pour afficher la facture
     function showFacture(id) {
+        alert(id)
         // Vérification de l'ID
         if (!id) {
             showError('ID de facture invalide');
@@ -33,6 +35,56 @@
         // Faire la requête AJAX
         $.ajax({
             url: `${apiUrl}/vente/factures/${id}`,
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                // Fermer le loader
+                Swal.close();
+
+                if (response.status === 'success') {
+                    // Mettre à jour le contenu du modal
+                    updateModalContent(response.data);
+
+                    // Afficher le modal
+                    factureModal.show();
+                } else {
+                    showError('Erreur lors du chargement des détails');
+                }
+            },
+            error: function(xhr) {
+                Swal.close();
+                showError('Erreur de communication avec le serveur');
+                console.error('Erreur AJAX:', xhr);
+            }
+        });
+    }
+
+    // Fonction principale pour afficher la facture revendeur
+    function showFactureRev(id) {
+        // alert(`Revendeur facture ID ${id}`)
+
+        // Vérification de l'ID
+        if (!id) {
+            showError('ID de facture invalide');
+            return;
+        }
+
+        // Afficher l'animation de chargement
+        Swal.fire({
+            title: 'Chargement...',
+            html: 'Récupération des détails de la facture',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Faire la requête AJAX
+        $.ajax({
+            url: `${apiUrl}/revendeurs/factures/${id}`,
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
