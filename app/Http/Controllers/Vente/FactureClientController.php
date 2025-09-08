@@ -258,12 +258,11 @@ class FactureClientController extends Controller
                  * Obtention de la quantité convertie
                  */
 
-                $QteConvertie = $this->serviceStockEntree
-                    ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
+                // $QteConvertie = $this->serviceStockEntree
+                //     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
-                // $QteStockConvertie = $this->serviceStockEntree
-                //     ->convertirQuantite($stock->article->reste($stock->depot_id), $conversion, $ligne['unite_vente_id']);
-
+                // $QteConvertie = $this->serviceStockEntree
+                //     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
                 /**Qte de Base */
                 $qantiteBase = $conversion ? $this->serviceStockEntree
@@ -280,11 +279,22 @@ class FactureClientController extends Controller
                 /**Qte Reste */
                 $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
 
+                Log::debug("Vérification stock", [
+                    "article" => $article->designation,
+                    "depot" => $depot->libelle_depot,
+                    "unite_stock" => $stockUnite->libelle_unite,
+                    "unite_vente" => $venteUnite->libelle_unite,
+                    "qte_saisie" => $ligne['quantite'],
+                    // "qte_convertie" => $QteConvertie,
+                    "qte_stock" => $qantiteBase,
+                    "qte_vendue" => $qteTotalVendu,
+                    "reste_stock" => $resteStock
+                ]);
                 if ($resteStock < 0) {
                     throw new Exception("Le stock est négatif! Veuillez approvisionne le stock");
                 }
                 // on verifie la quantité restante de l'article dans le depot est suffisante
-                if ($resteStock < $QteConvertie) {
+                if ($resteStock < $ligne['quantite']) {
                     return response()->json([
                         'status' => false,
                         'message' => "Le reste du stock de l'article ($article->designation) est de $resteStock $venteUnite->libelle_unite dans le depôt ({$stock->depot?->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
