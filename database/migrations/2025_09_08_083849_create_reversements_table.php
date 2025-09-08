@@ -13,6 +13,39 @@ return new class extends Migration
     {
         Schema::create('reversements', function (Blueprint $table) {
             $table->id();
+            $table->date('date_recette')->nullable();
+            $table->foreignId('depot_id')
+                ->nullable()
+                ->constrained('depots', "id")
+                ->onUpdate('cascade')
+                ->onDelete('set null');
+            $table->float('recette')->default(0);
+            $table->float('depense')->default(0);
+            $table->float('recette_to_reverse')->default(0);
+            $table->float('montant_reversed')->default(0);
+            $table->string("commentaire")->nullable();
+            $table->string("preuve")->nullable();
+
+            $table->foreignId('created_by')
+                ->nullable()
+                ->constrained('users', "id")
+                ->onUpdate('cascade')
+                ->onDelete('set null');
+
+            $table->foreignId('deleted_by')
+                ->nullable()
+                ->constrained('users', "id")
+                ->onUpdate('cascade')
+                ->onDelete('set null');
+            $table->foreignId('validated_by')
+                ->nullable()
+                ->constrained('users', "id")
+                ->onUpdate('cascade')
+                ->onDelete('set null');
+
+            $table->timestamp("validated_at")->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }

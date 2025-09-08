@@ -13,7 +13,7 @@ use App\Http\Controllers\Parametre\ConversionUniteController;
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
 use App\Http\Controllers\Achat\{AccompteFournisseurController, AvanceController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
-use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, TransportController};
+use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, ReversementController, TransportController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
@@ -928,6 +928,10 @@ Route::middleware('auth')->group(function () {
         // REQUTES
         Route::resource("requetes", RequeteController::class);
         Route::post('/valider-requete/{id}', [RequeteController::class, 'validateRequete'])->name('valider-requete');
+
+        // REVERSEMENTS
+        Route::resource("reversements", ReversementController::class);
+        Route::post('/valider-reversement/{id}', [ReversementController::class, 'validateReversement'])->name('valider-reversement');
 
         // TRANSPORTS
         Route::resource('transports', TransportController::class);

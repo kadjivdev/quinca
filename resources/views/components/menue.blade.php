@@ -315,6 +315,10 @@
                     <li><a class="dropdown-item" href="{{ route('revendeur.depenses.index') }}">
                             <div class="dropdown-item-wrapper">Enregistrements des dépenses</div>
                         </a></li>
+
+                    <li><a class="dropdown-item" href="{{ route('reversements.index') }}">
+                            <div class="dropdown-item-wrapper">Reversement recette</div>
+                        </a></li>
                 </ul>
             </li>
             @endcanany
