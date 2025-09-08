@@ -14,6 +14,7 @@
         <ul class="navbar-nav navbar-nav-top" data-dropdown-on-hover="data-dropdown-on-hover">
 
             <!-- ADMINISTRATION -->
+            @if(auth()->user()->hasRole("Super Administrateur"))
             @canany(['users.view', 'roles.view'])
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle lh-1" href="#" role="button" data-bs-toggle="dropdown"
@@ -35,6 +36,7 @@
                 </ul>
             </li>
             @endcanany
+            @endif
 
             <!-- PARAMETRE -->
             @canany(['configuration.view', 'point-vente.view', 'depot.view', 'caisse.view', 'unite-mesure.view', 'conversion.view', 'chauffeur.view', 'vehicule.view'])
