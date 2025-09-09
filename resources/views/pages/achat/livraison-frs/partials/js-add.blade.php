@@ -434,7 +434,7 @@
                         <span>${ligne.unite_mesure.libelle_unite}</span>
                     </td>
                     <td class="text-center">
-                        <input type="number"
+                         <input type="number"
                             class="form-control form-control-sm quantite-input text-end"
                             value="${ligne.quantite}"
                             readonly>

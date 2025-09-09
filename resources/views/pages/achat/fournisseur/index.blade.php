@@ -19,8 +19,11 @@
     @include('pages.achat.fournisseur.partials.add-modal')
     @include('pages.achat.fournisseur.partials.edit-modal')
     @include('pages.achat.fournisseur.partials.import-modal')
-@endsection
 
+    <!-- modals de details factures, acomptes, et reglements -->
+    <!-- include('pages.achat.fournisseur.partials.show-accomptes-modal') -->
+    <!-- include('pages.achat.fournisseur.partials.show-reglements-modal') -->
+@endsection
 
 @push('scripts')
     @include('pages.achat.fournisseur.partials.scripts')

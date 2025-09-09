@@ -17,13 +17,13 @@ use Illuminate\Validation\ValidationException;
 
 class BonLivraisonFournisseurController extends Controller
 {
-
     private $serviceStockEntree;
 
     public function __construct(ServiceStockEntree $serviceStockEntree)
     {
         $this->serviceStockEntree = $serviceStockEntree;
     }
+
     /**
      * Affiche la liste des bons de livraison fournisseur
      */
@@ -526,11 +526,16 @@ class BonLivraisonFournisseurController extends Controller
                     $ligneFact->quantite_livree_simple - $ligneFact->quantite_livree : $ligneFact->quantite_livree_simple;
 
                 $ligneFact->update([
-                    'quantite_livree' => $stockToAdd,
+                    'quantite_livree' => $ligneFact->quantite_livree  + $ligneFact->quantite_livree_simple,
                 ]);
 
-                Log::info("QTe restante", ["data" => $stockToAdd]);
+                Log::info("QTe ajouté", ["data" => $ligneFact->quantite_livree_simple]);
+                Log::info("QTe Total", ["data" => $ligneFact->quantite_livree]);
                 Log::info("Ligne facture après update", ["data" => $ligneFact]);
+
+                if ($ligneFact->quantite_livree > $ligneFact->quantite_base) {
+                    throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
+                }
 
                 // Log des prix unitaires
                 Log::debug("Prix unitaire pour article {$ligneFact->article_id}: {$ligneFact->prix_unitaire}");

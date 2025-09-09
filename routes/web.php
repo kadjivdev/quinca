@@ -23,6 +23,8 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\BonLivraisonFournisseur;
+use App\Models\Achat\FactureFournisseur;
+use App\Models\Catalogue\Article;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\Requete;
 
@@ -38,9 +40,45 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $requetesToDelete = Requete::whereIn("id", [75, 76, 77])->delete();
-    return response()->json($requetesToDelete);
-    // return "Regulation du stock de l'aticle ART-1418 & du Bon BLF2508120003 avec succès!!";
+    $FAC25093314 = FactureFournisseur::with("lignes")->firstWhere("code", "FAC25093314");
+
+    foreach ($FAC25093314->lignes as $ligne) {
+        switch ($ligne->id) {
+            case 513:
+                $ligne->update(["quantite_livree" => 00]);
+                break;
+
+            case 514:
+                $ligne->update(["quantite_livree" => 56]);
+                break;
+
+            default:
+                break;
+        }
+    }
+    // return response()->json($FAC25093314);
+
+    $FAC25087247 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25087247");
+
+    // return $FAC25087247;
+
+    foreach ($FAC25087247->lignes as $ligne) {
+        switch ($ligne->id) {
+            case 330:
+                $ligne->update(["quantite_livree_simple" => 494.96]);
+                break;
+
+            case 331:
+                $ligne->update(["quantite_livree" => 398.88, "quantite_livree_simple" => 115.2]);
+                break;
+
+            default:
+                break;
+        }
+    }
+    // return response()->json($FAC25087247);
+
+    return "Regulation effectuée pour les facture FAC25093314 & FAC25087247 éffectuée avec succès!!";
 });
 
 /**DETELE A STOCK */
@@ -282,6 +320,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/{fournisseur}', [FournisseurController::class, 'destroy'])->name('fournisseur.destroy');
             Route::get('/template/download', [FournisseurController::class, 'downloadTemplate'])->name('fournisseur.template');
             Route::post('/import', [FournisseurController::class, 'import'])->name('fournisseur.import');
+
+            Route::get('details/{id}/factures', [FournisseurController::class, 'facturesDetails'])->name('vente.clients.detailFactures');
+            Route::get('details/{id}/reglements', [FournisseurController::class, 'detailReglements'])->name('vente.clients.detailReglements');
+            Route::get('details/{id}/accomptes', [FournisseurController::class, 'detailAccomptes'])->name('vente.clients.detailAccomptes');
         });
 
         Route::prefix('programmations')->group(function () {

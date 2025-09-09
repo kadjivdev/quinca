@@ -127,6 +127,122 @@ class FournisseurController extends Controller
         }
     }
 
+    // Details
+
+    /**
+     * Affiche les détails des factures d'un client
+     */
+    public function facturesDetails(Request $request, $id)
+    {
+        try {
+            $fournisseur = Fournisseur::find($id);
+
+            if (!$fournisseur) {
+                throw new \Exception("Fournisseur non trouvé");
+            }
+
+            // Charger les relations nécessaires
+            $fournisseur->load([
+                'factures.bonCommande',
+            ]);
+            // Préparer les données pour la réponse
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'fournisseur' => $fournisseur,
+                ]);
+            }
+
+            return view('pages.achat.fournisseur.partials.details.facture', compact(
+                'fournisseur',
+            ));
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Affiche les détails des règlements d'un client
+     */
+    public function detailReglements(Request $request, $id)
+    {
+        try {
+            $fournisseur = Fournisseur::find($id);
+
+            if (!$fournisseur) {
+                throw new \Exception("Fournisseur non trouvé");
+            }
+
+            // Charger les relations nécessaires
+            $fournisseur->load([
+                'facture_fournisseurs' => function ($query) {
+                    $query->with('reglements.facture');
+                },
+            ]);
+            // Préparer les données pour la réponse
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'fournisseur' => $fournisseur,
+                    'reglements' => $fournisseur->facture_fournisseurs->flatMap->reglements,
+                ]);
+            }
+
+            return view('pages.achat.fournisseur.partials.details.facture', compact(
+                'fournisseur',
+            ));
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Affiche les détails des accomptes d'un client
+     */
+    public function detailAccomptes(Request $request, $id)
+    {
+
+        try {
+            $fournisseur = Fournisseur::find($id);
+
+            if (!$fournisseur) {
+                throw new \Exception("Fournisseur non trouvé");
+            }
+
+            // Charger les relations nécessaires
+            $fournisseur->load([
+                'accomptes',
+            ]);
+            // Préparer les données pour la réponse
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'fournisseur' => $fournisseur,
+                    'accomptes' => $fournisseur->accomptes,
+                ]);
+            }
+
+            return view('pages.achat.fournisseur.partials.details.facture', compact(
+                'fournisseur',
+            ));
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+
     public function update(Request $request, $id)
     {
         try {
