@@ -115,12 +115,7 @@ class ReglementFournisseurController extends Controller
             if (count($facturefournisseurs) == 1) {
                 $facture = $facturefournisseurs[0];
 
-                $approvisionnment = $facture->fournisseur?->approvisionnements()->sum("montant");
-                $reglementsAmount = $facture->fournisseur?->facture_fournisseurs->sum(function ($query) {
-                    return $query->facture_reglements_amount();
-                });
-
-                $resteSolde = ($approvisionnment - $reglementsAmount);
+                $resteSolde = $facture->fournisseur?->reste_appro();
 
                 if ($request->montant_reglement) {
                     // # quand le montant saisi est supérieur au reste de la facture
@@ -155,12 +150,8 @@ class ReglementFournisseurController extends Controller
             // en cas de plusieures factures
             if (count($facturefournisseurs) > 1) {
                 $fournisseur = $facturefournisseurs[0]->fournisseur;
-                $approvisionnment = $fournisseur?->approvisionnements()->sum("montant");
-                $reglementsAmount = $fournisseur?->facture_fournisseurs->sum(function ($query) {
-                    return $query->facture_reglements_amount();
-                });
-
-                $resteSolde = ($approvisionnment - $reglementsAmount);
+              
+                $resteSolde = $fournisseur?->reste_appro();
 
                 if ($request->montant_reglement) {
                     return response()->json([

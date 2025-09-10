@@ -46,9 +46,7 @@
                                             @if(count($facture->reglements->whereNull("validated_by"))>0 || count($facture->reglements_grouped()->whereNull("validated_by"))>0) disabled @endif
                                             >
                                             {{ $facture->code }} [ Montant: {{ number_format($facture->montant_ttc, 2) }}; Reste: {{ number_format($facture->facture_amont(), 2) }} FCFA] <br>
-                                            - {{ $facture->fournisseur?->raison_sociale }} [ Solde: {{ number_format($facture->fournisseur?->approvisionnements()->sum("montant") - $facture->fournisseur?->facture_fournisseurs->sum(function ($query) {
-                                                                   return $query->facture_reglements_amount();
-                                                                }),2) }} ]
+                                            - {{ $facture->fournisseur?->raison_sociale }} [ Solde: {{ number_format($facture->fournisseur?->reste_appro()) }} ]
                                         </option>
                                         @endforeach
                                     </select>

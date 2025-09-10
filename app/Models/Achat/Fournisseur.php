@@ -166,6 +166,25 @@ class Fournisseur extends Model
         return $this->hasMany(RequeteFournisseur::class, "fournisseur_id");
     }
 
+    function reste_appro()
+    {
+        $appro_solde = $this->approvisionnements()->sum("montant");
+
+        /**Les avances */
+        $avancesAmount = $this->avances
+            ->whereNotNull("validated_by")
+            ->sum("montant");
+
+        /**
+         * Les reglements
+         */
+        $reglementsAmount = $this->facture_fournisseurs->sum(function ($query) {
+            return $query->facture_reglements_amount();
+        });
+
+        return ($appro_solde + $avancesAmount) - $reglementsAmount;
+    }
+
     function reste_solde()
     {
         $appro_solde = $this->approvisionnements()->sum("montant");
@@ -195,6 +214,7 @@ class Fournisseur extends Model
     /**
      * Boot du modèle
      */
+
     protected static function boot()
     {
         parent::boot();
