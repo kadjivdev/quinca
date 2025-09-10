@@ -59,7 +59,7 @@
                     <textarea required class="form-control" name="formulation" id="formulation">{{ old('formulation') }}</textarea>
                 </div>
 
-                <div class="col-12 mb-3">
+                <!-- <div class="col-12 mb-3">
                     <label for="articles">Motif</label>
                     <select name="motif" id="motif" class="select2 form-select" required>
                         <option value="">Choisir le motif </option>
@@ -78,9 +78,9 @@
                         </option>
                         @endforeach
                     </select>
-                </div>
+                </div> -->
 
-                <div class="col-12 mb-3" id="autre_motif_div" style="display: none">
+                <div class="col-12 mb-3" id="autre_motif_div">
                     <label for="autre_motif">Contenu du motif</label>
                     <textarea class="form-control" name="autre_motif" id="autre_motif">{{ old('autre_motif') }}</textarea>
                     <br>

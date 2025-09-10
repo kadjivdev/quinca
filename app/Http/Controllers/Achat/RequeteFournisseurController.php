@@ -11,6 +11,7 @@ use App\Models\Vente\Requete;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class RequeteFournisseurController extends Controller
 {
@@ -59,18 +60,22 @@ class RequeteFournisseurController extends Controller
                 'mention' => 'required|string',
                 'formulation' => 'required|string',
                 'fournisseur_id' => 'required|string',
-                'motif' => 'required|string',
+                'motif' => 'nullable|string',
                 // 'articles' => 'required|array',
-                'articles.*' => 'exists:articles,id',
+                // 'articles.*' => 'exists:articles,id',
                 'fichier' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png', // types de fichiers autorisés
             ]);
 
             DB::beginTransaction();
 
+            $validated['fichier'] = "";
             if ($request->hasFile('fichier')) {
-                $filePath = $request->file('fichier')->store('uploads', 'public'); // Stocke le fichier dans le dossier 'uploads'
-                $validated['fichier'] = $filePath;
+                $fileName = $request->file('fichier')->getClientOriginalName();
+                $request->file('fichier')->move('requeteFiles', $fileName);
+                $validated['fichier'] = asset("requeteFiles/" . $fileName);
             }
+
+            $validated['user_id'] = auth()->user()->id;
 
             // Créer la requête
             $requete = RequeteFournisseur::create([
@@ -84,12 +89,9 @@ class RequeteFournisseurController extends Controller
                 'fournisseur_id' => $request->fournisseur_id,
                 'motif' => $request->motif,
                 'motif_content' => $request->autre_motif,
-                'fichier' => $request->hasFile('fichier') ? $request->file('fichier')->store('uploads', 'public') : null,
+                'fichier' => $request->hasFile('fichier') ? $validated['fichier'] : null,
             ]);
 
-            if ($request->motif == 'Articles') {
-                $requete->articles()->attach($request->articles);
-            }
 
             DB::commit();
             return response()->json([

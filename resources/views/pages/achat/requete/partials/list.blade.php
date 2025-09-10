@@ -13,6 +13,7 @@
                             <th class="border-bottom-0">Mention</th>
                             <th class="border-bottom-0">Articles</th>
                             <th class="border-bottom-0">Montant</th>
+                            <th class="border-bottom-0">Preuve</th>
                             <th class="border-bottom-0">Action</th>
                         </tr>
                     </thead>
@@ -36,6 +37,7 @@
                                 @endif
                             </td>
                             <td>{{ $requete->montant }}</td>
+                            <td>@if($requete->fichier)<a target="_blank" href="{{$requete->fichier}}" class="btn btn-sm btn-light">Voir</a> @else -- @endif</td>
                             <td>
                                 @if (is_null($requete->validate_at))
                                 <div class="dropdown">
