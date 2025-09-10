@@ -125,7 +125,7 @@
                                 </small>
                             </td>
                             <td class="text-end">
-                                <div class="fw-bold">{{ number_format($totalReglements, 2) }} FCFA</div>
+                                <div class="fw-bold"> {{ number_format($totalReglements, 2) }} FCFA</div>
                             </td>
                             <td class="text-center">
                                 <div class="d-flex gap-2 justify-content-center">

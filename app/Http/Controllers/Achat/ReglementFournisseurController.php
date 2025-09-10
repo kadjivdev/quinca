@@ -114,6 +114,14 @@ class ReglementFournisseurController extends Controller
             // en cas d'une seule facture
             if (count($facturefournisseurs) == 1) {
                 $facture = $facturefournisseurs[0];
+
+                $approvisionnment = $facture->fournisseur?->approvisionnements()->sum("montant");
+                $reglementsAmount = $facture->fournisseur?->facture_fournisseurs->sum(function ($query) {
+                    return $query->facture_reglements_amount();
+                });
+
+                $resteSolde = ($approvisionnment - $reglementsAmount);
+
                 if ($request->montant_reglement) {
                     // # quand le montant saisi est supérieur au reste de la facture
                     if ($request->montant_reglement > $facture->facture_amont()) {
@@ -124,14 +132,14 @@ class ReglementFournisseurController extends Controller
                     }
 
                     // # quand le montant saisi est supérieur au reste du solde du fournisseur
-                    if ($request->montant_reglement > $facture->fournisseur->reste_solde()) {
+                    if ($request->montant_reglement > $resteSolde) {
                         return response()->json([
                             'success' => false,
                             'message' => 'Le montant saisi dépasse le reste du solde du fournisseur'
                         ], 500);
                     }
                 } else {
-                    if ($facture->facture_amont() > $facture->fournisseur->reste_solde()) {
+                    if ($facture->facture_amont() > $resteSolde) {
                         // # quand le montant restant de la facture est supérieur au reste du solde du fournisseur
                         return response()->json([
                             'success' => false,
@@ -146,6 +154,14 @@ class ReglementFournisseurController extends Controller
 
             // en cas de plusieures factures
             if (count($facturefournisseurs) > 1) {
+                $fournisseur = $facturefournisseurs[0]->fournisseur;
+                $approvisionnment = $fournisseur?->approvisionnements()->sum("montant");
+                $reglementsAmount = $fournisseur?->facture_fournisseurs->sum(function ($query) {
+                    return $query->facture_reglements_amount();
+                });
+
+                $resteSolde = ($approvisionnment - $reglementsAmount);
+
                 if ($request->montant_reglement) {
                     return response()->json([
                         'success' => false,
@@ -159,10 +175,10 @@ class ReglementFournisseurController extends Controller
                 });
 
                 // Quand le total des reglements depasse le solde actuel du fournisseur
-                if ($totalRegle > $facturefournisseurs[0]->fournisseur->reste_solde()) {
+                if ($totalRegle > $resteSolde) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Le total des factures dépasse le solde actuel du fournisseur (' . $totalRegle . '>' . $facturefournisseurs[0]->fournisseur->reste_solde(),
+                        'message' => 'Le total des factures dépasse le solde actuel du fournisseur (' . $totalRegle . '>' . $resteSolde,
                     ]);
                 }
 
