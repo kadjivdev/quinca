@@ -40,45 +40,38 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $FAC25093314 = FactureFournisseur::with("lignes")->firstWhere("code", "FAC25093314");
+    $FAC25087092 = FactureFournisseur::with("lignes")->firstWhere("code", "FAC25087092");
 
-    foreach ($FAC25093314->lignes as $ligne) {
+    foreach ($FAC25087092->lignes as $ligne) {
         switch ($ligne->id) {
-            case 513:
-                $ligne->update(["quantite_livree" => 00]);
+            case 424:
+                $ligne->update(["quantite_livree" => 200]);
                 break;
-
-            case 514:
-                $ligne->update(["quantite_livree" => 56]);
-                break;
-
             default:
                 break;
         }
     }
+
     // return response()->json($FAC25093314);
 
-    $FAC25087247 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25087247");
+    // $FAC25087247 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25087247");
 
-    // return $FAC25087247;
+    // foreach ($FAC25087247->lignes as $ligne) {
+    //     switch ($ligne->id) {
+    //         case 330:
+    //             $ligne->update(["quantite_livree_simple" => 494.96]);
+    //             break;
 
-    foreach ($FAC25087247->lignes as $ligne) {
-        switch ($ligne->id) {
-            case 330:
-                $ligne->update(["quantite_livree_simple" => 494.96]);
-                break;
+    //         case 331:
+    //             $ligne->update(["quantite_livree" => 398.88, "quantite_livree_simple" => 115.2]);
+    //             break;
 
-            case 331:
-                $ligne->update(["quantite_livree" => 398.88, "quantite_livree_simple" => 115.2]);
-                break;
+    //         default:
+    //             break;
+    //     }
+    // }
 
-            default:
-                break;
-        }
-    }
-    // return response()->json($FAC25087247);
-
-    return "Regulation effectuée pour les facture FAC25093314 & FAC25087247 éffectuée avec succès!!";
+    return "Regulation effectuée pour les facture FAC25087092 éffectuée avec succès!!";
 });
 
 /**DETELE A STOCK */

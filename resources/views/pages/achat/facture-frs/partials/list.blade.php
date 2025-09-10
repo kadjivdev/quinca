@@ -83,6 +83,18 @@
                                 }else {
                                     $statut = 'PARTIELLEMENT_PAYE';
                                 }
+
+                                // 
+                                $qteTotalFacture = $facture->lignes()->sum('quantite');
+                                $totalLivres = $facture->lignes()->sum('quantite_livree');
+                                if ($totalLivres == 0) {
+                                    $factureStatutLivraison = 'NON_LIVRE';
+                                } elseif ($totalLivres >= $qteTotalFacture) {
+                                    $factureStatutLivraison = 'LIVRE';
+                                } else {
+                                    $factureStatutLivraison = 'PARTIELLEMENT_LIVRE';
+                                }
+
                             ;?>
                         <tr>
                             <td class="text-nowrap py-3">
@@ -129,8 +141,8 @@
                             </td>
                             <td class="text-center">
                                 <div class="d-flex gap-2 justify-content-center">
-                                    <span class="badge bg-{{ $facture->statut_livraison === 'LIVRE' ? 'success' : ($facture->statut_livraison === 'PARTIELLEMENT_LIVRE' ? 'warning' : 'danger') }}">
-                                        {{ str_replace('_', ' ', $facture->statut_livraison) }}
+                                    <span class="badge bg-{{ $factureStatutLivraison === 'LIVRE' ? 'success' : ($factureStatutLivraison === 'PARTIELLEMENT_LIVRE' ? 'warning' : 'danger') }}">
+                                        {{ str_replace('_', ' ', $factureStatutLivraison) }}
                                     </span>
 
                                     <span class="badge bg-{{ $statut === 'PAYE' ? 'success' : ($statut === 'PARTIELLEMENT_PAYE' ? 'warning' : 'danger') }}">
