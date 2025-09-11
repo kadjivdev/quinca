@@ -80,12 +80,12 @@
                     </select>
                 </div> -->
 
-                <div class="col-12 mb-3" id="autre_motif_div">
+                <!-- <div class="col-12 mb-3" id="autre_motif_div">
                     <label for="autre_motif">Contenu du motif</label>
                     <textarea class="form-control" name="autre_motif" id="autre_motif">{{ old('autre_motif') }}</textarea>
                     <br>
                     <input type="file" class="form-control" name="fichier">
-                </div>
+                </div> -->
 
 
                 <div class="text-center">

@@ -60,7 +60,7 @@ class RequeteFournisseurController extends Controller
                 'mention' => 'required|string',
                 'formulation' => 'required|string',
                 'fournisseur_id' => 'required|string',
-                'motif' => 'nullable|string',
+                // 'motif' => 'nullable|string',
                 // 'articles' => 'required|array',
                 // 'articles.*' => 'exists:articles,id',
                 'fichier' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png', // types de fichiers autorisés
