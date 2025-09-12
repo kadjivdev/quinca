@@ -130,7 +130,7 @@
                                 <div class="card border border-light-subtle">
                                     <div class="card-header bg-light">
                                         <h6 class="card-title mb-0">
-                                            <i class="fas fa-box me-2"></i>Articles
+                                            <i class="fas fa-box me-2"></i> Articles
                                         </h6>
                                     </div>
                                     <div class="card-body">
@@ -325,6 +325,7 @@
 
         // Fonction pour afficher les articles
         function displayArticles(articles) {
+            
             console.log(articles)
             const tbody = $('#articlesTableBody');
             tbody.empty();
@@ -494,7 +495,6 @@
             }
             calculateTotals();
         });
-
     });
 </script>
 @endpush

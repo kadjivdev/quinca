@@ -608,6 +608,7 @@ class FactureClientController extends Controller
 
     public function searchArticles(Request $request)
     {
+        // dd("gogo");
         $search = $request->get('q');
         Log::info("Terme de recherche:", ["terme" => $search]);
         $user = auth()->user();
@@ -628,7 +629,6 @@ class FactureClientController extends Controller
                 $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
                 if (in_array($stock->depot_id, $userPv_depotIds)) {
-
                     return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
                     );
@@ -708,21 +708,24 @@ class FactureClientController extends Controller
         }
     }
 
-    public function getUnites(Request $request, $articleId)
+    public function getUnites($articleId)
     {
         try {
             Log::info('Début récupération des unités', ['article_id' => $articleId]);
 
             // Récupérer l'article avec son unité de mesure
-            $article = Article::with('uniteMesure')->findOrFail($articleId);
+            $article = Article::with('uniteMesure', 'tarifications')->findOrFail($articleId);
 
             $unites = collect();
 
+
             // 1. Ajouter l'unité de base de l'article si elle existe
             if ($article->uniteMesure) {
+                $tarification =  $article->tarifViaUnite($article->uniteMesure->id);
+                // return $tarification->load(["typeTarif", "depotTarif"]);
                 $unites->push([
                     'id' => $article->uniteMesure->id,
-                    'text' => $article->uniteMesure->libelle_unite
+                    'text' => $article->uniteMesure?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
                 ]);
             }
 
@@ -736,11 +739,13 @@ class FactureClientController extends Controller
             $unitesConversion->pluck('uniteSource')
                 ->where('statut', true)
                 ->unique('id')
-                ->each(function ($unite) use (&$unites) {
+                ->each(function ($unite) use (&$unites, $article) {
                     if (!$unites->contains('id', $unite->id)) {
+                        $tarification =  $article->tarifViaUnite($unite->id);
                         $unites->push([
                             'id' => $unite->id,
-                            'text' => $unite->libelle_unite
+                            // 'text' => $unite->libelle_unite,
+                            'text' =>  $unite?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
                         ]);
                     }
                 });
@@ -749,11 +754,13 @@ class FactureClientController extends Controller
             $unitesConversion->pluck('uniteDest')
                 ->where('statut', true)
                 ->unique('id')
-                ->each(function ($unite) use (&$unites) {
+                ->each(function ($unite) use (&$unites, $article) {
                     if (!$unites->contains('id', $unite->id)) {
+                        $tarification =  $article->tarifViaUnite($unite->id);
                         $unites->push([
                             'id' => $unite->id,
-                            'text' => $unite->libelle_unite
+                            // 'text' => $unite->libelle_unite,
+                            'text' =>  $unite?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
                         ]);
                     }
                 });

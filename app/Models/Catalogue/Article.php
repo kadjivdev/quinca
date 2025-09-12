@@ -120,12 +120,19 @@ class Article extends Model
     /**
      * Obtient les tarifications de l'article
      */
-
     public function tarifications(): HasMany
     {
         return $this->hasMany(Tarification::class);
     }
 
+    /**
+     * Obtient les tarifications de l'article
+     * en fonction de l'unité Id
+     */
+    public function tarifViaUnite($uniteId)
+    {
+        return Tarification::firstWhere(["unite_mesure_id" => $uniteId]);
+    }
 
     public function getUnites()
     {

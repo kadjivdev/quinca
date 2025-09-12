@@ -48,7 +48,7 @@ class Tarification extends Model
 
     public function depotTarif()
     {
-        return $this->belongsTo(Depot::class);
+        return $this->belongsTo(Depot::class,"depot_id");
     }
 
     public function typeTarif()
