@@ -182,7 +182,7 @@ class Fournisseur extends Model
             return $query->facture_reglements_amount();
         });
 
-        return ($appro_solde + $avancesAmount) - $reglementsAmount;
+        return $appro_solde - ($avancesAmount + $reglementsAmount);
     }
 
     function reste_solde()
