@@ -1,7 +1,7 @@
 <!-- resources/views/parametrage/tarification/partials/add-modal.blade.php -->
 
 <div class="modal fade" id="addTarificationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content border-0 shadow">
             {{-- Header du modal --}}
             <div class="modal-header bg-light border-bottom-0 py-3">
@@ -19,7 +19,7 @@
                         {{-- Article --}}
                         <div class="col-12">
                             <label class="form-label fw-medium required">Article</label>
-                            <select class="form-select" name="article_id" required>
+                            <select class="form-select" name="article_id" id="add_article_id" required>
                                 <option value="">Sélectionner un article</option>
                                 @foreach($articles as $article)
                                 <option value="{{ $article->id }}" >
@@ -35,7 +35,7 @@
                         {{-- LES DEPOTS --}}
                         <div class="col-12">
                             <label class="form-label fw-medium required">Dépôts</label>
-                            <select class="form-select select2" name="depot_id" required>
+                            <select class="form-select select2" name="depot_id" id="add_depot_id" required>
                                 <option value="">Sélectionner un dépôt</option>
                                 @foreach($depots as $depot)
                                 <option value="{{ $depot->id }}">
@@ -51,7 +51,7 @@
                         {{-- Type de Tarif --}}
                         <div class="col-12">
                             <label class="form-label fw-medium required">Type de Tarif</label>
-                            <select class="form-select" name="type_tarif_id" required>
+                            <select class="form-select" name="type_tarif_id" id="add_type_tarif_id" required>
                                 <option value="">Sélectionner un type</option>
                                 @foreach($typesTarifs as $type)
                                 <option value="{{ $type->id }}">{{ $type->libelle_type_tarif }}</option>
@@ -77,6 +77,20 @@
                                 <div class="invalid-feedback">
                                     Le prix est requis et doit être supérieur à 0
                                 </div>
+                            </div>
+                        </div>
+
+                        {{-- Unite de mesure --}}
+                        <div class="col-12">
+                            <label class="form-label fw-medium required">Unité de mesure</label>
+                            <select class="form-select" name="unite_mesure_id" id="add_unite_mesure_id" required>
+                                <option value="">Sélectionner une unité de mesure</option>
+                                @foreach($uniteMesures as $uniteMesure)
+                                <option value="{{ $uniteMesure->id }}">{{ $uniteMesure->libelle_unite }}</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner une unité de mesure
                             </div>
                         </div>
 

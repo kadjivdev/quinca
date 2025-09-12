@@ -3,6 +3,7 @@
 namespace App\Models\Catalogue;
 
 use App\Models\Achat\LigneProgrammationAchat;
+use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,6 +20,8 @@ use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ServiceStockEntree;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 
 /**
  * Class Article
@@ -121,6 +124,75 @@ class Article extends Model
     public function tarifications(): HasMany
     {
         return $this->hasMany(Tarification::class);
+    }
+
+
+    public function getUnites()
+    {
+        try {
+            Log::info('Début récupération des unités', ['article_id' => $this->id]);
+
+            // Récupérer l'article avec son unité de mesure
+            $article = Article::with('uniteMesure')->findOrFail($this->id);
+
+            $unites = collect();
+
+            // 1. Ajouter l'unité de base de l'article si elle existe
+            if ($article->uniteMesure) {
+                $unites->push([
+                    'id' => $article->uniteMesure->id,
+                    'text' => $article->uniteMesure->libelle_unite
+                ]);
+            }
+
+            // 2. Obtenir toutes les unités ayant des conversions pour cet article
+            $unitesConversion = ConversionUnite::where('article_id', $this->id)
+                ->where('statut', true)
+                ->with(['uniteSource', 'uniteDest'])
+                ->get();
+
+            // Ajouter les unités source actives
+            $unitesConversion->pluck('uniteSource')
+                ->where('statut', true)
+                ->unique('id')
+                ->each(function ($unite) use (&$unites) {
+                    if (!$unites->contains('id', $unite->id)) {
+                        $unites->push([
+                            'id' => $unite->id,
+                            'text' => $unite->libelle_unite
+                        ]);
+                    }
+                });
+
+            // Ajouter les unités destination actives
+            $unitesConversion->pluck('uniteDest')
+                ->where('statut', true)
+                ->unique('id')
+                ->each(function ($unite) use (&$unites) {
+                    if (!$unites->contains('id', $unite->id)) {
+                        $unites->push([
+                            'id' => $unite->id,
+                            'text' => $unite->libelle_unite
+                        ]);
+                    }
+                });
+
+            Log::info('Unités récupérées avec succès', [
+                'article_id' => $this->id,
+                'nombre_unites' => $unites->count(),
+                'unites' => $unites->toArray()
+            ]);
+
+            return $unites->values()->all();
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la récupération des unités', [
+                'article_id' => $this->id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [];
+        }
     }
 
     public function stocks()

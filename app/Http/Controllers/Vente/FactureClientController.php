@@ -272,7 +272,6 @@ class FactureClientController extends Controller
                         $stock->unite_mesure_id
                     ) : 00;
 
-
                 /**Qte Vendue */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
 
@@ -432,7 +431,6 @@ class FactureClientController extends Controller
         try {
             Log::info("Total de ligne en debut de requete ", ["lignes" => $request->lignes]);
             Log::info('Début mise à jour facture', ['request' => $request->all(), 'facture_id' => $id]);
-
 
             // Vérifications initiales
             $sessionCaisse = SessionCaisse::ouverte()

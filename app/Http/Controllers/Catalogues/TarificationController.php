@@ -8,6 +8,7 @@ use App\Models\Catalogue\Article;
 use App\Models\Catalogue\FamilleArticle;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\TypeTarif;
+use App\Models\Parametre\UniteMesure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -33,6 +34,7 @@ class TarificationController extends Controller
             $typesTarifs = TypeTarif::where('statut', true)->get();
             $familles = FamilleArticle::where('statut', true)->get();
             $depots = Depot::get();
+            $uniteMesures = UniteMesure::get();
 
             // Statistiques
             $stats = [
@@ -51,7 +53,8 @@ class TarificationController extends Controller
                 'typesTarifs',
                 'familles',
                 'stats',
-                'date'
+                'date',
+                "uniteMesures",
             ));
         } catch (\Exception $e) {
             Log::error('Erreur lors du chargement des tarifications:', [
@@ -73,6 +76,7 @@ class TarificationController extends Controller
         $validator = Validator::make($request->all(), [
             'article_id' => 'required|exists:articles,id',
             'depot_id' => 'required|exists:depots,id',
+            'unite_mesure_id' => 'required|exists:unite_mesures,id',
             'type_tarif_id' => [
                 'required',
                 'exists:type_tarifs,id',
@@ -191,6 +195,7 @@ class TarificationController extends Controller
                      * 5=F
                      * 6=G
                      * 7=H
+                     * 8=I
                      */
 
                     // Validation des tarifs
@@ -204,6 +209,14 @@ class TarificationController extends Controller
                     $article = Article::firstWhere('code_article', $row["A"]);
                     if (!$article) {
                         $errors[] = "Ligne $rowNumber : L'article avec le code {{$row['A']}} n'existe pas";
+                        $skipped++;
+                        continue;
+                    }
+
+                    // Vérifier l'existence de l'unité de mesure
+                    $uniteMesure = Article::firstWhere('code_article', $row["I"]);
+                    if (!$uniteMesure) {
+                        $errors[] = "Ligne $rowNumber : Precisez l'unité de mesure de l'article ayant le code {{$row['A']}}";
                         $skipped++;
                         continue;
                     }
@@ -372,21 +385,23 @@ class TarificationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $tarification
+                'data' => [
+                    "tarification" => $tarification,
+                    'unites' => $tarification->article?->getUnites(), //ulites de l'article
+                    'depots' => $tarification->article?->depots, //depots de l'article
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors du chargement de la tarification'
+                'message' => 'Erreur lors du chargement de la tarification ' . $e->getMessage()
             ], 404);
         }
     }
 
     /**
      * Mettre à jour une tarification
-     *
      */
-
     public function update(Request $request, $id)
     {
         $tarification = Tarification::find($id);
@@ -400,7 +415,9 @@ class TarificationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'prix' => 'required|numeric|min:0',
-            'statut' => 'boolean'
+            'statut' => 'boolean',
+            'depot_id' => 'required|integer',
+            'unite_mesure_id' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -413,7 +430,7 @@ class TarificationController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->only(['prix', 'statut']);
+            $data = $request->only(['prix', 'statut', 'depot_id', 'unite_mesure_id']);
             $data['statut'] = $request->boolean('statut');
 
             $tarification->update($data);

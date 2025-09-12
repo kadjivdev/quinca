@@ -77,7 +77,7 @@
                                     <div class="d-flex align-items-center justify-content-end gap-2">
                                         @if($tarification)
                                         <div class="tarif-value d-flex align-items-center justify-content-between">
-                                            <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA</span>
+                                            <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA ({{$tarification->uniteMesure?->libelle_unite}})</span>
                                             <div class="btn-group btn-group-sm ms-3 action-buttons">
                                                 @can("tarification.edit")
                                                 <button class="btn btn-link p-0 text-warning btn-animated"
@@ -96,7 +96,7 @@
                                         @else
                                         @can("tarification.create")
                                         <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
-                                            onclick="showAddTarificationModal({{ $article->id }}, {{ $typeTarif->id }})"
+                                            onclick="showAddTarificationModal({{ $article->id }}, {{ $typeTarif }})"
                                             title="Ajouter un tarif">
                                             <i class="fas fa-plus"></i>
                                         </button>

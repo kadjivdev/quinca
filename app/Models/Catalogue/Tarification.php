@@ -2,11 +2,16 @@
 
 namespace App\Models\Catalogue;
 
+use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Parametre\TypeTarif;
+use App\Models\Parametre\UniteMesure;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 
 class Tarification extends Model
 {
@@ -17,7 +22,8 @@ class Tarification extends Model
         'depot_id',
         'type_tarif_id',
         'prix',
-        'statut'
+        'statut',
+        "unite_mesure_id"
     ];
 
     protected $casts = [
@@ -25,7 +31,9 @@ class Tarification extends Model
         'statut' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
+        'depot_id' => 'integer',
+        'unite_mesure_id' => 'integer',
     ];
 
     // Constantes
@@ -46,6 +54,11 @@ class Tarification extends Model
     public function typeTarif()
     {
         return $this->belongsTo(TypeTarif::class);
+    }
+
+    function uniteMesure(): BelongsTo
+    {
+        return $this->belongsTo(UniteMesure::class,"unite_mesure_id");
     }
 
     // Scopes

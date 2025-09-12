@@ -1,7 +1,7 @@
 <!-- resources/views/parametrage/tarification/partials/edit-modal.blade.php -->
 
 <div class="modal fade" id="editTarificationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content border-0 shadow">
             {{-- Header du modal --}}
             <div class="modal-header bg-light border-bottom-0 py-3">
@@ -33,26 +33,27 @@
                     {{-- Informations de dépôt --}}
                     <div class="article-info mb-4 p-3 bg-light rounded">
                         <div class="row">
-                            <div class="col-sm-12">
-                                <label class="form-label text-muted small">Dépôt</label>
-                                <div class="fw-medium" id="editDepot"></div>
-                            </div>
-
-                            <br>
-                            <!-- {{-- LES DEPOTS --}}
+                            {{-- LES DEPOTS --}}
                             <div class="col-12">
-                                <select class="form-select select2" name="depot_id" required>
-                                    <option value="">Sélectionner un dépôt</option>
-                                    @foreach($depots as $depot)
-                                    <option value="{{ $depot->id }}">
-                                        {{ $depot->libelle_depot }}
-                                    </option>
-                                    @endforeach
+                                <select class="form-select select2" name="depot_id" id="depot_id" required>
+                                    <!-- gere avec su js -->
                                 </select>
                                 <div class="invalid-feedback">
                                     Veuillez sélectionner un dépôt
                                 </div>
-                            </div> -->
+                            </div>
+
+                            <br><br>
+                            {{-- Unite de mesure --}}
+                            <div class="col-12">
+                                <label class="form-label fw-medium required">Unité de mesure</label>
+                                <select class="form-select" name="unite_mesure_id" id="unite_mesure_id" required>
+                                    <!-- gere avec du js -->
+                                </select>
+                                <div class="invalid-feedback">
+                                    Veuillez sélectionner une unité de mesure
+                                </div>
+                            </div>
                         </div>
                     </div>
 
