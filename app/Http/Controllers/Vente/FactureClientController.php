@@ -721,11 +721,11 @@ class FactureClientController extends Controller
 
             // 1. Ajouter l'unité de base de l'article si elle existe
             if ($article->uniteMesure) {
-                $tarification =  $article->tarifViaUnite($article->uniteMesure->id);
-                // return $tarification->load(["typeTarif", "depotTarif"]);
+                // $tarification =  $article->tarifViaUnite($article->uniteMesure->id);
                 $unites->push([
                     'id' => $article->uniteMesure->id,
-                    'text' => $article->uniteMesure?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
+                    'text' => $article->uniteMesure?->libelle_unite ,
+                    // 'text' => $article->uniteMesure?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
                 ]);
             }
 
@@ -741,11 +741,11 @@ class FactureClientController extends Controller
                 ->unique('id')
                 ->each(function ($unite) use (&$unites, $article) {
                     if (!$unites->contains('id', $unite->id)) {
-                        $tarification =  $article->tarifViaUnite($unite->id);
+                        // $tarification =  $article->tarifViaUnite($unite->id);
                         $unites->push([
                             'id' => $unite->id,
-                            // 'text' => $unite->libelle_unite,
-                            'text' =>  $unite?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
+                            'text' => $unite->libelle_unite,
+                            // 'text' =>  $unite?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
                         ]);
                     }
                 });
@@ -756,11 +756,11 @@ class FactureClientController extends Controller
                 ->unique('id')
                 ->each(function ($unite) use (&$unites, $article) {
                     if (!$unites->contains('id', $unite->id)) {
-                        $tarification =  $article->tarifViaUnite($unite->id);
+                        // $tarification =  $article->tarifViaUnite($unite->id);
                         $unites->push([
                             'id' => $unite->id,
-                            // 'text' => $unite->libelle_unite,
-                            'text' =>  $unite?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
+                            'text' => $unite->libelle_unite,
+                            // 'text' =>  $unite?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
                         ]);
                     }
                 });
