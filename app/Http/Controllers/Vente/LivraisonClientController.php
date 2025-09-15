@@ -110,7 +110,6 @@ class LivraisonClientController extends Controller
             ->latest()
             ->get();
 
-
         return view('pages.ventes.livraison.index', compact(
             'livraisons',
             'clients',

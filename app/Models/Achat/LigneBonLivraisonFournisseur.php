@@ -170,7 +170,6 @@ class LigneBonLivraisonFournisseur extends Model
         return $quantite_base ?? 0;
     }
 
-
     /**
      * Relation avec le bon de livraison
      */

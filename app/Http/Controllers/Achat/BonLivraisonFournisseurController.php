@@ -500,7 +500,7 @@ class BonLivraisonFournisseurController extends Controller
             ]);
 
             // Log pour vérifier les données chargées
-            \Log::debug('Données du bon de livraison:', [
+            Log::debug('Données du bon de livraison:', [
                 'bon_livraison' => $bonLivraison->toArray(),
                 'lignes' => $bonLivraison->lignes->toArray()
             ]);
@@ -508,6 +508,12 @@ class BonLivraisonFournisseurController extends Controller
             // Récupérer les prix unitaires de la facture
             $prixUnitaires = [];
             foreach ($bonLivraison->facture->lignes as $ligneFact) {
+                Log::info("Ligne bon de livraison avant update", ["data" => $bonLivraison->lignes]);
+
+                if (!in_array($ligneFact->article_id, $bonLivraison->lignes->pluck("article_id")->toArray())) {
+                    continue;
+                }
+
                 $prixUnitaires[$ligneFact->article_id] = $ligneFact->prix_unitaire;
 
                 // Vérifier si une ligne correspondante existe dans $bonLivraison->lignes

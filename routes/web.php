@@ -41,42 +41,40 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $reglement = ReglementClient::with("compteClient")->firstWhere("numero", "REG2025090038");
+    // $reglement = ReglementClient::with("compteClient")->firstWhere("numero", "REG2025090038");
 
-    if ($reglement->compteClient->isEmpty()) {
-        $reglement->compteClient()->create([
-            'date_op' => $reglement->date_reglement,
-            'montant_op' => $reglement->montant,
-            'client_id' => $reglement->facture->client_id,
-            'user_id' => $reglement->validated_by,
-            'type_op' => 'REG_CLT',
-        ]);
-    }
+    // if ($reglement->compteClient->isEmpty()) {
+    //     $reglement->compteClient()->create([
+    //         'date_op' => $reglement->date_reglement,
+    //         'montant_op' => $reglement->montant,
+    //         'client_id' => $reglement->facture->client_id,
+    //         'user_id' => $reglement->validated_by,
+    //         'type_op' => 'REG_CLT',
+    //     ]);
+    // }
 
-    $reglement->fresh();
-
-    return $reglement;
+    // $reglement->fresh();
+    // return $reglement;
 
     // return response()->json($FAC25093314);
 
-    // $FAC25087247 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25087247");
+    $FAC25097308 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25097308");
 
-    // foreach ($FAC25087247->lignes as $ligne) {
-    //     switch ($ligne->id) {
-    //         case 330:
-    //             $ligne->update(["quantite_livree_simple" => 494.96]);
-    //             break;
 
-    //         case 331:
-    //             $ligne->update(["quantite_livree" => 398.88, "quantite_livree_simple" => 115.2]);
-    //             break;
+    foreach ($FAC25097308->lignes as $ligne) {
+        switch ($ligne->id) {
+            case 524:
+                $ligne->update(["quantite_livree_simple" => 1767.000]);
+                break;
 
-    //         default:
-    //             break;
-    //     }
-    // }
+            default:
+                break;
+        }
+    }
 
-    return "Regulation effectuée pour les facture FAC25087092 éffectuée avec succès!!";
+    return $FAC25097308;
+
+    return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
 
 /**DETELE A STOCK */
