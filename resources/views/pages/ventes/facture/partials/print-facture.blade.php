@@ -56,11 +56,10 @@
         }
 
         th {
-            background: #f6f6f6;
-            color: #2c3e50;
+            background: #2c3e50;
+            color: white;
             padding: 10px;
             font-size: 11px;
-            font-weight: bold;
         }
 
         td {
@@ -88,13 +87,12 @@
         }
 
         .total-section table {
-            /* background: #f8f9fa; */
+            background: #f8f9fa;
         }
 
         .total-section table tr:last-child {
-            /* background: #f6f6f6; */
-            color: #2c3e50;
-            font-weight: bold;
+            background: #2c3e50;
+            color: white;
         }
 
         .clearfix {
@@ -107,7 +105,7 @@
             width: 100%;
             padding: 20px 0;
             font-size: 10px;
-            border-top: 2px solid #000;
+            border-top: 2px solid #eee;
         }
 
         .normalisation-info {
@@ -225,9 +223,9 @@
 
     <div class="total-section">
         <table>
-            <tr >
-                <td style="font-size: 20px!important;"><strong>Total HT</strong></td>
-                <td class="text-right" style="font-size: 20px!important;"><strong>{{ number_format($facture->montant_ht, 3, ',', ' ') }}</strong> </td>
+            <tr>
+                <td><strong>Total HT</strong></td>
+                <td class="text-right">{{ number_format($facture->montant_ht, 3, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>Remise globale</strong></td>
@@ -254,8 +252,8 @@
                 <td class="text-right">{{ number_format($facture->montant_regle, 3, ',', ' ') }}</td>
             </tr>
             <tr>
-                <td style="font-size: 20px!important;"><strong>Reste à payer</strong></td>
-                <td class="text-right" style="font-size: 20px!important;">{{ number_format($facture->reste_a_regler, 3, ',', ' ') }}</td>
+                <td><strong>Reste à payer</strong></td>
+                <td class="text-right">{{ number_format($facture->reste_a_regler, 3, ',', ' ') }}</td>
             </tr>
         </table>
     </div>
