@@ -26,6 +26,7 @@ use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\ReglementClient;
 use App\Models\Vente\Requete;
 
 /*
@@ -40,17 +41,21 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $FAC25087092 = FactureFournisseur::with("lignes")->firstWhere("code", "FAC25087092");
+    $reglement = ReglementClient::with("compteClient")->firstWhere("numero", "REG2025090038");
 
-    foreach ($FAC25087092->lignes as $ligne) {
-        switch ($ligne->id) {
-            case 424:
-                $ligne->update(["quantite_livree" => 200]);
-                break;
-            default:
-                break;
-        }
+    if ($reglement->compteClient->isEmpty()) {
+        $reglement->compteClient()->create([
+            'date_op' => $reglement->date_reglement,
+            'montant_op' => $reglement->montant,
+            'client_id' => $reglement->facture->client_id,
+            'user_id' => $reglement->validated_by,
+            'type_op' => 'REG_CLT',
+        ]);
     }
+
+    $reglement->fresh();
+
+    return $reglement;
 
     // return response()->json($FAC25093314);
 
