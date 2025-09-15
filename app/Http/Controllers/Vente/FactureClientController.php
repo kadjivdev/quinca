@@ -193,10 +193,12 @@ class FactureClientController extends Controller
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
-                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir]",
+                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir",
             ]);
 
             if ($validator->fails()) {
+                Log::debug("Erreure lors de l'enregistrement de lafacture ", ["error" => $validator->errors()]);
+
                 return response()->json([
                     'status' => 'error',
                     'errors' => $validator->errors()
@@ -724,7 +726,7 @@ class FactureClientController extends Controller
                 // $tarification =  $article->tarifViaUnite($article->uniteMesure->id);
                 $unites->push([
                     'id' => $article->uniteMesure->id,
-                    'text' => $article->uniteMesure?->libelle_unite ,
+                    'text' => $article->uniteMesure?->libelle_unite,
                     // 'text' => $article->uniteMesure?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
                 ]);
             }
