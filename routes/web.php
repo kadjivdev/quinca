@@ -59,26 +59,18 @@ Route::get("/debug", function () {
 
     // return response()->json($FAC25093314);
 
-    $BC2509102197 = BonCommande::with(["programmation.lignes", "lignes.article"])->firstWhere("code", "BC2509102197");
-    // return $BC2509102197;
+    $BC2509102197 = BonCommande::with(["factures.lignes", "programmation.lignes", "lignes.article"])->firstWhere("code", "BC2509102197");
+    // return $BC2509102197->factures->flatMap->lignes;
 
-    foreach ($BC2509102197->lignes as $ligne) {
+    foreach ($BC2509102197->factures->flatMap->lignes as $ligne) {
         switch ($ligne->id) {
-            case 750:
-                $ligne->update(["quantite" => 12, "quantite_base" => 12]);
-
-                $BC2509102197->programmation->lignes()
-                    ->firstWhere(["article_id" => $ligne->article_id])
-                    ?->update(["quantite" => 12]);
-                break;
-
-            case 749:
+            case 546:
                 $ligne->update(["quantite" => 6, "quantite_base" => 6]);
-                $BC2509102197->programmation->lignes()
-                    ->firstWhere(["article_id" => $ligne->article_id])
-                    ?->update(["quantite" => 6]);
                 break;
 
+            case 547:
+                $ligne->update(["quantite" => 12, "quantite_base" => 12]);
+                break;
             default:
                 break;
         }
