@@ -593,14 +593,14 @@ class BonLivraisonFournisseurController extends Controller
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
                     'unite_base_id' => $ligne->article?->unite_mesure_id,
-                    'quantite' => $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
+                    'quantite' => $ligneFact->quantite_livree_simple, // $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                 ]);
 
                 $entrees[] = [
                     'depot_id' => $bonLivraison->depot_id,
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
-                    'quantite' => $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
+                    'quantite' => $ligneFact->quantite_livree_simple, //$ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                     'prix_unitaire' => $prixUnitaires[$ligne->article_id],
                     'date_mouvement' => $bonLivraison->date_livraison,
                     'reference_mouvement' => $bonLivraison->code,
