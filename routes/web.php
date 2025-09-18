@@ -42,42 +42,14 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $reglement = ReglementClient::with("compteClient")->firstWhere("numero", "REG2025090038");
+    $FAC25084494 = FactureFournisseur::with(["lignes"])->firstWhere("code", "FAC25084494");
 
-    // if ($reglement->compteClient->isEmpty()) {
-    //     $reglement->compteClient()->create([
-    //         'date_op' => $reglement->date_reglement,
-    //         'montant_op' => $reglement->montant,
-    //         'client_id' => $reglement->facture->client_id,
-    //         'user_id' => $reglement->validated_by,
-    //         'type_op' => 'REG_CLT',
-    //     ]);
-    // }
 
-    // $reglement->fresh();
-    // return $reglement;
-
-    // return response()->json($FAC25093314);
-
-    $BC2509102197 = BonCommande::with(["factures.lignes", "programmation.lignes", "lignes.article"])
-        ->firstWhere("code", "BC2509175232");
-    // return $BC2509102197->factures->flatMap->lignes;
-
-    foreach ($BC2509102197->factures->flatMap->lignes as $ligne) {
-        switch ($ligne->id) {
-            case 546:
-                $ligne->update(["quantite" => 6, "quantite_base" => 6]);
-                break;
-
-            case 547:
-                $ligne->update(["quantite" => 12, "quantite_base" => 12]);
-                break;
-            default:
-                break;
-        }
+    foreach ($FAC25084494->lignes as $ligne) {
+        $ligne->update(["quantite_livree" => $ligne->quantite_livree_simple]);
     }
 
-    return $BC2509102197;
+    return response()->json($FAC25084494);
 
     return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
