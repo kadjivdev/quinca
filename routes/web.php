@@ -40,22 +40,15 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $requetes = Requete::whereIn("id", [111, 105, 108])->get();
+    // $BLF2509170009 = BonLivraisonFournisseur::with("facture.lignes.article")->firstWhere("code", "BLF2509170009");
 
-    // foreach ($requetes as $requete) {
-    //     $requete->update(["montant" => -$requete->montant]);
+    // foreach ($BLF2509170009->facture->lignes as $ligne) {
+    //     if ($ligne->id == 476) {
+    //         $ligne->update(["quantite_livree_simple" => 3.00]);
+    //     }
     // }
-    // return response()->json($requetes);
 
-    $BLF2509170009 = BonLivraisonFournisseur::with("facture.lignes.article")->firstWhere("code", "BLF2509170009");
-
-    foreach ($BLF2509170009->facture->lignes as $ligne) {
-        if ($ligne->id == 476) {
-            $ligne->update(["quantite_livree_simple" => 3.00]);
-        }
-    }
-
-    return response()->json($BLF2509170009);
+    // return response()->json($BLF2509170009);
 
     return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
