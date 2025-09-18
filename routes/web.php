@@ -26,6 +26,7 @@ use App\Models\Achat\BonCommande;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\AcompteClient;
 use App\Models\Vente\Requete;
 
 /*
@@ -40,15 +41,23 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $BLF2509170009 = BonLivraisonFournisseur::with("facture.lignes.article")->firstWhere("code", "BLF2509170009");
+    $accomptes = AcompteClient::with("compteClient")->whereIn("requete_id", [111, 105, 108])->get();
 
-    // foreach ($BLF2509170009->facture->lignes as $ligne) {
-    //     if ($ligne->id == 476) {
-    //         $ligne->update(["quantite_livree_simple" => 3.00]);
-    //     }
-    // }
+    foreach ($accomptes as $accompte) {
+        if ($accompte->montant > 0) {
+            $accompte->update(["montant" => -$accompte->montant]);
+            $accompte->compteClient()->update([
+                "montant_op" => $accompte->montant
+            ]);
+        } else {
+            $accompte->update(["montant" => $accompte->montant]);
+            $accompte->compteClient()->update([
+                "montant_op" => $accompte->montant
+            ]);
+        }
+    }
 
-    // return response()->json($BLF2509170009);
+    return response()->json($accomptes);
 
     return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
