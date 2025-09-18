@@ -59,7 +59,8 @@ Route::get("/debug", function () {
 
     // return response()->json($FAC25093314);
 
-    $BC2509102197 = BonCommande::with(["factures.lignes", "programmation.lignes", "lignes.article"])->firstWhere("code", "BC2509102197");
+    $BC2509102197 = BonCommande::with(["factures.lignes", "programmation.lignes", "lignes.article"])
+        ->firstWhere("code", "BC2509175232");
     // return $BC2509102197->factures->flatMap->lignes;
 
     foreach ($BC2509102197->factures->flatMap->lignes as $ligne) {

@@ -57,7 +57,6 @@ class BonCommandeController extends Controller
             ->where('point_de_vente_id', $user->point_de_vente_id)
             ->get();
 
-
         // Programmations validées du point de vente de l'utilisateur
         $programmationsValidees = ProgrammationAchat::whereNotNull('validated_at')
             ->where('point_de_vente_id', $user->point_de_vente_id)
@@ -581,7 +580,7 @@ class BonCommandeController extends Controller
 
     public function generatePDF(Request $request, $id, $bon_object, $entete = false)
     {
-        $bcde = BonCommande::with(['fournisseur', 'lignes.uniteMesure','lignes.article'])->where('id', $id)->first();
+        $bcde = BonCommande::with(['fournisseur', 'lignes.uniteMesure', 'lignes.article'])->where('id', $id)->first();
 
         $pdf = new PDF_MC_Table();
         $pdf->AliasNbPages();  // To use the total number of pages
@@ -643,6 +642,8 @@ class BonCommandeController extends Controller
 
         $lettre = new ChiffreEnLettre;
         $prix_lettre = $lettre->Conversion($tot_ht);
+
+        // dd($prix_lettre);
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->CheckPageBreak(10);
