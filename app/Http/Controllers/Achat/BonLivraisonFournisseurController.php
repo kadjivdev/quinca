@@ -539,7 +539,7 @@ class BonLivraisonFournisseurController extends Controller
                 Log::info("QTe Total", ["data" => $ligneFact->quantite_livree]);
                 Log::info("Ligne facture après update", ["data" => $ligneFact]);
 
-                if ($ligneFact->quantite_livree > $ligneFact->quantite_base) {
+                if ($ligneFact->quantite_livree > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
                     throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
                 }
 

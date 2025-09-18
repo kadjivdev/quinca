@@ -25,10 +25,7 @@ use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\BonCommande;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
-use App\Models\Catalogue\Article;
 use App\Models\Stock\StockDepot;
-use App\Models\Vente\ReglementClient;
-use App\Models\Vente\Requete;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,14 +39,15 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $FAC25084494 = FactureFournisseur::with(["lignes"])->firstWhere("code", "FAC25084494");
+    $BLF2509170005 = BonLivraisonFournisseur::with("facture.lignes")->firstWhere("code", "BLF2509170005");
 
+    return response()->json($BLF2509170005);
 
-    foreach ($FAC25084494->lignes as $ligne) {
+    foreach ($BLF2509170005->lignes as $ligne) {
         $ligne->update(["quantite_livree" => $ligne->quantite_livree_simple]);
     }
 
-    return response()->json($FAC25084494);
+    return response()->json($BLF2509170005);
 
     return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
