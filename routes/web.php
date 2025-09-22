@@ -39,28 +39,13 @@ use App\Models\Vente\FactureClient;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $compteClient = CompteClient::find(3570);
-    if ($compteClient) {
-        $compteClient->delete();
+    $FAC_20250920_0010 = FactureClient::with(["lignes.article", "lignes.facturedepot", "compteClient"])->firstWhere("numero", "FAC-20250920-0010");
+
+    if ($FAC_20250920_0010->lignes->firstWhere("depot", 6)) {
+        $FAC_20250920_0010->lignes->firstWhere("depot", 6)->update(["depot" => 4]);
     }
 
-    $FAC_20250919_0009 = FactureClient::with(["lignes.article", "compteClient"])->firstWhere("numero", "FAC-20250919-0009");
-
-    $FAC_20250919_0009->lignes()->first()
-        ->update(["prix_unitaire_ht" => 50000, "montant_ttc" => 100000]);
-
-    $FAC_20250919_0009->update(["montant_ttc" => 100000]);
-
-    $FAC_20250919_0009->update([
-        "montant_ht" => $FAC_20250919_0009->montant_ttc / 1.19,
-    ]);
-
-    $FAC_20250919_0009->update([
-        "montant_tva" => $FAC_20250919_0009->montant_ht * 0.18,
-        "montant_aib" => $FAC_20250919_0009->montant_ht * 0.01,
-    ]);
-
-    return $FAC_20250919_0009;
+    return $FAC_20250920_0010;
     return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
 
