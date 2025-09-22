@@ -68,7 +68,7 @@
                             @forelse($client->compteClient as $compte)
                             <tr>
                                 <td class="text-nowrap py-3">
-                                    <span class="code-client">{{ $loop->iteration }}</span>
+                                    <span class="code-client">{{$compte->id}} -  {{ $loop->iteration }}</span>
                                 </td>
                                 <td>{{ Carbon\Carbon::parse($compte->created_at)->format('d/m/Y H:i:s') }}</td>
                                 <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y H:i:s') }}</td>

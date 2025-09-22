@@ -73,6 +73,7 @@ class ServiceStockEntree
                 $article->id
             );
 
+
             Log::debug('Convertion retrouvée:', ["data" => $conversion]);
 
             if (!$conversion) {

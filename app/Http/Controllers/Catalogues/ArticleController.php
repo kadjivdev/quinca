@@ -74,6 +74,10 @@ class ArticleController extends Controller
                 //         $stock->unite_mesure_id
                 //     ) : 00;
 
+                // if ($article->id==2024) {
+                //     dd($conversion);
+                // }
+
                 /**Qte de Base */
                 $stock->qantiteBase = $conversion ? $this->serviceStockEntree
                     ->convertirQuantite(

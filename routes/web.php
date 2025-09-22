@@ -22,12 +22,9 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Achat\BonCommande;
-use App\Models\Achat\BonLivraisonFournisseur;
-use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
-use App\Models\Vente\AcompteClient;
-use App\Models\Vente\Requete;
+use App\Models\Vente\CompteClient;
+use App\Models\Vente\FactureClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,24 +38,29 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $accomptes = AcompteClient::with("compteClient")->whereIn("requete_id", [111, 105, 108])->get();
 
-    foreach ($accomptes as $accompte) {
-        if ($accompte->montant > 0) {
-            $accompte->update(["montant" => -$accompte->montant]);
-            $accompte->compteClient()->update([
-                "montant_op" => $accompte->montant
-            ]);
-        } else {
-            $accompte->update(["montant" => $accompte->montant]);
-            $accompte->compteClient()->update([
-                "montant_op" => $accompte->montant
-            ]);
-        }
+    $compteClient = CompteClient::find(3570);
+    if ($compteClient) {
+        $compteClient->delete();
     }
 
-    return response()->json($accomptes);
+    $FAC_20250919_0009 = FactureClient::with(["lignes.article", "compteClient"])->firstWhere("numero", "FAC-20250919-0009");
 
+    $FAC_20250919_0009->lignes()->first()
+        ->update(["prix_unitaire_ht" => 50000, "montant_ttc" => 100000]);
+
+    $FAC_20250919_0009->update(["montant_ttc" => 100000]);
+
+    $FAC_20250919_0009->update([
+        "montant_ht" => $FAC_20250919_0009->montant_ttc / 1.19,
+    ]);
+
+    $FAC_20250919_0009->update([
+        "montant_tva" => $FAC_20250919_0009->montant_ht * 0.18,
+        "montant_aib" => $FAC_20250919_0009->montant_ht * 0.01,
+    ]);
+
+    return $FAC_20250919_0009;
     return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
 
