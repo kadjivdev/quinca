@@ -46,7 +46,7 @@ use Illuminate\Support\Facades\Auth;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     /**
-     * Changement de signe de certaisn transports
+     * Changement de signe de certains transports
      */
     $transports = Transport::with(["accompte.compteClient"])
         ->whereHas("accompte", function ($accompte) {
