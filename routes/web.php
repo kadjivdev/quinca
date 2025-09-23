@@ -23,6 +23,8 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\AcompteClient;
+use App\Models\Vente\Client;
 use App\Models\Vente\CompteClient;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\ReglementClient;
@@ -40,23 +42,18 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-
-    $reglements = ReglementClient::with("compteClient")
-        ->whereNotNull("validated_by")
-        ->whereDoesntHave("compteClient")
+    $accomptes = AcompteClient::where("statut", "valide")
+        ->whereNotNull("transport_id")
         ->get();
 
-    foreach ($reglements as $reglement) {
-        $reglement->compteClient()->create([
-            'date_op' => $reglement->date_reglement,
-            'montant_op' => $reglement->montant,
-            'client_id' => $reglement->facture->client_id,
-            'user_id' => Auth::user()->id,
-            'type_op' => 'REG_CLT',
+    foreach ($accomptes as $accompte) {
+        $accompte->update([
+            'validated_by' => $accompte->transport->validator,
+            'validated_at' => $accompte->transport->validate_at,
         ]);
     }
 
-    return $reglements;
+    return $accomptes;
 });
 
 /**DETELE A STOCK */

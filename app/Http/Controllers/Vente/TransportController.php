@@ -161,6 +161,10 @@ class TransportController extends Controller
                 'type_paiement' => 'virement',
                 'transport_id' => $transport->id,
                 'statut'=>AcompteClient::STATUT_VALIDE,
+                
+                'validated_by'=>$transport->validator,
+                'validated_at'=>$transport->validate_at,
+                
                 'created_by'=>auth()->user()->id,
                 'point_de_vente_id' => Auth::user()->point_de_vente_id
             ]);
