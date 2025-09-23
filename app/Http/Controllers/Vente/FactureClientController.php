@@ -872,14 +872,18 @@ class FactureClientController extends Controller
                     'statut' => 'validee'
                 ]);
 
-                // Creation du compte client
-                $reglement->compteClient()->create([
-                    'date_op' => $reglement->date_reglement,
-                    'montant_op' => $reglement->montant,
-                    'client_id' => $reglement->facture->client_id,
-                    'user_id' => Auth::user()->id,
-                    'type_op' => 'REG_CLT',
-                ]);
+                /**
+                 *  Creation du compte client si c'est pas encore fait
+                 *  */
+                if ($reglement->compteClient->isEmpty()) {
+                    $reglement->compteClient()->create([
+                        'date_op' => $reglement->date_reglement,
+                        'montant_op' => $reglement->montant,
+                        'client_id' => $reglement->facture->client_id,
+                        'user_id' => Auth::user()->id,
+                        'type_op' => 'REG_CLT',
+                    ]);
+                }
             }
 
             $sessionCaisse->mettreAJourTotaux();
