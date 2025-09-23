@@ -50,7 +50,7 @@ Route::get("/debug", function () {
         ->get();
 
     foreach ($transportsWhithOutAccomptes as $transport) {
-        if ($transport->accompte && $transport->accompte->isEmpty()) {
+        if (!$transport->accompte) {
             $transport->accompte()->create([
                 'date' => $transport->date_op,
                 'montant' =>  $transport->montant,
