@@ -45,53 +45,70 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $transportsWhithOutAccomptes = Transport::with(["accompte.compteClient"])
-        ->whereDOesntHave("accompte")
-        ->get();
+    /**
+     * Changement de signe de certaisn transports
+     */
+    $transports = Transport::with(["accompte.compteClient"])
+        ->whereHas("accompte", function ($accompte) {
+            $accompte->whereIn("reference", ["ACP20250007", "ACP20250086", "ACP20250087", "ACP20250088"]);
+        })
+        ->get()
+        ->each(function ($transport) {
+            $transport->update(["montant" => -$transport->montant]);
 
-    foreach ($transportsWhithOutAccomptes as $transport) {
-        if (!$transport->accompte) {
-            $transport->accompte()->create([
-                'date' => $transport->date_op,
-                'montant' =>  $transport->montant,
-                'facture_id' => null,
-                'client_id' => $transport->client_id,
-                'user_id' => $transport->validator,
-                'type_paiement' => 'virement',
-                'transport_id' => $transport->id,
-                'statut' => AcompteClient::STATUT_VALIDE,
+            $transport->accompte->update(["montant" => -$transport->accompte->montant]);
 
-                'validated_by' => $transport->validator,
-                'validated_at' => $transport->validate_at,
+            $transport->accompte->compteClient->first()
+                ->update(["montant_op" => -$transport->accompte->compteClient->first()->montant_op]);
+        });
 
-                'created_by' => $transport->validator,
-                'point_de_vente_id' => User::find($transport->validator)->point_de_vente_id
-            ]);
-        }
-    }
-    // return $transportsWhithOutAccomptes;
+    // return $transports->pluck("accompte.reference");
+    return $transports;
 
-    $transportsWhitAccomptes = Transport::with(["accompte.compteClient"])
-        ->whereHas("accompte")
-        ->get();
+    // $transportsWhithOutAccomptes = Transport::with(["accompte.compteClient"])
+    //     ->whereDOesntHave("accompte")
+    //     ->get();
 
-    // return $transportsWhitAccomptes;
+    // foreach ($transportsWhithOutAccomptes as $transport) {
+    //     if (!$transport->accompte) {
+    //         $transport->accompte()->create([
+    //             'date' => $transport->date_op,
+    //             'montant' =>  $transport->montant,
+    //             'facture_id' => null,
+    //             'client_id' => $transport->client_id,
+    //             'user_id' => $transport->validator,
+    //             'type_paiement' => 'virement',
+    //             'transport_id' => $transport->id,
+    //             'statut' => AcompteClient::STATUT_VALIDE,
 
-    foreach ($transportsWhitAccomptes as $transport) {
-        $acompte = $transport->accompte;
+    //             'validated_by' => $transport->validator,
+    //             'validated_at' => $transport->validate_at,
 
-        if ($acompte->compteClient->isEmpty()) {
-            $acompte->compteClient()->create([
-                'date_op' => $acompte->date,
-                'montant_op' => $acompte->montant,
-                'client_id' => $acompte->client_id,
-                'user_id' => $transport->validator,
-                'type_op' => 'AC_CLT',
-            ]);
-        }
-    };
+    //             'created_by' => $transport->validator,
+    //             'point_de_vente_id' => User::find($transport->validator)->point_de_vente_id
+    //         ]);
+    //     }
+    // }
 
-    return Transport::with(["accompte.compteClient"])->get();
+    // $transportsWhitAccomptes = Transport::with(["accompte.compteClient"])
+    //     ->whereHas("accompte")
+    //     ->get();
+
+    // foreach ($transportsWhitAccomptes as $transport) {
+    //     $acompte = $transport->accompte;
+
+    //     if ($acompte->compteClient->isEmpty()) {
+    //         $acompte->compteClient()->create([
+    //             'date_op' => $acompte->date,
+    //             'montant_op' => $acompte->montant,
+    //             'client_id' => $acompte->client_id,
+    //             'user_id' => $transport->validator,
+    //             'type_op' => 'AC_CLT',
+    //         ]);
+    //     }
+    // };
+
+    // return Transport::with(["accompte.compteClient"])->get();
 
     /**
      * Regularisation des livraisons de la facture $FAC25094074
