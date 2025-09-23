@@ -118,6 +118,19 @@ class BonLivraisonFournisseurController extends Controller
             $facture = FactureFournisseur::findOrFail($request->facture_id);
             $fournisseur_id = $facture->fournisseur_id;
 
+            /**
+             * S'il y a une livraison 
+             * en attente de validation sur cette facture
+             * l'utilisateur va devoir la valider 
+             * d'abord avant de generer une autre livrai son sur
+             * la facture
+             */
+
+            $livraisons = $facture->bonLivraison->whereNull("validated_by"); //pas encore validée
+            if ($livraisons->isNotEmpty()) {
+                throw new Exception("Valider d'abord les livraisons en attente sur cette facture");
+            }
+
             // Validation des données
             $validated = $request->validate([
                 'facture_id' => 'required|exists:facture_fournisseurs,id',
@@ -259,8 +272,8 @@ class BonLivraisonFournisseurController extends Controller
                 'message' => 'Une erreur est survenue lors de la création du bon de livraison',
                 'debug' => config('app.debug') ? [
                     'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine()
+                    // 'file' => $e->getFile(),
+                    // 'line' => $e->getLine()
                 ] : null
             ], 500);
         }
@@ -507,12 +520,16 @@ class BonLivraisonFournisseurController extends Controller
 
             // Récupérer les prix unitaires de la facture
             $prixUnitaires = [];
-            foreach ($bonLivraison->facture->lignes as $ligneFact) {
+            foreach ($bonLivraison->lignes as $ligne) {
                 Log::info("Ligne bon de livraison avant update", ["data" => $bonLivraison->lignes]);
+
+                $ligneFact = $bonLivraison->facture->lignes()->firstWhere("article_id", $ligne->article_id);
 
                 if (!in_array($ligneFact->article_id, $bonLivraison->lignes->pluck("article_id")->toArray())) {
                     continue;
                 }
+
+                // Log::info("Ligne facture", ["ligne facture" => $ligneFact]);
 
                 $prixUnitaires[$ligneFact->article_id] = $ligneFact->prix_unitaire;
 

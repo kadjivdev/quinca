@@ -71,7 +71,6 @@
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner un magasin de destination interne</div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>

@@ -224,7 +224,7 @@ class FactureFournisseur extends Model
      */
     public function bonLivraison()
     {
-        return $this->hasOne(BonLivraisonFournisseur::class, 'facture_id');
+        return $this->hasMany(BonLivraisonFournisseur::class, 'facture_id');
     }
 
     public function reglements()

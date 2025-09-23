@@ -22,6 +22,7 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\AcompteClient;
 use App\Models\Vente\Client;
@@ -42,18 +43,10 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $accomptes = AcompteClient::where("statut", "valide")
-        ->whereNotNull("transport_id")
-        ->get();
+    $FAC25094074 = FactureFournisseur::with("lignes.article")
+        ->firstWhere("code","FAC25094074");
 
-    foreach ($accomptes as $accompte) {
-        $accompte->update([
-            'validated_by' => $accompte->transport->validator,
-            'validated_at' => $accompte->transport->validate_at,
-        ]);
-    }
-
-    return $accomptes;
+    return $FAC25094074;
 });
 
 /**DETELE A STOCK */

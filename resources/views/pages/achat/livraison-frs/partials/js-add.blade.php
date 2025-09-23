@@ -184,9 +184,10 @@
                         // Cas d'erreur serveur avec debug
                         else if (xhr.responseJSON.debug) {
                             message = xhr.responseJSON.message || message;
-                            details = `Erreur: ${xhr.responseJSON.debug.error}\n` +
-                                `Fichier: ${xhr.responseJSON.debug.file}\n` +
-                                `Ligne: ${xhr.responseJSON.debug.line}`;
+                            details = `Erreur: ${xhr.responseJSON.debug.error}\n`
+                            //  +
+                                // `Fichier: ${xhr.responseJSON.debug.file}\n` +
+                                // `Ligne: ${xhr.responseJSON.debug.line}`;
                         }
                         // Cas d'erreur simple
                         else if (xhr.responseJSON.message) {
