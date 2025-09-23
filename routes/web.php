@@ -57,7 +57,6 @@ Route::get("/debug", function () {
     }
 
     return $reglements;
-    return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
 
 /**DETELE A STOCK */
