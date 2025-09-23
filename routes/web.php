@@ -44,7 +44,19 @@ use Illuminate\Support\Facades\Auth;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     $FAC25094074 = FactureFournisseur::with("lignes.article")
-        ->firstWhere("code","FAC25094074");
+        ->firstWhere("code", "FAC25094074");
+
+    foreach ($FAC25094074->lignes as $ligne) {
+        switch ($ligne->id) {
+            case 560:
+                $ligne->update(["quantite_livree_simple" => 215]);
+                break;
+
+            case 561:
+                $ligne->update(["quantite_livree" => 60, "quantite_livree_simple" => 75]);
+                break;
+        }
+    }
 
     return $FAC25094074;
 });
