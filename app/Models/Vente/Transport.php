@@ -6,6 +6,8 @@ use App\Models\Vente\Client;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Transport extends Model
 {
@@ -21,7 +23,13 @@ class Transport extends Model
         'documents'
     ];
 
-    public function client() : BelongsTo {
+    public function client(): BelongsTo
+    {
         return $this->belongsTo(Client::class);
+    }
+
+    function accompte(): HasOne
+    {
+        return $this->hasOne(AcompteClient::class, "transport_id");
     }
 }

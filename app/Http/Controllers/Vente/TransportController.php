@@ -152,7 +152,7 @@ class TransportController extends Controller
                 'validate_at' => now()
             ]);
 
-            AcompteClient::create([
+            $acompte = AcompteClient::create([
                 'date' => $transport->date_op,
                 'montant' =>  $transport->montant,
                 'facture_id' => null,
@@ -167,6 +167,14 @@ class TransportController extends Controller
                 
                 'created_by'=>auth()->user()->id,
                 'point_de_vente_id' => Auth::user()->point_de_vente_id
+            ]);
+
+            $acompte->compteClient()->create([
+                'date_op' => $acompte->date,
+                'montant_op' => $acompte->montant,
+                'client_id' => $acompte->client_id,
+                'user_id' => Auth::user()->id,
+                'type_op' => 'AC_CLT',
             ]);
 
             DB::commit();

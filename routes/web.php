@@ -23,12 +23,14 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
+use App\Models\Securite\User;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\AcompteClient;
 use App\Models\Vente\Client;
 use App\Models\Vente\CompteClient;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\ReglementClient;
+use App\Models\Vente\Transport;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -43,22 +45,73 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $FAC25094074 = FactureFournisseur::with("lignes.article")
-        ->firstWhere("code", "FAC25094074");
+    $transportsWhithOutAccomptes = Transport::with(["accompte.compteClient"])
+        ->whereDOesntHave("accompte")
+        ->get();
 
-    foreach ($FAC25094074->lignes as $ligne) {
-        switch ($ligne->id) {
-            case 560:
-                $ligne->update(["quantite_livree_simple" => 215]);
-                break;
+    foreach ($transportsWhithOutAccomptes as $transport) {
+        if ($transport->accompte->isEmpty()) {
+            $transport->accompte()->create([
+                'date' => $transport->date_op,
+                'montant' =>  $transport->montant,
+                'facture_id' => null,
+                'client_id' => $transport->client_id,
+                'user_id' => $transport->validator,
+                'type_paiement' => 'virement',
+                'transport_id' => $transport->id,
+                'statut' => AcompteClient::STATUT_VALIDE,
 
-            case 561:
-                $ligne->update(["quantite_livree" => 60, "quantite_livree_simple" => 75]);
-                break;
+                'validated_by' => $transport->validator,
+                'validated_at' => $transport->validate_at,
+
+                'created_by' => $transport->validator,
+                'point_de_vente_id' => User::find($transport->validator)->point_de_vente_id
+            ]);
         }
     }
+    // return $transportsWhithOutAccomptes;
 
-    return $FAC25094074;
+    $transportsWhitAccomptes = Transport::with(["accompte.compteClient"])
+        ->whereHas("accompte")
+        ->get();
+
+    // return $transportsWhitAccomptes;
+
+    foreach ($transportsWhitAccomptes as $transport) {
+        $acompte = $transport->accompte;
+
+        if ($acompte->compteClient->isEmpty()) {
+            $acompte->compteClient()->create([
+                'date_op' => $acompte->date,
+                'montant_op' => $acompte->montant,
+                'client_id' => $acompte->client_id,
+                'user_id' => $transport->validator,
+                'type_op' => 'AC_CLT',
+            ]);
+        }
+    };
+
+    return Transport::with(["accompte.compteClient"])->get();
+
+    /**
+     * Regularisation des livraisons de la facture $FAC25094074
+     */
+    // $FAC25094074 = FactureFournisseur::with("lignes.article")
+    //     ->firstWhere("code", "FAC25094074");
+
+    // foreach ($FAC25094074->lignes as $ligne) {
+    //     switch ($ligne->id) {
+    //         case 560:
+    //             $ligne->update(["quantite_livree_simple" => 215]);
+    //             break;
+
+    //         case 561:
+    //             $ligne->update(["quantite_livree" => 60, "quantite_livree_simple" => 75]);
+    //             break;
+    //     }
+    // }
+
+    // return $FAC25094074;
 });
 
 /**DETELE A STOCK */
