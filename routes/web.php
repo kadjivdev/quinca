@@ -25,6 +25,8 @@ use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\CompteClient;
 use App\Models\Vente\FactureClient;
+use App\Models\Vente\ReglementClient;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,13 +41,22 @@ use App\Models\Vente\FactureClient;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $FAC_20250920_0010 = FactureClient::with(["lignes.article", "lignes.facturedepot", "compteClient"])->firstWhere("numero", "FAC-20250920-0010");
+    $reglements = ReglementClient::with("compteClient")
+        ->whereNotNull("validated_by")
+        ->whereDoesntHave("compteClient")
+        ->get();
 
-    if ($FAC_20250920_0010->lignes->firstWhere("depot", 6)) {
-        $FAC_20250920_0010->lignes->firstWhere("depot", 6)->update(["depot" => 4]);
+    foreach ($reglements as $reglement) {
+        $reglement->compteClient()->create([
+            'date_op' => $reglement->date_reglement,
+            'montant_op' => $reglement->montant,
+            'client_id' => $reglement->facture->client_id,
+            'user_id' => Auth::user()->id,
+            'type_op' => 'REG_CLT',
+        ]);
     }
 
-    return $FAC_20250920_0010;
+    return $reglements;
     return "Regulation effectuée pour les facture FAC25097308 éffectuée avec succès!!";
 });
 

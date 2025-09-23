@@ -871,6 +871,15 @@ class FactureClientController extends Controller
                     'validated_by' => auth()->id(),
                     'statut' => 'validee'
                 ]);
+
+                // Creation du compte client
+                $reglement->compteClient()->create([
+                    'date_op' => $reglement->date_reglement,
+                    'montant_op' => $reglement->montant,
+                    'client_id' => $reglement->facture->client_id,
+                    'user_id' => Auth::user()->id,
+                    'type_op' => 'REG_CLT',
+                ]);
             }
 
             $sessionCaisse->mettreAJourTotaux();
