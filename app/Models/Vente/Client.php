@@ -110,7 +110,8 @@ class Client extends Model
             return $clientAccomptesAmount;
         }
 
-        return ($reglementsAmount + $clientAccomptesAmount) - ($facturesAmount + $clientTransportAmount);
+        // return ($reglementsAmount + $clientAccomptesAmount) - ($facturesAmount + $clientTransportAmount);
+        return ($reglementsAmount + $clientAccomptesAmount) - ($facturesAmount);
     }
 
     /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */
