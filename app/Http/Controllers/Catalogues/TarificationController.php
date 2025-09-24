@@ -85,11 +85,12 @@ class TarificationController extends Controller
                     $exists = Tarification::where([
                         'article_id' => $request->article_id,
                         'type_tarif_id' => $value,
+                        'unite_mesure_id'=>$request->unite_mesure_id,
                         ['id', '!=', $request->id ?? 0]
                     ])->exists();
 
                     if ($exists) {
-                        $fail('Une tarification existe déjà pour cet article avec ce type de tarif.');
+                        $fail('Une tarification existe déjà pour cet article avec ce type de tarif & cette unité de mesure.');
                     }
                 }
             ],

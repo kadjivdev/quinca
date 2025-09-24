@@ -67,17 +67,18 @@
 
                             @foreach($typesTarifs as $typeTarif)
                                 @php
-                                    $tarification = $article->tarifications
-                                        ->where('type_tarif_id', $typeTarif->id)
-                                        ->where('statut', true)
-                                        ->first();
+                                    $tarifications = $article->tarifications
+                                    ->where('type_tarif_id', $typeTarif->id)
+                                    ->where('statut', true);
                                 @endphp
 
                                 <td class="text-end">
                                     <div class="d-flex align-items-center justify-content-end gap-2">
-                                        @if($tarification)
+                                        @if($tarifications->isNotEmpty())
+
+                                        @foreach($tarifications as $tarification)
                                         <div class="tarif-value d-flex align-items-center justify-content-between">
-                                            <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA ({{$tarification->uniteMesure?->libelle_unite}})</span>
+                                            <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA ({{$tarification->uniteMesure?->libelle_unite}}) | {{$tarification->depotTarif?->libelle_depot}}</span>
                                             <div class="btn-group btn-group-sm ms-3 action-buttons">
                                                 @can("tarification.edit")
                                                 <button class="btn btn-link p-0 text-warning btn-animated"
@@ -93,14 +94,16 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        @else
-                                        @can("tarification.create")
-                                        <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
-                                            onclick="showAddTarificationModal({{ $article->id }}, {{ $typeTarif }})"
-                                            title="Ajouter un tarif">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                        @endcan
+                                        @endforeach
+
+                                        <!-- else -->
+                                            @can("tarification.create")
+                                            <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
+                                                onclick="showAddTarificationModal({{ $article->id }}, {{ $typeTarif }})"
+                                                title="Ajouter un tarif">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            @endcan
                                         @endif
                                     </div>
                                 </td>
