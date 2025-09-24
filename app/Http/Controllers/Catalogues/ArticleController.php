@@ -421,7 +421,7 @@ class ArticleController extends Controller
             'data' => $article,
             'utils' => [
                 "unites" => $article->getUnites(),
-                "depots" => $article->depots,
+                "depots" => $article->depots()->distinct()->get(),
                 // "type_tarifs" => TypeTarif::get(["id", "code_type_tarif", "libelle_type_tarif"])
             ]
         ]);
