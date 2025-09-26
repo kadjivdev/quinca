@@ -22,6 +22,7 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Securite\User;
 use App\Models\Stock\StockDepot;
@@ -48,12 +49,17 @@ Route::get("/debug", function () {
     /**
      * Changement de signe de certains transports
      */
-    $CLI20250226 = Client::firstWhere("code_client", 'CLI20250226');
-    $CLI20250226->update([
-        "telephone" => "0197449261",
-        "raison_sociale" => "$CLI20250226->raison_sociale (0151362952)"
-    ]);
-    return $CLI20250226;
+    $BLF2509250002 = BonLivraisonFournisseur::with(["lignes", "facture.bonCommande.lignes.article", "facture.lignes.article", "lignes.article"])->firstWhere("code", 'BLF2509250002');
+
+    $bonCommande = $BLF2509250002->facture->bonCommande;
+    $bonCommande->lignes()->firstWhere("article_id", 1444)?->update(["prix_unitaire" => 19000, "montant_ligne" => 380000]);
+    $bonCommande->update(["montant_total" => $bonCommande->lignes()->sum("montant_ligne")]);
+
+    $facture = $BLF2509250002->facture;
+    $facture->lignes->firstWhere("article_id",1444)?->update(["prix_unitaire"=>19000,"montant_ttc"=>380000,"montant_ht"=>380000]);
+    $facture->update(["montant_ht" => $facture->lignes()->sum("montant_ht"),"montant_ttc" => $facture->lignes()->sum("montant_ttc")]);
+
+    return response()->json($BLF2509250002);
 });
 
 /**DETELE A STOCK */
