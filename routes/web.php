@@ -22,6 +22,7 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\AccompteFournisseur;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Securite\User;
@@ -48,11 +49,21 @@ use Illuminate\Support\Facades\Auth;
 Route::get("/debug", function () {
     $ACP20250003 = AcompteClient::with(["compteClient", 'requete', 'transport'])->firstWhere("reference", 'ACP20250003');
 
-    if ($ACP20250003->montant > 0) {
+    if ($ACP20250003->montant < 0) {
         $ACP20250003->requete->update(["montant" => -$ACP20250003->requete->montant]);
         $ACP20250003->update(["montant" => -$ACP20250003->montant]);
     }
-    return $ACP20250003;
+    // return $ACP20250003;
+
+    $ACP20250003_FR = AccompteFournisseur::with(['requete'])->firstWhere("reference", 'ACP20250003');
+    // return $ACP20250003_FR;
+
+    if ($ACP20250003_FR->montant > 0) {
+        $ACP20250003_FR->requete->update(["montant" => -$ACP20250003_FR->requete->montant]);
+        $ACP20250003_FR->update(["montant" => -$ACP20250003_FR->montant]);
+    }
+
+    return $ACP20250003_FR;
 });
 
 /**DETELE A STOCK */
