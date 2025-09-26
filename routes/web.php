@@ -46,20 +46,13 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    /**
-     * Changement de signe de certains transports
-     */
-    $BLF2509250002 = BonLivraisonFournisseur::with(["lignes", "facture.bonCommande.lignes.article", "facture.lignes.article", "lignes.article"])->firstWhere("code", 'BLF2509250002');
+    $ACP20250003 = AcompteClient::with(["compteClient", 'requete', 'transport'])->firstWhere("reference", 'ACP20250003');
 
-    $bonCommande = $BLF2509250002->facture->bonCommande;
-    $bonCommande->lignes()->firstWhere("article_id", 1444)?->update(["prix_unitaire" => 19000, "montant_ligne" => 380000]);
-    $bonCommande->update(["montant_total" => $bonCommande->lignes()->sum("montant_ligne")]);
-
-    $facture = $BLF2509250002->facture;
-    $facture->lignes->firstWhere("article_id",1444)?->update(["prix_unitaire"=>19000,"montant_ttc"=>380000,"montant_ht"=>380000]);
-    $facture->update(["montant_ht" => $facture->lignes()->sum("montant_ht"),"montant_ttc" => $facture->lignes()->sum("montant_ttc")]);
-
-    return response()->json($BLF2509250002);
+    if ($ACP20250003->montant > 0) {
+        $ACP20250003->requete->update(["montant" => -$ACP20250003->requete->montant]);
+        $ACP20250003->update(["montant" => -$ACP20250003->montant]);
+    }
+    return $ACP20250003;
 });
 
 /**DETELE A STOCK */
