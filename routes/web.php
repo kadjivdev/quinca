@@ -48,87 +48,12 @@ Route::get("/debug", function () {
     /**
      * Changement de signe de certains transports
      */
-    $transports = Transport::with(["accompte.compteClient"])
-        ->whereHas("accompte", function ($accompte) {
-            $accompte->whereIn("reference", ["ACP20250007", "ACP20250086", "ACP20250087", "ACP20250088"]);
-        })
-        ->get()
-        ->each(function ($transport) {
-            $transport->update(["montant" => -$transport->montant]);
-
-            $transport->accompte->update(["montant" => -$transport->accompte->montant]);
-
-            $transport->accompte->compteClient->first()
-                ->update(["montant_op" => -$transport->accompte->compteClient->first()->montant_op]);
-        });
-
-    // return $transports->pluck("accompte.reference");
-    return $transports;
-
-    // $transportsWhithOutAccomptes = Transport::with(["accompte.compteClient"])
-    //     ->whereDOesntHave("accompte")
-    //     ->get();
-
-    // foreach ($transportsWhithOutAccomptes as $transport) {
-    //     if (!$transport->accompte) {
-    //         $transport->accompte()->create([
-    //             'date' => $transport->date_op,
-    //             'montant' =>  $transport->montant,
-    //             'facture_id' => null,
-    //             'client_id' => $transport->client_id,
-    //             'user_id' => $transport->validator,
-    //             'type_paiement' => 'virement',
-    //             'transport_id' => $transport->id,
-    //             'statut' => AcompteClient::STATUT_VALIDE,
-
-    //             'validated_by' => $transport->validator,
-    //             'validated_at' => $transport->validate_at,
-
-    //             'created_by' => $transport->validator,
-    //             'point_de_vente_id' => User::find($transport->validator)->point_de_vente_id
-    //         ]);
-    //     }
-    // }
-
-    // $transportsWhitAccomptes = Transport::with(["accompte.compteClient"])
-    //     ->whereHas("accompte")
-    //     ->get();
-
-    // foreach ($transportsWhitAccomptes as $transport) {
-    //     $acompte = $transport->accompte;
-
-    //     if ($acompte->compteClient->isEmpty()) {
-    //         $acompte->compteClient()->create([
-    //             'date_op' => $acompte->date,
-    //             'montant_op' => $acompte->montant,
-    //             'client_id' => $acompte->client_id,
-    //             'user_id' => $transport->validator,
-    //             'type_op' => 'AC_CLT',
-    //         ]);
-    //     }
-    // };
-
-    // return Transport::with(["accompte.compteClient"])->get();
-
-    /**
-     * Regularisation des livraisons de la facture $FAC25094074
-     */
-    // $FAC25094074 = FactureFournisseur::with("lignes.article")
-    //     ->firstWhere("code", "FAC25094074");
-
-    // foreach ($FAC25094074->lignes as $ligne) {
-    //     switch ($ligne->id) {
-    //         case 560:
-    //             $ligne->update(["quantite_livree_simple" => 215]);
-    //             break;
-
-    //         case 561:
-    //             $ligne->update(["quantite_livree" => 60, "quantite_livree_simple" => 75]);
-    //             break;
-    //     }
-    // }
-
-    // return $FAC25094074;
+    $CLI20250226 = Client::firstWhere("code_client", 'CLI20250226');
+    $CLI20250226->update([
+        "telephone" => "0197449261",
+        "raison_sociale" => "$CLI20250226->raison_sociale (0151362952)"
+    ]);
+    return $CLI20250226;
 });
 
 /**DETELE A STOCK */
