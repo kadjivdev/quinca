@@ -46,7 +46,8 @@ class FactureClientController extends Controller
             $tauxTva = $configuration ? $configuration->taux_tva : 18;
 
             $query = FactureClient::with(['client'])
-                ->orderBy('created_at', 'desc');
+                ->orderBy('created_at', 'desc')
+                ->limit(200);
 
             // Chargement des factures avec les relations nécessaires
             if ($request->point_vente_id && !$request->client_id) {

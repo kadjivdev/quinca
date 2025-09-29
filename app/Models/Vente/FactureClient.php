@@ -67,7 +67,7 @@ class FactureClient extends Model
         'montant_regle' => 'decimal:3',
         'depot'
     ];
-
+    
     /**
      * Génère un numéro de facture unique
      * Format: FAC-AAAAMMJJ-XXXX
