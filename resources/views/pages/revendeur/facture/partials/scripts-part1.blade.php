@@ -463,7 +463,7 @@ class FactureManager {
         const tarifSelect = row.find(`select[name="lignes[${index}][tarification_id]"]`);
         tarifSelect.empty().append('<option value="">Sélectionner un tarif</option>');
 
-        if (tarifsData?.data?.tarifs) {
+        if (Array.isArray(tarifsData?.data?.tarifs)) {
             tarifsData.data.tarifs.forEach(tarif => {
                 const option = new Option(tarif.text, tarif.id);
                 $(option).data('prix', tarif.prix);
@@ -474,7 +474,7 @@ class FactureManager {
         // Mise à jour des unités
         const uniteSelect = row.find(`select[name="lignes[${index}][unite_vente_id]"]`);
 
-        if (unitesData?.data?.unites) {
+        if (Array.isArray(unitesData?.data?.unites)) {
             unitesData.data.unites.forEach(unite => {
                 uniteSelect.append(new Option(unite.text, unite.id));
             });
