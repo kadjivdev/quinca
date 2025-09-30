@@ -47,23 +47,17 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $ACP20250003 = AcompteClient::with(["compteClient", 'requete', 'transport'])->firstWhere("reference", 'ACP20250003');
+    $BLF2509190004 = BonLivraisonFournisseur::with(["facture.lignes.article", "lignes.article"])->firstWhere("code", 'BLF2509190004');
 
-    if ($ACP20250003->montant < 0) {
-        $ACP20250003->requete->update(["montant" => -$ACP20250003->requete->montant]);
-        $ACP20250003->update(["montant" => -$ACP20250003->montant]);
-    }
-    // return $ACP20250003;
-
-    $ACP20250003_FR = AccompteFournisseur::with(['requete'])->firstWhere("reference", 'ACP20250003');
-    // return $ACP20250003_FR;
-
-    if ($ACP20250003_FR->montant > 0) {
-        $ACP20250003_FR->requete->update(["montant" => -$ACP20250003_FR->requete->montant]);
-        $ACP20250003_FR->update(["montant" => -$ACP20250003_FR->montant]);
-    }
-
-    return $ACP20250003_FR;
+    $BLF2509190004->facture->lignes
+        ->each(function ($ligne) {
+            switch ($ligne->article_id) {
+                case 386:
+                    $ligne->update(["quantite_livree" => 115, "quantite_livree_simple" => 135]);
+                    break;
+            }
+        });
+    return response()->json($BLF2509190004);
 });
 
 /**DETELE A STOCK */

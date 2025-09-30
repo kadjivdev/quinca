@@ -530,12 +530,6 @@ class BonLivraisonFournisseurController extends Controller
                 }
 
                 $prixUnitaires[$ligneFact->article_id] = $ligneFact->prix_unitaire;
-
-                Log::info("Ligne facture avant update", ["data" => $ligneFact]);
-                /**Qte total livré dans l'unité de base de la ligne de facture */
-
-                // Log des prix unitaires
-                Log::debug("Prix unitaire pour article {$ligneFact->article_id}: {$ligneFact->prix_unitaire}");
             }
 
             // Préparer les entrées en stock
@@ -565,23 +559,6 @@ class BonLivraisonFournisseurController extends Controller
                     throw new Exception("Prix unitaire non trouvé pour l'article : " . $ligne->article?->code_article);
                 }
 
-                // // Unité supplementaire
-                // $QteBaseSupplementaire = 0;
-                // if ($ligne->unite_supplementaire_id) {
-                //     $QteBaseSupplementaire = $ligne
-                //         ->getQuantiteTotaleSupplement(
-                //             $ligne->unite_supplementaire_id, //unité de supplement entrant
-                //             $ligne->unite_mesure_id, //unité de destination(unite de base)
-                //             $ligne->quantite_supplementaire
-                //         );
-                // }
-
-                /**
-                 * Quantité total à livrer(quantité + QteBaseSupplementaire)
-                 */
-
-                // $qteTotal = $ligne->quantite + $QteBaseSupplementaire;
-
                 $diff = $ligneFact->quantite_livree_simple - $ligneFact->quantite_livree;
 
                 $stockToAdd = $ligneFact->quantite_livree ?
@@ -596,13 +573,13 @@ class BonLivraisonFournisseurController extends Controller
                     'quantite' => $stockToAdd, //$ligneFact->quantite_livree_simple, // $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                 ]);
 
-                Log::info("QTe ajouté", ["data" => $stockToAdd]);
-                Log::info("QTe Total", ["data" => $ligneFact->quantite_livree + $stockToAdd]);
-                Log::info("Ligne facture après update", ["data" => $ligneFact]);
-
                 $ligneFact->update([
                     'quantite_livree' => $ligneFact->quantite_livree  + $stockToAdd,
                 ]);
+
+                Log::info("QTe ajouté", ["data" => $stockToAdd]);
+                Log::info("QTe Total", ["data" => $ligneFact->quantite_livree]);
+                Log::info("Ligne facture après update", ["data" => $ligneFact]);
 
                 if ($ligneFact->quantite_livree > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
                     throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
@@ -622,7 +599,6 @@ class BonLivraisonFournisseurController extends Controller
                     'user_id' => Auth::id(),
                     'livraison' => $bonLivraison->id,
                 ];
-
             }
 
             // Log des entrées préparées
