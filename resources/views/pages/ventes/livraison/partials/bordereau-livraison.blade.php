@@ -112,7 +112,7 @@
             @foreach($livraison->lignes as $ligne)
             <tr>
                 <td class="text-center">{{ $ligne->article->designation }}</td>
-                <td class="text-center">{{ number_format($ligne->quantite, 3, ',', ' ') }} </td>
+                <td class="text-center">{{ number_format($ligne->quantite, 1, ',', ' ') }} </td>
                 <td class="text-center">{{$ligne->uniteVente?->libelle_unite}}</td>
             </tr>
             @endforeach

@@ -209,13 +209,13 @@
             @foreach($facture->lignes as $ligne)
             <tr>
                 <td>{{ $ligne->article->designation }}</td>
-                <td class="text-right">{{ number_format($ligne->quantite, 3, ',', ' ') }}</td>
-                <td class="text-right">{{ number_format($ligne->prix_unitaire_ht, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($ligne->quantite, 1, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($ligne->prix_unitaire_ht, 1, ',', ' ') }}</td>
                 <td class="text-right">{{ $ligne->uniteVente->libelle_unite }}</td>
                 <td class="text-right">{{ number_format($ligne->taux_remise, 2, ',', ' ') }}</td>
-                <td class="text-right">{{ number_format($ligne->montant_ht_apres_remise, 3, ',', ' ') }}</td>
-                <td class="text-right">{{ number_format($ligne->montant_tva, 3, ',', ' ') }}</td>
-                <td class="text-right">{{ number_format($ligne->montant_ttc, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($ligne->montant_ht_apres_remise, 1, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($ligne->montant_tva, 1, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($ligne->montant_ttc, 1, ',', ' ') }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -225,35 +225,35 @@
         <table>
             <tr>
                 <td><strong>Total HT</strong></td>
-                <td class="text-right">{{ number_format($facture->montant_ht, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->montant_ht, 1, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>Remise globale</strong></td>
-                <td class="text-right">{{ number_format($facture->montant_remise, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->montant_remise, 1, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>HT après remise</strong></td>
-                <td class="text-right">{{ number_format($facture->montant_ht_apres_remise, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->montant_ht_apres_remise, 1, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>TVA (18 %)</strong></td>
-                <td class="text-right">{{ number_format($facture->montant_ht * 18/100, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->montant_ht * 18/100, 1, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>AIB (1 %)</strong></td>
-                <td class="text-right">{{ number_format($facture->montant_ht * 1/100, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->montant_ht * 1/100, 1, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>Total TTC</strong></td>
-                <td class="text-right"><strong>{{ number_format($montantTTc, 3, ',', ' ') }}</strong></td>
+                <td class="text-right"><strong>{{ number_format($montantTTc, 1, ',', ' ') }}</strong></td>
             </tr>
             <tr>
                 <td><strong>Montant réglé</strong></td>
-                <td class="text-right">{{ number_format($facture->montant_regle, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->montant_regle, 1, ',', ' ') }}</td>
             </tr>
             <tr>
                 <td><strong>Reste à payer</strong></td>
-                <td class="text-right">{{ number_format($facture->reste_a_regler, 3, ',', ' ') }}</td>
+                <td class="text-right">{{ number_format($facture->reste_a_regler, 1, ',', ' ') }}</td>
             </tr>
         </table>
     </div>

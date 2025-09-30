@@ -47,17 +47,17 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $BLF2509190004 = BonLivraisonFournisseur::with(["facture.lignes.article", "lignes.article"])->firstWhere("code", 'BLF2509190004');
+    $BLF2509220002 = BonLivraisonFournisseur::with(["facture.lignes.article", "lignes.article"])->firstWhere("code", 'BLF2509220002');
 
-    $BLF2509190004->facture->lignes
-        ->each(function ($ligne) {
-            switch ($ligne->article_id) {
-                case 386:
-                    $ligne->update(["quantite_livree" => 115, "quantite_livree_simple" => 135]);
-                    break;
-            }
-        });
-    return response()->json($BLF2509190004);
+    // $BLF2509220002->facture->lignes
+    //     ->each(function ($ligne) {
+    //         switch ($ligne->article_id) {
+    //             case 386:
+    //                 $ligne->update(["quantite_livree" => 115, "quantite_livree_simple" => 135]);
+    //                 break;
+    //         }
+    //     });
+    return response()->json(FactureFournisseur::with("lignes")->firstWhere("code", 'FAC25095415'));
 });
 
 /**DETELE A STOCK */

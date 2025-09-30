@@ -741,6 +741,12 @@ class BonLivraisonFournisseurController extends Controller
             // Suppression du bon de livraison
             $bonLivraison->delete();
 
+            /**Regularisation des lignes des factures */
+            $bonLivraison->facture->lignes
+                ->each(function ($ligne) {
+                    $ligne->update(["quantite_livree_simple" => $ligne->quantite_livree]);
+                });
+
             DB::commit();
 
             return response()->json([
