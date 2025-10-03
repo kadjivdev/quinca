@@ -641,7 +641,7 @@ class BonLivraisonFournisseurController extends Controller
                 'statut_livraison' => $totalQuantiteLivree >= $totalQuantiteFacture ? 'LIVRE' : 'PARTIELLEMENT_LIVRE'
             ]);
 
-            // DB::commit();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
