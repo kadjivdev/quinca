@@ -66,18 +66,6 @@ class ArticleController extends Controller
                         $stock->article_id
                     );
 
-                /** Conersion de toute quantité en unité de base */
-                // $stock->qteTotalVendu = $conversion ? $this->serviceStockEntree
-                //     ->convertirQuantite(
-                //         $article->qteVendu($stock->depot_id), //$article->reste($stock->depot_id),
-                //         $conversion,
-                //         $stock->unite_mesure_id
-                //     ) : 00;
-
-                // if ($article->id==2024) {
-                //     dd($conversion);
-                // }
-
                 /**Qte de Base */
                 $stock->qantiteBase = $conversion ? $this->serviceStockEntree
                     ->convertirQuantite(
@@ -88,13 +76,6 @@ class ArticleController extends Controller
 
                 /**Qte Vendue */
                 $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
-
-                // $stock->resteStock = $conversion ? $this->serviceStockEntree
-                //     ->convertirQuantite(
-                //         $stock->quantite_reelle - $stock->qteTotalVendu, //$article->reste($stock->depot_id),
-                //         $conversion,
-                //         $stock->unite_mesure_id
-                //     ) : 00;
 
                 $stock->resteStock = $stock->qantiteBase - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
             });

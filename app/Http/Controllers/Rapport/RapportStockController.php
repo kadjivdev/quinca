@@ -292,12 +292,31 @@ class RapportStockController extends Controller
         $selectedDepot = $request->depot_id ?
             Depot::findOrFail($request->depot_id) :
             $depots->first();
-
+            
         $stocks = StockDepot::with(['article.uniteMesure', 'depot'])
             ->where('depot_id', $selectedDepot->id)
             ->where('quantite_reelle', '>', 0)
             ->get()
             ->map(function ($stock) use ($selectedDepot) {
+                $conversion = $this->serviceEntree
+                    ->rechercherConversion(
+                        $stock->unite_mesure_id,
+                        $stock->article->unite_mesure_id,
+                        $stock->article_id
+                    );
+                /**Qte de Base */
+                $qantiteBase = $conversion ? $this->serviceEntree
+                    ->convertirQuantite(
+                        $stock->quantite_reelle,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    ) : 00;
+
+                /**Qte Vendue */
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+
+                $resteStock = $qantiteBase - $qteTotalVendu;
+
                 return [
                     'article' => [
                         'code' => $stock->article->code_article,
@@ -307,7 +326,7 @@ class RapportStockController extends Controller
                     'unite_stock' => $stock->uniteMesure->libelle_unite,
                     'depot' => $stock->depot->libelle_depot,
                     'quantite_reelle' => $stock->quantite_reelle,
-                    'quantite_disponible' => $stock->article->reste($selectedDepot->id),
+                    'quantite_disponible' => $resteStock, // $stock->article->reste($selectedDepot->id),
                     'quantite_reservee' => $stock->quantite_reservee,
                     'prix_moyen' => $stock->prix_moyen,
                     'valeur_stock' => $stock->valeur_stock,
