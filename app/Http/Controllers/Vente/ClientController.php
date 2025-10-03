@@ -236,7 +236,7 @@ class ClientController extends Controller
 
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
-        $compteClients = CompteClient::with([
+        $query = CompteClient::with([
             "client",
             "user",
             "factureClient",
@@ -244,16 +244,53 @@ class ClientController extends Controller
             "reglementClient",
             "reglementRevendeur",
             "accompteClient"
-        ])
-            ->latest()
-            ->get();
+        ])->latest();
 
+        /**
+         * Filtre
+         */
+        $debut = $fin = null;
+        if ($request->debut && $request->fin) {
+            $query->whereBetween("date_op", [$request->debut, $request->fin]);
+            $debut = Carbon::parse($request->debut)->locale('fr')->isoFormat("D MMMM YYYY");
+            $fin = Carbon::parse($request->fin)->locale('fr')->isoFormat("D MMMM YYYY");
+        }
+
+        /** */
+        $client = null;
+        if ($request->client_id) {
+            $query->where("client_id", $request->client_id);
+            $client = Client::find($request->client_id);
+        }
+
+        $compteClients = $query->get()
+            ->map(function ($compte) {
+                $compte->dateFormated = Carbon::parse($compte->date_op)->locale('fr')->isoFormat("D MMMM YYYY");
+                $compte->createdDateFormated = Carbon::parse($compte->created_at)->locale('fr')->isoFormat("D MMMM YYYY");
+
+                return $compte;
+            });
+
+        $clients = $compteClients->pluck("client")
+        ->unique()
+        ->values()
+        ->map(function ($client) {
+            return (object) [
+                "id" => $client->id,
+                "raison_sociale" => $client->raison_sociale,
+            ];
+        });
+
+        // return $clients;
         // Récupération des données avec pagination
         $user = auth()->user();
 
         return view('pages.ventes.client.partials.details.all-detail-comptes', compact(
             'compteClients',
-            'date'
+            'clients',
+            'client',
+            'debut',
+            'fin',
         ));
     }
 

@@ -44,7 +44,7 @@
                         <div class="row g-4">
                             <div class="col-12">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <div class="form-group mb-3">
                                             <div class="">
                                                 <h5 class="text">Article : <span class="badge bg-warning">{{$article->code_article}} {{$article->designation}} ({{$article->uniteMesure->libelle_unite}}) </span> </h5>
@@ -54,14 +54,14 @@
                                         <div class="form-group mb-3">
                                             <h5 class="">Les dépôts déjà associés :</h5>
                                             @forelse($article->stocks as $stock)
-                                            <span class="badge bg-warning"> {{$stock->depot->libelle_depot}} <strong class="text-dark"> Stock : {{number_format($stock->quantite_reelle,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> </span>
+                                            <span class="badge bg-warning"> {{$stock->depot->libelle_depot}} <strong class="text-dark"> Stock Appovisionné: {{number_format($stock->quantite_reelle,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> | <strong class="text-dark"> Stock vendu: {{number_format($stock->qteTotalVendu,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> | <strong class="text-dark"> Stock disponible: {{number_format($stock->resteStock,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong>  </span>
                                             @empty
                                             <span class="badge bg-light text-dark">Aucun dépôt</span>
                                             @endforelse
                                         </div>
                                     </div>
 
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <div class="form-group mb-3">
                                             <label for="">La quantité du stock <span class="text-danger">*</span> </label>
                                             <input type="number" required name="quantite_reelle" class="form-control">

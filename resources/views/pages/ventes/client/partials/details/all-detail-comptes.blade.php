@@ -47,8 +47,41 @@
             <a href="{{route('vente.clients.index')}}" class="btn btn-sm btn-light border">Retour</a>
             <br>
             <div class="card mt-3 p-3 shadow-sm">
+                <form action="" method="get" class="p-3 shadow border rounded">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="date" class="form-control" name="debut" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="date" class="form-control" name="fin" required>
+                        </div>
+                        <div class="col-md-4">
+                            <select name="client_id" id="" class="form-control">
+                                <option value="">Selectionnez un client</option>
+                                @foreach($clients as $clt)
+                                <option value="{{$clt->id}}" @if($client!=null) @selected($client->id==$clt->id)@endif> {{$clt->raison_sociale}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <div>
+                        <button class="btn btn-dark border btn-sm w-100">Filtrer par période</button>
+                    </div>
+                </form>
+                <br>
+                <br>
+                @if($debut || $fin)
+                <div class="alert alert-secondary">
+                    Historique de la période du <span class="badge bg-light text-dark border rounded">{{$debut}}</span> au <span class="badge bg-light text-dark border rounded">{{$fin}}</span>
+                    @if($client)
+                    pour le client <span class="badge bg-light text-dark border rounded">{{$client->raison_sociale}}</span>
+                    @endif
+                </div>
+                @endif
                 <div class="table-responsive">
-                    <h5 class="mb-5">L'historique des opérations de : <strong class="badge bg-light border text-dark">tous les clients</strong></h5>
+                    <h5 class="mb-5">L'historique des opérations de <a href="{{route('vente.clients.allHistoriqueComptes')}}" class="btn btn-sm bg-primary text-white">Actualiser la page</a></h5>
+                    <h5 class="mb-5">Montant total : <strong class="badge bg-light border text-dark">{{number_format($compteClients->sum("montant_op"),2,' ',' ')}} Fcfa</h5>
 
                     <table id="example1" class="table table-hover align-middle mb-0" id="clientsTable">
                         <thead class="bg-light">
@@ -72,8 +105,8 @@
                                     <span class="code-client">{{ $loop->iteration }}</span>
                                 </td>
                                 <td><span class="badge bg-light border text-dark">{{$compte->client?->raison_sociale}}</span></td>
-                                <td>{{ Carbon\Carbon::parse($compte->created_at)->format('d/m/Y H:i:s') }}</td>
-                                <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y H:i:s') }}</td>
+                                <td><span class="badge bg-light border rounded text-dark">{{ $compte->createdDateFormated }} </span></td>
+                                <td><span class="badge bg-light border rounded text-dark">{{ $compte->dateFormated }} </span></td>
                                 <td>
                                     @if($compte->type_op=="FAC_CLT")
                                     Facture client <span class="badge bg-light text-dark">{{$compte->factureClient?->numero}}</span>

@@ -142,6 +142,28 @@ class ArticleController extends Controller
         $depots = Depot::get();
         $unites = UniteMesure::all();
 
+        $article->stocks->map(function ($stock) use ($article) {
+            $conversion = $this->serviceStockEntree
+                ->rechercherConversion(
+                    $stock->unite_mesure_id,
+                    $stock->article->unite_mesure_id,
+                    $stock->article_id
+                );
+
+            /**Qte de Base */
+            $stock->qantiteBase = $conversion ? $this->serviceStockEntree
+                ->convertirQuantite(
+                    $stock->quantite_reelle,
+                    $conversion,
+                    $stock->unite_mesure_id
+                ) : 00;
+
+            /**Qte Vendue */
+            $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
+
+            $stock->resteStock = $stock->qantiteBase - $stock->qteTotalVendu;
+        });
+
         return view("pages.catalogues.article.affect-depot", compact([
             "depots",
             "article",
