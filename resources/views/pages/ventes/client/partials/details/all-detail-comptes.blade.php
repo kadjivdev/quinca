@@ -81,7 +81,7 @@
                 @endif
                 <div class="table-responsive">
                     <h5 class="mb-5">L'historique des opérations de <a href="{{route('vente.clients.allHistoriqueComptes')}}" class="btn btn-sm bg-primary text-white">Actualiser la page</a></h5>
-                    <h5 class="mb-5">Montant total : <strong class="badge bg-light border text-dark">{{number_format($compteClients->sum("montant_op"),2,' ',' ')}} Fcfa</h5>
+                    <h5 class="mb-5">Montant total : <strong class="badge bg-light border text-dark">{{number_format($totalAmount,2,' ',' ')}} Fcfa</h5>
 
                     <table id="example1" class="table table-hover align-middle mb-0" id="clientsTable">
                         <thead class="bg-light">

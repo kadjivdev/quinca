@@ -271,17 +271,21 @@ class ClientController extends Controller
                 return $compte;
             });
 
-        $clients = $compteClients->pluck("client")
-        ->unique()
-        ->values()
-        ->map(function ($client) {
-            return (object) [
-                "id" => $client->id,
-                "raison_sociale" => $client->raison_sociale,
-            ];
+        $totalAmount = 0;
+        $compteClients->each(function ($compte) use (&$totalAmount) {
+            $totalAmount += in_array($compte->type_op, ["REG_CLT", "REG_REV"]) ? -$compte->montant_op : $compte->montant_op;
         });
 
-        // return $clients;
+        $clients = $compteClients->pluck("client")
+            ->unique()
+            ->values()
+            ->map(function ($client) {
+                return (object) [
+                    "id" => $client->id,
+                    "raison_sociale" => $client->raison_sociale,
+                ];
+            });
+
         // Récupération des données avec pagination
         $user = auth()->user();
 
@@ -289,6 +293,7 @@ class ClientController extends Controller
             'compteClients',
             'clients',
             'client',
+            'totalAmount',
             'debut',
             'fin',
         ));
