@@ -525,10 +525,6 @@ class BonLivraisonFournisseurController extends Controller
 
                 $ligneFact = $bonLivraison->facture->lignes()->firstWhere("article_id", $ligne->article_id);
 
-                if (!in_array($ligneFact->article_id, $bonLivraison->lignes->pluck("article_id")->toArray())) {
-                    continue;
-                }
-
                 $prixUnitaires[$ligneFact->article_id] = $ligneFact->prix_unitaire;
             }
 
@@ -581,7 +577,25 @@ class BonLivraisonFournisseurController extends Controller
                 Log::info("QTe Total", ["data" => $ligneFact->quantite_livree]);
                 Log::info("Ligne facture après update", ["data" => $ligneFact]);
 
-                if ($ligneFact->quantite_livree > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
+                /**
+                 * Quantité supplementaire convertie en 
+                 * unité de base de la ligne
+                 */
+
+                $QteBaseSupplementaire = 0;
+                if ($ligne->unite_supplementaire_id) {
+                    $QteBaseSupplementaire = $ligneFact
+                        ->getQuantiteTotaleSupplement(
+                            $ligne->unite_supplementaire_id, //unité de supplement entrant
+                            $ligne->unite_mesure_id, //unité de destination(unite de base)
+                            $ligne->quantite_supplementaire
+                        );
+                }
+
+                Log::info("QTe Base Supplementaire", ["data" => $QteBaseSupplementaire]);
+
+
+                if ($ligneFact->quantite_livree > (($ligneFact->quantite_base ?? $ligneFact->quantite) + $QteBaseSupplementaire)) {
                     throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
                 }
 
@@ -627,7 +641,7 @@ class BonLivraisonFournisseurController extends Controller
                 'statut_livraison' => $totalQuantiteLivree >= $totalQuantiteFacture ? 'LIVRE' : 'PARTIELLEMENT_LIVRE'
             ]);
 
-            DB::commit();
+            // DB::commit();
 
             return response()->json([
                 'success' => true,
