@@ -56,7 +56,7 @@
                             <input type="date" class="form-control" name="fin" required>
                         </div>
                         <div class="col-md-4">
-                            <select name="client_id" id="" class="form-control">
+                            <select name="client_id" id="client" class="form-control">
                                 <option value="">Selectionnez un client</option>
                                 @foreach($clients as $clt)
                                 <option value="{{$clt->id}}" @if($client!=null) @selected($client->id==$clt->id)@endif> {{$clt->raison_sociale}}</option>
@@ -555,6 +555,11 @@
 
 @push("scripts")
 <script>
+    $('#client').select2({
+        placeholder: "Sélectionner un client",
+        allowClear: true
+    });
+
     $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,
