@@ -464,7 +464,6 @@ class FactureManager {
         tarifSelect.empty().append('<option value="">Sélectionner un tarif</option>');
 
         if (Array.isArray(tarifsData?.data?.tarifs)) {
-
             tarifsData.data.tarifs.forEach(tarif => {
                 const option = new Option(tarif.text, tarif.id);
                 $(option).data('prix', tarif.prix);

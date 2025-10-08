@@ -49,9 +49,6 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $ART_927 = Article::with("stocks.depot")->firstWhere("code_article", "ART-927");
-    // return $ART_927;
-
     $FAC_20251003_0005 = FactureClient::with("lignes.article", "lignes.facturedepot", "client")
         ->firstWhere("numero", "FAC-20251003-0005");
 
