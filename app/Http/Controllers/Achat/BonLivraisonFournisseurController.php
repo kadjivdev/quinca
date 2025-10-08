@@ -27,9 +27,6 @@ class BonLivraisonFournisseurController extends Controller
     /**
      * Affiche la liste des bons de livraison fournisseur
      */
-    /**
-     * Affiche la liste des bons de livraison fournisseur
-     */
 
     public function index()
     {

@@ -3,6 +3,7 @@
 namespace App\Models\Vente;
 
 use App\Models\Catalogue\Article;
+use App\Models\Securite\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -41,5 +42,9 @@ class Requete extends Model
     public function accompte(): HasOne
     {
         return $this->hasOne(AcompteClient::class, "requete_id");
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

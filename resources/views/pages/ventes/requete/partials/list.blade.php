@@ -26,6 +26,7 @@
                             <th class="border-bottom-0">Articles</th>
                             <th class="border-bottom-0">Montant</th>
                             <th class="border-bottom-0">Document</th>
+                            <th class="border-bottom-0">Insérée par:</th>
                             <th class="border-bottom-0">Action</th>
                         </tr>
                     </thead>
@@ -55,6 +56,9 @@
                                 @else
                                 ---
                                 @endif
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border rounded">{{$requete->user?->name}}</span>
                             </td>
                             <td>
                                 @if (is_null($requete->validate_at))
