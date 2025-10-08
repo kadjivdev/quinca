@@ -23,8 +23,10 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\AccompteFournisseur;
+use App\Models\Achat\BonCommande;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
+use App\Models\Catalogue\Article;
 use App\Models\Securite\User;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\AcompteClient;
@@ -47,22 +49,16 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $BLF2510020003 = BonLivraisonFournisseur::with(["lignes.article"])
-        ->where("code", "BLF2510020003")->get();
+    // $ART_927 = Article::with("stocks.depot")->firstWhere("code_article", "ART-927");
+    // return $ART_927;
 
-    // return response()->json($BLF2510020003);
+    $FAC_20251003_0005 = FactureClient::with("lignes.article", "lignes.facturedepot", "client")
+        ->firstWhere("numero", "FAC-20251003-0005");
 
-    $FAC25108317 = FactureFournisseur::with(["lignes.article"])->firstWhere("code", 'FAC25108317');
+    $ligne = $FAC_20251003_0005->lignes->firstWhere("article_id", 928);
 
-    // $FAC25108317->lignes
-    //     ->each(function ($ligne) {
-    //         switch ($ligne->article_id) {
-    //             case 386:
-    //                 $ligne->update(["quantite_livree" => 115, "quantite_livree_simple" => 135]);
-    //                 break;
-    //         }
-    //     });
-    return response()->json($FAC25108317->lignes);
+    $ligne->update(["depot"=> 3]);
+    return $ligne;
 });
 
 /**DETELE A STOCK */
