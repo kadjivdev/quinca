@@ -232,6 +232,7 @@ class FactureFournisseurController extends Controller
     
     public function details(FactureFournisseur $facture)
     {
+        // dd("gogo");
         $facture->load([
             'bonCommande',
             'pointVente',

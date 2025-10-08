@@ -186,8 +186,8 @@
                             message = xhr.responseJSON.message || message;
                             details = `Erreur: ${xhr.responseJSON.debug.error}\n`
                             //  +
-                                // `Fichier: ${xhr.responseJSON.debug.file}\n` +
-                                // `Ligne: ${xhr.responseJSON.debug.line}`;
+                            // `Fichier: ${xhr.responseJSON.debug.file}\n` +
+                            // `Ligne: ${xhr.responseJSON.debug.line}`;
                         }
                         // Cas d'erreur simple
                         else if (xhr.responseJSON.message) {
@@ -254,7 +254,8 @@
                 // S'assurer que la quantité livrée est un nombre
                 const quantiteLivree = parseFloat(ligne.quantite_livree_simple) || 0;
                 const quantiteTotale = parseFloat(quantite_base) || 0;
-                const resteALivrer = Math.max(0, quantiteTotale - quantiteLivree);
+                const resteALivrer = Math.max(0, quantiteTotale - quantiteLivree)
+                    .toFixed(2);
 
                 // Formater les nombres pour l'affichage
                 const quantiteLivreeFormatted = this.formatNumber(quantiteLivree);
