@@ -557,7 +557,7 @@ class BonLivraisonFournisseurController extends Controller
                     $ligneFact->quantite_livree_simple;
 
                 $stockToAdd = number_format($stockToAdd, 2, '.', '');
-                
+
                 // Log des données de conversion
                 Log::debug("Données de ligne:", [
                     'article_id' => $ligne->article_id,
@@ -638,7 +638,7 @@ class BonLivraisonFournisseurController extends Controller
                 'statut_livraison' => $totalQuantiteLivree >= $totalQuantiteFacture ? 'LIVRE' : 'PARTIELLEMENT_LIVRE'
             ]);
 
-            // DB::commit();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
