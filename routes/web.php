@@ -96,11 +96,12 @@ Route::get("/debug", function () {
 
     // return "Operation reussie avec succès!";
 
-    // $factures = FactureFournisseur::with("lignes.article")
-    // ->whereHas("bonLivraison",function ($query) {
-    //     $query->whereNotNull()
-    // });
-    return $factures->lignes;
+    $factures = FactureFournisseur::with("lignes.article")
+        ->whereHas("bonLivraison", function ($query) {
+            $query->whereNotNull("validated_at");
+        })->get();
+
+    return $factures;
 });
 
 /**DETELE A STOCK */

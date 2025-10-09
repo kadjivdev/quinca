@@ -72,33 +72,36 @@
                     </thead>
                     <tbody>
                         @forelse($factures as $facture)
-                            <?php
-                                $totalReglements = $facture
-                                    ->facture_reglements_amount();
+                        <?php
+                        $totalReglements = $facture
+                            ->facture_reglements_amount();
 
-                                if ($totalReglements==0) {
-                                    $statut = 'NON PAYE';
-                                }elseif ($totalReglements>=$facture->montant_ttc) {
-                                    $statut = 'PAYE';
-                                }else {
-                                    $statut = 'PARTIELLEMENT_PAYE';
-                                }
+                        if ($totalReglements == 0) {
+                            $statut = 'NON PAYE';
+                        } elseif ($totalReglements >= $facture->montant_ttc) {
+                            $statut = 'PAYE';
+                        } else {
+                            $statut = 'PARTIELLEMENT_PAYE';
+                        }
 
-                                // 
-                                $qteTotalFacture = $facture->lignes()->sum('quantite_base');
-                                $totalLivres = $facture->lignes()->sum('quantite_livree');
-                                if ($totalLivres == 0) {
-                                    $factureStatutLivraison = 'NON_LIVRE';
-                                } elseif ($totalLivres >= $qteTotalFacture) {
-                                    $factureStatutLivraison = 'LIVRE';
-                                } else {
-                                    $factureStatutLivraison = 'PARTIELLEMENT_LIVRE';
-                                }
+                        // 
+                        $qteTotalFacture = $facture->lignes->sum(function ($ligne) {
+                            return $ligne->quantite_base ?? $ligne->quantite;
+                        });
 
-                                // if ($facture->code=='FAC25090427') {
-                                //     dd($qteTotalFacture,$totalLivres);
-                                // }
-                            ;?>
+                        $totalLivres = $facture->lignes()->sum('quantite_livree');
+                        if ($totalLivres == 0) {
+                            $factureStatutLivraison = 'NON_LIVRE';
+                        } elseif ($totalLivres >= $qteTotalFacture) {
+                            $factureStatutLivraison = 'LIVRE';
+                        } else {
+                            $factureStatutLivraison = 'PARTIELLEMENT_LIVRE';
+                        }
+
+                            // if ($facture->code=='FAC25090427') {
+                            //     dd($qteTotalFacture,$totalLivres);
+                            // }
+                        ; ?>
                         <tr>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
