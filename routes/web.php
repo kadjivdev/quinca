@@ -26,6 +26,7 @@ use App\Models\Achat\AccompteFournisseur;
 use App\Models\Achat\BonCommande;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
+use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Securite\User;
 use App\Models\Stock\StockDepot;
@@ -96,12 +97,58 @@ Route::get("/debug", function () {
 
     // return "Operation reussie avec succès!";
 
-    $factures = FactureFournisseur::with("lignes.article")
-        ->whereHas("bonLivraison", function ($query) {
-            $query->whereNotNull("validated_at");
-        })->get();
+    // Validées
+    $factures = BonLivraisonFournisseur::with("facture.lignes.article")
+        ->whereNotNull("validated_at")->get();
 
-    return $factures;
+    $facturesLignes = $factures->pluck("facture")
+        ->flatten()->pluck("lignes")
+        ->flatten()
+        ->map(function ($ligne) {
+            return (object) [
+                "id" => $ligne->id,
+                "quantite" => $ligne->quantite,
+                "quantite_base" => $ligne->quantite_base,
+                "quantite_livree" => $ligne->quantite_livree,
+                "quantite_livree_simple" => $ligne->quantite_livree_simple,
+                "equal" => $ligne->quantite_livree == $ligne->quantite_livree_simple,
+            ];
+        });
+
+    $facturesLignes->each(function ($ligne) {
+        $line = LigneFactureFournisseur::findOrFail($ligne->id);
+        $line->update(["quantite_livree" => $line->quantite_livree_simple]);
+    });
+
+    // Non validées
+    $unValidatedFactures = BonLivraisonFournisseur::with("facture.lignes.article")
+        ->whereNull("validated_at")->get();
+
+    $unValidatedFacturesLignes = $unValidatedFactures->pluck("facture")
+        ->flatten()->pluck("lignes")
+        ->flatten()
+        ->map(function ($ligne) {
+            return (object) [
+                "id" => $ligne->id,
+                "quantite" => $ligne->quantite,
+                "quantite_base" => $ligne->quantite_base,
+                "quantite_livree" => $ligne->quantite_livree,
+                "quantite_livree_simple" => $ligne->quantite_livree_simple,
+                "facture" => $ligne->facture?->code,
+                "article" => $ligne->article?->code_article,
+                "equal" => $ligne->quantite_livree == $ligne->quantite_livree_simple,
+            ];
+        });
+
+    $unValidatedFacturesLignes->each(function ($ligne) {
+        $line = LigneFactureFournisseur::findOrFail($ligne->id);
+        $line->update([
+            "quantite_livree" => null,
+            "quantite_livree_simple" => $line->quantite_base ?? $line->quantite,
+        ]);
+    });
+
+    return $unValidatedFacturesLignes;
 });
 
 /**DETELE A STOCK */
