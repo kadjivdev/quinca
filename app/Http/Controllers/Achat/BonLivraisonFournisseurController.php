@@ -27,7 +27,6 @@ class BonLivraisonFournisseurController extends Controller
     /**
      * Affiche la liste des bons de livraison fournisseur
      */
-
     public function index()
     {
         // Récupération des bons de livraison avec leurs relations
@@ -76,7 +75,6 @@ class BonLivraisonFournisseurController extends Controller
     /**
      * Affiche le formulaire de création
      */
-
     public function create()
     {
         // Récupérer les données nécessaires pour le formulaire
@@ -119,7 +117,7 @@ class BonLivraisonFournisseurController extends Controller
              * S'il y a une livraison 
              * en attente de validation sur cette facture
              * l'utilisateur va devoir la valider 
-             * d'abord avant de generer une autre livrai son sur
+             * d'abord avant de generer une autre livraison sur
              * la facture
              */
 
@@ -558,6 +556,8 @@ class BonLivraisonFournisseurController extends Controller
                     ($diff < 0 ? -$diff : $diff) :
                     $ligneFact->quantite_livree_simple;
 
+                $stockToAdd = number_format($stockToAdd, 2, '.', '');
+                
                 // Log des données de conversion
                 Log::debug("Données de ligne:", [
                     'article_id' => $ligne->article_id,
@@ -638,7 +638,7 @@ class BonLivraisonFournisseurController extends Controller
                 'statut_livraison' => $totalQuantiteLivree >= $totalQuantiteFacture ? 'LIVRE' : 'PARTIELLEMENT_LIVRE'
             ]);
 
-            DB::commit();
+            // DB::commit();
 
             return response()->json([
                 'success' => true,

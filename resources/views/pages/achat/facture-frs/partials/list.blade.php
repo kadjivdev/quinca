@@ -85,7 +85,7 @@
                                 }
 
                                 // 
-                                $qteTotalFacture = $facture->lignes()->sum('quantite');
+                                $qteTotalFacture = $facture->lignes()->sum('quantite_base');
                                 $totalLivres = $facture->lignes()->sum('quantite_livree');
                                 if ($totalLivres == 0) {
                                     $factureStatutLivraison = 'NON_LIVRE';
@@ -95,7 +95,7 @@
                                     $factureStatutLivraison = 'PARTIELLEMENT_LIVRE';
                                 }
 
-                                // if ($facture->code=='FAC25095415') {
+                                // if ($facture->code=='FAC25090427') {
                                 //     dd($qteTotalFacture,$totalLivres);
                                 // }
                             ;?>

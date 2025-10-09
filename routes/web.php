@@ -49,13 +49,52 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $FAC_20251003_0005 = FactureClient::with("lignes.article", "lignes.facturedepot", "client")
-        ->firstWhere("numero", "FAC-20251003-0005");
+    // FAC25090427
+    $FAC25090427 = FactureFournisseur::with("lignes.article")
+        ->firstWhere("code", "FAC25090427");
 
-    $ligne = $FAC_20251003_0005->lignes->firstWhere("article_id", 928);
+    $FAC25090427->lignes->whereNotNull("validated_at")
+        ->each(function ($ligne) {
+            if ($ligne->quantite_livree_simple == $ligne->quantite_base) {
+                $ligne->update(["quantite_livree" => $ligne->quantite_livree_simple]);
+            }
+        });
 
-    $ligne->update(["depot"=> 3]);
-    return $ligne;
+    // FAC25094281
+    $FAC25094281 = FactureFournisseur::with("lignes.article")
+        ->firstWhere("code", "FAC25094281");
+
+    $FAC25094281->lignes->whereNotNull("validated_at")
+        ->each(function ($ligne) {
+            if ($ligne->quantite_livree_simple == $ligne->quantite_base) {
+                $ligne->update(["quantite_livree" => $ligne->quantite_livree_simple]);
+            }
+        });
+
+    // FAC25095415
+    $FAC25095415 = FactureFournisseur::with("lignes.article")
+        ->firstWhere("code", "FAC25095415");
+
+    $FAC25095415->lignes
+        ->each(function ($ligne) {
+            if ($ligne->article_id == 1934) {
+                $ligne->update(["quantite_livree" => 904.32]);
+            }
+
+            if ($ligne->article_id == 1935) {
+                $ligne->update(["quantite_livree" => 800.64]);
+            }
+
+            if ($ligne->article_id == 1936) {
+                $ligne->update(["quantite_livree" => 1002.96]);
+            }
+
+            if ($ligne->article_id == 1939) {
+                $ligne->update(["quantite_livree" => 999]);
+            }
+        });
+
+    return "Operation reussie avec succès!";
 });
 
 /**DETELE A STOCK */
