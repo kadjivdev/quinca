@@ -115,13 +115,13 @@ Route::get("/debug", function () {
             ];
         });
 
-    $facturesLignes->each(function ($ligne) {
-        $line = LigneFactureFournisseur::findOrFail($ligne->id);
-        $line->update(["quantite_livree" => $line->quantite_livree_simple]);
-    });
+    // $facturesLignes->each(function ($ligne) {
+    //     $line = LigneFactureFournisseur::findOrFail($ligne->id);
+    //     $line->update(["quantite_livree" => $line->quantite_livree_simple]);
+    // });
 
-    return $facturesLignes;
-    
+    // return $facturesLignes;
+
     // Non validées
     $unValidatedFactures = BonLivraisonFournisseur::with("facture.lignes.article")
         ->whereNull("validated_at")->get();
