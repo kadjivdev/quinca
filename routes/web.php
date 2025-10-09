@@ -120,6 +120,8 @@ Route::get("/debug", function () {
         $line->update(["quantite_livree" => $line->quantite_livree_simple]);
     });
 
+    return $facturesLignes;
+    
     // Non validées
     $unValidatedFactures = BonLivraisonFournisseur::with("facture.lignes.article")
         ->whereNull("validated_at")->get();
