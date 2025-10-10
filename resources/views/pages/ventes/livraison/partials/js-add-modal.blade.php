@@ -116,7 +116,7 @@
                     $(this).val(max);
                     Toast.fire({
                         icon: 'warning',
-                        title: 'gogo La quantité saisie dépasse le reste à livrer'
+                        title: 'La quantité saisie dépasse le reste à livrer'
                     });
                 }
 
