@@ -4,8 +4,9 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body p-3">
                 <div class="row g-3">
-                    {{-- Filtre Catégorie --}}
-                    <div class="col-md-2">
+                    <form action="" method="get" class="d-flex justify-content-around flex-wrap w-100">
+                        {{-- Filtre Catégorie --}}
+                        <!-- <div class="col-md-2">
                         <label class="form-label small">Catégorie</label>
                         <select class="form-select form-select-sm" id="categorieFilter" onchange="filterClients()">
                             <option value="">Toutes les catégories</option>
@@ -13,10 +14,10 @@
                             <option value="professionnel">Professionnel</option>
                             <option value="societe">Société</option>
                         </select>
-                    </div>
+                    </div> -->
 
-                    {{-- Recherche --}}
-                    <!-- <div class="col-md-4">
+                        {{-- Recherche --}}
+                        <!-- <div class="col-md-4">
                         <label class="form-label small">Recherche</label>
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-light border-end-0">
@@ -30,53 +31,53 @@
                         </div>
                     </div> -->
 
-                    {{-- Filtre Statut --}}
-                    <div class="col-md-2">
+                        {{-- Filtre Statut --}}
+                        <!-- <div class="col-md-2">
                         <label class="form-label small">Statut</label>
                         <select class="form-select form-select-sm" id="statutFilter" onchange="filterClients()">
                             <option value="">Tous les statuts</option>
                             <option value="1">Actif</option>
                             <option value="0">Inactif</option>
                         </select>
-                    </div>
+                    </div> -->
 
-                    {{-- Filtre Crédit --}}
-                    <div class="col-md-2">
+                        {{-- Filtre Crédit --}}
+                        <!-- <div class="col-md-2">
                         <label class="form-label small">Crédit</label>
                         <select class="form-select form-select-sm" id="creditFilter" onchange="filterClients()">
                             <option value="">Tous</option>
                             <option value="with_credit">Avec crédit</option>
                             <option value="exceeded">Dépassement</option>
                         </select>
-                    </div>
+                    </div> -->
 
-                    {{-- Filtre Ville --}}
-                    <div class="col-md-2">
-                        <label class="form-label small">Ville</label>
-                        <select class="form-select form-select-sm" id="villeFilter" onchange="filterClients()">
-                            <option value="">Toutes les villes</option>
-                            @foreach ($villes as $ville)
-                            <option value="{{ $ville }}">{{ $ville }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        {{-- Filtre Ville --}}
+                        <div class="col-md-2">
+                            <select name="ville_id" class="form-select form-select-sm" id="ville_id">
+                                <option value="">Toutes les villes</option>
+                                @foreach ($villes as $ville)
+                                <option value="{{ $ville }}">{{ $ville }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    {{-- Filtre Ville --}}
-                    <div class="col-md-2">
-                        <label class="form-label small">Agent</label>
-                        <select name="agent_id" class="form-select form-select-sm" id="agentFilter" onchange="filterClients()">
-                            <option value="">Toutes les agents</option>
-                            @foreach ($agents as $agent)
-                            <option value="{{ $agent->id }}">{{ $agent->nom }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        {{-- Filtre Ville --}}
+                        <div class="col-md-2">
+                            <select name="agent_id" class="form-select form-select-sm" id="agent_id">
+                                <option value="">Toutes les agents</option>
+                                @foreach ($agents as $agent)
+                                <option value="{{ $agent->id }}">{{ $agent->nom }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    {{-- Bouton réinitialiser --}}
-                    <button class="col-md-2 btn btn-light btn-sm mt-3" onclick="resetFilters()">
-                        <i class="fas fa-undo me-1"></i>
-                        Réinitialiser les filtres
-                    </button>
+                        {{-- Bouton réinitialiser --}}
+                        <button type="submit" class="col-md-2 btn btn-light btn-sm mt-3">
+                            <i class="fas fa-undo me-1"></i>
+                            Rechercher
+                        </button>
+
+                    </form>
                 </div>
             </div>
         </div>
@@ -86,7 +87,7 @@
     <div class="col-12">
         <div class="card border-0 p-3 shadow-sm">
             <div class="table-responsive">
-                <h5 class="">Montant Total: <span class="badge bg-success" id="montantTotal">{{ number_format($clients->sum('solde'), 0, ',', ' ') }} FCFA</span></h5>
+                <h5 class="">Montant Total: <span class="badge bg-success" id="montantTotal">{{ number_format($clients->sum('solde'), 0, '.', ' ') }} FCFA</span></h5>
 
                 <table id="example1" class="table table-hover align-middle mb-0" id="clientsTable">
                     <thead class="bg-light">
@@ -154,9 +155,6 @@
                             <td>
                                 <span class="badge bg-warning bg-opacity-10 text-dark">{{number_format($client->clientAccomptesAmount,2,',',' ')}}</span>
                             </td>
-                            <!-- <td>
-                                <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->soldeClient,2,',',' ')}}</span>
-                            </td> -->
                             <td>
                                 <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->soldeRevendeur,2,',',' ')}}</span>
                             </td>
@@ -701,6 +699,23 @@
 
 @push("scripts")
 <script>
+    // 
+    $("#agent_id").select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: "Sélectionner un agent",
+        allowClear: true
+    });
+
+    $("#ville_id").select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: "Sélectionner une ville",
+        allowClear: true
+    });
+
+
+    // 
     const search = document.querySelector('input[type="search"]')
 
     // Fonction pour calculer le total
@@ -714,8 +729,6 @@
         }).data().each(function(value) {
             // Nettoyer la valeur (enlever "FCFA" et les espaces, puis convertir en nombre)
             let montant = parseInt(value.replace(/[^0-9-]/g, ''));
-            // alert(montant)
-            // console.log(`Montant total :${montant}`)
             total += montant;
         });
 
