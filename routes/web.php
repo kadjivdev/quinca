@@ -50,107 +50,63 @@ use Illuminate\Support\Facades\Auth;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // // FAC25090427
-    // $FAC25090427 = FactureFournisseur::with("lignes.article")
-    //     ->firstWhere("code", "FAC25090427");
+    $BLF2509180001 = BonLivraisonFournisseur::with("depot", "lignes.article")->firstWhere("code", "BLF2509180001");
 
-    // $FAC25090427->lignes->whereNotNull("validated_at")
-    //     ->each(function ($ligne) {
-    //         if ($ligne->quantite_livree_simple == $ligne->quantite_base) {
-    //             $ligne->update(["quantite_livree" => $ligne->quantite_livree_simple]);
-    //         }
+    $BLF2509180001->update(["depot_id" => 4]);
+    return response()->json($BLF2509180001);
+
+    // // Validées
+    // $factures = BonLivraisonFournisseur::with("facture.lignes.article")
+    //     ->whereNotNull("validated_at")->get();
+
+    // $facturesLignes = $factures->pluck("facture")
+    //     ->flatten()->pluck("lignes")
+    //     ->flatten()
+    //     ->map(function ($ligne) {
+    //         return (object) [
+    //             "id" => $ligne->id,
+    //             "quantite" => $ligne->quantite,
+    //             "quantite_base" => $ligne->quantite_base,
+    //             "quantite_livree" => $ligne->quantite_livree,
+    //             "quantite_livree_simple" => $ligne->quantite_livree_simple,
+    //             "equal" => $ligne->quantite_livree == $ligne->quantite_livree_simple,
+    //         ];
     //     });
-
-    // // FAC25094281
-    // $FAC25094281 = FactureFournisseur::with("lignes.article")
-    //     ->firstWhere("code", "FAC25094281");
-
-    // $FAC25094281->lignes->whereNotNull("validated_at")
-    //     ->each(function ($ligne) {
-    //         if ($ligne->quantite_livree_simple == $ligne->quantite_base) {
-    //             $ligne->update(["quantite_livree" => $ligne->quantite_livree_simple]);
-    //         }
-    //     });
-
-    // // FAC25095415
-    // $FAC25095415 = FactureFournisseur::with("lignes.article")
-    //     ->firstWhere("code", "FAC25095415");
-
-    // $FAC25095415->lignes
-    //     ->each(function ($ligne) {
-    //         if ($ligne->article_id == 1934) {
-    //             $ligne->update(["quantite_livree" => 904.32]);
-    //         }
-
-    //         if ($ligne->article_id == 1935) {
-    //             $ligne->update(["quantite_livree" => 800.64]);
-    //         }
-
-    //         if ($ligne->article_id == 1936) {
-    //             $ligne->update(["quantite_livree" => 1002.96]);
-    //         }
-
-    //         if ($ligne->article_id == 1939) {
-    //             $ligne->update(["quantite_livree" => 999]);
-    //         }
-    //     });
-
-    // return "Operation reussie avec succès!";
-
-    // Validées
-    $factures = BonLivraisonFournisseur::with("facture.lignes.article")
-        ->whereNotNull("validated_at")->get();
-
-    $facturesLignes = $factures->pluck("facture")
-        ->flatten()->pluck("lignes")
-        ->flatten()
-        ->map(function ($ligne) {
-            return (object) [
-                "id" => $ligne->id,
-                "quantite" => $ligne->quantite,
-                "quantite_base" => $ligne->quantite_base,
-                "quantite_livree" => $ligne->quantite_livree,
-                "quantite_livree_simple" => $ligne->quantite_livree_simple,
-                "equal" => $ligne->quantite_livree == $ligne->quantite_livree_simple,
-            ];
-        });
 
     // $facturesLignes->each(function ($ligne) {
     //     $line = LigneFactureFournisseur::findOrFail($ligne->id);
     //     $line->update(["quantite_livree" => $line->quantite_livree_simple]);
     // });
 
-    // return $facturesLignes;
+    // // Non validées
+    // $unValidatedFactures = BonLivraisonFournisseur::with("facture.lignes.article")
+    //     ->whereNull("validated_at")->get();
 
-    // Non validées
-    $unValidatedFactures = BonLivraisonFournisseur::with("facture.lignes.article")
-        ->whereNull("validated_at")->get();
+    // $unValidatedFacturesLignes = $unValidatedFactures->pluck("facture")
+    //     ->flatten()->pluck("lignes")
+    //     ->flatten()
+    //     ->map(function ($ligne) {
+    //         return (object) [
+    //             "id" => $ligne->id,
+    //             "quantite" => $ligne->quantite,
+    //             "quantite_base" => $ligne->quantite_base,
+    //             "quantite_livree" => $ligne->quantite_livree,
+    //             "quantite_livree_simple" => $ligne->quantite_livree_simple,
+    //             "facture" => $ligne->facture?->code,
+    //             "article" => $ligne->article?->code_article,
+    //             "equal" => $ligne->quantite_livree == $ligne->quantite_livree_simple,
+    //         ];
+    //     });
 
-    $unValidatedFacturesLignes = $unValidatedFactures->pluck("facture")
-        ->flatten()->pluck("lignes")
-        ->flatten()
-        ->map(function ($ligne) {
-            return (object) [
-                "id" => $ligne->id,
-                "quantite" => $ligne->quantite,
-                "quantite_base" => $ligne->quantite_base,
-                "quantite_livree" => $ligne->quantite_livree,
-                "quantite_livree_simple" => $ligne->quantite_livree_simple,
-                "facture" => $ligne->facture?->code,
-                "article" => $ligne->article?->code_article,
-                "equal" => $ligne->quantite_livree == $ligne->quantite_livree_simple,
-            ];
-        });
+    // $unValidatedFacturesLignes->each(function ($ligne) {
+    //     $line = LigneFactureFournisseur::findOrFail($ligne->id);
+    //     $line->update([
+    //         "quantite_livree" => null,
+    //         "quantite_livree_simple" => $line->quantite_base ?? $line->quantite,
+    //     ]);
+    // });
 
-    $unValidatedFacturesLignes->each(function ($ligne) {
-        $line = LigneFactureFournisseur::findOrFail($ligne->id);
-        $line->update([
-            "quantite_livree" => null,
-            "quantite_livree_simple" => $line->quantite_base ?? $line->quantite,
-        ]);
-    });
-
-    return $unValidatedFacturesLignes;
+    // return $unValidatedFacturesLignes;
 });
 
 /**DETELE A STOCK */
