@@ -93,7 +93,8 @@
                                             <th class="text-center">Quantité facturée</th>
                                             <th class="text-center">Déjà livrée</th>
                                             <th class="text-center">Reste à livrer</th>
-                                            <th class="text-center" style="width: 150px;">Quantité à livrer</th>
+                                            <th class="text-center" style="width: 150px;">Qté à livrer</th>
+                                            <th class="text-center" style="width: 150px;">Qté Supplementaire</th>
                                         </tr>
                                     </thead>
                                     <tbody id="lignesFacture">

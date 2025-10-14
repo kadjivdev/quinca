@@ -25,6 +25,7 @@ class LigneLivraisonClient extends Model
         'article_id',
         'unite_vente_id',
         'quantite',
+        'quantite_supplementaire',
         'quantite_base',
         'prix_unitaire',
         'montant_total',

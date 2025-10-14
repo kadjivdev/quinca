@@ -5,52 +5,7 @@
             <div class="card-body p-3">
                 <div class="row g-3">
                     <form action="" method="get" class="d-flex justify-content-around flex-wrap w-100">
-                        {{-- Filtre Catégorie --}}
-                        <!-- <div class="col-md-2">
-                        <label class="form-label small">Catégorie</label>
-                        <select class="form-select form-select-sm" id="categorieFilter" onchange="filterClients()">
-                            <option value="">Toutes les catégories</option>
-                            <option value="particulier">Particulier</option>
-                            <option value="professionnel">Professionnel</option>
-                            <option value="societe">Société</option>
-                        </select>
-                    </div> -->
-
-                        {{-- Recherche --}}
-                        <!-- <div class="col-md-4">
-                        <label class="form-label small">Recherche</label>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
-                            <input type="text"
-                                class="form-control form-control-sm border-start-0"
-                                id="searchFilter"
-                                placeholder="Nom, Code, IFU, RCCM, Téléphone..."
-                                onkeyup="filterClients()">
-                        </div>
-                    </div> -->
-
-                        {{-- Filtre Statut --}}
-                        <!-- <div class="col-md-2">
-                        <label class="form-label small">Statut</label>
-                        <select class="form-select form-select-sm" id="statutFilter" onchange="filterClients()">
-                            <option value="">Tous les statuts</option>
-                            <option value="1">Actif</option>
-                            <option value="0">Inactif</option>
-                        </select>
-                    </div> -->
-
-                        {{-- Filtre Crédit --}}
-                        <!-- <div class="col-md-2">
-                        <label class="form-label small">Crédit</label>
-                        <select class="form-select form-select-sm" id="creditFilter" onchange="filterClients()">
-                            <option value="">Tous</option>
-                            <option value="with_credit">Avec crédit</option>
-                            <option value="exceeded">Dépassement</option>
-                        </select>
-                    </div> -->
-
+                        
                         {{-- Filtre Ville --}}
                         <div class="col-md-2">
                             <select name="ville_id" class="form-select form-select-sm" id="ville_id">

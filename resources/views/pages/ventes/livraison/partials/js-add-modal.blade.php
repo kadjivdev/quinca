@@ -26,6 +26,8 @@
 
         // Fonction pour charger les lignes de facture
         function chargerLignesFacture(factureId, depotId) {
+            // alert("Charge les lignes de la facture");
+
             $.ajax({
                 url: `${apiUrl}/vente/livraisons/facture/${factureId}/lignes-disponibles`,
                 // data: {
@@ -75,12 +77,24 @@
                                     <div class="input-group input-group-sm">
                                         <input type="number"
                                             class="form-control quantite-input"
+                                            id="qte_${ligne.id}"
                                             name="lignes[${ligne.id}][quantite]"
                                             min="0"
                                             max="${max}"
                                             step="0.001"
-                                            value="0">
+                                            value="0"
+                                            onChange="checkTotalQuantity(${ligne.id})">
                                     </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="number"
+                                        class="form-control form-control-sm quantite-supp-input text-end"
+                                        id="qteSupple_${ligne.id}"
+                                        name="lignes[${ligne.id}][quantite_supplementaire]"
+                                        value="0"
+                                        min="0"
+                                        onChange="checkTotalQuantity(${ligne.id})">
+                                    </select>
                                 </td>
                             </tr>
                         `;
@@ -104,6 +118,25 @@
                     // });
                 }
             });
+        }
+
+        window.checkTotalQuantity = function(id) {
+            const qte = parseFloat($(`#qte_${id}`).val()) || 0;
+            const qteSupp = parseFloat($(`#qteSupple_${id}`).val()) || 0;
+            const max = parseFloat($(`#qte_${id}`).attr('max')) || 0;
+
+            const qteTotal = qte + qteSupp;
+
+            $('#btnSaveLivraison').prop('disabled', false);
+
+            if (qteTotal > max) {
+                $('#btnSaveLivraison').prop('disabled', true);
+
+                Toast.fire({
+                    icon: 'warning',
+                    title: 'La quantité totale dépasse le reste à livrer'
+                });
+            }
         }
 
         // Fonction pour initialiser les gestionnaires sur les inputs de quantité

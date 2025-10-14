@@ -146,6 +146,7 @@ class LivraisonClientController extends Controller
                 'lignes.*.article_id' => 'required|exists:articles,id',
                 'lignes.*.unite_vente_id' => 'required|exists:unite_mesures,id',
                 'lignes.*.quantite' => 'required|numeric|min:0',
+                'lignes.*.quantite_supplementaire' => 'required|numeric|min:0',
                 'lignes.*.prix_unitaire' => 'required|numeric|min:0',
                 'notes' => 'nullable|string'
             ]);
@@ -175,14 +176,21 @@ class LivraisonClientController extends Controller
             $livraison->created_by = auth()->id();
             $livraison->save();
 
+            Log::info("Data des lignes", ["data" => $validated['lignes']]);
+
             // Création des lignes
             foreach ($validated['lignes'] as $data) {
-                if ($data['quantite'] > 0) {
+                $QTeTotal = $data['quantite'] + $data['quantite_supplementaire'];
+                Log::info("Qte après formatage:", ["qteTotal" => $QTeTotal]);
+
+                if ($QTeTotal > 0) {
                     $ligneFacture = LigneFacture::find($data['ligne_facture_id']);
 
                     /**Update du ligne facture */
                     $ligneFacture
-                        ->update(["quantite_livree_simple" => $ligneFacture->quantite_livree_simple + $data['quantite']]);
+                        ->update([
+                            "quantite_livree_simple" => $ligneFacture->quantite_livree_simple + $QTeTotal
+                        ]);
 
                     // Vérifier les quantités par rapport à la facture
                     $quantiteLivree = $ligneFacture->lignesLivraison()
@@ -191,7 +199,7 @@ class LivraisonClientController extends Controller
                         })
                         ->sum('quantite');
 
-                    if ($data['quantite'] > ($ligneFacture->quantite - $quantiteLivree)) {
+                    if ($QTeTotal > ($ligneFacture->quantite - $quantiteLivree)) {
                         throw new Exception(
                             "La quantité saisie dépasse le reste à livrer pour l'article " .
                                 $ligneFacture->article->designation
@@ -204,7 +212,7 @@ class LivraisonClientController extends Controller
                     $ligneLivraison->article_id = $data['article_id'];
                     $ligneLivraison->unite_vente_id = $data['unite_vente_id'];
                     $ligneLivraison->quantite = $data['quantite'];
-                    // $ligneLivraison->quantite_base = $quantiteBase;
+                    $ligneLivraison->quantite_supplementaire = $data["quantite_supplementaire"];
                     $ligneLivraison->prix_unitaire = $data['prix_unitaire'];
                     $ligneLivraison->montant_total = $data['quantite'] * $data['prix_unitaire'];
                     $ligneLivraison->save();
