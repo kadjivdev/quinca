@@ -3,7 +3,6 @@
         // Gestion du changement de facture
         $('#factureSelect').on('change', function() {
             const factureId = $(this).val();
-            // const depotId = $('select[name="depot_id"]').val();
 
             if (factureId) {
                 chargerLignesFacture(factureId);
@@ -88,13 +87,12 @@
                                 </td>
                                 <td class="text-center">
                                     <input type="number"
-                                        class="form-control form-control-sm quantite-supp-input text-end"
+                                        class="form-control"
                                         id="qteSupple_${ligne.id}"
                                         name="lignes[${ligne.id}][quantite_supplementaire]"
                                         value="0"
                                         min="0"
                                         onChange="checkTotalQuantity(${ligne.id})">
-                                    </select>
                                 </td>
                             </tr>
                         `;
@@ -223,7 +221,6 @@
 
                         // Rafraîchissement de la liste
                         window.location.href = `${apiUrl}/vente/livraisons`
-                        // refreshList();
                     } else {
                         Toast.fire({
                             icon: response.type || 'warning',
@@ -318,34 +315,5 @@
             placeholder: 'Sélectionner une facture',
             dropdownParent: $('#addLivraisonModal')
         });
-
-        // Vérification dynamique des stocks
-        // function verifierStock(articleId, depotId, quantite, callback) {
-        //     $.ajax({
-        //         url: `${apiUrl}/vente/livraisons/verifier-stock`,
-        //         type: 'GET',
-        //         data: {
-        //             article_id: articleId,
-        //             depot_id: depotId
-        //         },
-        //         success: function(response) {
-        //             if (response.success) {
-        //                 const stockDisponible = parseFloat(response.quantite);
-        //                 callback(stockDisponible >= quantite, stockDisponible, response.prix_moyen);
-        //             } else {
-        //                 Toast.fire({
-        //                     icon: 'error',
-        //                     title: response.message
-        //                 });
-        //             }
-        //         },
-        //         error: function() {
-        //             Toast.fire({
-        //                 icon: 'error',
-        //                 title: 'Erreur lors de la vérification du stock'
-        //             });
-        //         }
-        //     });
-        // }
     });
 </script>

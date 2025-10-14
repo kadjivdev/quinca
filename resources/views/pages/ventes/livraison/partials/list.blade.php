@@ -492,7 +492,7 @@
                         </td>
                         <td class="text-center">
                             <span class="stock-dispo" id="edit-stock-${ligne.article.id}">
-                                <i class="fas fa-spinner fa-spin"></i>
+                                // <i class="fas fa-spinner fa-spin"></i>
                             </span>
                         </td>
                         <td class="text-center">${lotsSelect}</td>
