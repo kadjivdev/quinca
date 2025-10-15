@@ -45,9 +45,16 @@ class FactureClientController extends Controller
             $configuration = Societe::first();
             $tauxTva = $configuration ? $configuration->taux_tva : 18;
 
-            $query = FactureClient::with(['client'])
-                ->orderBy('created_at', 'desc')
-                ->limit(200);
+            // Construction de la requête de base
+            if ($request->debut && $request->fin) {
+                $query = FactureClient::with(['client'])
+                    ->orderBy('created_at', 'desc')
+                    ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
+            } else {
+                $query = FactureClient::with(['client'])
+                    ->orderBy('created_at', 'desc')
+                    ->limit(200);
+            }
 
             // Chargement des factures avec les relations nécessaires
             if ($request->point_vente_id && !$request->client_id) {
