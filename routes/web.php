@@ -25,6 +25,7 @@ use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\FactureClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,9 +39,10 @@ use App\Models\Stock\StockDepot;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $requete_frs = RequeteFournisseur::firstWhere("num_demande", 16);
-    $requete_frs->update(["montant" => -12542643]);
-    return $requete_frs;
+    // FAC-20251020-0009
+    $FAC_20251020_0009 = FactureClient::withTrashed()->firstWhere("numero", "FAC-20251020-0009");
+    $FAC_20251020_0009->restore();
+    return $FAC_20251020_0009;
 });
 
 /**DETELE A STOCK */
