@@ -39,7 +39,7 @@ use App\Models\Stock\StockDepot;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     $requete_frs = RequeteFournisseur::firstWhere("num_demande", 16);
-    $requete_frs->update(["montant" => -1542642]);
+    $requete_frs->update(["montant" => -12542643]);
     return $requete_frs;
 });
 
