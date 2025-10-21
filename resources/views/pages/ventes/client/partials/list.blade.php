@@ -42,7 +42,7 @@
     <div class="col-12">
         <div class="card border-0 p-3 shadow-sm">
             <div class="table-responsive">
-                <h5 class="">Montant Total: <span class="badge bg-success" id="montantTotal">{{ number_format($clients->sum('solde'), 0, '.', ' ') }} FCFA</span></h5>
+                <h5 class="">Montant Total: <span class="badge bg-success" >{{ number_format($clients->sum('solde'), 0, '.', ' ') }} FCFA</span></h5>
 
                 <table id="example1" class="table table-hover align-middle mb-0" id="clientsTable">
                     <thead class="bg-light">
