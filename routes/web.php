@@ -40,13 +40,17 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $programmation = ProgrammationAchat::with("bonCommande")->firstWhere("code","20251020-dj-33A55");
-
-    if ($programmation) {
-        $programmation->delete();
+    $facture_FAC_20251020_0009 = FactureClient::withTrashed()->firstWhere("numero", "FAC-20251020-0009");
+    if ($facture_FAC_20251020_0009) {
+        $update = $facture_FAC_20251020_0009->update(["numero" => "FAC-20251020-0009-ol"]);
+        // return $update;
+        if ($update) {
+            $facture_FAC_20251021_0004 = FactureClient::firstWhere("numero", "FAC-20251021-0004");
+            $facture_FAC_20251021_0004->update(["numero" => "FAC-20251020-0009"]);
+            return $facture_FAC_20251021_0004;
+        }
     }
-
-    return $programmation;
+    return "regularisation éffectuée avec succès!";
 });
 
 /**DETELE A STOCK */
