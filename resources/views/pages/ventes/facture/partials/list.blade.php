@@ -66,6 +66,7 @@
                             <th class="border-bottom-0 text-center">Type</th>
                             <th class="border-bottom-0">Date validation</th>
                             <th class="border-bottom-0 text-center">Statut</th>
+                            <th class="border-bottom-0 text-center">Inséré par</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
                     </thead>
@@ -155,6 +156,9 @@
                                 <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulée</span>
                                 @endswitch
                             </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark rounded border">{{$facture->createdBy?->name}}</span>
+                            </td>
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
@@ -227,7 +231,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucune facture trouvée</h6>

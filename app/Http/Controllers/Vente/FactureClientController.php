@@ -47,11 +47,11 @@ class FactureClientController extends Controller
 
             // Construction de la requête de base
             if ($request->debut && $request->fin) {
-                $query = FactureClient::with(['client'])
+                $query = FactureClient::with(['client','createdBy'])
                     ->orderBy('created_at', 'desc')
                     ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
             } else {
-                $query = FactureClient::with(['client'])
+                $query = FactureClient::with(['client','createdBy'])
                     ->orderBy('created_at', 'desc')
                     ->limit(200);
             }
