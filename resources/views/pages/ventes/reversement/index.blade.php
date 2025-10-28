@@ -54,9 +54,7 @@
     </div>
 </div>
 
-@can("requetes.create")
-    @include('pages.ventes.reversement.partials.add-modal')
-@endcan
+@include('pages.ventes.reversement.partials.add-modal')
 
 @endsection
 @push('scripts')
