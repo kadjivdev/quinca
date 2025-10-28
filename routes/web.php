@@ -23,6 +23,7 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
+use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Achat\ProgrammationAchat;
 use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
@@ -40,10 +41,11 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $facture_FAC_20251023_0003 = FactureClient::withTrashed()->with("client")->firstWhere("numero", "FAC-20251023-0003");
-    $facture_FAC_20251023_0003->update(["reference_recu" => "KAD18422"]);
-    return $facture_FAC_20251023_0003;
-
+    // $FAC25108372 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25108372");
+    // return $FAC25108372;
+    $ligne = LigneFactureFournisseur::with("article")->find(773);
+    $ligne->update(["quantite_livree_simple" => 7]);
+    return $ligne;
     return "regularisation éffectuée avec succès!";
 });
 
