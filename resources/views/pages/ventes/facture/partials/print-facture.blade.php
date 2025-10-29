@@ -164,15 +164,18 @@
             @endif
 
             {{-- Ajoutez vos informations d'entreprise --}}
-            <p>Cotonou - Benin</p>
+            <p>Cotonou - Benin <br>
+            Email: kadjivsarl1@gmail.com <br>
+            Téléphone: +2290156680840
+        </p>
         </div>
 
         <div class="invoice-details">
             <h1>PROFORMA</h1>
             <p>
                 <strong>N° : </strong>{{str_replace('FAC','PRO',$facture->numero) }}<br>
-                <strong>Date : </strong>{{ Carbon\Carbon::parse()->locale('fr')->isoFormat("D MMM YYY") }}<br>
-                <strong>Échéance : </strong>{{ Carbon\Carbon::parse($facture->date_echeance)->locale('fr')->isoFormat("D MMM YYY") }}<br>
+                <strong>Date : </strong>{{ Carbon\Carbon::parse()->locale('fr')->isoFormat("D MMMM YYYY") }}<br>
+                <strong>Échéance : </strong>{{ Carbon\Carbon::parse($facture->date_echeance)->locale('fr')->isoFormat("D MMMM YYYY") }}<br>
                 @if($facture->statut === 'valide')
                 <strong>Date validation : </strong>{{ $facture->date_validation->format('d/m/Y') }}<br>
                 @endif
