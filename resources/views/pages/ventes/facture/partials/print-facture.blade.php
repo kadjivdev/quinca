@@ -164,9 +164,7 @@
             @endif
 
             {{-- Ajoutez vos informations d'entreprise --}}
-            <p>Cotonou - Benin<br>
-                Téléphone: +229 212 345 678<br>
-                Email: contact@QuincaKadjiv.org</p>
+            <p>Cotonou - Benin</p>
         </div>
 
         <div class="invoice-details">
