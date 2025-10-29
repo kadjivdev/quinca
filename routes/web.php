@@ -43,9 +43,9 @@ use App\Models\Vente\FactureClient;
 Route::get("/debug", function () {
     // $FAC25108372 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25108372");
     // return $FAC25108372;
-    $ligne = LigneFactureFournisseur::with("article")->find(773);
-    $ligne->update(["quantite_livree_simple" => 7]);
-    return $ligne;
+    // $ligne = LigneFactureFournisseur::with("article")->find(773);
+    // $ligne->update(["quantite_livree_simple" => 7]);
+    // return $ligne;
     return "regularisation éffectuée avec succès!";
 });
 
