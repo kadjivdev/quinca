@@ -359,7 +359,7 @@ class ServiceStockEntree
             }
         }
 
-        if ($donnees['quantite'] <= 0) {
+        if ($donnees['quantite'] < 0) {
             throw new Exception("La quantité doit être positive");
         }
 

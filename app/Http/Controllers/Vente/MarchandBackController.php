@@ -353,7 +353,7 @@ class MarchandBackController extends Controller
         try {
             DB::beginTransaction();
 
-            $marchand = MarchandBack::findOrFail($id);
+            $marchand = MarchandBack::with("livraison.lignes")->findOrFail($id);
             // dd($marchand);
 
             if ($marchand->validated_by) {
@@ -392,6 +392,7 @@ class MarchandBackController extends Controller
                 ];
             }
 
+            Log::debug('Données d\'entrée en stock:', $entrees);
 
             // Traiter les entrées en stock
             $resultatStock = $this->serviceStockEntree->traiterEntreesMultiples($entrees);
@@ -412,7 +413,7 @@ class MarchandBackController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return back()
-                ->with("Erreure de validation " . $e->getMessage());
+                ->with("error" . $e->getMessage());
         }
     }
 
