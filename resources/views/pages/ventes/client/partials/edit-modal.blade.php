@@ -68,12 +68,15 @@
 
                                         <div class="col-md-6">
                                             <label class="form-label fw-medium required">Agent</label>
-                                            <select class="form-select" name="agent_id" id="agent_id" required>
+                                            <select class="form-select" name="agent_id" id="_agent_id" required>
                                                 <option value="">Choisissez un agent</option>
+                                                @foreach($agents as $agent)
+                                                <option value="{{$agent->id}}">{{$agent->nom}}</option>
+                                                @endforeach
                                                 <!-- gerer avec du js -->
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner un agent</div>
-                                            
+
                                         </div>
                                     </div>
                                 </div>
@@ -204,3 +207,13 @@
         </div>
     </div>
 </div>
+
+@push("scripts")
+<script>
+    $("#_agent_id").select2({
+        placeholder: "Rechercher un agent",
+        dropdownParent: $("#editClientModal"),
+        allowClear: true
+    })
+</script>
+@endpush

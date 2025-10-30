@@ -40,18 +40,24 @@
                     $('#editClientModal').modal('show');
 
                     // gestion des agents
-                    const agents = @json($agents);
-                    console.log(agents)
+                    // console.log("les agents")
 
-                    $("#agent_id").empty();
+                    const agents = {!! json_encode($agents) !!};
 
-                    let options = ``
-                    agents.forEach(agent => {
-                        options += `<option ${agent.id==client.agent?.id?'selected':''} value="${agent.id}">${agent.nom}</option>`
-                    });
+                    // const agents = @json($agents);
+                    console.log("les agents", agents)
 
-                    $("#agent_id").append(options)
+                    console.log("agent doom", $("#agent_id"));
 
+                    const options = agents.map(agent => `
+                        <option value="${agent.id}">
+                            ${agent.nom}
+                        </option>
+                    `).join('');
+
+
+                    console.log("les options", options)
+                    $("#agent_id").html(options)
 
                 } else {
                     Toast.fire({

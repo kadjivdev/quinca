@@ -6,12 +6,15 @@
     .modal-backdrop {
         z-index: 1040 !important;
     }
+
     .modal {
         z-index: 1050 !important;
     }
+
     .select2-container {
         z-index: 2000 !important;
     }
+
     .select2-dropdown {
         z-index: 2001 !important;
     }
@@ -38,21 +41,21 @@
 @endpush
 
 @section('content')
-    <div class="content">
-        @include('pages.ventes.client.partials.header')
-        <div class="row g-3 list mt-3" id="stockEntriesList">
-            @include('pages.ventes.client.partials.list')
-        </div>
+<div class="content">
+    @include('pages.ventes.client.partials.header')
+    <div class="row g-3 list mt-3" id="stockEntriesList">
+        @include('pages.ventes.client.partials.list')
     </div>
+</div>
 
-    @include('pages.ventes.client.partials.add-modal')
-    @include('pages.ventes.client.partials.show-modal')
-    @include('pages.ventes.client.partials.edit-modal')
-    @include('pages.ventes.client.partials.import-modal')
+@include('pages.ventes.client.partials.add-modal')
+@include('pages.ventes.client.partials.show-modal')
+@include('pages.ventes.client.partials.edit-modal')
+@include('pages.ventes.client.partials.import-modal')
 
-    <!-- modals de details factures, acomptes, et reglements -->
-    @include('pages.ventes.client.partials.show-accomptes-modal')
-    @include('pages.ventes.client.partials.show-reglements-modal')
+<!-- modals de details factures, acomptes, et reglements -->
+@include('pages.ventes.client.partials.show-accomptes-modal')
+@include('pages.ventes.client.partials.show-reglements-modal')
 @endsection
 
 @push('scripts')
@@ -61,4 +64,5 @@
 @include('pages.ventes.client.partials.js-edit-modal')
 @include('pages.ventes.client.partials.js-delete-modal')
 @include('pages.ventes.client.partials.js-import-modal')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 @endpush
