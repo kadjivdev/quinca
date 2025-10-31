@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Vente;
 use App\Http\Controllers\Controller;
 use App\Models\Parametre\Agent;
 use App\Models\Vente\{Client, CompteClient, ReglementClient};
+use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 // use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
@@ -39,6 +41,7 @@ class ClientController extends Controller
         $user = auth()->user();
         if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
             $clients = Client::with([
+                'zone',
                 'facturesClient',
                 'departement',
                 'agent',
@@ -46,12 +49,18 @@ class ClientController extends Controller
             ])->latest();
         } else {
             $clients = Client::with([
+                'zone',
                 'facturesClient',
                 'departement',
                 'agent',
                 'facturesClient.reglements' // Chargement des règlements via les factures
             ])->where('point_de_vente_id', Auth()->user()->point_de_vente_id)->latest();
         }
+
+        // SANDRINE,HIPPOLYTE,ASSOGBA AUBIN
+        // if (in_array(Auth::id(), [6, 22,28])) {
+        //     $clients = $clients->where("zone_id", Auth::user()->zone_id);
+        // }
 
         // Application des filtres si présents dans la requête
         if ($request->filled('categorie')) {
@@ -129,13 +138,15 @@ class ClientController extends Controller
         $villes = Client::distinct()->pluck('ville')->filter();
 
         $agents = Agent::all();
+        $zones = Zone::all();
 
         return view('pages.ventes.client.index', compact(
             'clients',
             'stats',
             'villes',
             'date',
-            'agents'
+            'agents',
+            'zones',
         ));
     }
 
@@ -442,7 +453,8 @@ class ClientController extends Controller
             'facturesClient.lignes.article',
             'facturesRevendeur.lignes.article',
             'acomptes.client',
-            'createdBy'
+            'createdBy',
+            'zone'
         ]);
 
         $reglements = $client->facturesClient
@@ -455,6 +467,7 @@ class ClientController extends Controller
             'client' => [
                 'id' => $client->id,
                 'agent' => $client->agent,
+                'zone' => $client->zone,
                 'code_client' => $client->code_client,
                 'raison_sociale' => $client->raison_sociale,
                 'categorie' => $client->categorie,

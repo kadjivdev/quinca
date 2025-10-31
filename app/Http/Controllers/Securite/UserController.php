@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Securite;
 use App\Http\Controllers\Controller;
 use App\Models\Securite\{User, Role};
 use App\Models\Parametre\PointDeVente;
+use App\Models\Zone;
 use App\Services\AuthenticationService;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -31,10 +33,11 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::with(['roles', 'pointDeVente'])->get();
+        $users = User::with(['roles', 'pointDeVente', 'zone'])->get();
+        $zones = Zone::all();
         $roles = Role::all();
         $pointsDeVente = PointDeVente::all();
-        return view('pages.securite.users.index', compact('users', 'roles', 'pointsDeVente'));
+        return view('pages.securite.users.index', compact('users', 'roles', 'pointsDeVente', 'zones'));
     }
 
     public function store(Request $request)
@@ -65,10 +68,13 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
+        Log::debug("Updating utilisateur...", ["data" => $request->all()]);
+
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'roles' => 'required',
+            'zone_id' => "required",
             // 'point_de_vente_id' => 'required|exists:point_de_ventes,id'
         ]);
 
@@ -76,12 +82,15 @@ class UserController extends Controller
         $data = [
             'name' => $request->name,
             'email' => $request->email,
+            'zone_id' => $request->zone_id,
             // 'point_de_vente_id' => $request->point_de_vente_id
         ];
 
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
+
+        Log::debug("New data...", ["data" => $data]);
 
         $user->update($data);
 
@@ -116,7 +125,7 @@ class UserController extends Controller
     public function show($id)
     {
         try {
-            $user = User::with('roles')->findOrFail($id);
+            $user = User::with('roles', "zone")->findOrFail($id);
             $currentUser = auth()->user();
 
             $isSuperAdmin = false;

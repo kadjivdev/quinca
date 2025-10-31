@@ -39,26 +39,28 @@
                     // Afficher le modal
                     $('#editClientModal').modal('show');
 
-                    // gestion des agents
-                    // console.log("les agents")
+                    const zones = @json($zones);
 
-                    const agents = {!! json_encode($agents) !!};
-
-                    // const agents = @json($agents);
-                    console.log("les agents", agents)
-
-                    console.log("agent doom", $("#agent_id"));
-
-                    const options = agents.map(agent => `
-                        <option value="${agent.id}">
-                            ${agent.nom}
-                        </option>
-                    `).join('');
+                    $("#zone_id").val(String('')).trigger("change");
+                    zones.forEach(zone => {
+                        console.log("Zone concernée ", zone)
+                        if (client.zone?.id == zone.id) {
+                            console.log("Zone id ", client.zone?.id)
+                            $("#zone_id").val(String(client.zone?.id)).trigger("change");
+                        }
+                    });
 
 
-                    console.log("les options", options)
-                    $("#agent_id").html(options)
+                    const agents = @json($agents);
 
+                    $("#_agent_id").val(String('')).trigger("change");
+                    agents.forEach(agent => {
+                        console.log("Agent concerné", agent)
+                        if (client.agent?.id == agent.id) {
+                            console.log("Agent id ", client.agent?.id)
+                            $("#_agent_id").val(String(client.agent?.id)).trigger("change");
+                        }
+                    });
                 } else {
                     Toast.fire({
                         icon: 'error',

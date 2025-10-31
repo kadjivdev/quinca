@@ -78,6 +78,17 @@
                                             <div class="invalid-feedback">Veuillez sélectionner un agent</div>
 
                                         </div>
+
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-medium required">Zone</label>
+                                            <select class="form-select" name="zone_id" id="zone_id" required>
+                                                <option value="">Choisissez une zone</option>
+                                                @foreach($zones as $zone)
+                                                <option value="{{$zone->id}}">{{$zone->libelle}}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">Veuillez sélectionner un agent</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -210,10 +221,10 @@
 
 @push("scripts")
 <script>
-    $("#_agent_id").select2({
-        placeholder: "Rechercher un agent",
-        dropdownParent: $("#editClientModal"),
-        allowClear: true
-    })
+    // $("#_agent_id,#zone_id").select2({
+    //     placeholder: "Rechercher ....",
+    //     dropdownParent: $("#editClientModal"),
+    //     allowClear: true
+    // })
 </script>
 @endpush

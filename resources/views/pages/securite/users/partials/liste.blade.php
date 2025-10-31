@@ -17,6 +17,7 @@
                     <tr class="bg-light">
                         <th class="border-0 px-4 py-3 text-secondary">#</th>
                         <th class="border-0 px-4 py-3 text-secondary">Utilisateur</th>
+                        <th class="border-0 px-4 py-3 text-secondary">Zone</th>
                         <th class="border-0 px-4 py-3 text-secondary">Email</th>
                         <th class="border-0 px-4 py-3 text-secondary">Rôle</th>
                         <th class="border-0 px-4 py-3 text-secondary">Point de Vente</th>
@@ -39,6 +40,7 @@
                                 </div>
                             </div>
                         </td>
+                        <td> <span class="badge bg-light border rounded text-dark">{{ $user->zone?$user->zone->libelle:'---' }} </span> </td>
                         <td class="px-4">
                             <div class="d-flex align-items-center">
                                 <i class="fas fa-envelope text-muted me-2"></i>

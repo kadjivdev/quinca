@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Securite\User;
 use App\Models\Vente\SoldeInitialClient;
+use App\Models\Zone;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 
 class Client extends Model
@@ -41,7 +43,8 @@ class Client extends Model
         'taux_aib',
         'point_de_vente_id',
         'deleted_by',
-        "agent_id"
+        "agent_id",
+        "zone_id"
     ];
 
     protected $casts = [
@@ -54,6 +57,13 @@ class Client extends Model
         'taux_aib',
     ];
 
+    /**zone */
+    function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class, "zone_id");
+    }
+
+    /**Compte Client */
     public function compteClient(): HasMany
     {
         return $this->hasMany(CompteClient::class, "client_id")->with("client");
@@ -326,6 +336,7 @@ class Client extends Model
             'notes' => 'nullable|string',
             'taux_aib' => 'nullable|numeric|min:0|max:100',
             'agent_id' => 'required|integer',
+            'zone_id' => 'required|integer',
         ];
     }
 }

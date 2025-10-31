@@ -50,6 +50,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Code Client</th>
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Raison Sociale</th>
+                            <th class="border-bottom-0">Zone</th>
                             <th class="border-bottom-0">Département</th>
                             <th class="border-bottom-0">Agent</th>
                             <th class="border-bottom-0">Contact</th>
@@ -85,6 +86,7 @@
                                     </div>
                                 </div>
                             </td>
+                            <td> <span class="badge bg-light border rounded text-dark">{{ $client->zone?$client->zone->libelle:'---' }} </span> </td>
                             <td>{{ $client->departement?->libelle }}</td>
                             <td>{{ $client->agent?->nom }}</td>
                             <td>
@@ -168,7 +170,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucun client trouvé</h6>

@@ -33,10 +33,10 @@
                     Importer
                 </button>
 
-                <button type="button" class="btn btn-light px-3 d-inline-flex align-items-center" onclick="refreshPage()">
+                <a href="{{route('vente.clients.index')}}" type="button" class="btn btn-light px-3 d-inline-flex align-items-center" onclick="refreshPage()">
                     <i class="fas fa-sync-alt me-2"></i>
                     Actualiser
-                </button>
+                </a>
                 @if(auth()->user()->can("vente.clients.create") || auth()->user()->can("revendeur.clients.create"))
                 <button type="button"
                     class="btn btn-primary px-3 d-inline-flex align-items-center"

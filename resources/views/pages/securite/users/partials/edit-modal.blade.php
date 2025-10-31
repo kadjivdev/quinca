@@ -34,24 +34,37 @@
                             <small class="text-muted">Laissez vide pour conserver le mot de passe actuel</small>
                         </div>
 
+                        <div class="col-md-12">
+                            <label class="form-label fw-medium required">Zone</label>
+                            <select class="form-select" name="zone_id" id="zone_id" required>
+                                <option value="">Choisissez une zone</option>
+                                @foreach($zones as $zone)
+                                <option value="{{$zone->id}}">{{$zone->libelle}}</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">Veuillez sélectionner un agent</div>
+                        </div>
+
                         <div class="col-12">
                             <label class="form-label fw-semibold required">Rôle</label>
                             <div class="row g-3">
                                 @foreach($roles as $role)
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input role-radio"
-                                                   name="roles" value="{{ $role->name }}"
-                                                   id="edit_role_{{ $role->id }}"
-                                                   required><!-- Ajout de required -->
-                                            <label class="form-check-label" for="edit_role_{{ $role->id }}">
-                                                {{ $role->name }}
-                                            </label>
-                                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input role-radio"
+                                            name="roles" value="{{ $role->name }}"
+                                            id="edit_role_{{ $role->id }}"
+                                            required><!-- Ajout de required -->
+                                        <label class="form-check-label" for="edit_role_{{ $role->id }}">
+                                            {{ $role->name }}
+                                        </label>
                                     </div>
+                                </div>
                                 @endforeach
                             </div>
                         </div>
+
+
                     </div>
                 </div>
 

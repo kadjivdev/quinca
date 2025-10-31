@@ -3,6 +3,8 @@
 namespace App\Models\Securite;
 
 use App\Models\Parametre\PointDeVente;
+use App\Models\Zone;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -25,6 +27,7 @@ class User extends Authenticatable
         'password',
         'is_active',
         'point_de_vente_id',
+        "zone_id",
     ];
 
     protected $hidden = [
@@ -37,6 +40,11 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
     ];
+
+    function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class, "zone_id");
+    }
 
     public function pointDeVente()
     {
