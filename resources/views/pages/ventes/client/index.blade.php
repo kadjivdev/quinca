@@ -64,5 +64,5 @@
 @include('pages.ventes.client.partials.js-edit-modal')
 @include('pages.ventes.client.partials.js-delete-modal')
 @include('pages.ventes.client.partials.js-import-modal')
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> -->
 @endpush
