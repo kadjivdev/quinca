@@ -44,7 +44,8 @@ class Client extends Model
         'point_de_vente_id',
         'deleted_by',
         "agent_id",
-        "zone_id"
+        "zone_id",
+        'departement_id'
     ];
 
     protected $casts = [

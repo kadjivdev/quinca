@@ -58,9 +58,9 @@ class ClientController extends Controller
         }
 
         // SANDRINE,HIPPOLYTE,ASSOGBA AUBIN
-        // if (in_array(Auth::id(), [6, 22,28])) {
-        //     $clients = $clients->where("zone_id", Auth::user()->zone_id);
-        // }
+        if (in_array(Auth::id(), [6, 22,28])) {
+            $clients = $clients->where("zone_id", Auth::user()->zone_id);
+        }
 
         // Application des filtres si présents dans la requête
         if ($request->filled('categorie')) {

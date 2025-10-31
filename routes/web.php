@@ -22,12 +22,8 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Achat\FactureFournisseur;
-use App\Models\Achat\LigneFactureFournisseur;
-use App\Models\Achat\ProgrammationAchat;
-use App\Models\Achat\RequeteFournisseur;
 use App\Models\Stock\StockDepot;
-use App\Models\Vente\FactureClient;
+use App\Models\Vente\Client;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,11 +37,16 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $FAC25108372 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25108372");
-    // return $FAC25108372;
-    // $ligne = LigneFactureFournisseur::with("article")->find(773);
-    // $ligne->update(["quantite_livree_simple" => 7]);
-    // return $ligne;
+    //les clients du Sud & centre
+    Client::whereIn("departement_id",[5,6,7,8,9,10,11,12])->update(["zone_id"=>3]);
+
+    // les clients du Nord
+    Client::whereIn("departement_id",[1,2,3,4])->update(["zone_id"=>2]);
+
+    // les client BTP
+    Client::whereIn("agent_id",[11])->update(["zone_id"=>1]);
+
+
     return "regularisation éffectuée avec succès!";
 });
 

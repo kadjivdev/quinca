@@ -43,14 +43,16 @@
 @section('content')
 <div class="content">
 
-    @if(session("error"))
-    <div class="alert alert-danger">{{session()->get('error')}}</div>
-    @elseif(session("success"))
-    <div class="alert alert-success">{{session()->get('success')}}</div>
-    @endif
+
 
     <div class="row g-3 list mt-3 justify-content-center" id="stockEntriesList">
         <div class="col-6 ">
+            @if(session("error"))
+            <div class="alert alert-danger">{{session()->get('error')}}</div>
+            @elseif(session("success"))
+            <div class="alert alert-success">{{session()->get('success')}}</div>
+            @endif
+            <br><br>
             <h3 class="">Affectation de zone au client : <span class="badge bg-light border rounded text-dark">{{$client->raison_sociale}}</span> </h3>
             <form action="{{route('affect-to-zone',$client->id)}}" class="p-3 bg-light border rounded" method="POST">
                 @csrf
