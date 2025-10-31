@@ -121,6 +121,8 @@
 
                             <td class="text-end">
                                 <div class="btn-group">
+                                    <a target="_blank" href="{{route('affect-to-zone',$client->id)}}" class="btn btn-sm btn-light shadow">Affecter une zone</a>
+
                                     <button class="btn btn-sm btn-light-primary btn-icon"
                                         onclick="showClient({{ $client->id }})"
                                         data-bs-toggle="tooltip"

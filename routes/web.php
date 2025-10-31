@@ -627,6 +627,9 @@ Route::middleware('auth')->group(function () {
         // Clients
         Route::prefix('clients')->group(function () {
             Route::get('/', [ClientController::class, 'index'])->name('vente.clients.index');
+            Route::get('/affect-to-zone/{client}', [ClientController::class, 'affectToZone'])->name('affect-to-zone');
+            Route::match(['POST', 'GET'], '/affect-to-zone/{client}', [ClientController::class, 'affectToZone'])
+                ->name('affect-to-zone');
 
             Route::get('details/{id}/factures', [ClientController::class, 'facturesDetails'])->name('vente.clients.detailFactures');
             Route::get('details/{id}/reglements', [ClientController::class, 'detailReglements'])->name('vente.clients.detailReglements');

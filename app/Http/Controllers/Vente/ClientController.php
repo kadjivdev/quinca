@@ -150,6 +150,39 @@ class ClientController extends Controller
         ));
     }
 
+    // affecter une zone
+    function affectToZone(Request $request, Client $client)
+    {
+        if (!$client) {
+            return back();
+        }
+
+        if ($request->isMethod("post")) {
+            try {
+                if (!$client) {
+                    throw new \Exception("Ce Client n'existe pas!");
+                }
+                DB::beginTransaction();
+
+                $request->validate(["zone_id" => "required"], ["zone_id.required" => "La zone est réquise!"]);
+
+                $client->update(["zone_id" => $request->zone_id]);
+
+                DB::commit();
+                return back()->with("success", "Affectation éffectuée avec succès!");
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                Log::debug("Erreure d'affectation", ["data" => $e->errors()]);
+                return back()->withErrors($e->errors());
+            } catch (\Exception $e) {
+                Log::debug("Erreure d'affectation", ["data" => $e->getMessage()]);
+                return back()->with("error", $e->getMessage());
+            }
+        } else {
+            $zones = Zone::all();
+            return view("pages.ventes.client.partials.affect-to-zone", compact("zones", "client"));
+        }
+    }
+
     // clients pour les revendeurs
     public function clientRevendeur(Request $request)
     {
