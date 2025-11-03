@@ -58,7 +58,7 @@ class ClientController extends Controller
         }
 
         // SANDRINE,HIPPOLYTE,ASSOGBA AUBIN
-        if (in_array(Auth::id(), [6, 22,28])) {
+        if (in_array(Auth::id(), [6, 22, 28])) {
             $clients = $clients->where("zone_id", Auth::user()->zone_id);
         }
 
@@ -398,6 +398,8 @@ class ClientController extends Controller
 
     public function store(Request $request)
     {
+        Log::debug("All data", ["data" => $request->all()]);
+
         try {
             // Conversion explicite du statut en booléen
             $data = $request->all();
@@ -456,6 +458,18 @@ class ClientController extends Controller
                     ])
                 ]
             ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            Log::error('Erreur lors de la création du client:', [
+                'message' => $e->errors(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreure de validation',
+                'type' => 'error'
+            ], 500);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur lors de la création du client:', [

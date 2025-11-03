@@ -31,7 +31,6 @@
                             <i class="fas fa-undo me-1"></i>
                             Rechercher
                         </button>
-
                     </form>
                 </div>
             </div>
