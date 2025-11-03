@@ -623,6 +623,7 @@ Route::middleware('auth')->group(function () {
         // Clients
         Route::prefix('clients')->group(function () {
             Route::get('/', [ClientController::class, 'index'])->name('vente.clients.index');
+            Route::get('/inactifs', [ClientController::class, 'inactifs'])->name('vente.clients.inactif');
             Route::get('/affect-to-zone/{client}', [ClientController::class, 'affectToZone'])->name('affect-to-zone');
             Route::match(['POST', 'GET'], '/affect-to-zone/{client}', [ClientController::class, 'affectToZone'])
                 ->name('affect-to-zone');

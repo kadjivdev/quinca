@@ -25,7 +25,7 @@ use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
 class ClientController extends Controller
 {
     /**
-     * Affiche la liste des clients
+     * Affiche la liste des clients actifs
      */
 
     public function index(Request $request)
@@ -121,13 +121,17 @@ class ClientController extends Controller
                 return $client;
             });
 
-        // Statistiques pour le header
+        /**Les clients actifs sont ceux dont le solde est different de 0 */
+        $clients = $clients->where(function ($query) {
+            return $query->solde != 0;
+        });
 
+        // Statistiques pour le header
         $stats = [
-            'total_clients' => Client::count(),
-            'clients_actifs' => Client::where('statut', true)->count(),
-            'clients_professionnels' => Client::where('categorie', 'professionnel')->count(),
-            'clients_avec_credit' => Client::where('plafond_credit', '>', 0)->count(),
+            'total_clients' => $clients->count(), // Client::count(),
+            'clients_actifs' => $clients->where('statut', true)->count(), // Client::where('statut', true)->count(),
+            'clients_professionnels' => $clients->where('categorie', 'professionnel')->count(), //Client::where('categorie', 'professionnel')->count(),
+            'clients_avec_credit' => $clients->where('plafond_credit', '>', 0)->count(), //Client::where('plafond_credit', '>', 0)->count(),
             'total_reglements' => DB::table('facture_clients')
                 ->join('reglement_clients', 'facture_clients.id', '=', 'reglement_clients.facture_client_id')
                 ->where('reglement_clients.statut', ReglementClient::STATUT_VALIDE)
@@ -141,6 +145,136 @@ class ClientController extends Controller
         $zones = Zone::all();
 
         return view('pages.ventes.client.index', compact(
+            'clients',
+            'stats',
+            'villes',
+            'date',
+            'agents',
+            'zones',
+        ));
+    }
+
+    /**
+     * Affiche la liste des clients inactifs
+     */
+
+    public function inactifs(Request $request)
+    {
+        if (request()->ajax()) {
+            return response()->json(Client::all());
+        }
+
+        // 
+        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+
+        // Récupération des données avec pagination
+        $user = auth()->user();
+        if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
+            $clients = Client::with([
+                'zone',
+                'facturesClient',
+                'departement',
+                'agent',
+                'facturesClient.reglements' // Chargement des règlements via les factures
+            ])->latest();
+        } else {
+            $clients = Client::with([
+                'zone',
+                'facturesClient',
+                'departement',
+                'agent',
+                'facturesClient.reglements' // Chargement des règlements via les factures
+            ])->where('point_de_vente_id', Auth()->user()->point_de_vente_id)->latest();
+        }
+
+        // SANDRINE,HIPPOLYTE,ASSOGBA AUBIN
+        if (in_array(Auth::id(), [6, 22, 28])) {
+            $clients = $clients->where("zone_id", Auth::user()->zone_id);
+        }
+
+        // Application des filtres si présents dans la requête
+        if ($request->filled('categorie')) {
+            $clients->where('categorie', $request->categorie);
+        }
+
+        if ($request->filled('ville')) {
+            $clients->where('ville', $request->ville);
+        }
+
+        if ($request->filled('statut')) {
+            $clients->where('statut', $request->statut);
+        }
+
+        if ($request->filled("agent_id")) {
+            $clients->where("agent_id", $request->agent_id);
+        }
+
+        if ($request->filled('search')) {
+            $clients->search($request->search);
+        }
+
+        if ($request->has('avec_credit')) {
+            $clients->avecCredit();
+        }
+
+        $clients = $clients->get()
+            ->transform(function ($client) {
+                /**LES FACTURES */
+                $client->facturesAmount = $client->facturesClient
+                    ->whereNotNull('validated_by')
+                    ->sum("montant_ttc") - $client->facturesClient
+                    ->whereNotNull('validated_by')
+                    ->sum("montant_remise");
+
+                $client->reglementAmount = $client->facturesClient
+                    ->whereNotNull('validated_by')
+                    ->pluck("reglements")
+                    ->flatten() //le flatten permet de regrouper les tableaux des reglements en un seul seul tableau
+                    ->whereNotNull('validated_by')
+                    ->sum("montant");
+
+                /** LES ACCOMPTES */
+                $client->clientAccomptesAmount = $client->acomptes
+                    ->whereNotNull("validated_by")
+                    ->sum("montant");
+
+                /**Transports amount */
+                $transportAmount = $client->transports
+                    ->whereNotNull("validate_at")
+                    ->sum("montant");
+
+                /** SOLDE = SOLDE CLIENT + SOLDE REVENDEUR*/
+                // $client->soldeClient = $client->solde();
+                $client->soldeRevendeur = $client->soldeRevendeur();
+                $client->solde = $client->solde() + $client->soldeRevendeur();
+
+                return $client;
+            });
+
+        /**Les clients actifs sont ceux dont le solde est null */
+        $clients = $clients->where(function ($query) {
+            return $query->solde == 0;
+        });
+
+        // Statistiques pour le header
+        $stats = [
+            'total_clients' => $clients->count(), // Client::count(),
+            'clients_actifs' => $clients->where('statut', true)->count(), // Client::where('statut', true)->count(),
+            'clients_professionnels' => $clients->where('categorie', 'professionnel')->count(), //Client::where('categorie', 'professionnel')->count(),
+            'clients_avec_credit' => $clients->where('plafond_credit', '>', 0)->count(), //Client::where('plafond_credit', '>', 0)->count(),
+            'total_reglements' => DB::table('facture_clients')
+                ->join('reglement_clients', 'facture_clients.id', '=', 'reglement_clients.facture_client_id')
+                ->where('reglement_clients.statut', ReglementClient::STATUT_VALIDE)
+                ->sum('reglement_clients.montant')
+        ];
+
+        // Liste des villes pour le filtre
+        $villes = Client::distinct()->pluck('ville')->filter();
+
+        $agents = Agent::all();
+        $zones = Zone::all();
+
+        return view('pages.ventes.client.inactifs', compact(
             'clients',
             'stats',
             'villes',

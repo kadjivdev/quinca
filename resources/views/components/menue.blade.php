@@ -209,7 +209,13 @@
                     @can('vente.clients.view')
                     <li>
                         <a class="dropdown-item" href="{{ route('vente.clients.index') }}">
-                            <div class="dropdown-item-wrapper">Liste des Clients</div>
+                            <div class="dropdown-item-wrapper">Clients actifs</div>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" href="{{ route('vente.clients.inactif') }}">
+                            <div class="dropdown-item-wrapper">Clients inactifs</div>
                         </a>
                     </li>
 

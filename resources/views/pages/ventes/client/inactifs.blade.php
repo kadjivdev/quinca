@@ -44,7 +44,8 @@
 <div class="content">
     @include('pages.ventes.client.partials.header')
     <div class="row g-3 list mt-3" id="stockEntriesList">
-        <h2 class="text-center">Liste de clients <span class="badge bg-light border rounded text-success"> actifs</span></h2>
+        <h2 class="text-center">Liste de clients <span class="badge bg-light border rounded text-success"> inactifs</span></h2>
+
         @include('pages.ventes.client.partials.list')
     </div>
 </div>
