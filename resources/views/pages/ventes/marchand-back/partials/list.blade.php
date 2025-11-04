@@ -28,6 +28,7 @@
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">N° Marchandise</th>
                             <th class="border-bottom-0">Livraison</th>
+                            <th class="border-bottom-0">Dépôt</th>
                             <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date concernée</th>
@@ -50,6 +51,11 @@
                                     onclick="showLivraison({{ $marchand->livraison->id }})"
                                     data-bs-toggle="tooltip" title="Détails livraison">
                                     <i class="fas fa-eye"></i> {{$marchand->livraison?->numero}}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="w-100 badge btn bg-primary">
+                                    {{$marchand->depot?->libelle_depot}}
                                 </span>
                             </td>
                             <td>

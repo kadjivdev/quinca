@@ -25,6 +25,17 @@
             </div>
             <br>
             <div class="row">
+                <div class="col-12">
+                    <select class="form-select form-control select2-form" name="zone_id" id="">
+                        <option value="">Sélectionner une zone</option>
+                        @foreach($zones as $zone)
+                        <option value="{{$zone->id}}" class="">{{$zone->libelle}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <br>
+            <div class="row">
                 <div class="col-6">
                     <label for="debut">Date de début</label>
                     <input type="date" name="debut" class="form-control" id="debut">
@@ -56,6 +67,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date facture</th>
                             <th class="border-bottom-0">Client</th>
+                            <th class="border-bottom-0">Zone</th>
                             <!-- <th class="border-bottom-0">Etat</th> -->
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
@@ -110,6 +122,7 @@
                                     </div>
                                 </div>
                             </td>
+                            <td><span class="badge bg-light rounded border text-dark">{{$facture->client?->zone?->libelle??'---'}}</span></td>
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
                             <td class="text-end fw-medium">
                                 {{ number_format($facture->montant_ht, 0, ',', ' ') }}
@@ -231,7 +244,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucune facture trouvée</h6>
@@ -288,6 +301,14 @@
 
 @push("scripts")
 <script>
+    $(document).ready(function() {
+        $(".select2-form").select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+        })
+    })
+    // 
+
     $(document).on('click', '.generate-facture-btn', function(e) {
         e.preventDefault(); // Empêche le comportement par défaut du lien
         var type = $(this).data('type'); // Récupère la valeur de data-type
@@ -309,12 +330,6 @@
         // Ouvre le modal Bootstrap 5
         var modal = new bootstrap.Modal(document.getElementById('factureModal'));
         modal.show();
-
-        // 
-        $(".select2-form").select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-        })
     });
 </script>
 @endpush

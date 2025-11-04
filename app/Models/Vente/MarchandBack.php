@@ -2,6 +2,7 @@
 
 namespace App\Models\Vente;
 
+use App\Models\Parametre\Depot;
 use App\Models\Securite\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +23,8 @@ class MarchandBack extends Model
         "created_by",
         "validated_by",
         "documents",
-        "observation"
+        "observation",
+        'depot_id'
     ];
 
     protected $casts = [
@@ -37,6 +39,16 @@ class MarchandBack extends Model
     {
         return $this->belongsTo(LivraisonClient::class, "livraison_id");
     }
+
+    /**
+     * Depot concerné
+     */
+
+    function depot(): BelongsTo
+    {
+        return $this->belongsTo(Depot::class, "depot_id");
+    }
+
 
     /**
      * Client concerné

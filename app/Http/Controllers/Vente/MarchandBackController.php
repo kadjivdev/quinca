@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vente\{FactureClient, LivraisonClient, MarchandBack, SessionCaisse, ReglementClient, RevendeurDepense};
+use App\Models\Parametre\Depot;
+use App\Models\Vente\{FactureClient, LivraisonClient, Magasin, MarchandBack, SessionCaisse, ReglementClient, RevendeurDepense};
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Services\ServiceStockEntree;
@@ -38,11 +39,11 @@ class MarchandBackController extends Controller
             $day = $request->date;
             // Chargement des factures avec les relations nécessaires
             if ($day) {
-                $query = MarchandBack::with(['livraison', 'createdBy', 'validatedBy'])
+                $query = MarchandBack::with(['livraison', 'createdBy', 'validatedBy', "depot"])
                     ->whereDate("date", $day)
                     ->orderByDesc('id');
             } else {
-                $query = MarchandBack::with(['livraison', 'createdBy', 'validatedBy'])
+                $query = MarchandBack::with(['livraison', 'createdBy', 'validatedBy', "depot"])
                     ->orderByDesc('id');
             }
 
@@ -62,10 +63,12 @@ class MarchandBackController extends Controller
                     ->get();
             }
 
+            $depots = Depot::all();
             return view('pages.ventes.marchand-back.index', compact(
                 'livraisons',
                 'marchanBacks',
                 'date',
+                'depots'
             ));
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement de la liste des depenses', [
@@ -86,6 +89,9 @@ class MarchandBackController extends Controller
             $validated = $request->validate([
                 'date' => 'required|date',
                 'livraison_id' => 'required|exists:livraison_clients,id',
+
+                'depot_id' => 'required|exists:depots,id',
+
                 'documents' => 'nullable|file|mimes:jpg,png,jpeg,gif,svg',
 
                 //les lignes
@@ -188,163 +194,73 @@ class MarchandBackController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            Log::info("Total de ligne en debut de requete ", ["lignes" => $request->lignes]);
-            Log::info('Début mise à jour facture', ['request' => $request->all(), 'facture_id' => $id]);
-
-            $facture = FactureRevendeur::findOrFail($id);
+            Log::info('Début création de retour de marchandise', ['request' => $request->all()]);
 
             // Validation
-            $validator = Validator::make($request->all(), [
-                'date_facture' => 'required|date',
-                'client_id' => 'required|exists:clients,id',
-                'date_echeance' => 'date',
-                'montant_regle' => 'required|numeric|min:0',
-                'moyen_reglement' => 'required|string',
+            $validated = $request->validate([
+                'date' => 'required|date',
+                'livraison_id' => 'required|exists:livraison_clients,id',
 
-                'lignes' => 'required|array|min:1',
-                'lignes.*.article_id' => 'required|exists:articles,id',
-                'lignes.*.depot_id' => 'required|exists:depots,id',
-                'lignes.*.quantite' => 'required',
-                'lignes.*.tarification_id' => 'required',
+                'depot_id' => 'required|exists:depots,id',
 
-                'type_facture' => 'required|in:simple,normaliser',
-                'observations' => 'nullable|string',
-                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir",
-            ]);
+                'documents' => 'nullable|file|mimes:jpg,png,jpeg,gif,svg',
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => 'error',
-                    'errors' => $validator->errors()
-                ], 422);
+                //les lignes
+                'lignes' => 'array',
+                'lignes*article_id' => "required|exists:articles,id",
+                'lignes*quantite' => "required",
+                'lignes*prix_unitaire' => "required",
+                'lignes*unite_vente_id' => "required|exists:unite_mesures,id",
+
+            ], ["documents.mimes" => "Le document doit être de type jpg,png,jpeg,gif,svg"]);
+
+            if ($request->hasFile("documents")) {
+                $fileName = $request->file('documents')->getClientOriginalName();
+                $request->file('documents')->move("marchand_docs", $fileName);
+                $validated["documents"] = asset("marchand_docs/" . $fileName);
             }
 
+            // dd($validated["lignes"]);
             DB::beginTransaction();
 
             try {
-                // Mise à jour de la facture
-                $facture->update([
-                    'date_facture' => Carbon::parse($request->date_facture)->startOfDay(),
-                    'client_id' => $request->client_id,
-                    'date_echeance' => Carbon::parse($request->date_echeance)->startOfDay(),
-                    // 'session_caisse_id' => $sessionCaisse->id,
-                    'created_by' => auth()->id(),
-                    'observations' => $request->observations,
-                    'statut' => 'brouillon',
-                    'type_facture' => $request->type_facture === "normaliser" ? "NORMALISE" : "SIMPLE",
-                    'moyen_reglement' => $request->moyen_reglement ?? $facture->moyen_reglement,
-                    'montant_ht' => 0,
-                    'montant_remise' => 0,
-                    'montant_tva' => 0,
-                    'montant_aib' => 0,
-                    'montant_ttc' => 0,
-                    'taux_tva' => 0.18,
-                    'taux_aib' => 0.01,
-                    'taux_remise' => 0,
-                    'montant_ht_apres_remise' => 0,
-                    'montant_tva' => 0,
-                    'montant_aib' => 0,
-                    'montant_ttc' => 0,
-                    'montant_regle' => 0,
-                    'montant_regle' => $request->montant_regle
-                ]);
+                // Création de la depense
+                $marchandise = MarchandBack::create($validated);
 
-                Log::info("Total de ligne avant suppression des anciennes ", ["count" => count($request->lignes)]);
-
-                // Suppression des anciens règlements
-                $facture->reglements()->delete();
-
-                // Réinitialisation des totaux et suppression des anciennes lignes
-                $facture->lignes()->delete();
-
-                // Création du règlement si nécessaire
-                if ($request->montant_regle > 0) {
-                    $reglement = new ReglementClient([
-                        'facture_client_id' => $facture->id,
-                        'date_reglement' => Carbon::parse($request->date_facture),
-                        'type_reglement' => $request->moyen_reglement,
-                        'montant' => $request->montant_regle,
-                        'statut' => 'brouillon',
-                        // 'session_caisse_id' => $sessionCaisse->id,
-                        'created_by' => auth()->id(),
-                    ]);
-                    $facture->reglements()->save($reglement);
+                if (is_null($request->lignes)) {
+                    throw new Exception("Aucun article n'est disponible sur cette livraison", 1);
                 }
 
-                Log::info("Total de ligne après suppression des anciennes", ["count" => count($request->lignes)]);
+                //suppression des anciennes lignes
+                $marchandise->lignes()->delete();
 
-                // Mise à jour des lignes
-                foreach ($request->lignes as $index => $ligne) {
-                    $ligneMontantTTC = $ligne['quantite'] * $ligne['tarification_id'];
-                    $ligneMontantHt = $ligneMontantTTC / 1.19;
-                    $ligneMontantTVA = $ligneMontantHt * 0.18;
-                    $ligneMontantAIB = $ligneMontantHt * 0.01;
-                    $ligneMontantRemise = $ligneMontantTTC * $ligne['taux_remise'] / 100;
-
-                    Log::info("La ligne $index", [
-                        "montantHt" => $ligneMontantHt,
-                        "montantTva" => $ligneMontantTVA,
-                        "montantAib" => $ligneMontantAIB,
-                        "montantRemise" => $ligneMontantRemise,
+                /** Creation des lignes */
+                foreach ($validated["lignes"] as $ligne) {
+                    Log::info("Début d'enregistrement des lignes d'article");
+                    $marchandise->lignes()->create([
+                        "article_id" => $ligne["article_id"],
+                        "quantite" => $ligne["quantite"],
+                        "unite_vente_id" => $ligne["unite_vente_id"],
+                        "prix_unitaire" => $ligne["prix_unitaire"],
                     ]);
-
-                    $ligneFacture = new LigneFactureRevendeur([
-                        'article_id' => $ligne['article_id'],
-                        'unite_vente_id' => $ligne['unite_vente_id'],
-                        'quantite' => $ligne['quantite'],
-                        'depot' => $ligne['depot_id'],
-                        'prix_unitaire_ht' => $ligne['tarification_id'],
-                        'taux_remise' => $ligne['taux_remise'] ?? 0,
-                        'taux_tva' => $request->type_facture === 'simple' ? 0 : 18 / 100,
-                        'taux_aib' => $request->type_facture === 'simple' ? 0 : 1 / 100,
-                        'montant_ht' => $ligneMontantHt,
-                        'montant_tva' => $ligneMontantTVA,
-                        'montant_aib' => $ligneMontantAIB,
-                        'montant_ttc' => $ligneMontantTTC,
-                        'montant_remise' => $ligneMontantRemise,
-                        'montant_ht_apres_remise' => $ligneMontantHt - $ligneMontantRemise,
-                        'quantite_livree' => 0,
-                    ]);
-
-                    $facture->lignes()->save($ligneFacture);
                 }
-
-                // Mise à jour des totaux
-                $facture->update([
-                    'montant_ht' => $facture->lignes->sum("montant_ht"),
-                    'montant_remise' => $facture->lignes->sum("montant_remise"),
-                    'montant_ht_apres_remise' => $facture->lignes->sum("montant_ht_apres_remise"),
-                    'montant_tva' => $facture->lignes->sum("montant_tva"),
-                    'montant_aib' => $facture->lignes->sum("montant_aib"),
-                    'montant_ttc' => $facture->lignes->sum("montant_ttc"),
-                    'montant_regle' => $request->montant_regle,
-                ]);
 
                 DB::commit();
 
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Facture mise à jour avec succès',
-                    'data' => ['facture' => $facture->load([
-                        'client',
-                        'lignes.article',
-                        'lignes.uniteVente',
-                    ])]
-                ]);
+                return back()
+                    ->with("success", 'Modification de retour de marchandise éffectué avec succès');
             } catch (Exception $e) {
                 DB::rollBack();
                 throw $e;
             }
         } catch (Exception $e) {
-            Log::error('Erreur mise à jour facture', [
+            Log::error('Erreur modification marchandise', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Erreur mise à jour facture: ' . $e->getMessage()
-            ], 500);
+            return back()
+                ->with("error", 'Erreur création marchandise: ' . $e->getMessage());
         }
     }
 
@@ -354,8 +270,7 @@ class MarchandBackController extends Controller
             DB::beginTransaction();
 
             $marchand = MarchandBack::with("livraison.lignes")->findOrFail($id);
-            // dd($marchand);
-
+            
             if ($marchand->validated_by) {
                 throw new Exception('Marchandise déjà validée');
             }
@@ -376,7 +291,7 @@ class MarchandBackController extends Controller
 
                 /** DATA POUR APPROVISIONNEMENT */
                 $entrees[] = [
-                    'depot_id' => $livraisonClient->depot_dest_id??$livraisonClient->depot_id,
+                    'depot_id' => $marchand->depot_id ?? ($livraisonClient->depot_dest_id ?? $livraisonClient->depot_id), //$livraisonClient->depot_dest_id ?? $livraisonClient->depot_id,
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_vente_id,
                     'quantite' => $ligne->quantite,

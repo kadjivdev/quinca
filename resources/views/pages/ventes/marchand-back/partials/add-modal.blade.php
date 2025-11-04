@@ -54,6 +54,17 @@
                                             <div class="invalid-feedback">La livraison est requise</div>
                                         </div>
                                         <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Dépôt</label>
+                                            <select class="form-select" id="magasin_select" name="depot_id" required>
+                                                @foreach ($depots as $depot)
+                                                <option value="{{ $depot->id }}">
+                                                    {{ $depot->libelle_depot }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">Le dépôt est requis</div>
+                                        </div>
+                                        <div class="col-md-6">
                                             <label class="form-label fw-medium required">Observation</label>
                                             <textarea name="observation" class="form-control"></textarea>
                                             <div class="invalid-feedback">L'observation est requise</div>
@@ -114,7 +125,7 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("#livraison_select").select2({
+    $("#livraison_select,#magasin_select").select2({
         theme: 'bootstrap-5',
         dropdownParent: $('#addMarchandModal .modal-content'),
         placeholder: $(this).attr('placeholder') || 'Sélectionner...',
@@ -146,7 +157,7 @@
                     console.log(data)
                     // Lignes de livraison
                     let lignesHtml = '';
-                    if(data.lignes.length>0){
+                    if (data.lignes.length > 0) {
                         data.lignes.forEach(ligne => {
                             lignesHtml += `
                                 <tr>
@@ -171,8 +182,8 @@
                                 </tr>
                             `;
                         });
-                    }else{
-                        lignesHtml+=`<p class="">Aucun article trouvé</p>`
+                    } else {
+                        lignesHtml += `<p class="">Aucun article trouvé</p>`
                     }
 
                     $('#lignesLivraisonContainer').html(lignesHtml);

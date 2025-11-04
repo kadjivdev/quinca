@@ -12,6 +12,7 @@ use App\Models\Vente\{CompteClient, FactureClient, LigneFacture, PointVente, Ses
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Stock\StockDepot;
+use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -47,11 +48,11 @@ class FactureClientController extends Controller
 
             // Construction de la requête de base
             if ($request->debut && $request->fin) {
-                $query = FactureClient::with(['client','createdBy'])
+                $query = FactureClient::with(['client', 'createdBy'])
                     ->orderBy('created_at', 'desc')
                     ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
             } else {
-                $query = FactureClient::with(['client','createdBy'])
+                $query = FactureClient::with(['client', 'createdBy'])
                     ->orderBy('created_at', 'desc')
                     ->limit(200);
             }
@@ -74,6 +75,13 @@ class FactureClientController extends Controller
                     });
             } else {
                 $factures = $query->get();
+            }
+
+            // dd($request->zone_id);
+            if ($request->zone_id) {
+                $factures = $factures->filter(function ($facture) use ($request) {
+                    return $facture->client?->zone_id == $request->zone_id;
+                });
             }
 
             // Ajouter des attributs calculés pour chaque facture
@@ -148,8 +156,9 @@ class FactureClientController extends Controller
 
             // Charger la liste des clients pour le filtre
             $clients = Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
+            $zones = Zone::all();
 
-            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes'));
+            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'zones'));
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement de la liste des factures', [
                 'error' => $e->getMessage(),
