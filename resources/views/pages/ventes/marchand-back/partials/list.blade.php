@@ -55,7 +55,7 @@
                             </td>
                             <td>
                                 <span class="w-100 badge btn bg-primary">
-                                    {{$marchand->depot?->libelle_depot}}
+                                    {{$marchand->depot?->libelle_depot??'---'}}
                                 </span>
                             </td>
                             <td>

@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Vente;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vente\Client;
-use App\Models\Catalogue\{Tarification, Article};
+use App\Models\Catalogue\{Article};
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
-use App\Models\Vente\{CompteClient, FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
+use App\Models\Vente\{FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Stock\StockDepot;
