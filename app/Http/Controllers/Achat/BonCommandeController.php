@@ -217,7 +217,6 @@ class BonCommandeController extends Controller
                     throw new \Exception('Article non trouvé dans la programmation');
                 }
 
-
                 // Les bases
                 $conversion = $this->serviceStockEntree->rechercherConversion(
                     $ligne["unite_mesure_base_id"],

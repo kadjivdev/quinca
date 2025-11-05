@@ -896,7 +896,7 @@ class FactureClientController extends Controller
                     $reglement->compteClient()->create([
                         'date_op' => $reglement->date_reglement,
                         'montant_op' => $reglement->montant,
-                        'client_id' => $reglement->facture->client_id,
+                        'client_id' => $reglement->facture?->client_id,
                         'user_id' => Auth::user()->id,
                         'type_op' => 'REG_CLT',
                     ]);

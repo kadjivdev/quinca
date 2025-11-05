@@ -25,7 +25,7 @@
 
         // Fonction pour charger les lignes de facture
         function chargerLignesFacture(factureId, depotId) {
-            // alert("Charge les lignes de la facture");
+            alert("Charge les lignes de la facture");
 
             $.ajax({
                 url: `${apiUrl}/vente/livraisons/facture/${factureId}/lignes-disponibles`,
@@ -44,8 +44,8 @@
                         let html = '';
 
                         response.lignes.forEach(function(ligne) {
-                            const stockClass = ligne.stock_disponible < ligne
-                                .reste_a_livrer ? 'stock-danger' : '';
+                            // const stockClass = ligne.stock_disponible < ligne
+                            //     .reste_a_livrer ? 'stock-danger' : '';
 
                             const uniteVenteLibelle = ligne.unite_vente.libelle
                             const max = ligne.reste_max
