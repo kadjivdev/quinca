@@ -7,7 +7,7 @@
             @csrf
             <div class="row">
                 <div class="col-6">
-                    <select class="form-select form-control select2-form" name="point_vente_id" id="">
+                    <select class="form-select form-control _select2-form" name="point_vente_id" id="">
                         <option value="">Sélectionner un point de vente</option>
                         @foreach($pointsVentes as $pointVente)
                         <option value="{{$pointVente->id}}" class="">{{$pointVente->nom_pv}} ({{$pointVente->id}})</option>
@@ -15,7 +15,7 @@
                     </select>
                 </div>
                 <div class="col-6">
-                    <select class="form-select form-control select2-form" name="client_id" id="">
+                    <select class="form-select form-control _select2-form" name="client_id" id="">
                         <option value="">Sélectionner un client</option>
                         @foreach($clients as $client)
                         <option value="{{$client->id}}" class="">{{$client->raison_sociale}}</option>
@@ -26,7 +26,7 @@
             <br>
             <div class="row">
                 <div class="col-12">
-                    <select class="form-select form-control select2-form" name="zone_id" id="">
+                    <select class="form-select form-control _select2-form" name="zone_id" id="">
                         <option value="">Sélectionner une zone</option>
                         @foreach($zones as $zone)
                         <option value="{{$zone->id}}" class="">{{$zone->libelle}}</option>
