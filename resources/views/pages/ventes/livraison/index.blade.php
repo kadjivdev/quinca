@@ -57,6 +57,6 @@
 @include('pages.ventes.livraison.partials.js-show-modal')
 @include('pages.ventes.livraison.partials.js-validate-modal')
 @include('pages.ventes.livraison.partials.js-delete-modal')
-@include('pages.ventes.livraison.partials.js-load-line-facture')
+<!-- include('pages.ventes.livraison.partials.js-load-line-facture') -->
 
 @endpush
