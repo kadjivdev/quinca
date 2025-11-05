@@ -86,13 +86,7 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <input type="number"
-                                        class="form-control"
-                                        id="qteSupple_${ligne.id}"
-                                        name="lignes[${ligne.id}][quantite_supplementaire]"
-                                        value="0"
-                                        min="0"
-                                        onChange="checkTotalQuantity(${ligne.id})">
+                                   testing...
                                 </td>
                             </tr>
                         `;
