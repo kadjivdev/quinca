@@ -84,9 +84,15 @@
                 <input type="hidden" name="lignes[${ligne.id}][prix_unitaire]" value="${ligne.prix_unitaire}">
             </td>
             <td class="text-center">
-                <span class="stock-dispo" id="stock-${ligne.article.id}">
-                    <i class="fas fa-spinner fa-spin"></i>
-                </span>
+                <td class="text-center">
+                    <input type="number"
+                        class="form-control"
+                        id="qteSupple_${ligne.id}"
+                        name="lignes[${ligne.id}][quantite_supplementaire]"
+                        value="0"
+                        min="0"
+                        onChange="checkTotalQuantity(${ligne.id})">
+                </td>
             </td>
         </tr>
     `;
