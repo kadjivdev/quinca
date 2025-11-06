@@ -274,6 +274,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('achat')->middleware(['auth'])->group(function () {
         Route::prefix('fournisseurs')->group(function () {
             Route::get('/', [FournisseurController::class, 'index'])->name('fournisseur.index');
+            Route::get('/fournisseurs-partiels', [FournisseurController::class, 'partielSolde'])->name('fournisseur-partiel.solde');
             Route::post('/', [FournisseurController::class, 'store'])->name('fournisseur.store');
             Route::get('/{fournisseur}/edit', [FournisseurController::class, 'edit'])->name('fournisseur.edit');
             Route::put('/{fournisseur}', [FournisseurController::class, 'update'])->name('fournisseur.update');
@@ -342,7 +343,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/', [BonCommandeController::class, 'store'])->name('bon-commandes.store');
             Route::get('/{bonCommande}', [BonCommandeController::class, 'show'])->name('bon-commandes.show');
             Route::put('/{bonCommande}', [BonCommandeController::class, 'update'])->name('bon-commandes.update');
-            Route::post('/{bonCommande}/validate', [BonCommandeController::class, 'validated'])->name('bon-commandes.validate');
+            Route::post('/validate', [BonCommandeController::class, 'validated'])->name('bon-commandes.validate');
             Route::delete('/{bonCommande}', [BonCommandeController::class, 'destroy'])->name('bon-commandes.destroy');
             Route::put('/{bonCommande}/rejet', [BonCommandeController::class, 'rejectBonCommande'])->name('bon-commandes.reject');
 
@@ -1110,6 +1111,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/stock-dispo', [RapportStockController::class, 'rapportStockDisponible'])
             ->name('rapports.stock-dispo');
+
+        Route::get('/historique-stock', [RapportStockController::class, 'historiqueStocks'])
+            ->name('rapports.historique-stock');
 
         Route::get('/ventes-journalier', [RapportVenteController::class, 'ventesJournalieres'])
             ->name('rapports.vente-journaliere');

@@ -26,11 +26,11 @@
             {{-- Section droite avec les boutons d'action --}}
             <div class="col-auto d-flex gap-2">
                 {{-- Bouton Nouvelle facture --}}
-                <button type="button" class="btn btn-warning btn-sm d-flex align-items-center" data-bs-toggle="modal"
+                <!-- <button type="button" class="btn btn-warning btn-sm d-flex align-items-center" data-bs-toggle="modal"
                     data-bs-target="#addFactureModal">
                     <i class="fas fa-plus me-2"></i>
                     Nouvelle facture
-                </button>
+                </button> -->
 
                 {{-- Bouton de synchronisation --}}
                 <a href="{{route('factures.index')}}" class="btn btn-light-secondary btn-sm d-flex align-items-center">

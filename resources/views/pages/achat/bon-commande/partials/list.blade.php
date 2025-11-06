@@ -2,6 +2,27 @@
     {{-- Table des bons de commande --}}
     <div class="col-12">
         <div class="card border-0 shadow-sm p-3">
+            <div class="row justify-content-center">
+                <div class="col-6">
+                    @if(session("success"))
+                    <div class="alert alert-success">{{session()->get("success")}}</div>
+                    @endif
+                    @if(session("error"))
+                    <div class="alert alert-danger">{{session()->get("error")}}</div>
+                    @endif
+
+                    <!--  -->
+                    @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+                </div>
+            </div>
             <div class="table-responsive">
                 <table id="example1" class="table table-hover align-middle mb-0" id="bonCommandesTable">
                     <thead class="bg-light">
@@ -88,7 +109,8 @@
 
                                     @can("bon-commandes.validate")
                                     <button class="btn btn-sm btn-light-success btn-icon ms-1"
-                                        onclick="validateBonCommande({{ $bonCommande->id }})"
+                                        onclick="validateBc({{$bonCommande}})"
+                                        data-bs-toggle="modal" data-bs-target="#validateBon"
                                         data-bs-toggle="tooltip" title="Valider">
                                         <i class="fas fa-check"></i>
                                     </button>
@@ -143,6 +165,128 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal  de validation-->
+    <div class="modal fade" id="validateBon" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{route('bon-commandes.validate')}}" id="validateForm">
+                    @csrf
+
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Validation du bon : <strong class="badge bg-light border rounded text-success" id="codeBon"></strong> </h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <input type="hidden" name="bonId" id="bonId">
+
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Code Facture</label>
+                                <input type="text" class="form-control" id="codeFacture"
+                                    name="code" readonly required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date de Facture</label>
+                                <input type="date" class="form-control" name="date_facture" id="date_facture" required>
+                                <div class="invalid-feedback">La date de facture est requise</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Type de Facture</label>
+                                <select class="form-select" name="type_facture" required>
+                                    <option value="SIMPLE">Facture Simple</option>
+                                    <option value="NORMALISE">Facture Normalisée</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        {{-- Section totaux --}}
+                        <div class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-calculator me-2"></i>Récapitulatif
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row justify-content-end">
+                                        <div class="col-md-4">
+                                            <div class="mb-3 tva-aib-section" style="display: none;">
+                                                <label class="form-label">Taux TVA (%)</label>
+                                                <input type="number" class="form-control" name="taux_tva"
+                                                    id="tauxTVA" value="20" min="0" max="100"
+                                                    step="0.01">
+                                            </div>
+                                            <div class="mb-3 tva-aib-section" style="display: none;">
+                                                <label class="form-label">Taux AIB (%)</label>
+                                                <input type="number" class="form-control" name="taux_aib"
+                                                    id="tauxAIB" value="0" min="0" max="100"
+                                                    step="0.01">
+                                            </div>
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <th>Total HT</th>
+                                                    <td class="text-end">
+                                                        <span id="montantHT">0.00</span> FCFA
+                                                        <input type="hidden" name="montant_ht"
+                                                            id="montantHTInput">
+                                                    </td>
+                                                </tr>
+                                                <tr class="row-tva">
+                                                    <th>Total TVA</th>
+                                                    <td class="text-end">
+                                                        <span id="montantTVA">0.00</span> FCFA
+                                                        <input type="hidden" name="montant_tva"
+                                                            id="montantTVAInput">
+                                                    </td>
+                                                </tr>
+                                                <tr class="row-aib">
+                                                    <th>Total AIB</th>
+                                                    <td class="text-end">
+                                                        <span id="montantAIB">0.00</span> FCFA
+                                                        <input type="hidden" name="montant_aib"
+                                                            id="montantAIBInput">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Net à Payer</th>
+                                                    <td class="text-end">
+                                                        <span id="montantTTC">0.00</span> FCFA
+                                                        <input type="hidden" name="montant_ttc"
+                                                            id="montantTTCInput">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section commentaire --}}
+                        <div class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-comments me-2"></i>Commentaire
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <textarea class="form-control" name="commentaire" rows="3" placeholder="Ajouter un commentaire (optionnel)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Valider le bon</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -307,6 +451,77 @@
 </style>
 
 <script>
+    function validateBc(bonCommande) {
+        // e.preventDefault();
+        console.log('Validation appelée pour le bon:', bonCommande);
+
+        $("#codeBon").html(bonCommande?.code);
+        $("#bonId").val(bonCommande?.id);
+
+        // Génération automatique du code facture
+        function generateFactureCode() {
+            const date = new Date();
+            const year = date.getFullYear().toString().substr(-2);
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+            return `FAC${year}${month}${random}`;
+        }
+
+        $('#codeFacture').val(generateFactureCode());
+        $('select[name="type_facture"]').change(function() {
+            const isNormalise = $(this).val() === 'NORMALISE';
+            if (isNormalise) {
+                $('.tva-aib-section, .row-tva, .row-aib').show();
+            } else {
+                $('.tva-aib-section, .row-tva, .row-aib').hide();
+                $('#tauxTVA, #tauxAIB').val(0);
+            }
+            calculateTotals();
+        });
+
+        // Calculer les totaux
+        function calculateTotals() {
+            let totalHT = 0;
+            $('#articlesTableBody tr').each(function() {
+                totalHT += parseFloat($(this).find('.montant-ht-input').val()) || 0;
+            });
+
+            const isNormalise = $('select[name="type_facture"]').val() === 'NORMALISE';
+            const tauxTVA = isNormalise ? (parseFloat($('#tauxTVA').val()) || 0) : 0;
+            const tauxAIB = isNormalise ? (parseFloat($('#tauxAIB').val()) || 0) : 0;
+
+            const totalTVA = totalHT * (tauxTVA / 100);
+            const totalAIB = totalHT * (tauxAIB / 100);
+            const totalTTC = isNormalise ? (totalHT + totalTVA + totalAIB) : totalHT;
+
+            $('#montantHT').text(totalHT.toFixed(2));
+            $('#montantTVA').text(totalTVA.toFixed(2));
+            $('#montantAIB').text(totalAIB.toFixed(2));
+            $('#montantTTC').text(totalTTC.toFixed(2));
+
+            $('#montantHTInput').val(totalHT.toFixed(2));
+            $('#montantTVAInput').val(totalTVA.toFixed(2));
+            $('#montantAIBInput').val(totalAIB.toFixed(2));
+            $('#montantTTCInput').val(totalTTC.toFixed(2));
+        }
+
+        // Initialiser le code facture lors de la sélection du bon de commande
+
+        $('#codeFacture').val(generateFactureCode());
+        $('select[name="type_facture"]').trigger('change')
+
+        $('select[name="type_facture"]').change(function() {
+            const isNormalise = $(this).val() === 'NORMALISE';
+            if (isNormalise) {
+                $('.tva-aib-section, .row-tva, .row-aib').show();
+            } else {
+                $('.tva-aib-section, .row-tva, .row-aib').hide();
+                $('#tauxTVA, #tauxAIB').val(0);
+            }
+            calculateTotals();
+        });
+    }
+
     // Fonction pour afficher les détails d'un bon de commande
     function showBonCommande(id) {
         Swal.fire({
@@ -357,7 +572,7 @@
         if (bon_object) {
             window.open(`${apiUrl}/achat/bon-commandes/${bon_id}/${bon_object}/${entete}/pdf`)
             // window.location.href = `/quinkadjiv_refont/public/achat/bon-commandes/${bon_id}/${bon_object}/pdf`
-        }else{
+        } else {
             alert("Saisissez un object dans le champ ...")
         }
     }

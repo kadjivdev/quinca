@@ -81,7 +81,7 @@
                 @endif
                 <div class="table-responsive">
                     <h5 class="mb-5">L'historique des opérations de <a href="{{route('vente.clients.allHistoriqueComptes')}}" class="btn btn-sm bg-primary text-white">Actualiser la page</a></h5>
-                    <h5 class="mb-5">Montant total : <strong class="badge bg-light border text-dark">{{number_format($totalAmount,2,' ',' ')}} Fcfa</h5>
+                    <h5 class="mb-5">Montant total : <strong class="badge bg-light border text-dark">{{number_format($totalAmount,2,",",".")}} Fcfa</h5>
 
                     <table id="example1" class="table table-hover align-middle mb-0" id="clientsTable">
                         <thead class="bg-light">
@@ -170,14 +170,14 @@
                                 </td>
                                 <td class="bg-secondary text-white">
                                     @if(in_array($compte->type_op,["FAC_CLT","FAC_REV","AC_CLT"]))
-                                    {{number_format($compte->montant_op,0," "," ")}} FCFA
+                                    {{number_format($compte->montant_op,2,",",".")}} FCFA
                                     @else
                                     -
                                     @endif
                                 </td>
                                 <td class="bg-light text-dark">
                                     @if(in_array($compte->type_op,["REG_CLT","REG_REV"]))
-                                    {{number_format($compte->montant_op,0," "," ")}} FCFA
+                                    {{number_format($compte->montant_op,2,",",".")}} FCFA
                                     @else
                                     -
                                     @endif

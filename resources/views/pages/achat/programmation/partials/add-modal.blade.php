@@ -204,54 +204,6 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        // 
-        // $("#depot_select").on('change', function() {
-        //     if ($(this).val()) {
-        //         $("#articles-bloc").removeClass("d-none");
-
-        //         let depot = JSON.parse($(this).val());
-
-        //         $("#depot_id").val(depot.id)
-
-        //         // Stockage du depot dans une session
-        //         localStorage.setItem("depot", $(this).val())
-
-        //         $(".articles_select").empty()
-
-        //         let rows = `<option value="">Selectionner un article</option>`
-        //         if (depot.articles.length > 0) {
-        //             depot.articles.forEach(article => {
-        //                 rows += `
-        //                     <option ${(!article.reste || article.reste<0)? "disabled" :''} value="${ article.id }">
-        //                         ${ article.code_article } ${ article.designation } - Reste : ${article.reste}
-        //                     </option>
-        //                     `
-        //             });
-        //         }
-        //         $(".articles_select").append(rows)
-        //     } else {
-        //         $("#articles-bloc").addClass("d-none")
-        //     }
-        // })
-
-        // let articles = JSON.parse({
-        //     {
-        //         $articles
-        //     }
-        // });
-        // $(".articles_select").empty();
-        // let rows = `<option value="">Selectionner un article</option>`
-        // if (articles.length > 0) {
-        //     articles.forEach(article => {
-        //         rows += `
-        //                     <option value="${ article.id }">
-        //                         ${ article.code_article } ${ article.designation }
-        //                     </option>
-        //                     `
-        //     });
-        // }
-        // $(".articles_select").append(rows)
-
 
         // Initialisation de Select2 avec gestion d'erreur
         try {
@@ -271,25 +223,6 @@
                 loadArticles(fournisseurId);
             }
         });
-
-        // Ajouter une nouvelle ligne
-        // $('#btnAddLigne').on('click', function() {
-        //     let _depot = localStorage.getItem("depot");
-
-        //     let depot = JSON.parse(_depot)
-
-        //     let rows = ``
-        //     if (depot.articles.length > 0) {
-        //         depot.articles.forEach(article => {
-        //             rows += `
-        //                     <option ${(!article.reste || article.reste<0)? "disabled" :''} value="${ article.id }">
-        //                         ${ article.code_article } ${ article.designation } - Reste : ${article.reste}
-        //                     </option>
-        //                     `
-        //         });
-        //     }
-        //     $(".articles_select").append(rows)
-        // });
 
         // Supprimer une ligne
         $(document).on('click', '.remove-ligne', function() {
@@ -326,6 +259,24 @@
                 </option>`;
         });
         $('.select2-articles').html(options);
+    }
+
+    $('.select2-articles').on('select2:select', function(e) {
+        alert("e.params.data.id"); // ou e.params.data.text selon ce que tu veux
+        const selected = $(this).find(':selected');
+        const unites = selected.data('unites');
+        console.log("les unites de l'article selectionné ", unites)
+    });
+
+    function updateUnitesOptions(unites) {
+        let options = '<option value="">Sélectionner une unité ...</option>';
+        unites.forEach(unite => {
+            options += `<option value="${unite.id}" >
+                    ${unite.code_unite} - ${unite.libelle_unite}
+                </option>`;
+        });
+
+        $('.unites').html(options);
     }
 </script>
 @endpush

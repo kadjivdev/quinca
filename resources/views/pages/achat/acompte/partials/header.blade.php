@@ -12,7 +12,7 @@
                     <div>
                         <div class="text-muted small">{{ $date }}</div>
                         <div class="d-flex align-items-center gap-2">
-                            <h5 class="mb-0 fw-bold">Gestion des Acomptes</h5>
+                            <h5 class="mb-0 fw-bold">Gestion des Anciens Soldes</h5>
                             <div class="d-flex gap-2 align-items-center ms-3">
                                 <span class="badge bg-success bg-opacity-10 text-success rounded-pill">
                                     <i class="fas fa-calendar-alt me-1"></i>
@@ -35,7 +35,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#addAcompteModal">
                     <i class="fas fa-plus me-2"></i>
-                    Nouvel Acompte
+                    Ajouter un ancien solde
                 </button>
             </div>
         </div>
@@ -53,7 +53,7 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-0">Total Acomptes</h6>
+                                <h6 class="mb-0">Total des anciens soldes</h6>
                                 <small class="text-muted">Tous les acomptes</small>
                             </div>
                         </div>

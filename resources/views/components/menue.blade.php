@@ -14,7 +14,7 @@
         <ul class="navbar-nav navbar-nav-top" data-dropdown-on-hover="data-dropdown-on-hover">
 
             <!-- ADMINISTRATION & gael-->
-            @if(auth()->user()->hasRole("Super Administrateur") || auth()->user()->id==14)
+            @if(auth()->user()->hasRole("Super Administrateur") || in_array(auth()->user()->id,[14,21]))
             @canany(['users.view', 'roles.view'])
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle lh-1" href="#" role="button" data-bs-toggle="dropdown"
@@ -140,6 +140,12 @@
                         </a></li>
                     @endcan
 
+                    @if(Auth::user()->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT") || Auth::user()->hasRole("Super Administrateur"))
+                    <li><a class="dropdown-item" href="{{ route('fournisseur-partiel.solde') }}">
+                            <div class="dropdown-item-wrapper">Solde partiel fournisseur</div>
+                        </a></li>
+                    @endif
+
                     @can('programmations.view')
                     <li><a class="dropdown-item" href="{{ route('programmations.index') }}">
                             <div class="dropdown-item-wrapper">Pré Commande</div>
@@ -180,7 +186,7 @@
                     <hr>
                     @can("accomptes.view")
                     <li><a class="dropdown-item" href="{{ route('achat.acomptes.index') }}">
-                            <div class="dropdown-item-wrapper">Accomptes Fourniseurs</div>
+                            <div class="dropdown-item-wrapper">Anciens Soldes Fourniseurs</div>
                         </a></li>
 
                     <li><a class="dropdown-item" href="{{ route('achat.avances.index') }}">
@@ -457,7 +463,12 @@
                         </a></li>
                     @endcan
 
+
                     @can('rapports.mouvement-stock.view')
+                    <li><a class="dropdown-item" href="{{ route('rapports.historique-stock') }}">
+                            <div class="dropdown-item-wrapper">Historique des Stocks</div>
+                        </a></li>
+
                     <li><a class="dropdown-item" href="{{ route('rapports.mouvement-stock') }}">
                             <div class="dropdown-item-wrapper">Mouvements de Stock</div>
                         </a></li>

@@ -144,6 +144,11 @@ class Fournisseur extends Model
             ->whereNotNull("validated_by");
     }
 
+    function all_factures()
+    {
+        return $this->hasMany(FactureFournisseur::class, "fournisseur_id");
+    }
+
     public function approvisionnements(): HasMany
     {
         return $this->hasMany(FournisseurApprovisionnement::class, "fournisseur_id")
@@ -154,6 +159,11 @@ class Fournisseur extends Model
     {
         return $this->hasMany(AccompteFournisseur::class, "fournisseur_id")
             ->whereNotNull("validated_by");
+    }
+
+    function all_accomptes(): HasMany
+    {
+        return $this->hasMany(AccompteFournisseur::class, "fournisseur_id");
     }
 
     function avances(): HasMany

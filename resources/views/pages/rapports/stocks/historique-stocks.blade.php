@@ -1,93 +1,94 @@
-@extends('layouts.ventes.client')
+@extends('layouts.rapport.facture')
 
-@push('styles')
-<style>
-    /* Z-index fixes */
-    .modal-backdrop {
-        z-index: 1040 !important;
-    }
-
-    .modal {
-        z-index: 1050 !important;
-    }
-
-    .select2-container {
-        z-index: 2000 !important;
-    }
-
-    .select2-dropdown {
-        z-index: 2001 !important;
-    }
-
-    /* Select2 styling */
-    .select2-container--bootstrap-5 {
-        width: 100% !important;
-    }
-
-    .select2-container--bootstrap-5 .select2-selection {
-        min-height: 38px;
-        border: 1px solid #dee2e6;
-    }
-
-    .ligne-facture {
-        transition: all 0.3s ease;
-    }
-
-    .ligne-facture.loading {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-</style>
-@endpush
-
+@section('title', 'Rapport du Stock Disponible')
 @section('content')
-<div class="content container">
-    <div class="row g-3 list mt-3 " id="stockEntriesList">
-        <div class="col-1"></div>
-        <div class="col-10">
-            <div class="card p-3">
-                <h5 class="mb-5">Les accomptes du client : <strong>{{$client->raison_sociale}}</strong></h5>
-                <div class="table-responsive">
-                    <table class="table table-sm" id="example1">
-                        <thead>
-                            <tr>
-                                <th>Numéro</th>
-                                <th>Date</th>
-                                <th>status</th>
-                                <th>Facture</th>
-                                <th class="text-end">Montant</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($client->acomptes as $accompte)
-                            <tr>
-                                <td><span class="badge bg-light text-dark border">{{$accompte->reference}}</span></td>
-                                <td>{{$accompte->created_at}}</td>
-                                <td>{{$accompte->statut}}</td>
-                                <td>{{$accompte->requete_id?'Requete':''}} {{$accompte->transport_id?'Transport':''}} {{($accompte->requete_id && $accompte->transport_id)?'---':'' }} </td>
-                                <td class="text-end">{{number_format($accompte->montant,2,",",".")}} FCFA</td>
-                            </tr>
+<br><br>
+<div class="col-12">
+    <div class="card p-3 border-0 shadow-sm">
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <form action="" method="get">
+                    <div class="">
+                        <select name="depot_id" class="form-control" id="depot_select" required>
+                            @foreach($depots as $dep)
+                            <option value="{{$dep->id}}" @selected($dep->id==$depot->id)>{{$dep->libelle_depot}}</option>
                             @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        </select>
+                    </div>
+                    <br>
+                    <button class="btn btn-success w-100">Rechercher....</button>
+                </form>
             </div>
         </div>
-        <div class="col-1"></div>
+
+        <br>
+        <h4 class="">Historique du stock du dépôt : <span class="badge bg-light rounded borded text-success">{{$depot->libelle_depot}}</span> </h4>
+       
+        <div class="table-responsive">
+            <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="border-bottom-0">Code</th>
+                        <th class="border-bottom-0 text-center">Désignation</th>
+                        <th class="border-bottom-0">Stock départ</th>
+                        <th class="border-bottom-0">Approvisionné</th>
+                        <th class="border-bottom-0">Stock disponible</th>
+                        <th class="border-bottom-0">Vente</th>
+                        <th class="border-bottom-0">Stock final</th>
+                        <!-- <th class="border-bottom-0" style="min-width: 150px;">Dépôt</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($articles as $article)
+                    <tr>
+                        <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
+                        <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format(0,2,","," ")}} ({{$article->stockMesure->libelle_unite}})</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->quantite_reelle,2,","," ")}} ({{$article->stockMesure->libelle_unite}})</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->quantite_reelle,2,","," ")}} ({{$article->stockMesure->libelle_unite}})</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,","," ")}} ({{$article->stockMesure->libelle_unite}})</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,","," ")}} ({{$article->uniteMesure->libelle_unite}})</span></td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 @endsection
 
-@push("scripts")
+@push('styles')
+<style>
+    .text-monospace {
+        font-family: 'Monaco', 'Consolas', monospace;
+    }
+
+    .table-responsive {
+        min-height: 300px;
+    }
+
+    .badge {
+        font-size: 85%;
+    }
+</style>
+@endpush
+
+
+<!-- DATATABLES -->
+@push('scripts')
 <script>
+    $(document).ready(function() {
+        $("#depot_select").select2();
+    });
+
     $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
-        "order": [
-            [0, 'asc']
-        ],
+        // "order": [
+        //     [7, 'asc']
+        // ],
         "pageLength": 15,
         language: {
             "emptyTable": "Aucune donnée disponible dans le tableau",

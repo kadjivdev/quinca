@@ -8,7 +8,7 @@
                         <i class="fas fa-money-bill-wave fs-4 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">Nouvel Acompte</h5>
+                        <h5 class="modal-title fw-bold mb-0">Ajouter un ancien solde</h5>
                         <p class="text-muted small mb-0">Enregistrement d'un acompte client</p>
                     </div>
                 </div>

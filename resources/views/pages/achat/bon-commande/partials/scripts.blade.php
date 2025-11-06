@@ -583,9 +583,10 @@
         }
     }
 
-    function validateBonCommande(id) {
-        console.log('Validation appelée pour ID:', id);
-
+    function validateBonCommande() {
+        console.log('Validation appelée pour ID:');
+        alert("validateBonCommande called...")
+        
         Swal.fire({
             title: 'Confirmer la validation',
             text: 'Êtes-vous sûr de vouloir valider ce bon de commande ? Cette action est irréversible.',
@@ -610,7 +611,7 @@
                     }
                 });
 
-                axios.post(`bon-commandes/${id}/validate`)
+                axios.post(`{{route('bon-commandes.validate')}}`)
                     .then(response => {
                         if (response.data.success) {
                             loadingAlert.close();

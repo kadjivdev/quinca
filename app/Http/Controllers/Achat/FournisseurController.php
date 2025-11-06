@@ -59,6 +59,48 @@ class FournisseurController extends Controller
         ));
     }
 
+    /**
+     * Soldes partiels des fournisseurs
+     */
+    public function partielSolde()
+    {
+        // Récupération des fournisseurs avec tri par date de création décroissante
+        $fournisseurs = Fournisseur::with("approvisionnements")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $fournisseurs->map(function ($fournisseur) {
+            $fournisseur->totalAppro = $fournisseur->approvisionnements()->sum("montant");
+
+            $fournisseur->factureAchatAmount = $fournisseur->all_factures->sum("montant_ttc");
+
+            $fournisseur->reglementsAmount = $fournisseur->all_factures->sum(function ($query) {
+                return $query->all_facture_reglements_amount();
+            });
+
+            $fournisseur->avancesAmount = $fournisseur->avances->sum("montant");
+
+            $fournisseur->accompteAmount = $fournisseur->all_accomptes->sum("montant");
+            
+            //solde
+            $fournisseur->reste_solde = ($fournisseur->factureAchatAmount + $fournisseur->accompteAmount) - ($fournisseur->reglementsAmount + $fournisseur->avancesAmount);
+        });
+
+        // Statistiques globales
+        $stats = [
+            'total_fournisseurs' => $fournisseurs->count(),
+            'fournisseurs_actifs' => $fournisseurs->where('statut', true)->count(),
+        ];
+
+        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+
+        return view('pages.achat.fournisseur.partial-sold', compact(
+            'fournisseurs',
+            'stats',
+            'date'
+        ));
+    }
+
     public function store(Request $request)
     {
         try {

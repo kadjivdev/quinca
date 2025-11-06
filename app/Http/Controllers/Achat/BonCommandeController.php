@@ -7,6 +7,8 @@ use App\Models\Achat\BonCommande;
 use App\Models\Achat\LigneBonCommande;
 use App\Models\Achat\ProgrammationAchat;
 use App\Http\Controllers\Controller;
+use App\Models\Achat\FactureFournisseur;
+use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Parametre\UniteMesure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +20,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use App\Services\ServiceStockEntree;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\ErrorHandler\Debug;
 
 class BonCommandeController extends Controller
 {
@@ -534,25 +539,113 @@ class BonCommandeController extends Controller
     /**
      * Valide une programmation
      */
-    public function validated(BonCommande $bonCommande)
+    public function validated(Request $request)
     {
         try {
-            if ($bonCommande->validate()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Bon de commande validé avec succès'
-                ]);
+            Log::info("Les données entrantes", ["data" => $request->all()]);
+
+
+            /**
+             * Traitement diu bon
+             */
+            DB::beginTransaction();
+
+            $bonCommande = BonCommande::with("lignes")->firstWhere("id", $request->bonId);
+            if (!$bonCommande) {
+                throw new \Exception("Le bon de commande n'existe pas!");
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Impossible de valider le Bon de commande'
-            ], 400);
+            if ($bonCommande->factures->isNotEmpty()) {
+                throw new \Exception("Le bon de commande dispose déjà d'une facture!");
+            }
+
+            if ($bonCommande->validated_by || $bonCommande->validated_at) {
+                throw new \Exception("Bon de commande validé avec succès");
+            }
+
+            $request->validate([
+                'code' => 'required|unique:facture_fournisseurs,code',
+                'date_facture' => 'required|date',
+                // 'bon_commande_id' => 'required|exists:bon_commandes,id',
+                // 'point_de_vente_id' => 'required|exists:point_de_ventes,id',
+                // 'fournisseur_id' => 'required|exists:fournisseurs,id',
+                'type_facture' => 'required|in:SIMPLE,NORMALISE',
+                // 'articles' => 'required|array',
+
+                // 'articles.*.unite_mesure_id' => 'required|numeric',
+                // 'articles.*.quantite' => 'required|numeric|min:0',
+
+                // 'articles.*.unite_mesure_base_id' => 'nullable|numeric',
+                // 'articles.*.quantite_base' => 'nullable|numeric|min:0',
+
+                // 'articles.*.prix_unitaire' => 'required|numeric|min:0',
+            ]);
+
+            Log::info("Fin du chargement des lignes", ["data" => $request->articles]);
+
+            // Création de la facture avec les montants par défaut
+            $facture = new FactureFournisseur();
+            $facture->code = $request->code;
+            $facture->date_facture = $request->date_facture;
+            $facture->bon_commande_id = $bonCommande->id;
+            $facture->point_de_vente_id = $bonCommande->point_de_vente_id;
+            $facture->fournisseur_id = $bonCommande->fournisseur_id;
+            $facture->type_facture = $request->type_facture;
+            $facture->commentaire = $request->commentaire;
+            $facture->taux_tva = $request->type_facture === 'NORMALISE' ? ($request->taux_tva ?? 0) : 0;
+            $facture->taux_aib = $request->type_facture === 'NORMALISE' ? ($request->taux_aib ?? 0) : 0;
+
+            $facture->save();
+
+            // return $bonCommande->lignes;
+            // Création des lignes
+            foreach ($bonCommande->lignes as $line) {
+                Log::info("La line", ["data" => $line]);
+
+                $ligne = new LigneFactureFournisseur();
+                $ligne->facture_id = $facture->id;
+                $ligne->article_id = $line->article_id;
+                $ligne->unite_mesure_id = $line->unite_mesure_id;
+                $ligne->quantite = $line->quantite;
+                $ligne->prix_unitaire = $line->prix_unitaire;
+                $ligne->taux_tva = $request->type_facture === 'NORMALISE' ? ($request->taux_tva ?? 0) : 0;;
+                $ligne->taux_aib = $request->type_facture === 'NORMALISE' ? ($request->taux_aib ?? 0) : 0;
+
+                /** */
+                $ligne->unite_mesure_base_id = $line->unite_mesure_base_id;
+                $ligne->quantite_base = $line->quantite_base;
+                /** */
+
+                Log::info("Unité", ["unité" => $ligne->unite_mesure_id, "unite_base" => $ligne->unite_mesure_base_id]);
+                Log::info("Quantites", ["qte" => $ligne->quantite, "qte_base" => $ligne->quantite_base]);
+
+                $ligne->save();
+            }
+
+            // Mise à jour des montants
+            $facture->updateMontants();
+
+            $facture->validated_by = Auth::id();
+            $facture->validated_at = now();
+            $facture->update();
+
+            /**
+             * Validation du bon
+             */
+
+            $bonCommande->validated_by = Auth::id();
+            $bonCommande->validated_at = now();
+            $bonCommande->update();
+
+            DB::commit();
+
+            return back()->with("success", "Bon de commande validé avec succès!");
+        } catch (ValidationException $e) {
+            Log::debug("Erreure survenue lors de la validation", ["errors" => $e->errors()]);
+            return back()->withErrors($e->errors());
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la validation: ' . $e->getMessage()
-            ], 500);
+            Log::debug("Erreure survenue lors de la validation", ["error" => $e->getMessage()]);
+            return back()->with("error", "Erreure survenue lors de la validation " . $e->getMessage());
         }
     }
 

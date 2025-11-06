@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MouvementsStockExport;
+use Illuminate\Support\Facades\Log;
 use PDF;
 
 class RapportStockController extends Controller
@@ -88,6 +89,69 @@ class RapportStockController extends Controller
                     'seuil_maximum' => $stock->isStockMaximum(),
                 ];
             });
+    }
+
+    /**
+     * Historiques des stocks
+     */
+    public function historiqueStocks(Request $request)
+    {
+        try {
+            if ($request->depot_id) {
+                $depot = Depot::find($request->depot_id);
+            } else {
+                $depot = Depot::find(1);
+            }
+
+            $stocks = StockDepot::with("article", "depot")
+                ->where("depot_id", $depot->id)->get();
+
+            $articles = $stocks->pluck("article");
+
+            $articles->map(function ($article) use ($depot) {
+                $articleStocks = $article->stocks
+                    ->where("depot_id", $depot->id);
+
+                /**
+                 * Stocks de l'article
+                 */
+               
+                $articleStocks
+                    ->map(function ($stock) use ($article) {
+                        $conversion = $this->serviceEntree
+                            ->rechercherConversion(
+                                $stock->unite_mesure_id,
+                                $stock->article->unite_mesure_id,
+                                $stock->article_id
+                            );
+
+                        /**Qte de Base */
+                        $stock->qantiteBase = $conversion ? $this->serviceEntree
+                            ->convertirQuantite(
+                                $stock->quantite_reelle,
+                                $conversion,
+                                $stock->unite_mesure_id
+                            ) : 00;
+
+                        /**Qte Vendue */
+                        $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
+
+                        $stock->resteStock = $stock->qantiteBase - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
+                    });
+
+                $article->quantite_reelle = $articleStocks->sum("quantite_reelle");
+                $article->qteTotalVendu = $articleStocks->sum("qteTotalVendu");
+                $article->resteStock = $articleStocks->sum("resteStock");
+
+                $article->stockMesure = $articleStocks->first()->uniteMesure;
+            });
+
+            $depots = Depot::all();
+            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots"));
+        } catch (\Exception $e) {
+            Log::debug("Une erreure est survenue lors du chargement du stock", ["error" => $e->getMessage()]);
+            return back()->with("error", "Une erreure est survenue lors du chargement du stock :" . $e->getMessage());
+        }
     }
 
     private function getStats(int $depotId)
@@ -292,7 +356,7 @@ class RapportStockController extends Controller
         $selectedDepot = $request->depot_id ?
             Depot::findOrFail($request->depot_id) :
             $depots->first();
-            
+
         $stocks = StockDepot::with(['article.uniteMesure', 'depot'])
             ->where('depot_id', $selectedDepot->id)
             ->where('quantite_reelle', '>', 0)

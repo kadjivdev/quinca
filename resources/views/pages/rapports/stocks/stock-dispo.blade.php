@@ -59,8 +59,8 @@
                                     <td>{{ $stock['article']['designation'] }} ({{ $stock['article']['unite'] }})</td>
                                     <td>{{$stock["unite_stock"]}} </td>
                                     <td class="text-end">{{ $stock["depot"] }}</td>
-                                    <td class="text-end">{{ number_format($stock['quantite_reelle'], 2, ',', ' ') }}</td>
-                                    <td class="text-end">{{ number_format($stock['quantite_disponible'], 2, ',', ' ') }}</td>
+                                    <td class="text-end">{{ number_format($stock['quantite_reelle'], 0, ',', ' ') }}</td>
+                                    <td class="text-end">{{ number_format($stock['quantite_disponible'], 0, ',', ' ') }}</td>
                                     <td>
                                         @switch($stock['statut'])
                                             @case('Alerte')

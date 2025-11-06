@@ -142,6 +142,19 @@ class FactureFournisseur extends Model
         return $montant_reglement;
     }
 
+    // SOMME DE TOUS SES REGLEMENTS
+    function all_facture_reglements_amount()
+    {
+        $regleUnique = $this->reglements; ## reglement par selection unique
+        $regleMultiple = $this->reglements_grouped()->count(); ## reglement par selection multiple
+
+        $montant_reglement_unique = $regleUnique ? $regleUnique->sum('montant_reglement') : 0;
+        $montant_reglement_multiple = $regleMultiple ? $this->montant_ttc : 0;
+        $montant_reglement =  $montant_reglement_unique + $montant_reglement_multiple;
+
+        return $montant_reglement;
+    }
+
     /**
      * 
      * Recherche de factures
