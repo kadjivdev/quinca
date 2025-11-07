@@ -146,7 +146,7 @@ class ServiceStockEntree
                 'prix_moyen' => $nouveau_cump ?? 0.00,
                 'date_dernier_mouvement' => $donnees['date_mouvement'],
                 'user_id' => $donnees['user_id'],
-                'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
+                // 'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
             ]);
 
             $stock->save();
