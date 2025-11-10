@@ -56,13 +56,18 @@
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <input type="date"  required name="date" class="form-control" id="">
+                                        <input type="date" required name="date" class="form-control" id="">
                                         <div class="invalid-feedback">Veuillez choisir une date</div>
                                     </div>
 
                                     <div class="form-group mb-3">
                                         <input type="file" required name="document" class="form-control" id="">
                                         <div class="invalid-feedback">Veuillez sélectionner une preuve</div>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <input type="text" name="reference" class="form-control" placeholder="Inserez une reference ici">
+                                        <div class="invalid-feedback">Veuillez sélectionner une reference</div>
                                     </div>
                                 </div>
                             </div>

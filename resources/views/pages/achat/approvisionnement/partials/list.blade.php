@@ -6,7 +6,8 @@
                 <table id="example1" class="table table-hover align-middle mb-0" id="bonCommandesTable">
                     <thead class="bg-light">
                         <tr>
-                            <th class="border-bottom-0 text-nowrap py-3">COde</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Code</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Reference</th>
                             <th class="border-bottom-0">Founisseur</th>
                             <th class="border-bottom-0">Montant</th>
                             <th class="border-bottom-0">Date de paiement</th>
@@ -25,6 +26,7 @@
                                     <span class="code-commande me-2">{{ $appro->fournisseur?->code_fournisseur }}</span>
                                 </div>
                             </td>
+                            <td class="text-center"> <span class="badge bg-light rouded border text-dark">{{$appro->reference??'---' }} </span> </td>
                             <td> <span class="badge bg-dark">{{$appro->fournisseur?->raison_sociale }} </span> </td>
                             <td><span class="fw-bold">{{ number_format($appro->montant, 2) }} F
                                     CFA</span></td>

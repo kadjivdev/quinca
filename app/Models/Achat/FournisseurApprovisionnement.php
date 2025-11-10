@@ -23,7 +23,8 @@ class FournisseurApprovisionnement extends Model
         "rejected_by",
         "validated_by",
         "date",
-        'deleted_by'
+        'deleted_by',
+        "reference"
     ];
 
     static function rules()
@@ -34,6 +35,7 @@ class FournisseurApprovisionnement extends Model
             "source" => "required|in:DIRECTION,AGENT",
             "document" => "required",
             "date" => "required|date",
+            "reference" => "nullable|unique:fournisseur_approvisionnements,reference",
         ];
     }
 
@@ -48,6 +50,7 @@ class FournisseurApprovisionnement extends Model
             "document.required" => "La preuve est réquise",
             "date.required" => "Veuillez préciser la date",
             "date.date" => "La date doit être de format date",
+            "reference.unique" => "Cette reference existe déjà",
         ];
     }
 
