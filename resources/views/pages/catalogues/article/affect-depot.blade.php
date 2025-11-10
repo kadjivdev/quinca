@@ -54,7 +54,7 @@
                                         <div class="form-group mb-3">
                                             <h5 class="">Les dépôts déjà associés :</h5>
                                             @forelse($article->stocks as $stock)
-                                            <span class="badge bg-warning"> {{$stock->depot->libelle_depot}} <strong class="text-dark"> Stock Appovisionné: {{number_format($stock->quantite_reelle,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> | <strong class="text-dark"> Stock vendu: {{number_format($stock->qteTotalVendu,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> | <strong class="text-dark"> Stock disponible: {{number_format($stock->resteStock,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong>  </span>
+                                            <span class="badge bg-warning"> {{$stock->depot->libelle_depot}} <strong class="text-dark"> Stock Appovisionné: {{number_format($stock->quantite_reelle,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> | <strong class="text-dark"> Stock vendu: {{number_format($stock->qteTotalVendu,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> | <strong class="text-dark"> Stock disponible: {{number_format($stock->resteStock,2,"."," ")}} ({{$stock->uniteMesure->libelle_unite}}) </strong> </span>
                                             @empty
                                             <span class="badge bg-light text-dark">Aucun dépôt</span>
                                             @endforelse
@@ -69,10 +69,12 @@
 
                                         <div class="form-group">
                                             <label class="form-label fw-semibold required">Unité de mésure</label>
+                                           
+
                                             <select class="form-select unite-select2" name="unite_mesure_id" required>
                                                 <option value="">Sélectionner une unité</option>
                                                 @foreach ($unites as $unite)
-                                                <option value="{{ $unite->id }}">{{ $unite->libelle_unite }}</option>
+                                                <option value="{{ $unite['id'] }}">{{ $unite['text'] }}</option>
                                                 @endforeach
                                             </select>
                                             <div class="invalid-feedback">

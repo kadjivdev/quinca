@@ -7,6 +7,7 @@ use App\Models\Catalogue\Article;
 use App\Models\Catalogue\DetailInventaire;
 use App\Models\Catalogue\FamilleArticle;
 use App\Models\Catalogue\Inventaire;
+use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\TypeTarif;
 use App\Models\Parametre\UniteMesure;
@@ -27,6 +28,7 @@ use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 
 class ArticleController extends Controller
 {
@@ -140,7 +142,7 @@ class ArticleController extends Controller
 
         $familles = FamilleArticle::all();
         $depots = Depot::get();
-        $unites = UniteMesure::all();
+        $unites = self::getUnites($article->id)->values(); //UniteMesure::all();
 
         $article->stocks->map(function ($stock) use ($article) {
             $conversion = $this->serviceStockEntree
@@ -175,6 +177,75 @@ class ArticleController extends Controller
             "unites"
         ]));
     }
+
+    private static function getUnites($articleId)
+    {
+        try {
+            Log::info('Début récupération des unités', ['article_id' => $articleId]);
+
+            // Récupérer l'article avec son unité de mesure
+            $article = Article::with('uniteMesure', 'tarifications')->findOrFail($articleId);
+
+            $unites = collect();
+
+            // 1. Ajouter l'unité de base de l'article si elle existe
+            if ($article->uniteMesure) {
+                // $tarification =  $article->tarifViaUnite($article->uniteMesure->id);
+                $unites->push([
+                    'id' => $article->uniteMesure->id,
+                    'text' => $article->uniteMesure?->libelle_unite,
+                    // 'text' => $article->uniteMesure?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
+                ]);
+            }
+
+            // 2. Obtenir toutes les unités ayant des conversions pour cet article
+            $unitesConversion = ConversionUnite::where('article_id', $articleId)
+                ->where('statut', true)
+                ->with(['uniteSource', 'uniteDest'])
+                ->get();
+
+            // Ajouter les unités source actives
+            $unitesConversion->pluck('uniteSource')
+                ->where('statut', true)
+                ->unique('id')
+                ->each(function ($unite) use (&$unites, $article) {
+                    if (!$unites->contains('id', $unite->id)) {
+                        // $tarification =  $article->tarifViaUnite($unite->id);
+                        $unites->push([
+                            'id' => $unite->id,
+                            'text' => $unite->libelle_unite,
+                            // 'text' =>  $unite?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
+                        ]);
+                    }
+                });
+
+            // Ajouter les unités destination actives
+            $unitesConversion->pluck('uniteDest')
+                ->where('statut', true)
+                ->unique('id')
+                ->each(function ($unite) use (&$unites, $article) {
+                    if (!$unites->contains('id', $unite->id)) {
+                        // $tarification =  $article->tarifViaUnite($unite->id);
+                        $unites->push([
+                            'id' => $unite->id,
+                            'text' => $unite->libelle_unite,
+                            // 'text' =>  $unite?->libelle_unite . ' (' . $tarification?->typeTarif?->libelle_type_tarif . ' | ' . $tarification?->depotTarif?->libelle_depot . ' | ' . $tarification?->prix . ' ' . "FCFA )",
+                        ]);
+                    }
+                });
+            // dd($unites->toArray()[0]['id']);
+            return $unites;
+        } catch (\Exception $e) {
+            return back();
+            Log::error('Erreur lors de la récupération des unités', [
+                'article_id' => $articleId,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+
 
     /**
      * Recherche d'articles pour le select2
