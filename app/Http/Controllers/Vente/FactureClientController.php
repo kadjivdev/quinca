@@ -207,7 +207,7 @@ class FactureClientController extends Controller
                 'lignes*depot_id' => 'required|exits,depots',
                 'lignes*quantite' => 'required',
                 'lignes*tarification_id' => 'required',
-                'lignes*stock' => 'required',
+                // 'lignes*stock' => 'required',
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
@@ -283,7 +283,7 @@ class FactureClientController extends Controller
                     ) : 00;
 
                 /**Qte Restante */
-                $resteStock = $ligne["stock"]; //$article->reste($stock->depot_id);
+                $resteStock = $ligne["stock"] ?? 0; //$article->reste($stock->depot_id);
 
                 Log::debug("Vérification stock", [
                     // "conversion" => $conversion->load("uniteSource", "uniteDest"),
@@ -296,16 +296,16 @@ class FactureClientController extends Controller
                     "reste_stock" => $resteStock,
                 ]);
 
-                if ($resteStock < 0) {
-                    throw new Exception("Le stock est négatif pour n'article ($article->designation - $article->code_article)! Veuillez approvisionne le stock");
-                }
-                // on verifie la quantité restante de l'article dans le depot est suffisante
-                if ($resteStock < $qantiteConvertie) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => "Le reste du stock de l'article ($article->designation - $article->code_article) est de $resteStock $venteUnite->libelle_unite dans le depôt ({$stock->depot?->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
-                    ], 500);
-                }
+                // if ($resteStock < 0) {
+                //     throw new Exception("Le stock est négatif pour n'article ($article->designation - $article->code_article)! Veuillez approvisionne le stock");
+                // }
+                // // on verifie la quantité restante de l'article dans le depot est suffisante
+                // if ($resteStock < $qantiteConvertie) {
+                //     return response()->json([
+                //         'status' => false,
+                //         'message' => "Le reste du stock de l'article ($article->designation - $article->code_article) est de $resteStock $venteUnite->libelle_unite dans le depôt ({$stock->depot?->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
+                //     ], 500);
+                // }
             }
             // dd("gogo");
             DB::beginTransaction();

@@ -166,7 +166,7 @@
         <td class="p-2">
             <div class="input-group">
                 <!-- <label class="d-block form-label fw-medium required my-1" for="">Article</label> -->
-                <select class="form-select  select2-articles articles_select" name="articles[]" required>
+                <select class="form-select  select2-articles articles_select" id="_select2-articles" name="articles[]" required>
                     <option value="">Selectionner un article</option>
                     @foreach($articles as $article)
                     <option value="{{$article->id}}" data-unites="{{ $article->unites }}">
@@ -218,16 +218,33 @@
 
         // Charger les articles quand le fournisseur change
         $('#_fournisseurSelect').on('change', function() {
+            alert("fournisseur called")
             const fournisseurId = $(this).val();
             if (fournisseurId) {
                 loadArticles(fournisseurId);
             }
         });
 
-        // Supprimer une ligne
-        $(document).on('click', '.remove-ligne', function() {
-            $(this).closest('tr').remove();
+        // $('#_select2-articles').on('change', function() {
+        //     alert("artcle selected......")
+        //     // const data = e.params.data;
+        //     // alert(data.id); // use variable, not string!
+
+        //     // const selected = $(this).find(':selected');
+        //     // const unites = selected.data('unites');
+        //     // console.log("Les unités de l'article sélectionné :", unites);
+        // });
+
+        $('#_select2-articles').on('change', function() {
+            alert("Article sélectionné via change !");
+            const selected = $(this).find(':selected');
+            console.log(selected.data('unites'));
         });
+
+        // Supprimer une ligne
+        // $(document).on('click', '.remove-ligne', function() {
+        $(this).closest('tr').remove();
+        // });
 
         // Soumission du formulaire
         $('#addProgrammationForm').on('submit', function(e) {
@@ -238,47 +255,38 @@
 
             $(this).addClass('was-validated');
         });
+
+        function loadArticles(fournisseurId) {
+            $.ajax({
+                url: `${apiUrl}/achat/programmations/fournisseurs/${fournisseurId}/articles`,
+                method: 'GET',
+                success: function(response) {
+                    const articles = response;
+                    updateArticlesOptions(articles);
+                }
+            });
+        }
+
+        function updateArticlesOptions(articles) {
+            let options = '<option value="">Sélectionner un article ...</option>';
+            articles.forEach(article => {
+                options += `<option value="${article.id}" data-unites='${JSON.stringify(article.unites)}'>
+                            ${article.designation}
+                        </option>`;
+            });
+            $('.select2-articles').html(options);
+        }
+
+        function updateUnitesOptions(unites) {
+            let options = '<option value="">Sélectionner une unité ...</option>';
+            unites.forEach(unite => {
+                options += `<option value="${unite.id}" >
+                            ${unite.code_unite} - ${unite.libelle_unite}
+                        </option>`;
+            });
+
+            $('.unites').html(options);
+        }
     });
-
-    function loadArticles(fournisseurId) {
-        $.ajax({
-            url: `${apiUrl}/achat/programmations/fournisseurs/${fournisseurId}/articles`,
-            method: 'GET',
-            success: function(response) {
-                const articles = response;
-                updateArticlesOptions(articles);
-            }
-        });
-    }
-
-    function updateArticlesOptions(articles) {
-        let options = '<option value="">Sélectionner un article ...</option>';
-        articles.forEach(article => {
-            options += `<option value="${article.id}" data-unites='${JSON.stringify(article.unites)}'>
-                    ${article.designation}
-                </option>`;
-        });
-        $('.select2-articles').html(options);
-    }
-
-    $('.select2-articles').on('select2:select', function(e) {
-        const data = e.params.data;
-        alert(data.id); // use variable, not string!
-
-        const selected = $(this).find(':selected');
-        const unites = selected.data('unites');
-        console.log("Les unités de l'article sélectionné :", unites);
-    });
-
-    function updateUnitesOptions(unites) {
-        let options = '<option value="">Sélectionner une unité ...</option>';
-        unites.forEach(unite => {
-            options += `<option value="${unite.id}" >
-                    ${unite.code_unite} - ${unite.libelle_unite}
-                </option>`;
-        });
-
-        $('.unites').html(options);
-    }
 </script>
 @endpush
