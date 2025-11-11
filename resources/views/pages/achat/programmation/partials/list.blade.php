@@ -281,7 +281,6 @@
     }
 </style>
 
-
 @push('scripts')
 <script>
     function rejeteProgrammation(id) {

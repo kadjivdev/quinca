@@ -207,6 +207,7 @@ class FactureClientController extends Controller
                 'lignes*depot_id' => 'required|exits,depots',
                 'lignes*quantite' => 'required',
                 'lignes*tarification_id' => 'required',
+                'lignes*stock' => 'required',
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
@@ -273,53 +274,40 @@ class FactureClientController extends Controller
                     ], 500);
                 }
 
-                /**
-                 * Obtention de la quantité convertie
-                 */
-
-                // $QteConvertie = $this->serviceStockEntree
-                //     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
-
-                // $QteConvertie = $this->serviceStockEntree
-                //     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
-
-                /**Qte de Base */
-                $qantiteBase = $conversion ? $this->serviceStockEntree
+                /**Qte convertie en base */
+                $qantiteConvertie = $conversion ? $this->serviceStockEntree
                     ->convertirQuantite(
-                        $stock->quantite_reelle,
+                        $ligne['quantite'],
                         $conversion,
-                        $stock->unite_mesure_id
+                        $ligne['unite_vente_id']
                     ) : 00;
 
-                /**Qte Vendue */
-                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
-
-                /**Qte Reste */
-                $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
+                /**Qte Restante */
+                $resteStock = $ligne["stock"]; //$article->reste($stock->depot_id);
 
                 Log::debug("Vérification stock", [
-                    "article" => $article->designation,
+                    // "conversion" => $conversion->load("uniteSource", "uniteDest"),
+                    "article" => $article->designation . ' ' . $article->code_article,
                     "depot" => $depot->libelle_depot,
                     "unite_stock" => $stockUnite->libelle_unite,
                     "unite_vente" => $venteUnite->libelle_unite,
                     "qte_saisie" => $ligne['quantite'],
-                    // "qte_convertie" => $QteConvertie,
-                    "qte_stock" => $qantiteBase,
-                    "qte_vendue" => $qteTotalVendu,
-                    "reste_stock" => $resteStock
+                    "qte_convertie" => $qantiteConvertie,
+                    "reste_stock" => $resteStock,
                 ]);
+
                 if ($resteStock < 0) {
-                    throw new Exception("Le stock est négatif! Veuillez approvisionne le stock");
+                    throw new Exception("Le stock est négatif pour n'article ($article->designation - $article->code_article)! Veuillez approvisionne le stock");
                 }
                 // on verifie la quantité restante de l'article dans le depot est suffisante
-                if ($resteStock < $ligne['quantite']) {
+                if ($resteStock < $qantiteConvertie) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Le reste du stock de l'article ($article->designation) est de $resteStock $venteUnite->libelle_unite dans le depôt ({$stock->depot?->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
+                        'message' => "Le reste du stock de l'article ($article->designation - $article->code_article) est de $resteStock $venteUnite->libelle_unite dans le depôt ({$stock->depot?->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
                     ], 500);
                 }
             }
-
+            // dd("gogo");
             DB::beginTransaction();
 
             try {

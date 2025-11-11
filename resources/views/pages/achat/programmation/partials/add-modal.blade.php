@@ -169,7 +169,7 @@
                 <select class="form-select  select2-articles articles_select" name="articles[]" required>
                     <option value="">Selectionner un article</option>
                     @foreach($articles as $article)
-                    <option value="{{$article->id}}">
+                    <option value="{{$article->id}}" data-unites="{{ $article->unites }}">
                         {{$article->code_article }} {{$article->designation }}
                     </option>
                     @endforeach
@@ -262,10 +262,12 @@
     }
 
     $('.select2-articles').on('select2:select', function(e) {
-        alert("e.params.data.id"); // ou e.params.data.text selon ce que tu veux
+        const data = e.params.data;
+        alert(data.id); // use variable, not string!
+
         const selected = $(this).find(':selected');
         const unites = selected.data('unites');
-        console.log("les unites de l'article selectionné ", unites)
+        console.log("Les unités de l'article sélectionné :", unites);
     });
 
     function updateUnitesOptions(unites) {
