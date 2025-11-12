@@ -166,7 +166,7 @@
         <td class="p-2">
             <div class="input-group">
                 <!-- <label class="d-block form-label fw-medium required my-1" for="">Article</label> -->
-                <select class="form-select  select2-articles articles_select" id="_select2-articles" name="articles[]" required>
+                <select class="form-select select2-articles articles_select" id="_select2-articles" name="articles[]" required>
                     <option value="">Selectionner un article</option>
                     @foreach($articles as $article)
                     <option value="{{$article->id}}" data-unites="{{ $article->unites }}">
@@ -205,6 +205,12 @@
 <script>
     $(document).ready(function() {
 
+        $('#_select2-articles').on('change', function() {
+            alert("Article sélectionné via change !");
+            const selected = $(this).find(':selected');
+            console.log(selected.data('unites'));
+        });
+
         // Initialisation de Select2 avec gestion d'erreur
         try {
             $('.select2').select2({
@@ -223,22 +229,6 @@
             if (fournisseurId) {
                 loadArticles(fournisseurId);
             }
-        });
-
-        // $('#_select2-articles').on('change', function() {
-        //     alert("artcle selected......")
-        //     // const data = e.params.data;
-        //     // alert(data.id); // use variable, not string!
-
-        //     // const selected = $(this).find(':selected');
-        //     // const unites = selected.data('unites');
-        //     // console.log("Les unités de l'article sélectionné :", unites);
-        // });
-
-        $('#_select2-articles').on('change', function() {
-            alert("Article sélectionné via change !");
-            const selected = $(this).find(':selected');
-            console.log(selected.data('unites'));
         });
 
         // Supprimer une ligne

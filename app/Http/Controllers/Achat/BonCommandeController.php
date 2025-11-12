@@ -38,6 +38,7 @@ class BonCommandeController extends Controller
     /**
      * Affiche la liste des bons de commande
      */
+    
     public function index()
     {
         // Récupérer l'utilisateur connecté et son point de vente
@@ -543,7 +544,6 @@ class BonCommandeController extends Controller
     {
         try {
             Log::info("Les données entrantes", ["data" => $request->all()]);
-
 
             /**
              * Traitement diu bon

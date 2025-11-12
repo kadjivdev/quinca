@@ -416,6 +416,7 @@ class FactureClientController extends Controller
                         'reglements'
                     ])]
                 ]);
+                
             } catch (Exception $e) {
                 DB::rollBack();
                 throw $e;

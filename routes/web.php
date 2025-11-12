@@ -25,6 +25,8 @@ use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\Requete;
+use App\Models\Achat\BonCommande;
+use App\Models\Achat\LigneFactureFournisseur;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,8 +40,12 @@ use App\Models\Vente\Requete;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $requete = Requete::find()
-    return "regularisation éffectuée avec succès!";
+    $bonCommande = BonCommande::with("factures","lignes")->firstWhere("code","BC2511062746");
+    
+    $bonCommande->update(["validated_by"=>null,"validated_at"=>null]);
+
+    return $bonCommande;
+
 });
 
 /**DETELE A STOCK */
