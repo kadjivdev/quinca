@@ -115,7 +115,6 @@ class FactureFournisseur extends Model
         'deleted_at'
     ];
 
-
     // RESTE DU MONTANT D'UNE FACTURE
     public function facture_amont()
     {

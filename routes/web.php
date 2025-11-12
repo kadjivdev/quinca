@@ -40,12 +40,21 @@ use App\Models\Achat\LigneFactureFournisseur;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $bonCommande = BonCommande::with("factures","lignes")->firstWhere("code","BC2511062746");
-    
-    $bonCommande->update(["validated_by"=>null,"validated_at"=>null]);
+    $facture = FactureFournisseur::with("bonCommande")->firstWhere("code", "FAC25096337");
 
-    return $bonCommande;
+    foreach ($facture->lignes as $ligne) {
+        $ligne->update(["quantite_livree" => $ligne->quantite_base, "quantite_livree_simple" => $ligne->quantite_base]);
+    }
+    // return $facture;
 
+    $facture_FAC25074311 = FactureFournisseur::with("bonCommande", "lignes.article")->firstWhere("code", "FAC25074311");
+
+    $ligne = $facture_FAC25074311->lignes->firstWhere("article_id", 1861);
+    $ligne->prix_unitaire = 5700;
+    $ligne->montant_ht = $ligne->quantite * $ligne->prix_unitaire;
+    $ligne->update();
+
+    return $ligne;
 });
 
 /**DETELE A STOCK */
