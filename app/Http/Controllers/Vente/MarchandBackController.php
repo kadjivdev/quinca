@@ -53,12 +53,13 @@ class MarchandBackController extends Controller
                 || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
             ) {
                 $marchanBacks = $query->get();
-                $livraisons = LivraisonClient::get();
+                $livraisons = LivraisonClient::whereNotNull("validated_by")
+                    ->get();
             } else {
                 $marchanBacks = $query
                     ->where('created_by', $user->id)
                     ->get();
-                $livraisons = LivraisonClient::where("created_by")
+                $livraisons = LivraisonClient::where("created_by", Auth::id())
                     ->whereNotNull("validated_by")
                     ->get();
             }
@@ -270,7 +271,7 @@ class MarchandBackController extends Controller
             DB::beginTransaction();
 
             $marchand = MarchandBack::with("livraison.lignes")->findOrFail($id);
-            
+
             if ($marchand->validated_by) {
                 throw new Exception('Marchandise déjà validée');
             }
