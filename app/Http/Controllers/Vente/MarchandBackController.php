@@ -59,7 +59,7 @@ class MarchandBackController extends Controller
                 $marchanBacks = $query
                     ->where('created_by', $user->id)
                     ->get();
-                $livraisons = LivraisonClient::where("created_by", Auth::id())
+                $livraisons = LivraisonClient::where("created_by", auth()->id())
                     ->whereNotNull("validated_by")
                     ->get();
             }
