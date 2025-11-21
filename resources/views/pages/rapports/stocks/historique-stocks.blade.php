@@ -35,6 +35,7 @@
                         <th class="border-bottom-0">Stock disponible</th>
                         <th class="border-bottom-0">Vente</th>
                         <th class="border-bottom-0">Stock final</th>
+                        <th class="border-bottom-0">Unité</th>
                         <!-- <th class="border-bottom-0" style="min-width: 150px;">Dépôt</th> -->
                     </tr>
                 </thead>
@@ -43,11 +44,12 @@
                     <tr>
                         <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
                         <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format(0,2,","," ")}} ({{$article->stockMesure->libelle_unite}})</span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->quantite_reelle,2,","," ")}} ({{$article->stockMesure->libelle_unite}})</span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->quantite_reelle,2,","," ")}} ({{$article->stockMesure->libelle_unite}})</span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,","," ")}} ({{$article->stockMesure->libelle_unite}})</span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,","," ")}} ({{$article->uniteMesure->libelle_unite}})</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format(0,2,","," ")}} </span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->quantite_reelle,2,","," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->quantite_reelle,2,","," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,","," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,","," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">({{$article->uniteMesure?->libelle_unite}})</span></td>
                     </tr>
                     @endforeach
                 </tbody>
