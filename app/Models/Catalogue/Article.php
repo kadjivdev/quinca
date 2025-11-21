@@ -202,9 +202,16 @@ class Article extends Model
         }
     }
 
+    // les stocks de cet article dans tous les depots
     public function stocks()
     {
         return $this->hasMany(StockDepot::class, 'article_id', 'id');
+    }
+
+    // le stock de cet article dans un depot donné
+    public function stockInDepot($depotId)
+    {
+        return $this->stocks->firstWhere("depot_id", $depotId)?->quantite_reelle;
     }
 
     function depots(): BelongsToMany
@@ -233,6 +240,12 @@ class Article extends Model
     function ventes(): HasMany
     {
         return $this->hasMany(LigneFacture::class, "article_id");
+    }
+
+    // les ventes de cet article dans un depot donné
+    public function ventesInDepot($depotId)
+    {
+        return $this->ventes->where("depot_id", $depotId);
     }
 
     /**

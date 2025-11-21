@@ -128,7 +128,7 @@ class ServiceStockEntree
                 'article_id' => $article->id,
                 'date_mouvement' => $donnees['date_mouvement'],
                 'type_mouvement' => StockMouvement::TYPE_ENTREE,
-                'quantite' => $donnees['quantite'], //old $quantite_base,
+                'quantite' => $quantite_base,
                 'quantite_origine' => $donnees['quantite'],
                 'unite_mesure_id' => $donnees["unite_mesure_id"],
                 'unite_mesure_origine_id' => $unite_origine_id,
@@ -209,11 +209,6 @@ class ServiceStockEntree
     }
 
     /**
-     * [
-     * {"depot_id":4,"article_id":157,"unite_mesure_id":12,"quantite":"0.00","prix_unitaire":2400.0,"date_mouvement":"2025-08-29 00:00:00","reference_mouvement":"BLF2509050003","document_type":"BON_LIVRAISON_FOURNISSEUR","document_id":233,"notes":null,"user_id":1,"livraison":233},
-     * {"depot_id":4,"article_id":158,"unite_mesure_id":12,"quantite":"-56.00","prix_unitaire":2400.0,"date_mouvement":"2025-08-29 00:00:00","reference_mouvement":"BLF2509050003","document_type":"BON_LIVRAISON_FOURNISSEUR","document_id":233,"notes":null,"user_id":1,"livraison":233}]}
-     */
-    /**
      * Traite plusieurs entrées en stock
      */
     public function traiterEntreesMultiples(array $entrees): array
@@ -223,7 +218,6 @@ class ServiceStockEntree
 
         $resultats = [];
         $erreurs = [];
-
 
         DB::beginTransaction();
         try {

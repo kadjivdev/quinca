@@ -701,12 +701,7 @@ class ArticleController extends Controller
 
             // Récupération de tous les stocks concernés en une seule requête
             $stockDepots = StockDepot::whereIn('article_id', $articles->pluck('id'))
-                ->whereIn('depot_id',  $idsToArray)
-                // ->get()
-                // ->keyBy(function ($stock) {
-                //     return $stock->article_id . '_' . $stock->depot_id;
-                // })
-            ;
+                ->whereIn('depot_id',  $idsToArray);
 
             $detailsInventaire = [];
             $stockUpdates = [];
