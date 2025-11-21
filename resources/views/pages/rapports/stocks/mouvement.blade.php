@@ -10,7 +10,7 @@
         <div class="card-body">
             <form id="filterForm" class="row g-3">
                 <input type="hidden" name="depot_id" value="{{ $selectedDepot->id }}">
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label class="form-label">Type de mouvement</label>
                     <select class="form-select" name="type_mouvement">
                         <option value="">Tous</option>
@@ -19,7 +19,7 @@
                         <option value="{{ \App\Models\Stock\StockMouvement::TYPE_TRANSFERT }}">Transferts</option>
                         <option value="{{ \App\Models\Stock\StockMouvement::TYPE_AJUSTEMENT }}">Ajustements</option>
                     </select>
-                </div>
+                </div> -->
                 <div class="col-md-4">
                     <label class="form-label">Période</label>
                     <div class="input-group">
@@ -88,7 +88,7 @@
                         <tr>
                             <th>Code</th>
                             <th>Date</th>
-                            <th>Type</th>
+                            <!-- <th>Type</th> -->
                             <th>Article</th>
                             <th>Unité</th>
                             <th class="text-end">Quantité</th>
@@ -102,7 +102,7 @@
                         <tr>
                             <td class="text-monospace">{{ $mouvement->code }}</td>
                             <td>{{ $mouvement->date_mouvement->format('d/m/Y') }}</td>
-                            <td>
+                            <!-- <td>
                                 @switch($mouvement->type_mouvement)
                                 @case('ENTREE')
                                 <span class="badge bg-success">Entrée</span>
@@ -119,7 +119,7 @@
                                 @default
                                 <span class="badge bg-secondary">Ajustement</span>
                                 @endswitch
-                            </td>
+                            </td> -->
                             <td>{{ $mouvement->article->designation }}</td>
                             <td>{{ $mouvement->uniteMesure->libelle_unite }}</td>
                             <td class="text-end">{{ number_format($mouvement->quantite, 2, ',', ' ') }}</td>
