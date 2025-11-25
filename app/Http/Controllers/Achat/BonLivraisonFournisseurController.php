@@ -567,7 +567,7 @@ class BonLivraisonFournisseurController extends Controller
                 ]);
 
                 $ligneFact->update([
-                    'quantite_livree' => $ligneFact->quantite_livree  + $stockToAdd,
+                    'quantite_livree' => round($ligneFact->quantite_livree  + $stockToAdd, 2),
                 ]);
 
                 Log::info("QTe ajouté", ["data" => $stockToAdd]);
@@ -590,6 +590,9 @@ class BonLivraisonFournisseurController extends Controller
                 }
 
                 Log::info("QTe Base Supplementaire", ["data" => $QteBaseSupplementaire]);
+
+                Log::info("QTe livré", ["data" => $ligneFact->quantite_livree]);
+                Log::info("QTe de facture", ["data" => (($ligneFact->quantite_base ?? $ligneFact->quantite) + $QteBaseSupplementaire)]);
 
 
                 if ($ligneFact->quantite_livree > (($ligneFact->quantite_base ?? $ligneFact->quantite) + $QteBaseSupplementaire)) {

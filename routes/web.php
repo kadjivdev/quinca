@@ -24,9 +24,6 @@ use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
-use App\Models\Vente\Requete;
-use App\Models\Achat\BonCommande;
-use App\Models\Achat\LigneFactureFournisseur;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,21 +37,21 @@ use App\Models\Achat\LigneFactureFournisseur;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $facture = FactureFournisseur::with("bonCommande")->firstWhere("code", "FAC25096337");
+    $facture = FactureFournisseur::with("lignes.article")
+        ->firstWhere("code", "FAC25110159");
 
     foreach ($facture->lignes as $ligne) {
-        $ligne->update(["quantite_livree" => $ligne->quantite_base, "quantite_livree_simple" => $ligne->quantite_base]);
+        switch ($ligne->article_id) {
+            case 'value':
+                // $ligne->update(["quantite_livree" => $ligne->quantite_livree_simple]);
+                break;
+
+            default:
+                # code...
+                break;
+        }
     }
-    // return $facture;
-
-    $facture_FAC25074311 = FactureFournisseur::with("bonCommande", "lignes.article")->firstWhere("code", "FAC25074311");
-
-    $ligne = $facture_FAC25074311->lignes->firstWhere("article_id", 1861);
-    $ligne->prix_unitaire = 5700;
-    $ligne->montant_ht = $ligne->quantite * $ligne->prix_unitaire;
-    $ligne->update();
-
-    return $ligne;
+    return $facture->lignes;
 });
 
 /**DETELE A STOCK */
