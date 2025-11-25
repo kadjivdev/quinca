@@ -39,11 +39,11 @@
                                             <i class="fas fa-building text-warning"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-medium">{{ $livraison->fournisseur?->raison_sociale }}
+                                            <div class="fw-medium">{{ $livraison->facture?->fournisseur?->raison_sociale }}
                                             </div>
-                                            @if ($livraison->fournisseur?->telephone)
+                                            @if ($livraison->facture?->fournisseur?->telephone)
                                             <div class="text-muted small">
-                                                {{ $livraison->fournisseur?->telephone }}
+                                                {{ $livraison->facture?->fournisseur?->telephone }}
                                             </div>
                                             @endif
                                         </div>

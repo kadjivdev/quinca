@@ -38,8 +38,11 @@ use App\Models\Stock\StockDepot;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     // FAC25093314
-    $facture_FAC25093314 = FactureFournisseur::with("lignes.article")
+    $facture_FAC25093314 = FactureFournisseur::with("fournisseur","lignes.article")
         ->firstWhere("code", "FAC25093314");
+
+    return $facture_FAC25093314;
+
     foreach ($facture_FAC25093314->lignes as $ligne) {
         switch ($ligne->article_id) {
             case 158:
