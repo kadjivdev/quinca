@@ -42,8 +42,8 @@ Route::get("/debug", function () {
 
     $acompte->update(["montant" => -11602411]);
     $acompte->compteClient()
-    ->update(["montant_op" => -11602411]);
-    
+        ->update(["montant_op" => -11602411]);
+
     return $acompte;
     return "regulation ....";
 });
