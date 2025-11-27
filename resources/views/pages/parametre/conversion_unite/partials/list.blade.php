@@ -10,7 +10,7 @@
         <thead class="bg-light">
             <tr>
                 <th class="border-bottom-0 text-nowrap py-3" style="width: 25%;">Désignations des articles</th>
-                <th class="border-bottom-0" style="width: 75%;">Convertions</th>
+                <th class="border-bottom-0" style="width: 75%;">Conversions</th>
             </tr>
         </thead>
         <tbody>
