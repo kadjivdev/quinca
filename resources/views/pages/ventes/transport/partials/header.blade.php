@@ -21,7 +21,7 @@
                     Actualiser
                 </button>
 
-                @can("transports.create")
+                @canany(["transports.create","requetes.create"])
                 <button type="button"
                     class="btn btn-primary px-3 d-inline-flex align-items-center"
                     data-bs-toggle="modal"
