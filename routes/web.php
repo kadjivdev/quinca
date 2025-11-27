@@ -24,6 +24,7 @@ use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\AcompteClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,55 +38,13 @@ use App\Models\Stock\StockDepot;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // FAC25093314
-    $facture_FAC25093314 = FactureFournisseur::with("fournisseur","lignes.article")
-        ->firstWhere("code", "FAC25093314");
+    $acompte = AcompteClient::with("compteClient")->firstWhere("reference", "824faeed-61c1-466a-b996-eb45e7ec28d0");
 
-    return $facture_FAC25093314;
-
-    foreach ($facture_FAC25093314->lignes as $ligne) {
-        switch ($ligne->article_id) {
-            case 158:
-                $ligne->update(["quantite_livree" => $ligne->quantite_base, "quantite_livree_simple" => $ligne->quantite_base]);
-                break;
-        }
-    }
-
-    // FAC25087247
-    $facture_FAC25087247 = FactureFournisseur::with("lignes.article")
-        ->firstWhere("code", "FAC25087247");
-    foreach ($facture_FAC25087247->lignes as $ligne) {
-        $ligne->update(["quantite_livree" => $ligne->quantite_base, "quantite_livree_simple" => $ligne->quantite_base]);
-    }
-
-    // FAC25089894
-    // $facture_FAC25089894 = FactureFournisseur::with("lignes.article")
-    //     ->firstWhere("code", "FAC25089894");
-    // foreach ($facture_FAC25089894->lignes as $ligne) {
-    //     $ligne->update(["quantite_livree" => $ligne->quantite_base, "quantite_livree_simple" => $ligne->quantite_base]);
-    // }
-
-    // FAC25093263
-    $facture_FAC25093263 = FactureFournisseur::with("lignes.article")
-        ->firstWhere("code", "FAC25093263");
-    foreach ($facture_FAC25093263->lignes as $ligne) {
-        $ligne->update(["quantite_livree" => $ligne->quantite_base, "quantite_livree_simple" => $ligne->quantite_base]);
-    }
-
-    // FAC25083585
-    // $facture_FAC25083585 = FactureFournisseur::with("lignes.article")
-    //     ->firstWhere("code", "FAC25083585");
-    // foreach ($facture_FAC25083585->lignes as $ligne) {
-    //     $ligne->update(["quantite_livree" => $ligne->quantite_base, "quantite_livree_simple" => $ligne->quantite_base]);
-    // }
-
-    // FAC25085455
-    // $facture_FAC25085455 = FactureFournisseur::with("lignes.article")
-    //     ->firstWhere("code", "FAC25085455");
-    // foreach ($facture_FAC25085455->lignes as $ligne) {
-    //     $ligne->update(["quantite_livree" => $ligne->quantite_base, "quantite_livree_simple" => $ligne->quantite_base]);
-    // }
-
+    $acompte->update(["montant" => 11602411]);
+    $acompte->compteClient()
+    ->update(["montant_op" => 11602411]);
+    
+    return $acompte;
     return "regulation ....";
 });
 

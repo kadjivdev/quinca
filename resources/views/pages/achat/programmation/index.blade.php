@@ -25,5 +25,4 @@
 
 @push('scripts')
     @include('pages.achat.programmation.partials.scripts')
-    {{-- @include('pages.achat.programmation.partials.js-import-modal') --}}
 @endpush

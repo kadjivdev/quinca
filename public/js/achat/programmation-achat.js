@@ -1,8 +1,8 @@
 // Constantes et variables globales
 const ENDPOINTS = {
-    GENERATE_CODE: apiUrl.length>0 ? `${apiUrl}/achat/programmations/generate-code` : `/achat/programmations/generate-code`,
-    GET_ARTICLES: apiUrl.length>0 ? `${apiUrl}/achat/programmation/articles` : `/achat/programmation/articles`,
-    SAVE_PROGRAMMATION: apiUrl.length>0 ? `${apiUrl}/achat/programmations` : `/achat/programmations`
+    GENERATE_CODE: apiUrl.length > 0 ? `${apiUrl}/achat/programmations/generate-code` : `/achat/programmations/generate-code`,
+    GET_ARTICLES: apiUrl.length > 0 ? `${apiUrl}/achat/programmation/articles` : `/achat/programmation/articles`,
+    SAVE_PROGRAMMATION: apiUrl.length > 0 ? `${apiUrl}/achat/programmations` : `/achat/programmations`
 };
 
 let articlesList = [];
@@ -82,6 +82,7 @@ class ProgrammationAchat {
             url: `${ENDPOINTS.GET_ARTICLES}/${fournisseurId}`,
             method: 'GET',
             success: (response) => {
+                console.log("Article liste :", response)
                 articlesList = response;
                 this.updateArticlesOptions();
             },
@@ -104,16 +105,30 @@ class ProgrammationAchat {
     }
 
     handleArticleChange(event) {
-        const $select = $(event.target);
+        const $select = $(event.currentTarget);
         const $row = $select.closest('tr');
-        const articleId = $select.val();
-        const article = articlesList.find(a => a.id == articleId);
 
-        if (article && article.unites) {
+        // 🔥 Get selected option
+        const $selectedOption = $select.find('option:selected');
+        console.log("Option récupérée :", $selectedOption);
+
+        // 🔥 Get the unites from the data attribute
+        let unites = $selectedOption.data('unites');
+
+        console.log("Unites récupérées :", unites);
+
+        // If unites is a JSON string, parse it
+        // if (typeof unites === 'string') {
+        //     try { unites = JSON.parse(unites); } catch (e) { }
+        // }
+
+        if (Array.isArray(unites)) {
             let unitesOptions = '<option value="">Sélectionner une unité</option>';
-            article.unites.forEach(unite => {
-                unitesOptions += `<option value="${unite.id}">${unite.nom}</option>`;
+
+            unites.forEach(unite => {
+                unitesOptions += `<option value="${unite.id}">${unite.text}</option>`;
             });
+
             $row.find('select[name="unites[]"]').html(unitesOptions);
         }
     }
@@ -126,8 +141,8 @@ class ProgrammationAchat {
         $('#lignesContainer').append($newLine);
 
         // Initialiser Select2 sur la nouvelle ligne
-        
-        $('.select2-articles').select2({
+
+        $('.select2-articles,.select2-unites').select2({
             theme: 'bootstrap-5',
             width: '100%',
             dropdownParent: $('#addProgrammationModal')

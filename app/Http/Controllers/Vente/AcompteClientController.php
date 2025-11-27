@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+// use Illuminate\Validation\ValidationException;
 
 class AcompteClientController extends Controller
 {

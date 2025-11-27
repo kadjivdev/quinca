@@ -35,6 +35,20 @@ class ProgrammationAchatController extends Controller
             return $depot;
         });
 
+        $articles = Article::with(["stocks", "depots"])->where('statut', Article::STATUT_ACTIF)
+            ->orderBy('designation')
+            ->get()
+            ->map(function ($article) {
+                try {
+                    $article->unites = $article->getUnites();
+                } catch (\Exception $e) {
+                    // Handle the exception, log it, or set a default value
+                    $article->unites = null;
+                }
+
+                return $article;
+            });
+
         $data = [
             'date' => $date,
             'programmations' => ProgrammationAchat::with(['pointVente', 'fournisseur', 'lignes.article', 'lignes.uniteMesure'])
@@ -47,9 +61,7 @@ class ProgrammationAchatController extends Controller
             'programmationsValidees' => ProgrammationAchat::whereNotNull('validated_at')->count(),
             'fournisseurs' => \App\Models\Achat\Fournisseur::all(),
             'pointVentes' => \App\Models\Parametre\PointDeVente::all(),
-            'articles' => Article::with(["stocks", "depots"])->where('statut', Article::STATUT_ACTIF)
-                ->orderBy('designation')
-                ->get(),
+            'articles' => $articles,
 
             'unitesMesure' => UniteMesure::where('statut', UniteMesure::STATUT_ACTIF)
                 ->orderBy('libelle_unite')

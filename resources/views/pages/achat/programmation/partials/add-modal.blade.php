@@ -76,29 +76,6 @@
                             </div>
                         </div>
 
-                        {{-- Choisir un depot --}}
-                        <!-- <div class="col-md-12">
-                            <div class="card border">
-                                <div class="card-header bg-light border-light-subtle d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title mb-0">
-                                        <i class="fas fa-box me-2"></i>Les Dépôts de votre point de vente <span class="text-danger">*</span>
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <input type="number" id="depot_id" name="depot" class="form-control d-none">
-                                    
-                                    <select class="form-control form-select select2" required id="depot_select" required>
-                                        <option value="">Selectionner un dépôt</option>
-                                        @foreach (auth()->user()->pointDeVente->depot as $depot)
-                                        <option value="{{ $depot }}">
-                                            {{ $depot->libelle_depot }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div> -->
-
 
                         {{-- Section articles --}}
                         <div class="col-12">
@@ -166,14 +143,15 @@
         <td class="p-2">
             <div class="input-group">
                 <!-- <label class="d-block form-label fw-medium required my-1" for="">Article</label> -->
-                <select class="form-select select2-articles articles_select" id="_select2-articles" name="articles[]" required>
+                <select class="form-select select2-articles" name="articles[]" required>
                     <option value="">Selectionner un article</option>
                     @foreach($articles as $article)
-                    <option value="{{$article->id}}" data-unites="{{ $article->unites }}">
+                    <option value="{{$article->id}}" data-unites="{{ json_encode($article->unites)}}">
                         {{$article->code_article }} {{$article->designation }}
                     </option>
                     @endforeach
                 </select>
+
             </div>
             <div class="invalid-feedback">L'article est requis</div>
         </td>
@@ -183,7 +161,7 @@
             <div class="invalid-feedback">La quantité est requise</div>
         </td>
         <td class="p-2">
-            <select class="form-select select2" name="unites[]" required>
+            <select class="form-select select2-unites" name="unites[]" required>
                 <option value="">Sélectionner une unité</option>
                 @foreach ($unitesMesure as $unite)
                 <option value="{{ $unite->id }}">
@@ -200,83 +178,3 @@
         </td>
     </tr>
 </template>
-
-@push('scripts')
-<script>
-    $(document).ready(function() {
-
-        $('#_select2-articles').on('change', function() {
-            alert("Article sélectionné via change !");
-            const selected = $(this).find(':selected');
-            console.log(selected.data('unites'));
-        });
-
-        // Initialisation de Select2 avec gestion d'erreur
-        try {
-            $('.select2').select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                dropdownParent: $('#addProgrammationModal')
-            });
-        } catch (e) {
-            console.error('Erreur initialisation Select2:', e);
-        }
-
-        // Charger les articles quand le fournisseur change
-        $('#_fournisseurSelect').on('change', function() {
-            alert("fournisseur called")
-            const fournisseurId = $(this).val();
-            if (fournisseurId) {
-                loadArticles(fournisseurId);
-            }
-        });
-
-        // Supprimer une ligne
-        // $(document).on('click', '.remove-ligne', function() {
-        $(this).closest('tr').remove();
-        // });
-
-        // Soumission du formulaire
-        $('#addProgrammationForm').on('submit', function(e) {
-            e.preventDefault();
-            if (this.checkValidity()) {
-                saveProgrammation($(this));
-            }
-
-            $(this).addClass('was-validated');
-        });
-
-        function loadArticles(fournisseurId) {
-            $.ajax({
-                url: `${apiUrl}/achat/programmations/fournisseurs/${fournisseurId}/articles`,
-                method: 'GET',
-                success: function(response) {
-                    const articles = response;
-                    updateArticlesOptions(articles);
-                }
-            });
-        }
-
-        function updateArticlesOptions(articles) {
-            let options = '<option value="">Sélectionner un article ...</option>';
-            articles.forEach(article => {
-                options += `<option value="${article.id}" data-unites='${JSON.stringify(article.unites)}'>
-                            ${article.designation}
-                        </option>`;
-            });
-            $('.select2-articles').html(options);
-        }
-
-        function updateUnitesOptions(unites) {
-            let options = '<option value="">Sélectionner une unité ...</option>';
-            unites.forEach(unite => {
-                options += `<option value="${unite.id}" >
-                            ${unite.code_unite} - ${unite.libelle_unite}
-                        </option>`;
-            });
-
-            $('.unites').html(options);
-        }
-    });
-</script>
-@endpush

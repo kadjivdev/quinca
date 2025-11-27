@@ -83,7 +83,7 @@
                         <i class="fas fa-user fs-4 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">Accomptes du fournisseur : <strong class="bg-light badge border rounded text-dark" id="acc_fournisseurName"></strong></h5>
+                        <h5 class="modal-title fw-bold mb-0">Anciens solde du fournisseur : <strong class="bg-light badge border rounded text-dark" id="acc_fournisseurName"></strong></h5>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -128,7 +128,7 @@
                 <th class="text-center">Payé au fournisseur</th>
                 <th class="text-center">Factures</th>
                 <th class="text-center">Règlement</th>
-                <th class="text-center">Avances</th>
+                <th class="text-center">Ancien solde</th>
                 <th class="text-center">Accompte</th>
                 <th class="text-center">Solde fournisseur</th>
                 <th class="text-center">Action</th>
@@ -171,7 +171,7 @@
                         <!-- <a target="_blank" href="{{route('vente.clients.detailReglements',$fournisseur->id) }}" class="btn btn-sm btn-light text-dark border"><i class="fas fa-eye"></i> Voir les règlements </a> -->
                         <button class="btn btn-sm btn-light border text-dark rounded"
                             onclick="showAccomptes({{ $fournisseur->id }})">
-                            Voir les accomptes
+                            Voir les anciens soldes
                         </button>
                         <!-- <a target="_blank" href="{{route('vente.clients.detailAccomptes',$fournisseur->id) }}" class="btn btn-sm btn-light text-dark border"><i class="fas fa-eye"></i> Voir les accomptes </a> -->
                     </div>
