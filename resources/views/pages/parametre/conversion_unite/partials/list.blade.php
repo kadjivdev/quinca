@@ -17,7 +17,7 @@
             @forelse($conversions as $articleId=>$articleConversions)
             <tr>
                 <td class="text-nowrap py-3">
-                    <span class="badge bg-light border rounded text-dark"> {{ $articleConversions->first()->article?->designation }} </span>
+                    <span class="badge bg-light border rounded text-dark"> {{ $articleConversions->first()->article?->designation }} - ( {{ $articleConversions->first()->article?->code_article }})</span>
                 </td>
                 <td>
                     <div class="row">
