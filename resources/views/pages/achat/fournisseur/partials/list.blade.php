@@ -128,8 +128,8 @@
                 <th class="text-center">Payé au fournisseur</th>
                 <th class="text-center">Factures</th>
                 <th class="text-center">Règlement</th>
+                <th class="text-center">Avances</th>
                 <th class="text-center">Ancien solde</th>
-                <th class="text-center">Accompte</th>
                 <th class="text-center">Solde fournisseur</th>
                 <th class="text-center">Action</th>
             </tr>
