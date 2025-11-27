@@ -196,6 +196,9 @@ class ConversionUnite extends Model
                 $conversion->article_id
             );
 
+            //Activation de la convertion de façon automatique
+            $conversion->statut = true;
+
             if ($existingConversion) {
                 throw new Exception("Une conversion entre ces unités existe déjà");
             }

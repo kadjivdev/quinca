@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 
@@ -25,7 +24,10 @@ class ConversionUniteController extends Controller
         try {
             // Chargement des conversions avec leurs relations
             $conversions = ConversionUnite::with(['uniteSource', 'uniteDest', 'article'])
-                ->get();
+                ->get()
+                ->groupBy(function ($conversion) {
+                    return $conversion->article_id;
+                });
 
             // Chargement des unités de mesure actives
             $unitesMesure = UniteMesure::where('statut', true)
@@ -168,7 +170,6 @@ class ConversionUniteController extends Controller
 
                     $conversion = $this->createConversion($data);
                     $createdConversions[] = $conversion;
-                    
                 }
             }
 
@@ -358,7 +359,7 @@ class ConversionUniteController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la suppression de la conversion '.$e->getMessage(),
+                'message' => 'Erreur lors de la suppression de la conversion ' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }

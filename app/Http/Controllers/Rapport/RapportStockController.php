@@ -115,7 +115,7 @@ class RapportStockController extends Controller
                 /**
                  * Stocks de l'article
                  */
-               
+
                 $articleStocks
                     ->map(function ($stock) use ($article) {
                         $conversion = $this->serviceEntree
@@ -125,18 +125,35 @@ class RapportStockController extends Controller
                                 $stock->article_id
                             );
 
+                        // Qte relle
+                        $stock->quantite_reelle = $conversion ? $this->serviceEntree
+                            ->convertirQuantite(
+                                $stock->quantite_reelle,
+                                $conversion,
+                                $stock->unite_mesure_id,
+                                // $article->unite_mesure_id
+                            ) : 00;
+
                         /**Qte de Base */
                         $stock->qantiteBase = $conversion ? $this->serviceEntree
                             ->convertirQuantite(
                                 $stock->quantite_reelle,
                                 $conversion,
-                                $stock->unite_mesure_id
+                                // $stock->unite_mesure_id,
+                                $article->unite_mesure_id
                             ) : 00;
 
                         /**Qte Vendue */
-                        $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
+                        $stock->qteTotalVendu = $conversion ? $this->serviceEntree
+                            ->convertirQuantite(
+                                $article->qteVendu($stock->depot_id),
+                                $conversion,
+                                $stock->unite_mesure_id,
+                                // $article->unite_mesure_id
+                            ) : 00;
+                        // $article->qteVendu($stock->depot_id);
 
-                        $stock->resteStock = $stock->qantiteBase - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
+                        $stock->resteStock = $stock->quantite_reelle - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
                     });
 
                 $article->quantite_reelle = $articleStocks->sum("quantite_reelle");
