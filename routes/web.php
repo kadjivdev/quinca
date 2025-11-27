@@ -40,9 +40,9 @@ use App\Models\Vente\AcompteClient;
 Route::get("/debug", function () {
     $acompte = AcompteClient::with("compteClient")->firstWhere("reference", "824faeed-61c1-466a-b996-eb45e7ec28d0");
 
-    $acompte->update(["montant" => 11602411]);
+    $acompte->update(["montant" => -11602411]);
     $acompte->compteClient()
-    ->update(["montant_op" => 11602411]);
+    ->update(["montant_op" => -11602411]);
     
     return $acompte;
     return "regulation ....";
