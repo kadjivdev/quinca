@@ -71,6 +71,11 @@ class ConversionUniteController extends Controller
                 })
             ]);
 
+            // Variation Swatches for WooCommerce, 
+            // WPC Smart Compare for WooCommerce, 
+            // WPC Smart Quick View for WooCommerce, 
+            // WPC Smart Wishlist for WooCommerce
+
             return view('pages.parametre.conversion_unite.index', compact(
                 'conversions',
                 'unitesMesure',

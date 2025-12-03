@@ -25,6 +25,7 @@ use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\AcompteClient;
+use App\Models\Vente\Transport;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,13 +39,13 @@ use App\Models\Vente\AcompteClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $acompte = AcompteClient::with("compteClient")->firstWhere("reference", "824faeed-61c1-466a-b996-eb45e7ec28d0");
+    $transports = Transport::where("montant", ">", 0)->get();
 
-    $acompte->update(["montant" => -11602411]);
-    $acompte->compteClient()
-        ->update(["montant_op" => -11602411]);
+    $transports->each(function ($transport) {
+        $transport->update(["montant" => -$transport->montant]);
+    });
 
-    return $acompte;
+    return $transports;
     return "regulation ....";
 });
 
