@@ -39,13 +39,12 @@ use App\Models\Vente\Transport;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $transports = Transport::where("montant", ">", 0)->get();
+    $acomptes = AcompteClient::whereIn("reference", ["ACP20250507", "ACP20250090", "ACP20250508"])->get();
 
-    $transports->each(function ($transport) {
-        $transport->update(["montant" => -$transport->montant]);
+    $acomptes->each(function ($acompte) {
+        $acompte->update(["montant" => -$acompte->montant]);
     });
 
-    return $transports;
     return "regulation ....";
 });
 
