@@ -61,7 +61,6 @@
 @include('pages.ventes.marchand-back.partials.scripts-part1')
 
 <script type="text/javascript">
-
     // Attendre que jQuery soit chargé
     $(function() {
         console.log('Initialisation du gestionnaire de depenses');

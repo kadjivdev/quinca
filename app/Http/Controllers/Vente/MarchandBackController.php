@@ -110,36 +110,30 @@ class MarchandBackController extends Controller
                 $validated["documents"] = asset("marchand_docs/" . $fileName);
             }
 
-            // dd($validated["lignes"]);
             DB::beginTransaction();
 
-            try {
-                // Création de la depense
-                $marchandise = MarchandBack::create($validated);
+            // Création de la depense
+            $marchandise = MarchandBack::create($validated);
 
-                if (is_null($request->lignes)) {
-                    throw new Exception("Aucun article n'est disponible sur cette livraison", 1);
-                }
-
-                /** Creation des lignes */
-                foreach ($validated["lignes"] as $ligne) {
-                    Log::info("Début d'enregistrement des lignes d'article");
-                    $marchandise->lignes()->create([
-                        "article_id" => $ligne["article_id"],
-                        "quantite" => $ligne["quantite"],
-                        "unite_vente_id" => $ligne["unite_vente_id"],
-                        "prix_unitaire" => $ligne["prix_unitaire"],
-                    ]);
-                }
-
-                DB::commit();
-
-                return back()
-                    ->with("success", 'Retour de marchandise éffectué avec succès');
-            } catch (Exception $e) {
-                DB::rollBack();
-                throw $e;
+            if (is_null($request->lignes)) {
+                throw new Exception("Aucun article n'est disponible sur cette livraison", 1);
             }
+
+            /** Creation des lignes */
+            foreach ($validated["lignes"] as $ligne) {
+                Log::info("Début d'enregistrement des lignes d'article");
+                $marchandise->lignes()->create([
+                    "article_id" => $ligne["article_id"],
+                    "quantite" => $ligne["quantite"],
+                    "unite_vente_id" => $ligne["unite_vente_id"],
+                    "prix_unitaire" => $ligne["prix_unitaire"],
+                ]);
+            }
+
+            DB::commit();
+
+            return back()
+                ->with("success", 'Retour de marchandise éffectué avec succès');
         } catch (Exception $e) {
             Log::error('Erreur création marchandise', [
                 'error' => $e->getMessage(),
