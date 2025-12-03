@@ -45,6 +45,8 @@ Route::get("/debug", function () {
         $acompte->update(["montant" => -$acompte->montant]);
     });
 
+    return $acomptes;
+
     return "regulation ....";
 });
 
