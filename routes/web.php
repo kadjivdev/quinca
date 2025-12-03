@@ -40,17 +40,17 @@ use App\Models\Vente\Transport;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $acomptes = AcompteClient::whereIn("reference", ["ACP20250507", "ACP20250090", "ACP20250508"])
-        ->with("compteClient")
-        ->get();
+    // $acomptes = AcompteClient::whereIn("reference", ["ACP20250507", "ACP20250090", "ACP20250508"])
+    //     ->with("compteClient")
+    //     ->get();
 
-    $acomptes->each(function ($acompte) {
-        $acompte
-            ->compteClient()
-            ->update(["montant_op" => -$acompte->montant]);
-    });
+    // $acomptes->each(function ($acompte) {
+    //     $acompte
+    //         ->compteClient()
+    //         ->update(["montant_op" => -$acompte->montant]);
+    // });
 
-    return $acomptes;
+    // return $acomptes;
     return "regulation ....";
 });
 
