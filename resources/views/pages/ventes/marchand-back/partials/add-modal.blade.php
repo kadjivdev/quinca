@@ -125,7 +125,8 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("#livraison_select,#magasin_select").select2({
+    // ,#magasin_select
+    $("#livraison_select").select2({
         theme: 'bootstrap-5',
         dropdownParent: $('#addMarchandModal .modal-content'),
         placeholder: $(this).attr('placeholder') || 'Sélectionner...',
@@ -145,6 +146,8 @@
 
     function loadArticles(e) {
         const livraisonId = e.target.value;
+
+        console.log("Chargement des articles pour la livraison ID :", livraisonId);
 
         // Charger les données
         $.ajax({
