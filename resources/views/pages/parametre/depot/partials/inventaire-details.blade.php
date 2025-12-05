@@ -58,13 +58,13 @@
                             <td><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($detail->created_at)->locale('fr')->isoFormat('dddd D MMMM YYYY')}}</span></td>
                             <td class="text-center"><span class="badge bg-light text-dark"> {{$inventaire->auteur?->name}} </span></td>
                             <td class="border p-2">
-                                <span class="badge bg-light border text-dark"> {{$detail->stockDepot->depot?->libelle_depot}} </span>
+                                <span class="badge bg-light border text-dark"> {{$detail->stockDepot?->depot?->libelle_depot}} </span>
                             </td>
                             <td class="border p-2">
-                                <span class="badge bg-light border text-dark">{{$detail->stockDepot->article?->code_article}} - {{$detail->stockDepot->article?->designation}} </span>
+                                <span class="badge bg-light border text-dark">{{$detail->stockDepot?->article?->code_article}} - {{$detail->stockDepot->article?->designation}} </span>
                             </td>
                             <td class="border p-2">
-                                <span class="badge bg-light border text-dark"> {{$detail->stockDepot->uniteMesure?->libelle_unite}} </span>
+                                <span class="badge bg-light border text-dark"> {{$detail->stockDepot?->uniteMesure?->libelle_unite}} </span>
                             </td>
                             <td class="border p-2">
                                 <span class="badge bg-light border text-dark"> {{number_format($detail->qte_stock,2,"."," ") }} </span>

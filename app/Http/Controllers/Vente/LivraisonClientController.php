@@ -778,67 +778,72 @@ class LivraisonClientController extends Controller
 
     public function show(Request $request, LivraisonClient $livraisonClient)
     {
-        if (!$request->ajax()) {
-            return response()->json(['error' => 'Requête non autorisée'], 403);
-        }
+        try {
 
-        // Charger les relations nécessaires
-        $livraisonClient->load([
-            'facture.client',
-            'depot',
-            'lignes.article',
-            'lignes.uniteVente',
-            'lignes.ligneFacture',
-            'createdBy',
-            'validatedBy'
-        ]);
+            if (!$request->ajax()) {
+                return response()->json(['error' => 'Requête non autorisée'], 403);
+            }
 
-        // Préparer les données pour la réponse
-        $data = [
-            'livraison' => [
-                'id' => $livraisonClient->id,
-                'numero' => $livraisonClient->numero,
-                'date_livraison' => $livraisonClient->date_livraison->format('d/m/Y'),
-                'date_validation' => $livraisonClient->date_validation ? $livraisonClient->date_validation->format('d/m/Y H:i') : null,
-                'statut' => $livraisonClient->statut,
-                'notes' => $livraisonClient->notes,
-                'facture' => [
-                    'numero' => $livraisonClient->facture->numero,
-                    'date' => $livraisonClient->facture->date_facture->format('d/m/Y'),
-                    'client' => [
-                        'raison_sociale' => $livraisonClient->facture->client->raison_sociale,
-                        'telephone' => $livraisonClient->facture->client->telephone,
-                        'adresse' => $livraisonClient->facture->client->adresse
-                    ]
-                ],
-                'depot' => [
-                    'libelle' => $livraisonClient->depot->libelle_depot,
-                    'adresse' => $livraisonClient->depot->adresse_depot
-                ],
-                'created_by' => $livraisonClient->createdBy ? $livraisonClient->createdBy->name : null,
-                'validated_by' => $livraisonClient->validatedBy ? $livraisonClient->validatedBy->name : null
-            ],
-            'lignes' => $livraisonClient->lignes->map(function ($ligne) {
-                return [
-                    'id' => $ligne->id,
-                    'article' => [
-                        'id' => $ligne->article->id,
-                        'reference' => $ligne->article->code_article,
-                        'designation' => $ligne->article->designation
+            // Charger les relations nécessaires
+            $livraisonClient->load([
+                'facture.client',
+                'depot',
+                'lignes.article',
+                'lignes.uniteVente',
+                'lignes.ligneFacture',
+                'createdBy',
+                'validatedBy'
+            ]);
+
+            // Préparer les données pour la réponse
+            $data = [
+                'livraison' => [
+                    'id' => $livraisonClient->id,
+                    'numero' => $livraisonClient->numero,
+                    'date_livraison' => $livraisonClient->date_livraison->format('d/m/Y'),
+                    'date_validation' => $livraisonClient->date_validation ? $livraisonClient->date_validation->format('d/m/Y H:i') : null,
+                    'statut' => $livraisonClient->statut,
+                    'notes' => $livraisonClient->notes,
+                    'facture' => [
+                        'numero' => $livraisonClient->facture->numero,
+                        'date' => $livraisonClient->facture->date_facture->format('d/m/Y'),
+                        'client' => [
+                            'raison_sociale' => $livraisonClient->facture->client->raison_sociale,
+                            'telephone' => $livraisonClient->facture->client->telephone,
+                            'adresse' => $livraisonClient->facture->client->adresse
+                        ]
                     ],
-                    'quantite' => number_format($ligne->quantite, 2, ".", " "),
-                    'unite_id' => $ligne->uniteVente->id,
-                    'unite' => $ligne->uniteVente->libelle_unite,
-                    'prix_unitaire' => number_format($ligne->prix_unitaire, 2, ".", ""),
-                    'montant_total' => number_format($ligne->montant_total, 2, ".", "")
-                ];
-            })
-        ];
+                    'depot' => [
+                        'libelle' => $livraisonClient->depot->libelle_depot,
+                        'adresse' => $livraisonClient->depot->adresse_depot
+                    ],
+                    'created_by' => $livraisonClient->createdBy ? $livraisonClient->createdBy->name : null,
+                    'validated_by' => $livraisonClient->validatedBy ? $livraisonClient->validatedBy->name : null
+                ],
+                'lignes' => $livraisonClient->lignes->map(function ($ligne) {
+                    return [
+                        'id' => $ligne->id,
+                        'article' => [
+                            'id' => $ligne->article->id,
+                            'reference' => $ligne->article->code_article,
+                            'designation' => $ligne->article->designation
+                        ],
+                        'quantite' => number_format($ligne->quantite, 2, ".", " "),
+                        'unite_id' => $ligne->uniteVente->id,
+                        'unite' => $ligne->uniteVente->libelle_unite,
+                        'prix_unitaire' => number_format($ligne->prix_unitaire, 2, ".", ""),
+                        'montant_total' => number_format($ligne->montant_total, 2, ".", "")
+                    ];
+                })
+            ];
 
-        return response()->json([
-            'success' => true,
-            'data' => $data
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            Log::debug("Erreure lors de la récuperation de la livraison", ["data" => $e->getMessage()]);
+        }
     }
 
     public function generateBonA4(FactureClient $facture)
