@@ -122,7 +122,6 @@
     </div>
 </div>
 
-
 @push('scripts')
 <script type="text/javascript">
     // ,#magasin_select
@@ -170,7 +169,7 @@
                                         <div class="small text-muted">${ligne.article.reference}</div>
                                     </td>
                                     <td class="text-center">
-                                        <input type="number" name="lignes[${ligne.id}][quantite]" value="${ligne.quantite}">
+                                        <input type="number" name="lignes[${ligne.id}][quantite]" value="${ligne.quantite}" step="any">
                                         <input type="hidden" name="lignes[${ligne.id}][unite_vente_id]" value="${ligne.unite_id}">
                                         ${ligne.unite}
 
@@ -194,6 +193,8 @@
             },
 
             error: function() {
+                console.log("Erreur lors du chargement des détails de la livraison");
+
                 Toast.fire({
                     icon: 'error',
                     title: 'Erreur lors du chargement des détails'
