@@ -46,7 +46,7 @@ Route::get("/debug", function () {
     $facture->update([
         'date_validation' => null,
         'validated_by' => null,
-        'statut' => ''
+        'statut' => 'brouillon'
     ]);
 
     return $facture;
