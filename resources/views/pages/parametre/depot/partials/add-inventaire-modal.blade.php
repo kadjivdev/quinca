@@ -106,7 +106,7 @@
                                                 <input hidden name="stock_depots[${stock.id}][depot_id]" value="${stock.depot.id}"/>
                                                 <input hidden name="stock_depots[${stock.id}][id]" value="${stock.id}"/>
                                                 <small>${stock.article.code_article}</small><br>
-                                                <span class="badge bg-light text-dark numero-bl me-2">${stock.depot.libelle_depot.slice(0, 30) + '...'} / ${stock.article.designation.slice(0, 30) + '...'}</span>
+                                                <span class="badge bg-light text-dark numero-bl me-2">${stock.depot.libelle_depot.slice(0, 30) + '...'} / ${stock.article.designation}</span>
                                             </td>
                                             <td class="text-center">
                                                 <input hidden type="number" class="form-control" name="stock_depots[${stock.id}][unite_mesure_id]" value="${stock.unite_mesure_id}"/>

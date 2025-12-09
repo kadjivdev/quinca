@@ -393,7 +393,6 @@ class DepotController extends Controller
             }
         }
 
-
         try {
             DB::beginTransaction();
 
@@ -420,8 +419,14 @@ class DepotController extends Controller
                     ];
 
                     // Mise à jour en masse des stocks
-                    StockDepot::where('id', $stockDepot->id)
-                        ->update(['quantite_reelle' => $request->all_qte_reel ?? 0]);
+                    $stok_depot = StockDepot::find($stockDepot["id"]);
+                    if (!$stok_depot) {
+                        throw new \Exception("Ce stock depot n'existe pas");
+                    }
+                    $stok_depot->update(['quantite_reelle' => $request->all_qte_reel ?? $stok_depot->quantite_reelle]);
+                    
+                    // StockDepot::where('id', $stockDepot->id)
+                    //     ->update(['quantite_reelle' => $request->all_qte_reel ?? 0]);
 
                     /** Classement des ventes(direction et revendeur) dans l'inventaires | il s'agit bien des ventes 
                      * qui ne sont pas encore associées à un inventaire
@@ -442,8 +447,14 @@ class DepotController extends Controller
                     ];
 
                     // Mise à jour en masse des stocks
-                    StockDepot::where('id', $stockDepot["id"])
-                        ->update(['quantite_reelle' => $stockDepot["qte_reel"] ?? 0]);
+                    $stok_depot = StockDepot::find($stockDepot["id"]);
+                    if (!$stok_depot) {
+                        throw new \Exception("Ce stock depot n'existe pas");
+                    }
+                    $stok_depot->update(['quantite_reelle' => $stockDepot["qte_reel"] ?? $stok_depot->quantite_reelle]);
+
+                    // StockDepot::where('id', $stockDepot["id"])
+                    //     ->update(['quantite_reelle' => $stockDepot["qte_reel"] ?? 0]);
 
                     /** Classement des ventes(direction et revendeur) dans l'inventaires | il s'agit bien des ventes 
                      * qui ne sont pas encore associées à un inventaire
