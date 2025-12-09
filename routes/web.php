@@ -26,6 +26,7 @@ use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\AcompteClient;
 use App\Models\Vente\CompteClient;
+use App\Models\Vente\FactureClient;
 use App\Models\Vente\Transport;
 
 /*
@@ -40,21 +41,16 @@ use App\Models\Vente\Transport;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $acomptes = AcompteClient::whereIn("reference", ["ACP20250507", "ACP20250090", "ACP20250508"])
-        ->with("compteClient")
-        ->get();
+    $facture = FactureClient::firstWhere("numero", "FAC-20251208-0007");
 
-    $acomptes->each(function ($acompte) {
-        // if ($acompte->montant < 0) {
-        $acompte->update(["montant" => -$acompte->montant]);
-        // }
-        // $acompte
-        //     ->compteClient()
-        //     ->update(["montant_op" => -$acompte->montant]);
-    });
+    $facture->update([
+        'date_validation' => null,
+        'validated_by' => null,
+        'statut' => ''
+    ]);
 
-    return $acomptes;
-    return "regulation ....";
+    return $facture;
+    // return "regulation ....";
 });
 
 /**DETELE A STOCK */

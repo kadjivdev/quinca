@@ -441,16 +441,16 @@ class FactureClientController extends Controller
             Log::info('Début mise à jour facture', ['request' => $request->all(), 'facture_id' => $id]);
 
             // Vérifications initiales
-            $sessionCaisse = SessionCaisse::ouverte()
-                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                ->first();
+            // $sessionCaisse = SessionCaisse::ouverte()
+            //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+            //     ->first();
 
-            if (!$sessionCaisse) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Session de caisse requise.'
-                ], 422);
-            }
+            // if (!$sessionCaisse) {
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'message' => 'Session de caisse requise.'
+            //     ], 422);
+            // }
 
             $facture = FactureClient::findOrFail($id);
             // $client = Client::findOrFail($request->client_id);
@@ -490,7 +490,7 @@ class FactureClientController extends Controller
                     'date_facture' => Carbon::parse($request->date_facture)->startOfDay(),
                     'client_id' => $request->client_id,
                     'date_echeance' => Carbon::parse($request->date_echeance)->startOfDay(),
-                    'session_caisse_id' => $sessionCaisse->id,
+                    // 'session_caisse_id' => $sessionCaisse->id,
                     'created_by' => auth()->id(),
                     'observations' => $request->observations,
                     'statut' => 'brouillon',
