@@ -50,7 +50,6 @@ Route::get("/debug", function () {
     ]);
 
     return $facture;
-    // return "regulation ....";
 });
 
 /**DETELE A STOCK */
