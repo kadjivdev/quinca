@@ -911,6 +911,7 @@ class FactureClientController extends Controller
                 'message' => 'Facture validée',
                 'data' => ['facture' => $facture->fresh(['client', 'createdBy'])]
             ]);
+            
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Erreur validation facture', [

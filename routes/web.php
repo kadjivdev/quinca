@@ -42,11 +42,11 @@ use App\Models\Vente\Transport;
 Route::get("/debug", function () {
     $facture = FactureClient::firstWhere("numero", "FAC-20251208-0007");
 
-    $facture->update([
-        'date_validation' => null,
-        'validated_by' => null,
-        'statut' => 'brouillon'
-    ]);
+    // $facture->update([
+    //     'date_validation' => null,
+    //     'validated_by' => null,
+    //     'statut' => 'brouillon'
+    // ]);
 
     return $facture;
 });
