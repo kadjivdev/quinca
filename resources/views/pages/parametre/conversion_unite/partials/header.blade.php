@@ -29,10 +29,12 @@
                     <span class="refresh-text">Actualiser</span>
                 </button>
 
+                @if(Auth::id()==1 || Auth::id()==14)
                 <button type="button" class="btn btn-warning btn-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addConversionModal">
                     <i class="fas fa-plus me-2"></i>
                     Nouvelle Conversion
                 </button>
+                @endif
             </div>
         </div>
 
@@ -84,39 +86,39 @@
 </div>
 
 <style>
-:root {
-    --adjiv-orange: #FF9B00;
-    --adjiv-orange-rgb: 255, 155, 0;
-}
+    :root {
+        --adjiv-orange: #FF9B00;
+        --adjiv-orange-rgb: 255, 155, 0;
+    }
 
-.page-header {
-    background: #fff;
-    padding: 1.25rem 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-    margin-bottom: 1.5rem;
-    transition: all 0.3s ease;
-}
+    .page-header {
+        background: #fff;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
 
-.page-header:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+    .page-header:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-.header-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.75rem;
-    background: linear-gradient(145deg, rgba(var(--adjiv-orange-rgb), 0.1), rgba(var(--adjiv-orange-rgb), 0.05));
-    position: relative;
-    overflow: hidden;
-}
+    .header-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        background: linear-gradient(145deg, rgba(var(--adjiv-orange-rgb), 0.1), rgba(var(--adjiv-orange-rgb), 0.05));
+        position: relative;
+        overflow: hidden;
+    }
 
-/* ... [Reste du CSS inchangé] ... */
+    /* ... [Reste du CSS inchangé] ... */
 </style>
 
 <script>
-// ... [Scripts inchangés] ...
+    // ... [Scripts inchangés] ...
 </script>
