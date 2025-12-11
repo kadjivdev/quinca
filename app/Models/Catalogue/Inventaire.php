@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Inventaire extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, softDeletes;
 
     protected $table = 'inventaires';
 

@@ -521,7 +521,11 @@ class DepotController extends Controller
         try {
             DB::beginTransaction();
             $inventaire = Inventaire::with('details')
-                ->findOrFail($inventaireId);
+                ->find($inventaireId);
+
+            if (!$inventaire) {
+                throw new \Exception("Cet inventaire n'existe pas");
+            }
 
             // suppression de sdétails
             $inventaire->details()
@@ -533,11 +537,12 @@ class DepotController extends Controller
             // suppression de l'inventaire
             $inventaire->delete();
 
+            DB::commit();
             return redirect()->back()
                 ->with("success", "Inventaire supprimé avec succès!");
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with("error", "Une erreure est survenue lors de la suppression de l'inventaire");
+                ->with("error", "Une erreure est survenue lors de la suppression de l'inventaire : " . $e->getMessage());
         }
     }
 }
