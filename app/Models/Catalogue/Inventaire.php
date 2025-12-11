@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Inventaire extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'inventaires';
 
@@ -27,23 +28,27 @@ class Inventaire extends Model
         'depot_ids',
         'validated_at',
         'validator_id',
+        'deleted_by'
     ];
 
-    public function auteur() : BelongsTo {
+    public function auteur(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id');
     }
 
     // à revoir
-    public function depots() {
+    public function depots()
+    {
         if ($this->depot_ids) {
-            $inventaires = Depot::whereIn("id",json_decode($this->depot_ids))->get();
-        }else {
+            $inventaires = Depot::whereIn("id", json_decode($this->depot_ids))->get();
+        } else {
             $inventaires = collect();
         }
         return $inventaires;
     }
 
-    public function details() : HasMany {
+    public function details(): HasMany
+    {
         return $this->hasMany(DetailInventaire::class)->latest();
     }
 }

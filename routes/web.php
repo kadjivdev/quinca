@@ -152,6 +152,7 @@ Route::middleware('auth')->group(function () {
             /** GESTION DES INVENTAIRES DANS LES DEPOTS */
             Route::get('/{depot}/inventaires', [DepotController::class, 'inventaires'])->name('depot.inventaires');
             Route::get('/inventaires/{id}/details', [DepotController::class, 'inventairesDetails'])->name('depot.inventaire.details');
+            Route::get('/inventaires/{id}/delete', [DepotController::class, 'inventaireDelete'])->name('depot.inventaireDelete');
             Route::post('/{depot}/inventaires/store', [DepotController::class, 'inventairesStore'])->name('depot.inventairesStore');
             /** FIN GESTION DES INVENTAIRES DANS LES DEPOTS */
 

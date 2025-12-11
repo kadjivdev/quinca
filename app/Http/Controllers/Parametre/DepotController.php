@@ -512,4 +512,32 @@ class DepotController extends Controller
 
         return view("pages.parametre.depot.partials.inventaire-details", compact("inventaire", "date"));
     }
+
+    /**
+     * Supprimer un inventaire
+     */
+    public function inventaireDelete($inventaireId)
+    {
+        try {
+            DB::beginTransaction();
+            $inventaire = Inventaire::with('details')
+                ->findOrFail($inventaireId);
+
+            // suppression de sdétails
+            $inventaire->details()
+                ->delete();
+
+            // updating the inventaire
+            $inventaire->update(["deleted_by" => Auth::id()]);
+
+            // suppression de l'inventaire
+            $inventaire->delete();
+
+            return redirect()->back()
+                ->with("success", "Inventaire supprimé avec succès!");
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with("error", "Une erreure est survenue lors de la suppression de l'inventaire");
+        }
+    }
 }

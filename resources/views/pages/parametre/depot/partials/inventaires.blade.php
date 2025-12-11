@@ -112,7 +112,6 @@
         </div>
     </div>
 
-
     {{-- Liste des dépôts --}}
     <div class="row g-3 list mt-3" id="depotsList">
         <!-- les erreurs -->
@@ -155,9 +154,24 @@
                             <td class="text-center"><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($inventaire->created_at)->locale('fr')->isoFormat('dddd D MMMM YYYY')}}</span></td>
                             <td class="text-center"><span class="badge bg-light text-dark"> {{$inventaire->auteur?->name}} </span></td>
                             <td class="text-center">
-                                <a target="__blank" class="dropdown-item" href="{{route('depot.inventaire.details',$inventaire->id)}}">
-                                    <i class="fa fa-eye"></i>
-                                </a>
+                                <div class="dropdown">
+                                    <button class="w-100 btn btn-icon btn-light" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a target="__blank" class="dropdown-item text-dark" href="{{route('depot.inventaire.details',$inventaire->id)}}">
+                                                <i class="fa fa-eye"></i> Voir les détails
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="{{route('depot.inventaireDelete',$inventaire->id)}}">
+                                                <i class="far fa-trash-alt me-2"></i>
+                                                Supprimer
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -173,7 +187,6 @@
 
 <!-- DATATABLES -->
 @push('scripts')
-
 <script>
     $("#example1").DataTable({
         "responsive": true,
