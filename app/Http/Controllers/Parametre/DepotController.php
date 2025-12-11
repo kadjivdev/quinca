@@ -536,7 +536,6 @@ class DepotController extends Controller
 
             // suppression de l'inventaire
             $inventaire->delete();
-
             DB::commit();
             return redirect()->back()
                 ->with("success", "Inventaire supprimé avec succès!");
