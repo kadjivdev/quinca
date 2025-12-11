@@ -140,7 +140,7 @@
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
-                                    @can("vente.facture.view")
+                                    @can("revendeur.facture.show")
                                     <button class="btn btn-sm btn-light-primary btn-icon"
                                         onclick="showFacture({{ $facture->id }})"
                                         data-bs-toggle="tooltip" title="Voir les détails">
@@ -149,7 +149,7 @@
                                     @endcan
 
                                     @if($facture->statut === 'brouillon')
-                                    @can("vente.facture.edit")
+                                    @can("revendeur.facture.edit")
                                     {{-- Modifier --}}
                                     <button class="btn btn-sm btn-light-warning btn-icon ms-1"
                                         onclick="editFactures({{ $facture->id }})"
@@ -159,7 +159,7 @@
                                     @endcan
 
                                     {{-- Valider --}}
-                                    @can("vente.facture.validate")
+                                    @can("revendeur.facture.validate")
                                     @if(!$facture->validated_by)
                                     <button class="btn btn-sm btn-light-success btn-icon ms-1"
                                         onclick="validateFacture({{ $facture->id }})"
@@ -169,7 +169,7 @@
                                     @endif
                                     @endcan
 
-                                    @can("vente.facture.delete")
+                                    @can("revendeur.facture.delete")
                                     {{-- Supprimer --}}
                                     <button class="btn btn-sm btn-light-danger btn-icon ms-1"
                                         onclick="deleteFacture({{ $facture->id }})"
