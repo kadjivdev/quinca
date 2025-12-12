@@ -140,13 +140,13 @@
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
-                                    @can("revendeur.facture.show")
-                                    <button class="btn btn-sm btn-light-primary btn-icon"
+                                    @canany(["revendeur.facture.show","vente.facture.show"])
+                                    <button  class="btn btn-sm btn-light-primary btn-icon"
                                         onclick="showFacture({{ $facture->id }})"
                                         data-bs-toggle="tooltip" title="Voir les détails">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    @endcan
+                                    @endcanany
 
                                     @if($facture->statut === 'brouillon')
                                     @can("revendeur.facture.edit")
