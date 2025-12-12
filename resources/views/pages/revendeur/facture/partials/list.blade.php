@@ -140,7 +140,7 @@
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
-                                    @canany(["revendeur.facture.show","vente.facture.show"])
+                                    @canany(["revendeur.facture.edit","vente.facture.edit"])
                                     <button  class="btn btn-sm btn-light-primary btn-icon"
                                         onclick="showFacture({{ $facture->id }})"
                                         data-bs-toggle="tooltip" title="Voir les détails">
