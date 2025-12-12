@@ -159,7 +159,7 @@
                                     @endcan
 
                                     {{-- Valider --}}
-                                    @can("revendeur.facture.validate")
+                                    @can("vente.facture.validate")
                                     @if(!$facture->validated_by)
                                     <button class="btn btn-sm btn-light-success btn-icon ms-1"
                                         onclick="validateFacture({{ $facture->id }})"
