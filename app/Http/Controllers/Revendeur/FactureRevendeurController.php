@@ -58,12 +58,12 @@ class FactureRevendeurController extends Controller
 
             if ($request->point_vente_id) {
                 $query->where("point_de_vente_id", $request->point_vente_id);
-                Session::flash("pointDeVente",$request->point_vente_id);
+                Session::flash("pointDeVente", $request->point_vente_id);
             }
 
             if ($request->day) {
                 $query->whereDate("created_at", $request->day);
-                Session::flash("day",$request->day);
+                Session::flash("day", $request->day);
             }
 
             if (
@@ -358,8 +358,59 @@ class FactureRevendeurController extends Controller
         }
     }
 
+    // public function searchArticles(Request $request)
+    // {
+    //     $search = $request->get('q');
+    //     Log::info("Terme de recherche:", ["terme" => $search]);
+    //     $user = auth()->user();
+
+    //     $stocks = StockDepot::with('article')
+    //         ->get()
+    //         ->filter(function ($stock) use ($search, $user) {
+    //             /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
+    //             if ($user->hasRole('Super Administrateur') || $user->hasRole('CHARGE DES STOCKS ET SUIVI DES ACHATS')) {
+    //                 return (
+    //                     str_contains(strtolower($stock->article->designation), strtolower($search)) ||
+    //                     str_contains(strtolower($stock->article->code_article), strtolower($search))
+    //                 );
+    //             }
+
+    //             /** ON FILTRE LES STOCKS SELON LES POINT DE VENTE DU USER */
+    //             $userPv = auth()->user()->pointDeVente;
+    //             $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+
+    //             if (in_array($stock->depot_id, $userPv_depotIds)) {
+
+    //                 return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
+    //                     str_contains(strtolower($stock->article->code_article), strtolower($search))
+    //                 );
+    //             }
+    //         });
+
+    //     return response()->json([
+    //         'results' => $stocks->map(function ($stock) {
+    //             /**
+    //              * @param $resteStock Reste du stock dans le depot
+    //              */
+
+    //             $resteStock = $stock->article
+    //                 ->reste($stock->depot_id);
+
+    //             return [
+    //                 'id' => $stock->article->id,
+    //                 'text' => $stock->article->designation,
+    //                 'code_article' => $stock->article->code_article,
+    //                 'depot' => $stock->depot,
+    //                 'unite_mesure' => $stock->uniteMesure, //->libelle_unite,
+    //                 'stock' => $resteStock ?? 00,
+    //             ];
+    //         })
+    //     ]);
+    // }
+
     public function searchArticles(Request $request)
     {
+        // dd("gogo");
         $search = $request->get('q');
         Log::info("Terme de recherche:", ["terme" => $search]);
         $user = auth()->user();
@@ -380,7 +431,6 @@ class FactureRevendeurController extends Controller
                 $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
                 if (in_array($stock->depot_id, $userPv_depotIds)) {
-
                     return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
                     );
@@ -392,9 +442,27 @@ class FactureRevendeurController extends Controller
                 /**
                  * @param $resteStock Reste du stock dans le depot
                  */
+                $conversion = $this->serviceStockEntree
+                    ->rechercherConversion(
+                        $stock->unite_mesure_id,
+                        $stock->article->unite_mesure_id,
+                        $stock->article_id
+                    );
 
-                $resteStock = $stock->article
-                    ->reste($stock->depot_id);
+                /**Qte de Base */
+                $qantiteBase = $conversion ? $this->serviceStockEntree
+                    ->convertirQuantite(
+                        $stock->quantite_reelle,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    ) : 00;
+
+
+                /**Qte Vendue */
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+
+                /**Qte Reste */
+                $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
 
                 return [
                     'id' => $stock->article->id,

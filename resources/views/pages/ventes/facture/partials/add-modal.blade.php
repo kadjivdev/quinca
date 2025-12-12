@@ -267,8 +267,6 @@
             <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
             <div class="invalid-feedback">Le depôt est requis</div>
         </td>
-        <!-- <td>
-        </td> -->
         <td>
             <div class="input-group">
                 <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"

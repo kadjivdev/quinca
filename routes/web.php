@@ -22,12 +22,8 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
-use App\Models\Vente\AcompteClient;
-use App\Models\Vente\CompteClient;
 use App\Models\Vente\FactureClient;
-use App\Models\Vente\Transport;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,12 +37,6 @@ use App\Models\Vente\Transport;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     $facture = FactureClient::firstWhere("numero", "FAC-20251208-0007");
-
-    // $facture->update([
-    //     'date_validation' => null,
-    //     'validated_by' => null,
-    //     'statut' => 'brouillon'
-    // ]);
 
     return $facture;
 });
