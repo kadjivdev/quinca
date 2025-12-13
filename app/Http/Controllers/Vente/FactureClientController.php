@@ -416,7 +416,6 @@ class FactureClientController extends Controller
                         'reglements'
                     ])]
                 ]);
-                
             } catch (Exception $e) {
                 DB::rollBack();
                 throw $e;
@@ -582,6 +581,19 @@ class FactureClientController extends Controller
                     'montant_ttc' => $facture->lignes->sum("montant_ttc"),
                     'montant_regle' => $request->montant_regle,
                 ]);
+
+                // Mise à jour du compte client
+                if ($facture->compteClient->isNotEmpty()) {
+                    $facture->compteClient
+                        ->first()
+                        ->update([
+                            'date_op' => $facture->date_facture,
+                            'montant_op' => $facture->montant_ttc - $facture->montant_remise,
+                            'client_id' => $facture->client_id,
+                            'user_id' => Auth::user()->id,
+                            'type_op' => 'FAC_CLT',
+                        ]);
+                }
 
                 // $sessionCaisse->mettreAJourTotaux();
                 DB::commit();
@@ -896,13 +908,25 @@ class FactureClientController extends Controller
 
             Log::info("La facture concernée ", ["facture" => $facture]);
 
-            $facture->compteClient()->create([
-                'date_op' => $facture->date_facture,
-                'montant_op' => $facture->montant_ttc - $facture->montant_remise,
-                'client_id' => $facture->client_id,
-                'user_id' => Auth::user()->id,
-                'type_op' => 'FAC_CLT',
-            ]);
+            if ($facture->compteClient->isEmpty()) {
+                $facture->compteClient()->create([
+                    'date_op' => $facture->date_facture,
+                    'montant_op' => $facture->montant_ttc - $facture->montant_remise,
+                    'client_id' => $facture->client_id,
+                    'user_id' => Auth::user()->id,
+                    'type_op' => 'FAC_CLT',
+                ]);
+            } else {
+                $facture->compteClient
+                    ->first()
+                    ->update([
+                        'date_op' => $facture->date_facture,
+                        'montant_op' => $facture->montant_ttc - $facture->montant_remise,
+                        'client_id' => $facture->client_id,
+                        'user_id' => Auth::user()->id,
+                        'type_op' => 'FAC_CLT',
+                    ]);
+            }
 
             DB::commit();
 
@@ -940,6 +964,9 @@ class FactureClientController extends Controller
                     'message' => 'Impossible de supprimer une facture validée'
                 ], 422);
             }
+
+            // suppression du compte client lié à la facture
+            $facture->compteClient()->delete();
 
             // Supprimer les règlements de manière forcée
             $facture->reglements()->forceDelete();

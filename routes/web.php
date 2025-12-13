@@ -36,8 +36,11 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $facture = FactureClient::firstWhere("numero", "FAC-20251208-0007");
+    $facture = FactureClient::firstWhere("numero", "FAC-20250715-0001");
 
+    $facture->update([
+        "validated_by" => null,
+    ]);
     return $facture;
 });
 

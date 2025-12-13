@@ -18,7 +18,6 @@ class AcompteClientController extends Controller
     /**
      * Affiche la liste des acomptes
      */
-
     public function index(Request $request)
     {
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
@@ -142,7 +141,6 @@ class AcompteClientController extends Controller
     public function store(Request $request)
     {
         try {
-
             // Vérifications initiales
             $sessionCaisse = SessionCaisse::ouverte()
                 ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
@@ -155,7 +153,7 @@ class AcompteClientController extends Controller
                     'message' => 'Session de caisse requise.'
                 ], 422);
             }
-            Log::info("Les intrées", $request->all());
+            Log::info("Les entrées", $request->all());
 
             // Validation des données
             $validated = $request->validate(AcompteClient::rules(), [
