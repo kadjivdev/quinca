@@ -33,7 +33,7 @@
     <div class="row g-3 list mt-3" id="depotsList">
         <div class="card">
             <div class="card-header">
-                <h6 class="modal-title fs-5" id="">Détails de l'inventaire : <span class="badge bg-warning">#{{$inventaire->id}} | {{\Carbon\carbon::parse($inventaire->created_at)->locale('fr')->isoFormat('dddd D MMMM YYYY')}} | {{$inventaire->auteur?->name}}</span></h6>
+                <h6 class="modal-title fs-5" id="">Détails de l'inventaire : <span class="badge bg-warning">#{{$inventaire->id}} | {{\Carbon\carbon::parse($inventaire->created_at)->locale('fr')->isoFormat('dddd D MMMM YYYY à HH:mm:ss')}} | {{$inventaire->auteur?->name}}</span></h6>
             </div>
             <div class="card-body">
                 <table class="table table-hover align-middle mb-0" id="example1">
