@@ -151,7 +151,7 @@
                             <td class="text-nowrap py-3">
                                 <span class="badge bg-light text-dark numero-bl me-2">#{{$loop->iteration}}</span>
                             </td>
-                            <td class="text-center"><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($inventaire->created_at)->locale('fr')->isoFormat('dddd D MMMM YYYY')}}</span></td>
+                            <td class="text-center"><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($inventaire->created_at)->locale('fr')->isoFormat('dddd D MMMM YYYY à HH:mm:ss')}}</span></td>
                             <td class="text-center"><span class="badge bg-light text-dark"> {{$inventaire->auteur?->name}} </span></td>
                             <td class="text-center">
                                 <div class="dropdown">
