@@ -23,8 +23,11 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
+use App\Models\Catalogue\Inventaire;
+use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
+use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,15 +40,25 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $facture = FactureClient::firstWhere("numero", "FAC-20251212-0005");
+    $inventaires = Inventaire::whereBetween('created_at', ['2025-12-07 00:00:00', '2025-12-15 23:59:59'])
+        ->get();
+        
+    $factureRevs = FactureRevendeur::all();
 
-    $facture->update([
-        "numero" => "_" . $facture->numero,
-        "reference_recu" => "_" . $facture->reference_recu
-    ]);
+    // dd($factureRevs
+    //     ->unique("inventaire_id")
+    //     ->pluck("inventaire_id")
+    //     ->toArray(), $inventaires->pluck("id")->toArray());
 
-    $facture->delete();
-    return $facture;
+    $facts = collect();
+    foreach ($factureRevs as $factureRev) {
+        if (in_array($factureRev->inventaire_id, $inventaires->pluck("id")->toArray())) {
+            $factureRev->update(["inventaire_id" => null]);
+            // return $factureRev;
+            $facts->push($factureRev);
+        }
+    }
+    return $facts;
 });
 
 /**DETELE A STOCK */

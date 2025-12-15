@@ -431,7 +431,7 @@ class DepotController extends Controller
                     /** Classement des ventes(direction et revendeur) dans l'inventaires | il s'agit bien des ventes 
                      * qui ne sont pas encore associées à un inventaire
                      */
-
+                    
                     FactureClient::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
                     FactureRevendeur::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
                 }
