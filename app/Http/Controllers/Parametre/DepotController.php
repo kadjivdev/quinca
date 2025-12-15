@@ -421,7 +421,7 @@ class DepotController extends Controller
                     // Mise à jour en masse des stocks
                     $stok_depot = StockDepot::find($stockDepot["id"]);
                     if (!$stok_depot) {
-                        throw new \Exception("Ce stock depot n'existe pas");
+                        throw new \Exception("Ce stock depot n'existe pas!");
                     }
                     $stok_depot->update(['quantite_reelle' => $request->all_qte_reel ?? $stok_depot->quantite_reelle]);
                     
@@ -436,6 +436,7 @@ class DepotController extends Controller
                     FactureRevendeur::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
                 }
             } else {
+
                 // Préparation des détails d'inventaire
                 foreach ($stockDepotCheckeds as $stockDepot) {
                     Log::info("Les infos du stock du depot :", ["data" => $stockDepot]);
