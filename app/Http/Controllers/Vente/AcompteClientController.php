@@ -174,9 +174,9 @@ class AcompteClientController extends Controller
 
             // Vérifier si le client existe et est actif
             $client = Client::findOrFail($validated['client_id']);
-            if (!$client->statut) {
-                throw new Exception('Ce client est inactif');
-            }
+            // if (!$client->statut) {
+            //     throw new Exception('Ce client est inactif');
+            // }
 
             // Ajouter le statut par défaut aux données validées
             $validated['statut'] = AcompteClient::STATUT_EN_ATTENTE;

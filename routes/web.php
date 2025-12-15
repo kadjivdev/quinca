@@ -37,7 +37,7 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // $facture = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25129506");
+    $facture = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25129506");
 
     // $facture->update([
     //     "statut_livraison" => "PARTIELLEMENT_LIVRE",
