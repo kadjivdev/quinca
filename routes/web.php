@@ -60,7 +60,7 @@ Route::get("/debug", function () {
     //         $facts->push($factureRev);
     //     }
     // }
-    return $facts;
+    return "regularisation effectuée avec succès";
 });
 
 /**DETELE A STOCK */
