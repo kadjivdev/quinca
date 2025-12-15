@@ -22,6 +22,7 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
 
@@ -36,11 +37,11 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $facture = FactureClient::firstWhere("numero", "FAC-20250715-0001");
+    // $facture = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC25129506");
 
-    $facture->update([
-        "validated_by" => null,
-    ]);
+    // $facture->update([
+    //     "statut_livraison" => "PARTIELLEMENT_LIVRE",
+    // ]);
     return $facture;
 });
 

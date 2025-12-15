@@ -44,12 +44,17 @@ class BonLivraisonFournisseurController extends Controller
             ->whereNotNull('validated_at')
             ->whereNotNull("validated_by")
             ->whereNull('rejected_at')
-            ->where(function ($query) {
-                $query->where('statut_livraison', 'NON_LIVRE')
-                    ->orWhere('statut_livraison', 'PARTIELLEMENT_LIVRE');
-            })
             ->orderBy('date_facture', 'desc')
-            ->get();
+            ->get()
+            ->filter(function ($facture) {
+                $qteTotalFacture = $facture->lignes->sum(function ($ligne) {
+                    return $ligne->quantite_base ?? $ligne->quantite;
+                });
+
+                // on recupere juste les factures non encore totalement livrées
+                $totalLivres = $facture->lignes()->sum('quantite_livree');
+                return $totalLivres < $qteTotalFacture || $totalLivres == 0;
+            });
 
         // Récupération des véhicules actifs
         $vehicules = Vehicule::where('statut', true)
