@@ -40,9 +40,11 @@ use Carbon\Carbon;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $inventaires = Inventaire::whereBetween('created_at', ['2025-12-07 00:00:00', '2025-12-15 23:59:59'])
+    $inventaires = Inventaire::whereBetween('created_at', ['2025-12-07 00:00:00', '2025-12-16 23:59:59'])
         ->get();
-        
+
+    // $inventaires = Inventaire::all();
+
     $factureRevs = FactureRevendeur::all();
 
     // dd($factureRevs
