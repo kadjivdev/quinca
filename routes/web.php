@@ -56,6 +56,7 @@ Route::get("/debug", function () {
         $facture->update(["inventaire_id" => null]);
     }
 
+    // return $factureCotos->whereNotNull("inventaire_id");
     // $inventaires = Inventaire::whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
     //     ->get();
 
