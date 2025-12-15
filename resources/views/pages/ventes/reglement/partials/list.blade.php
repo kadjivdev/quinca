@@ -53,19 +53,19 @@
                                     <a href="#" class="text-decoration-none"
                                         data-bs-toggle="modal"
                                         data-bs-target="#reglementFactureModal">
-                                        {{ $reglement->facture->numero }}
+                                        {{ $reglement->facture?->numero }}
                                     </a>
                                 </span>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-client me-2">
-                                        {{ substr($reglement->facture->client->raison_sociale, 0, 2) }}
+                                        {{ substr($reglement->facture?->client?->raison_sociale, 0, 2) }}
                                     </div>
                                     <div>
-                                        <div class="fw-medium">{{ $reglement->facture->client->raison_sociale }}
+                                        <div class="fw-medium">{{ $reglement->facture?->client?->raison_sociale }}
                                         </div>
-                                        <div class="text-muted small">{{ $reglement->facture->client->telephone }}
+                                        <div class="text-muted small">{{ $reglement->facture?->client?->telephone }}
                                         </div>
                                     </div>
                                 </div>

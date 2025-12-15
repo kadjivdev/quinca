@@ -45,7 +45,10 @@ Route::get("/debug", function () {
 
     // $inventaires = Inventaire::all();
 
-    $factureRevs = FactureRevendeur::all();
+    $factureRevs = FactureRevendeur::whereBetween('created_at', ['2025-12-07 00:00:00', '2025-12-16 23:59:59'])
+        ->get();
+        
+    // dd($factureRevs->pluck("inventaire_id")->toArray());
 
     // dd($factureRevs
     //     ->unique("inventaire_id")
@@ -60,6 +63,9 @@ Route::get("/debug", function () {
             $facts->push($factureRev);
         }
     }
+
+    dd($factureRevs->pluck("inventaire_id")->toArray());
+
     return $facts;
 });
 
