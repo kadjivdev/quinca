@@ -40,18 +40,7 @@ use Carbon\Carbon;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // ==== old ===== //
-
-    // $inventaires = Inventaire::whereBetween('created_at', ['2025-12-07 00:00:00', '2025-12-15 23:59:59'])
-    //     ->get();
-
-    // $factureRevs = FactureRevendeur::all();
-
-    // $inventaires = Inventaire::whereBetween('created_at', ['2025-12-07 00:00:00', '2025-12-16 23:59:59'])
-    //     ->get();
-
-    $inventaires = Inventaire::all();
-
+    // ==== Retrait des factures crée le ['2025-12-08 00:00:00' au '2025-12-16 23:59:59'] des inventaires de cette période  ===== //
     $factureRevs = FactureRevendeur::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
         ->get();
 
@@ -59,10 +48,19 @@ Route::get("/debug", function () {
         $factureRev->update(["inventaire_id" => null]);
     }
 
-    return $factureRevs->pluck("inventaire_id")->toArray();
-    // return $facts;
-    // dd($factureRevs->pluck("inventaire_id")->unique()->toArray());
+    // $inventaires = Inventaire::whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
+    //     ->get();
 
+    // $facts = collect();
+    // $_factureRevs = FactureRevendeur::all();
+
+    // foreach ($_factureRevs as $factureRev) {
+    //     if (in_array($factureRev->inventaire_id, $inventaires->pluck("id")->toArray())) {
+    //         // $factureRev->update(["inventaire_id" => null]);
+    //         $facts->push($factureRev);
+    //     }
+    // }
+    return $facts;
 });
 
 /**DETELE A STOCK */
