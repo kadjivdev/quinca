@@ -131,44 +131,45 @@
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
-                                    @can("vente.facture.view")
+                                    @canany(["revendeur.speciales.edit","vente.facture.edit"])
                                     <button class="btn btn-sm btn-light-primary btn-icon"
                                         onclick="showFacture({{ $facture->id }})"
                                         data-bs-toggle="tooltip" title="Voir les détails">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    @endcan
+                                    @endcanany
 
                                     @if($facture->statut === 'brouillon')
-                                        @can("vente.facture.edit")
-                                        {{-- Modifier --}}
-                                        <button class="btn btn-sm btn-light-warning btn-icon ms-1"
-                                            onclick="editFactures({{ $facture->id }})"
-                                            data-bs-toggle="tooltip" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        @endcan
 
-                                        {{-- Valider --}}
-                                        @can("vente.facture.validate")
-                                            @if(!$facture->validated_by)
-                                            <button class="btn btn-sm btn-light-success btn-icon ms-1"
-                                                onclick="validateFacture({{ $facture->id }})"
-                                                data-bs-toggle="tooltip" title="Valider">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            @endif
-                                        @endcan
 
-                                        @can("vente.facture.delete")
-                                        {{-- Supprimer --}}
-                                        <button class="btn btn-sm btn-light-danger btn-icon ms-1"
-                                            onclick="deleteFacture({{ $facture->id }})"
-                                            data-bs-toggle="tooltip" title="Supprimer">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        @endcan
+                                    {{-- Modifier --}}
+                                    @canany(["revendeur.speciales.edit","vente.facture.edit"])
+                                    <button class="btn btn-sm btn-light-warning btn-icon ms-1"
+                                        onclick="editFactures({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    @endcanany
+
+                                    {{-- Valider --}}
+                                    @canany(["revendeur.speciales.validate","vente.facture.validate"])
+                                    @if(!$facture->validated_by)
+                                    <button class="btn btn-sm btn-light-success btn-icon ms-1"
+                                        onclick="validateFacture({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Valider">
+                                        <i class="fas fa-check"></i>
+                                    </button>
                                     @endif
+                                    @endcanany
+
+                                    @canany(["revendeur.speciales.delete","vente.facture.delete"])
+                                    {{-- Supprimer --}}
+                                    <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                        onclick="deleteFacture({{ $facture->id }})"
+                                        data-bs-toggle="tooltip" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    @endcanany
 
                                     {{-- Imprimer --}}
                                     <div class="btn-group ms-1">
