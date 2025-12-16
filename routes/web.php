@@ -40,21 +40,39 @@ use Carbon\Carbon;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // ==== Retrait des factures revendeurs crée le ['2025-12-08 00:00:00' au '2025-12-16 23:59:59'] des inventaires de cette période  ===== //
-    $factureRevs = FactureRevendeur::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
-        ->get();
+    $facture = FactureClient::withTrashed()->firstWhere("numero", "_FAC-20251212-0005");
 
-    foreach ($factureRevs as $factureRev) {
-        $factureRev->update(["inventaire_id" => null]);
-    }
+    $facture->update([
+            "numero" => "FAC-20251212-0005",
+            "validated_by" => null,
+            "reference_recu" => "KAD18907",
+            "deleted_by" => null,
+            "deleted_at" => null
+        ]);
+
+    return $facture;
+    // ==== Retrait des factures revendeurs crée le ['2025-12-08 00:00:00' au '2025-12-16 23:59:59'] des inventaires de cette période  ===== //
+    // $factureRevs = FactureRevendeur::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
+    //     ->get();
+
+    // foreach ($factureRevs as $factureRev) {
+    //     $factureRev->update(["inventaire_id" => null]);
+    // }
+
+    //  $beforeInventfactureRevs = FactureRevendeur::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
+    //     ->get();
+
+    // foreach ($factureRevs as $factureRev) {
+    //     $factureRev->update(["inventaire_id" => null]);
+    // }
 
     // ==== Retrait des factures cotonou crée le ['2025-12-08 00:00:00' au '2025-12-16 23:59:59'] des inventaires de cette période  ===== //
-    $factureCotos = FactureClient::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
-        ->get();
+    // $factureCotos = FactureClient::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
+    //     ->get();
 
-    foreach ($factureCotos as $facture) {
-        $facture->update(["inventaire_id" => null]);
-    }
+    // foreach ($factureCotos as $facture) {
+    //     $facture->update(["inventaire_id" => null]);
+    // }
 
     // return $factureCotos->whereNotNull("inventaire_id");
     // $inventaires = Inventaire::whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
