@@ -171,6 +171,8 @@
                                     </button>
                                     @endcanany
 
+                                    @endif
+
                                     {{-- Imprimer --}}
                                     <div class="btn-group ms-1">
                                         <button class="btn btn-sm btn-light-secondary btn-icon"
