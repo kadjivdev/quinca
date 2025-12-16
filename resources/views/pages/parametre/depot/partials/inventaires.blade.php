@@ -133,7 +133,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h6 class="modal-title fs-5" id="">Dépôt : <span class="badge bg-warning depot-title">{{$depot?->libelle_depot}}</span></h6>
+                <h6 class="modal-title fs-5" id="">Dépôt : <span class="badge bg-warning depot-title">{{$depot?->id}} | ID: {{$depot?->libelle_depot}}</span></h6>
             </div>
             <div class="card-body">
                 <table class="table table-hover align-middle mb-0" id="example1">
