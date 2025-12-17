@@ -125,6 +125,7 @@ class RapportStockController extends Controller
                                 $stock->article_id
                             );
 
+
                         // Qte relle
                         $stock->quantite_reelle = $conversion ? $this->serviceEntree
                             ->convertirQuantite(
@@ -151,16 +152,22 @@ class RapportStockController extends Controller
                                 $stock->unite_mesure_id,
                                 // $article->unite_mesure_id
                             ) : 00;
-                        // $article->qteVendu($stock->depot_id);
 
                         $stock->resteStock = $stock->quantite_reelle - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
                     });
 
-                $article->quantite_reelle = $articleStocks->sum("quantite_reelle");
-                $article->qteTotalVendu = $articleStocks->sum("qteTotalVendu");
                 $article->resteStock = $articleStocks->sum("resteStock");
-
+                $article->qteTotalVendu = $articleStocks->sum("qteTotalVendu");
                 $article->stockMesure = $articleStocks->first()->uniteMesure;
+
+                // qte de depart
+                $article->qteDepart = $article->lastInventaireDetail($depot->id)?->qte_reel ?? 0;
+                // qte approvisionnee
+                $article->qteAppro = $articleStocks->sum("quantite_reelle") - $article->qteDepart;
+                //stock disponible
+                $article->stockDisponible = $article->qteAppro > 0 ? $article->qteAppro + $article->qteDepart : $article->qteDepart;
+                // reste en stock
+                // $article->resteStock = $article->stockDisponible - $article->qteTotalVendu;
             });
 
             $depots = Depot::all();

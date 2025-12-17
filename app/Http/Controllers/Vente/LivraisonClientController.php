@@ -848,9 +848,7 @@ class LivraisonClientController extends Controller
 
     public function generateBonA4(FactureClient $facture)
     {
-
         // dd($facture);
-
         $pdf = new PDF_MC_Table();
         $pdf->AliasNbPages();  // To use the total number of pages
         $pdf->AddPage();

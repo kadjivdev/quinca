@@ -20,6 +20,7 @@ use App\Models\Vente\LigneFacture;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ServiceStockEntree;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 
@@ -102,6 +103,17 @@ class Article extends Model
         'famille_id' => 'integer',
         'unite_mesure_id' => 'integer'
     ];
+
+    /***
+     * Deriere inventaire de cet article dans un magasin de depot
+     */
+
+    function lastInventaireDetail($depotId)
+    {
+        return DetailInventaire::whereHas("stockDepot", function ($query) use ($depotId) {
+            $query->where(["depot_id" => $depotId, "article_id" => $this->id]);
+        })->latest()->first();
+    }
 
     function detail(): BelongsTo
     {
@@ -263,15 +275,6 @@ class Article extends Model
 
     function facturesVente($depotId = null)
     {
-        // return $this->hasMany(LigneFacture::class, "article_id")->where("depot", $depotId)
-        //     ->get()->filter(function ($vente) {
-        //         if ($vente->factureClient) {
-        //             // if ($vente->factureClient->validated_by) {
-        //             //     return $vente; // facture validées
-        //             // }
-        //             return $vente->factureClient->validated_by;
-        //         }
-        //     });
 
         return $this->hasMany(LigneFacture::class, "article_id")
             ->where("depot", $depotId)
@@ -306,11 +309,6 @@ class Article extends Model
         $factureVentes = $this->facturesVente($depotId);
 
         $factureRevendeurs = $this->facturesVenteRevendeur($depotId);
-        // if ($this->id == 1418 && $depotId == 4) {
-        //     // dd(Depot::find($depotId));
-        //     dd($factureVentes);
-        // }
-        //Vente revendeur (ventes speciales et autres)
 
         $qteVenteConvertie = 0;
         if ($factureVentes->isEmpty() && $factureRevendeurs->isEmpty()) {
@@ -320,34 +318,11 @@ class Article extends Model
         /**Conversion qteVendu Client*/
         if ($factureVentes->isNotEmpty()) {
             $qteVenteConvertie += $factureVentes->sum("quantite_base");
-            // foreach ($factureVentes as $vente) {
-            // $conversion = $serviceStockEntree
-            //     ->rechercherConversion(
-            //         $vente->unite_vente_id,
-            //         $stock->unite_mesure_id,
-            //         $stock->article_id
-            //     );
-
-            //     $qteVenteConvertie += $serviceStockEntree
-            //         ->convertirQuantite($factureVentes->sum("quantite"), $conversion, $stock->unite_mesure_id);
-            // }
         }
 
         /**Conversion qteVendu Revendeur*/
         if ($factureRevendeurs->isNotEmpty()) {
             $qteVenteConvertie += $factureRevendeurs->sum("quantite_base");
-
-            // foreach ($factureRevendeurs as $vente) {
-            //     $conversion = $serviceStockEntree
-            //         ->rechercherConversion(
-            //             $vente->unite_vente_id,
-            //             $stock->unite_mesure_id,
-            //             $stock->article_id
-            //         );
-
-            //     $qteVenteConvertie += $serviceStockEntree
-            //         ->convertirQuantite($factureRevendeurs->sum("quantite"), $conversion, $stock->unite_mesure_id);
-            // }
         }
 
         return $qteVenteConvertie;
