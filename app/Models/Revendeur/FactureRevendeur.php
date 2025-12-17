@@ -192,7 +192,6 @@ class FactureRevendeur extends Model
         return $this->hasMany(ReglementRevendeur::class, "facture_revendeur_id");
     }
 
-
     public function getResteAReglerAttribute(): float
     {
         return $this->montant_ttc - $this->montant_regle;
