@@ -83,7 +83,7 @@
                                     @endif
 
                                     @if($compte->type_op=="REG_CLT")
-                                    Règlement de facture client <span class="badge bg-light text-dark">{{$compte->reglementClient->numero}}</span> | <span class="badge bg-light text-dark border">{{ $compte->reglementClient?->reference_preuve }} / {{ $compte->reglementClient?->facture?->reference_recu }}</span>
+                                    Règlement de facture client <span class="badge bg-light text-dark">{{$compte->reglementClient?->numero}}</span> | <span class="badge bg-light text-dark border">{{ $compte->reglementClient?->reference_preuve }} / {{ $compte->reglementClient?->facture?->reference_recu }}</span>
                                     @endif
 
                                     @if($compte->type_op=="REG_REV")
