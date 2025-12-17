@@ -80,7 +80,7 @@ class ReglementRevendeurController extends Controller
         $statsReglements = [
             // Total des règlements du mois
             'total_mois' => ReglementRevendeur::whereMonth('created_at', now()->month)
-                ->whereYear('date_reglement', now()->year)
+                ->whereYear('created_at', now()->year)
                 ->where('statut', 'validee')
                 ->sum('montant'),
 
