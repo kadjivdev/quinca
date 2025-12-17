@@ -43,7 +43,9 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $factureRevs = FactureRevendeur::with("compteClient", "reglements")->whereIn("numero", ["FAC-20251217-5701484e", "FAC-20251217-38a2a169"]);
+    $factureRevs = FactureRevendeur::with("compteClient", "reglements")
+        ->whereIn("numero", ["FAC-20251217-5701484e", "FAC-20251217-38a2a169"])
+        ->get();
 
     foreach ($factureRevs as $facture) {
         $facture->compteClient()->delete();
