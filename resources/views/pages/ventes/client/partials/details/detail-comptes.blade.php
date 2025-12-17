@@ -75,11 +75,11 @@
 
                                 <td>
                                     @if($compte->type_op=="FAC_CLT")
-                                    Facture de vente client <span class="badge bg-light text-dark">{{$compte->factureClient->numero}}</span>
+                                    Facture de vente client <span class="badge bg-light text-dark">{{$compte->factureClient?->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="FAC_REV")
-                                    Facture de vente revendeur <span class="badge bg-light text-dark">{{$compte->factureRevendeur->numero}}</span>
+                                    Facture de vente revendeur <span class="badge bg-light text-dark">{{$compte->factureRevendeur?->numero}}</span>
                                     @endif
 
                                     @if($compte->type_op=="REG_CLT")
