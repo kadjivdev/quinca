@@ -47,7 +47,7 @@
         </div>
 
         {{-- Cartes de statistiques --}}
-        <!-- <div class="row g-4">
+        <div class="row g-4">
             {{-- Total des règlements du mois --}}
             <div class="col-xl-3 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
@@ -154,7 +154,7 @@
                     </div>
                 </div>
             </div>
-        </div> -->
+        </div>
     </div>
 </div>
 <link href="{{ asset('css/theme/header.css') }}" rel="stylesheet">
