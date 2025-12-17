@@ -79,27 +79,27 @@ class ReglementRevendeurController extends Controller
         // Statistiques pour le header
         $statsReglements = [
             // Total des règlements du mois
-            'total_mois' => ReglementRevendeur::whereMonth('created_at', now()->month)
+            'total_mois' => $reglements->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->where('statut', 'validee')
                 ->sum('montant'),
 
             // Total des règlements
-            'total_reglements' => ReglementRevendeur::where('statut', 'validee')
+            'total_reglements' => $reglements->where('statut', 'validee')
                 ->sum('montant'),
 
             // Nombre de règlements en attente
-            'reglements_en_attente' => ReglementRevendeur::where('statut', 'brouillon')->count(),
+            'reglements_en_attente' => $reglements->where('statut', 'brouillon')->count(),
 
             // Montant des règlements en attente
-            'montant_en_attente' => ReglementRevendeur::where('statut', 'brouillon')
+            'montant_en_attente' => $reglements->where('statut', 'brouillon')
                 ->sum('montant'),
 
             // Répartition par mode de paiement
-            'repartition_modes' => ReglementRevendeur::where('statut', 'valide')
+            'repartition_modes' => $reglements->where('statut', 'valide')
                 ->select('type_reglement', DB::raw('COUNT(*) as count'), DB::raw('SUM(montant) as total'))
                 ->groupBy('type_reglement')
-                ->get()
+                // ->get()
         ];
 
         // Récupérer les factures non soldées pour le modal d'ajout
