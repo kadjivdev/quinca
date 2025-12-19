@@ -20,7 +20,7 @@
                     @foreach($depots as $depot)
                     <tr>
                         <td class="text-nowrap py-3">
-                            <span class="badge bg-light text-dark numero-bl me-2">{{ $loop->iteration }}</span>
+                            <span class="badge bg-light text-dark numero-bl me-2">{{ $loop->iteration }} | ID : {{ $depot->id }}</span>
                         </td>
                         <td><span class="badge bg-light text-dark">{{$depot->code_depot}}</span></td>
                         <td class="text-center"><span class="badge bg-light text-dark"> {{$depot->libelle_depot}} </span></td>
