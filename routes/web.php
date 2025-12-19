@@ -43,15 +43,24 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $factureRevs = FactureRevendeur::with("compteClient", "reglements")
-        ->whereIn("numero", ["FAC-20251217-5701484e", "FAC-20251217-38a2a169"])
-        ->get();
+    // === Regulation des factures revendeurs liées aux inventaires du pr Fahim === //
+    $_factureRevsQuery = FactureRevendeur::with("createdBy", "inventaire.auteur");
 
-    foreach ($factureRevs as $facture) {
-        $facture->compteClient()->delete();
-        $facture->reglements()->delete();
-        $facture->delete();
-    }
+    $factureInventoriPrFahim =  $_factureRevsQuery->whereHas("inventaire", function ($query) {
+        $query->where("user_id", 21);
+    })->update(["inventaire_id" => null]);
+
+    return $factureInventoriPrFahim;
+
+    // $factureRevs = FactureRevendeur::with("compteClient", "reglements")
+    //     ->whereIn("numero", ["FAC-20251217-5701484e", "FAC-20251217-38a2a169"])
+    //     ->get();
+
+    // foreach ($factureRevs as $facture) {
+    //     $facture->compteClient()->delete();
+    //     $facture->reglements()->delete();
+    //     $facture->delete();
+    // }
 
     //  $beforeInventfactureRevs = FactureRevendeur::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
     //     ->get();
