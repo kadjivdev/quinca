@@ -76,7 +76,6 @@ Route::get("/debug", function () {
         ->whereBetween('created_at', ['2023-01-01 00:00:00', '2025-12-14 00:00:00']);
     $beforeInventfactureRevsParakou->update(["inventaire_id" => 241]);// attachement de toutes les factures de cxette période au dernier inventaire du depot 
 
-
     // ==== Retrait des factures cotonou crée le ['2025-12-08 00:00:00' au '2025-12-16 23:59:59'] des inventaires de cette période  ===== //
     // $factureCotos = FactureClient::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])
     //     ->get();
