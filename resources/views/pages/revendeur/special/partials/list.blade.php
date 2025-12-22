@@ -36,6 +36,9 @@
                                     <span class="badge bg-info bg-opacity-10 text-info">Proforma</span>
                                     @endif
                                 </div>
+                                @if($facture->inventaire)
+                                <span class="text-dark">Inventorié: {{ $facture->inventaire?->id }}</span>
+                                @endif
                             </td>
                             <td>
                                 <span class="badge bg-dark text-white">{{$facture->createdBy->pointDeVente->nom_pv}}</span>

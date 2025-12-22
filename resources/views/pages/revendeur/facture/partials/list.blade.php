@@ -57,11 +57,15 @@
                         <tr>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
-                                    <span class="numero-facture me-2">{{ $facture->numero }}</span>
+                                    <span class="numero-facture me-2">{{ $facture->numero }}</span> <br>
+
                                     @if ($facture->is_proforma)
                                     <span class="badge bg-info bg-opacity-10 text-info">Proforma</span>
                                     @endif
                                 </div>
+                                @if($facture->inventaire)
+                                <span class="text-dark">Inventorié: {{ $facture->inventaire?->id }}</span>
+                                @endif
                             </td>
                             <td>
                                 <span class="badge bg-dark text-white">{{$facture->createdBy->pointDeVente->nom_pv}}</span>
@@ -141,7 +145,7 @@
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
                                     @canany(["revendeur.facture.edit","vente.facture.edit"])
-                                    <button  class="btn btn-sm btn-light-primary btn-icon"
+                                    <button class="btn btn-sm btn-light-primary btn-icon"
                                         onclick="showFacture({{ $facture->id }})"
                                         data-bs-toggle="tooltip" title="Voir les détails">
                                         <i class="fas fa-eye"></i>
