@@ -69,10 +69,16 @@ Route::get("/debug", function () {
     //     ->whereBetween('created_at', ['2023-01-01 00:00:00', '2025-12-10 00:00:00']);
     // $beforeInventfactureRevsDjougou->update(["inventaire_id" => 236]);// attachement de toutes les factures de cxette période au dernier inventaire du depot 
 
+    // $beforeInventfactureRevsDjougou = FactureRevendeur::with("inventaire", "createdBy")
+    //     ->where("created_by", 20)
+    //     // ->whereNull("inventaire_id")
+    //     ->whereBetween('created_at', ['2025-12-10 00:00:00', '2025-12-22 00:00:00']);
+    // $beforeInventfactureRevsDjougou->update(["inventaire_id" => null]); // dettachement de toutes les factures de cxette période au dernier inventaire du depot 
+
     $beforeInventfactureRevsDjougou = FactureRevendeur::with("inventaire", "createdBy")
-        ->where("created_by", 20)
+        ->where("created_by", 17)
         // ->whereNull("inventaire_id")
-        ->whereBetween('created_at', ['2025-12-10 00:00:00', '2025-12-22 00:00:00']);
+        ->whereBetween('created_at', ['2025-12-17 00:00:00', '2025-12-22 00:00:00']);
     $beforeInventfactureRevsDjougou->update(["inventaire_id" => null]); // dettachement de toutes les factures de cxette période au dernier inventaire du depot 
 
     // // PARAKOU Inventaire ID: 241
