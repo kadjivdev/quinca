@@ -103,6 +103,16 @@ class RapportStockController extends Controller
                 $depot = Depot::find(1);
             }
 
+            // date de filtre
+            if ($request->date_ftr) {
+                session()->put("date_ftr", Carbon::parse($request->date_ftr));
+            } else {
+                session()->forget("date_ftr");
+            }
+
+            // $date = $request->date_ftr;
+            $date_ftr = session()->get("date_ftr");
+
             $stocks = StockDepot::with("article", "depot")
                 ->where("depot_id", $depot->id)->get();
 
@@ -147,7 +157,7 @@ class RapportStockController extends Controller
                         /**Qte Vendue */
                         $stock->qteTotalVendu = $conversion ? $this->serviceEntree
                             ->convertirQuantite(
-                                $article->qteVendu($stock->depot_id),
+                                session()->get("date_ftr") ? $article->qteVenduAtDate($stock->depot_id, session()->get("date_ftr")) : $article->qteVendu($stock->depot_id),
                                 $conversion,
                                 $stock->unite_mesure_id,
                                 // $article->unite_mesure_id
@@ -168,10 +178,13 @@ class RapportStockController extends Controller
                 $article->stockDisponible = $article->qteAppro > 0 ? $article->qteAppro + $article->qteDepart : $article->qteDepart;
                 // reste en stock
                 // $article->resteStock = $article->stockDisponible - $article->qteTotalVendu;
+
+                return $article;
             });
 
+
             $depots = Depot::all();
-            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots"));
+            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr"));
         } catch (\Exception $e) {
             Log::debug("Une erreure est survenue lors du chargement du stock", ["error" => $e->getMessage()]);
             return back()->with("error", "Une erreure est survenue lors du chargement du stock :" . $e->getMessage());

@@ -8,12 +8,15 @@
         <div class="row justify-content-center">
             <div class="col-6">
                 <form action="" method="get">
-                    <div class="">
+                    <div class="mb-3">
                         <select name="depot_id" class="form-control" id="depot_select" required>
                             @foreach($depots as $dep)
                             <option value="{{$dep->id}}" @selected($dep->id==$depot->id)>{{$dep->libelle_depot}}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="">
+                        <input type="date" name="date_ftr" class="form-control">
                     </div>
                     <br>
                     <button class="btn btn-success w-100">Rechercher....</button>
@@ -22,8 +25,8 @@
         </div>
 
         <br>
-        <h4 class="">Historique du stock du dépôt : <span class="badge bg-light rounded borded text-success">{{$depot->libelle_depot}}</span> </h4>
-       
+        <h4 class="">Historique du stock du dépôt : <span class="badge bg-light rounded borded text-success">{{$depot->libelle_depot}} @if($date_ftr) - Date filtrée : {{\Carbon\Carbon::parse($date_ftr)->format('d/m/Y')}} @endif </span> </h4>
+
         <div class="table-responsive">
             <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
                 <thead class="bg-light">
@@ -36,7 +39,6 @@
                         <th class="border-bottom-0">Vente</th>
                         <th class="border-bottom-0">Stock final</th>
                         <th class="border-bottom-0">Unité</th>
-                        <!-- <th class="border-bottom-0" style="min-width: 150px;">Dépôt</th> -->
                     </tr>
                 </thead>
                 <tbody>

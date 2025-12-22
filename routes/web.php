@@ -43,6 +43,13 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
+    $ART_254 = Article::firstWhere("code_article", "ART-254");
+
+    $stockDepot = StockDepot::where(["article_id" => $ART_254->id, "depot_id" => 2])
+        ->get();
+
+    return $stockDepot;
+
     // === Regulation des factures revendeurs liées aux inventaires du pr Fahim === //
     // $_factureRevsQuery = FactureRevendeur::with("createdBy", "inventaire.auteur");
 
@@ -89,10 +96,10 @@ Route::get("/debug", function () {
     //     ->whereBetween('created_at', ['2023-01-01 00:00:00', '2025-12-14 00:00:00']);
     // $beforeInventfactureRevsParakou->update(["inventaire_id" => 241]);// attachement de toutes les factures de cxette période au dernier inventaire du depot 
 
-    $beforeInventfactureRevsParakou = FactureRevendeur::with("inventaire", "createdBy")
-        ->where("created_by", 12)
-        ->whereBetween('created_at', ['2025-12-18 00:00:00', '2025-12-22 00:00:00']);
-    $beforeInventfactureRevsParakou->update(["inventaire_id" => null]); // dettachement de toutes les factures de cxette période au dernier inventaire du depot 
+    // $beforeInventfactureRevsParakou = FactureRevendeur::with("inventaire", "createdBy")
+    //     ->where("created_by", 12)
+    //     ->whereBetween('created_at', ['2025-12-18 00:00:00', '2025-12-22 00:00:00']);
+    // $beforeInventfactureRevsParakou->update(["inventaire_id" => null]); // dettachement de toutes les factures de cxette période au dernier inventaire du depot 
 
     // ==== Retrait des factures cotonou crée le ['2025-12-08 00:00:00' au '2025-12-16 23:59:59'] des inventaires de cette période  ===== //
     // $factureCotos = FactureClient::with("inventaire")->whereBetween('created_at', ['2025-12-08 00:00:00', '2025-12-16 23:59:59'])

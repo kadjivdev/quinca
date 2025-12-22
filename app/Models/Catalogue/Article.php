@@ -329,6 +329,55 @@ class Article extends Model
     }
 
     /**
+     * Calcul de la quantité vendue (vente client, vente revendeurs, vente speciale) de l'article dans un depot à une date donnée
+     */
+
+    function qteVenduAtDate($depotId = null, $date)
+    {
+        //Vente à la directeur
+        $factureVentes = $this->hasMany(LigneFacture::class, "article_id")
+            ->where("depot", $depotId)
+            ->whereDate("created_at", $date)
+            ->whereHas("factureClient", function ($query) {
+                $query
+                    ->whereNotNull("validated_by")
+                    ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
+            })->get();
+        // $this->facturesVente($depotId)
+        // ->where("created_at", $date);
+
+        // vente des revendeurs
+        $factureRevendeurs = $this->hasMany(LigneFactureRevendeur::class, "article_id")
+            ->where("depot", $depotId)
+            ->whereDate("created_at", $date)
+            ->whereHas("factureRevendeur", function ($query) {
+                $query
+                    ->whereNotNull("validated_by")
+                    ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
+            })->get();
+
+        // $this->facturesVenteRevendeur($depotId)
+        //     ->where("created_at", $date);
+
+        $qteVenteConvertie = 0;
+        if ($factureVentes->isEmpty() && $factureRevendeurs->isEmpty()) {
+            $qteVenteConvertie = 0;
+        }
+
+        /**Conversion qteVendu Client*/
+        if ($factureVentes->isNotEmpty()) {
+            $qteVenteConvertie += $factureVentes->sum("quantite_base");
+        }
+
+        /**Conversion qteVendu Revendeur*/
+        if ($factureRevendeurs->isNotEmpty()) {
+            $qteVenteConvertie += $factureRevendeurs->sum("quantite_base");
+        }
+
+        return $qteVenteConvertie;
+    }
+
+    /**
      * Calcul du montant vendu (vente client, vente revendeurs, vente speciale) de l'article dans un depot
      */
 
