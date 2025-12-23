@@ -46,11 +46,11 @@
                     <tr>
                         <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
                         <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->qteDepart,2,","," ")}} </span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->qteAppro,2,","," ")}}</span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->stockDisponible,2,","," ")}}</span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,","," ")}}</span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,","," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qteDepart,2,"."," ")}} </span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qteAppro,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->stockDisponible,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">({{$article->uniteMesure?->libelle_unite}})</span></td>
                     </tr>
                     @endforeach
