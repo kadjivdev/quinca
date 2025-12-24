@@ -5,6 +5,7 @@
 /public/storage
 /public/assets/img
 /public/assets/video
+/puclic/preuve_credit
 /storage/*.key
 /vendor/
 /.history
