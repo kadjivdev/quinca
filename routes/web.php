@@ -89,20 +89,20 @@ Route::get("/debug", function () {
     //     ->whereBetween('created_at', ['2023-01-01 00:00:00', '2025-12-14 00:00:00']);
     // $beforeInventfactureRevsParakou->update(["inventaire_id" => 241]);// attachement de toutes les factures de cxette période au dernier inventaire du depot 
 
-    $facturesDjougou = FactureRevendeur::with("inventaire", "createdBy")
-        ->where("created_by", 20)
-        ->whereBetween('created_at', ['2025-12-10 16:00:00', '2025-12-24 00:00:00']);
-    $facturesDjougou->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
+    // $facturesDjougou = FactureRevendeur::with("inventaire", "createdBy")
+    //     ->where("created_by", 20)
+    //     ->whereBetween('created_at', ['2025-12-10 16:00:00', '2025-12-24 00:00:00']);
+    // $facturesDjougou->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
 
     $facturesParakou = FactureRevendeur::with("inventaire", "createdBy")
         ->where("created_by", 12)
-        ->whereBetween('created_at', ['2025-12-18 6:00:00', '2025-12-24 00:00:00']);
+        ->whereBetween('created_at', ['2025-12-18 00:00:00', '2025-12-25 00:00:00']);
     $facturesParakou->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
 
-    $facturesKandi = FactureRevendeur::with("inventaire", "createdBy")
-        ->where("created_by", 17)
-        ->whereBetween('created_at', ['2025-12-22 16:00:00', '2025-12-24 00:00:00']);
-    $facturesKandi->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
+    // $facturesKandi = FactureRevendeur::with("inventaire", "createdBy")
+    //     ->where("created_by", 17)
+    //     ->whereBetween('created_at', ['2025-12-22 16:00:00', '2025-12-24 00:00:00']);
+    // $facturesKandi->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
 
     return "regularisation effectuée avec succès";
 });
