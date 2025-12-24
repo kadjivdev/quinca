@@ -48,7 +48,9 @@ class FactureClient extends Model
         'reference_recu',
         'moyen_reglement',
         'inventaire_id',
-        'deleted_by'
+        'deleted_by',
+        'recommandeur_credit',
+        'preuve_credit',
     ];
 
     protected $casts = [
@@ -67,7 +69,7 @@ class FactureClient extends Model
         'montant_regle' => 'decimal:3',
         'depot'
     ];
-    
+
     /**
      * Génère un numéro de facture unique
      * Format: FAC-AAAAMMJJ-XXXX

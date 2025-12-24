@@ -126,7 +126,7 @@
     }
 
     function initializeSelect2() {
-        $('.select2-standard').select2({
+        $('.select2-standard,#_fournisseurSelect').select2({
             theme: 'bootstrap-5',
             width: '100%',
             placeholder: 'Sélectionner...',

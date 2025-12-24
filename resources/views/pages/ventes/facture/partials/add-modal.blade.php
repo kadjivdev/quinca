@@ -15,7 +15,7 @@
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            
+
             <!-- route('vente.facture.store') -->
             <form action="{{route('vente.facture.store')}}" method="POST" id="addFactureForm" class="needs-validation" novalidate>
                 @csrf
@@ -153,7 +153,7 @@
                             <div class="card border border-light-subtle">
                                 <div class="card-header bg-light">
                                     <h6 class="card-title mb-0">
-                                        <i class="fas fa-money-bill-wave me-2"></i>Règlement
+                                        <i class="fas fa-money-bill-wave me-2"></i> Règlement
                                     </h6>
                                 </div>
                                 <div class="card-body">
@@ -220,6 +220,48 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section crédit --}}
+                        <div class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-money-bill-wave me-2"></i>Crédit
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium ">Recommandeur du crédit</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-person text-primary"></i>
+                                                </span>
+                                                <input type="text" class="form-control" name="recommandeur_credit">
+                                            </div>
+                                            @error('recommandeur_credit')
+                                            <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="row g-3 mt-0">
+                                                <div class="col-md-12">
+                                                    <label class="form-label fw-medium">Preuve du crédit</label>
+                                                    <div class="input-group">
+                                                        <input type="file" class="form-control" name="preuve_credit">
+                                                    </div>
+                                                    @error('preuve_credit')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -313,6 +355,5 @@
         width: '100%',
         dropdownParent: $('#addFactureModal'),
     })
-
 </script>
 @endpush

@@ -184,7 +184,6 @@ class FactureClientController extends Controller
             // Vérifications initiales
             $sessionCaisse = SessionCaisse::ouverte()
                 ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                // ->where('utilisateur_id', auth()->user()->id)
                 ->first();
 
             if (!$sessionCaisse) {
@@ -202,17 +201,30 @@ class FactureClientController extends Controller
                 'montant_regle' => 'required|numeric|min:0',
                 'moyen_reglement' => 'required|string',
 
+                'recommandeur_credit' => 'nullable|string',
+                // 'preuve_credit' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+
                 'lignes' => 'required|array|min:1',
                 'lignes*article_id' => 'required|exists,articles',
                 'lignes*depot_id' => 'required|exits,depots',
                 'lignes*quantite' => 'required',
                 'lignes*tarification_id' => 'required',
-                // 'lignes*stock' => 'required',
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
                 'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir",
             ]);
+
+
+            // Credit file handling
+            $preuve_credit = null;
+            if ($request->hasFile("preuve_credit")) {
+                $fileName = time() . '_' . $request->file('preuve_credit')->getClientOriginalName();
+
+                $request->file('preuve_credit')->move("preuve_credit", $fileName);
+
+                $preuve_credit = asset("/preuve_credit/" . $fileName);
+            }
 
             if ($validator->fails()) {
                 Log::debug("Erreure lors de l'enregistrement de lafacture ", ["error" => $validator->errors()]);
@@ -336,6 +348,10 @@ class FactureClientController extends Controller
                     'montant_aib' => 0,
                     'montant_ttc' => 0,
                     'montant_regle' => 0,
+
+                    // credit
+                    "preuve_credit" => $preuve_credit,
+                    "recommandeur_credit" => $request->recommandeur_credit,
                 ]);
 
                 $facture->save();
@@ -423,7 +439,8 @@ class FactureClientController extends Controller
         } catch (Exception $e) {
             Log::error('Erreur création facture', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'ligne' => $e->getLine()
             ]);
 
             return response()->json([

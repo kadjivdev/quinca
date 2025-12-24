@@ -78,6 +78,8 @@
                             <th class="border-bottom-0 text-center">Type</th>
                             <th class="border-bottom-0">Date validation</th>
                             <th class="border-bottom-0 text-center">Statut</th>
+                            <th class="border-bottom-0 text-center">Recommandeur Crédit</th>
+                            <th class="border-bottom-0 text-center">Preuve crédit</th>
                             <th class="border-bottom-0 text-center">Inséré par</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
@@ -172,6 +174,19 @@
                                 <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulée</span>
                                 @endswitch
                             </td>
+
+
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark rounded border">{{$facture->recommandeur_credit??'---'}}</span>
+                            </td>
+                            <td class="text-center">
+                                @if($facture->preuve_credit)
+                                <a href="{{$facture->preuve_credit}}" target="_blank" rel="noopener noreferrer"><span class="badge bg-light text-dark rounded border"> <i class="fas fa-file text-primary"></i></span> </a>
+                                @else
+                                <span class="badge bg-light text-dark border rounded">---</span>
+                                @endif
+                            </td>
+
                             <td class="text-center">
                                 <span class="badge bg-light text-dark rounded border">{{$facture->createdBy?->name}}</span>
                             </td>
