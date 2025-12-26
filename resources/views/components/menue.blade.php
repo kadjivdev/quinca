@@ -247,8 +247,14 @@
                     <li><a class="dropdown-item" href="{{ route('vente.facture.index') }}">
                             <div class="dropdown-item-wrapper">Facturation Vente Client</div>
                         </a></li>
+
+                    <!-- vente à crédit -->
+                    <li><a class="dropdown-item" href="{{ route('vente.facture.credits') }}">
+                            <div class="dropdown-item-wrapper">Facturation vente à crédit</div>
+                        </a></li>
                     @endcan
 
+                    <!-- vente.facture.credits -->
                     <!-- FACTURE PROFORMA -->
                     @can('facture.proformas.view')
                     <li>

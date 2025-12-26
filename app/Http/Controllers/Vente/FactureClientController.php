@@ -176,6 +176,143 @@ class FactureClientController extends Controller
         }
     }
 
+    // les ventes à crédit
+    public function credits(Request $request)
+    {
+        try {
+            $pointsVentes = PointVente::all();
+
+            Log::info('Début du chargement de la liste des factures');
+            $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+            $configuration = Societe::first();
+            $tauxTva = $configuration ? $configuration->taux_tva : 18;
+
+            // Construction de la requête de base
+            $query = FactureClient::with(['client', 'createdBy'])
+                ->whereNotNull("recommandeur_credit")
+                ->orderBy('created_at', 'desc')
+                ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
+
+            // Chargement des factures avec les relations nécessaires
+            if ($request->point_vente_id && !$request->client_id) {
+                $factures = $query->get()
+                    ->filter(function ($facture) use ($request) {
+                        return $facture->createdBy->point_de_vente_id == $request->point_vente_id;
+                    });
+            } elseif ($request->client_id && !$request->point_vente_id) {
+                $factures = $query->get()
+                    ->filter(function ($facture) use ($request) {
+                        return $facture->client_id == $request->client_id;
+                    });
+            } elseif ($request->client_id && $request->point_vente_id) {
+                $factures = $query->get()
+                    ->filter(function ($facture) use ($request) {
+                        return ($facture->createdBy->point_de_vente_id == $request->point_vente_id && $facture->client_id == $request->client_id);
+                    });
+            } else {
+                $factures = $query->get();
+            }
+
+            // dd($request->zone_id);
+            if ($request->zone_id) {
+                $factures = $factures->filter(function ($facture) use ($request) {
+                    return $facture->client?->zone_id == $request->zone_id;
+                });
+            }
+
+            // Ajouter des attributs calculés pour chaque facture
+            $factures->transform(function ($facture) {
+                // Calcul du reste à payer
+                $facture->reste_a_payer = ($facture->montant_ttc - $facture->montant_remise) - $facture->montant_regle;
+
+                // Détermination du vrai statut basé sur le paiement
+                if ($facture->statut === 'brouillon') {
+                    $facture->statut_reel = 'brouillon';
+                } elseif ($facture->statut === 'validee') {
+                    if ($facture->montant_regle == 0) {
+                        $facture->statut_reel = 'validee';
+                    } elseif ($facture->montant_regle < $facture->montant_ttc - $facture->montant_remise) {
+                        $facture->statut_reel = 'partiellement_payee';
+                    } elseif ($facture->montant_regle >= $facture->montant_ttc - $facture->montant_remise) {
+                        $facture->statut_reel = 'payee';
+                    }
+                }
+
+                // Vérifier si la facture est en retard
+                $facture->is_overdue = $facture->statut !== 'payee'
+                    && Carbon::now()->startOfDay()->gt($facture->date_echeance);
+
+                return $facture;
+            });
+
+            $facturesResteAPayer = $factures->filter(function ($facture) {
+                return $facture->reste_a_payer > 0;
+            });
+            $montantResteAPyer = $facturesResteAPayer->sum('montant_ttc') - $facturesResteAPayer->sum('montant_remise');
+
+            // Calculer le montant total des factures du mois en cours
+            $currentMonth = Carbon::now()->month;
+            $currentYear = Carbon::now()->year;
+
+            $facturesDuMois = $factures->filter(function ($facture) use ($currentMonth, $currentYear) {
+                return Carbon::parse($facture->date_facture)->month == $currentMonth &&
+                    Carbon::parse($facture->date_facture)->year == $currentYear;
+            });
+
+            $montantFactureMois = $facturesDuMois->sum('montant_ttc');
+
+            // Calculer le total encaissé et le nombre de factures encaissées
+            $facturesEncaissees = $facturesDuMois->filter(function ($facture) {
+                return !is_null($facture->encaissed_at);
+            });
+
+            $totalEncaisse = $facturesEncaissees->sum('montant_ttc');
+            $nombreEncaisse = $facturesEncaissees->count();
+
+            $statsFactures = [
+                'total_mois' => $montantFactureMois,
+                'total_encaisse' => $totalEncaisse,
+                'nombre_encaisse' => $nombreEncaisse,
+                'montant_en_attente' => $montantResteAPyer,
+                'factures_en_attente' => $facturesResteAPayer,
+            ];
+
+            Log::info('Liste des factures chargée avec succès', [
+                'nombre_factures' => count($factures)
+            ]);
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [
+                        'factures' => $factures
+                    ]
+                ]);
+            }
+
+            // Charger la liste des clients pour le filtre
+            $clients = Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
+            $zones = Zone::all();
+
+            return view('pages.ventes.facture.venteCredits', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'zones'));
+        } catch (Exception $e) {
+            Log::error('Erreur lors du chargement de la liste des factures', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Une erreur est survenue lors du chargement des factures'
+                ], 500);
+            }
+
+            return back()->with('error', 'Une erreur est survenue lors du chargement des factures');
+        }
+    }
+
+
     public function store(Request $request)
     {
         try {

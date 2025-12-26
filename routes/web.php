@@ -828,6 +828,9 @@ Route::middleware('auth')->group(function () {
             // Liste des factures
             Route::get('/', [FactureClientController::class, 'index'])->name('vente.facture.index');
 
+            // Liste des factures credits
+            Route::get('/credits', [FactureClientController::class, 'credits'])->name('vente.facture.credits');
+
             // Créer une nouvelle facture
             Route::post('/store', [FactureClientController::class, 'store'])->name('vente.facture.store');
 
