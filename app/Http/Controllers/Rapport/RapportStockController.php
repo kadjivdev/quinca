@@ -172,6 +172,10 @@ class RapportStockController extends Controller
 
                 // qte de depart
                 $article->qteDepart = $article->lastInventaireDetail($depot->id)?->qte_reel ?? 0;
+
+                // inventaire date
+                $article->inventaire_date = $article->lastInventaireDetail($depot->id)?->created_at;
+
                 // qte approvisionnee
                 $article->qteAppro = $articleStocks->sum("quantite_reelle") - $article->qteDepart;
                 //stock disponible

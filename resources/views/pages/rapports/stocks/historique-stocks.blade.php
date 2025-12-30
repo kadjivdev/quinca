@@ -34,6 +34,7 @@
                         <th class="border-bottom-0">Code</th>
                         <th class="border-bottom-0 text-center">Désignation</th>
                         <th class="border-bottom-0">Stock départ</th>
+                        <th class="border-bottom-0">Inventorié le:</th>
                         <th class="border-bottom-0">Approvisionné</th>
                         <th class="border-bottom-0">Stock disponible</th>
                         <th class="border-bottom-0">Vente</th>
@@ -47,6 +48,7 @@
                         <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
                         <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteDepart,2,"."," ")}} </span></td>
+                        <td><span class="badge bg-light text-dark">{{Carbon\carbon::parse($article->inventaire_date)->locale('fr')->isoFormat("D MMMM YYYY H:m:s")}} </span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteAppro,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->stockDisponible,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,"."," ")}}</span></td>
