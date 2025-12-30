@@ -337,7 +337,8 @@ class Article extends Model
         //Vente à la directeur
         $factureVentes = $this->hasMany(LigneFacture::class, "article_id")
             ->where("depot", $depotId)
-            ->whereDate("created_at", $date)
+            ->whereDate("created_at", "<=", $date)
+            // ->whereDate("created_at", $date)
             ->whereHas("factureClient", function ($query) {
                 $query
                     ->whereNotNull("validated_by")
@@ -349,7 +350,8 @@ class Article extends Model
         // vente des revendeurs
         $factureRevendeurs = $this->hasMany(LigneFactureRevendeur::class, "article_id")
             ->where("depot", $depotId)
-            ->whereDate("created_at", $date)
+            ->whereDate("created_at", "<=", $date)
+            // ->whereDate("created_at", $date)
             ->whereHas("factureRevendeur", function ($query) {
                 $query
                     ->whereNotNull("validated_by")

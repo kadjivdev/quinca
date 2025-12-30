@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Parametre;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catalogue\DetailInventaire;
+// use App\Models\Catalogue\DetailInventaire;
 use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
@@ -40,7 +40,6 @@ class DepotController extends Controller
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
         $pvs = PointDeVente::where('actif', true)->get();
-
         return view('pages.parametre.depot.index', compact('depots', 'typesDepot', 'date', 'pvs'));
     }
 

@@ -352,7 +352,6 @@ class FactureClientController extends Controller
                 'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir",
             ]);
 
-
             // Credit file handling
             $preuve_credit = null;
             if ($request->hasFile("preuve_credit")) {
@@ -364,7 +363,7 @@ class FactureClientController extends Controller
             }
 
             if ($validator->fails()) {
-                Log::debug("Erreure lors de l'enregistrement de lafacture ", ["error" => $validator->errors()]);
+                Log::debug("Erreure lors de l'enregistrement de la facture ", ["error" => $validator->errors()]);
 
                 return response()->json([
                     'status' => 'error',
@@ -456,7 +455,7 @@ class FactureClientController extends Controller
                 //     ], 500);
                 // }
             }
-            // dd("gogo");
+
             DB::beginTransaction();
 
             try {
