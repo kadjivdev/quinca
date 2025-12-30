@@ -9,7 +9,7 @@
                         <i class="fas fa-truck fs-4 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">Nouveau Bon de Livraison</h5>
+                        <h5 class="modal-title fw-bold mb-0">Nouveau bordereau de livraison</h5>
                         <p class="text-muted small mb-0" id="factureInfo"></p>
                     </div>
                 </div>

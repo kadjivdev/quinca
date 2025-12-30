@@ -13,7 +13,7 @@
                     <div>
                         <div class="header-pretitle">{{ $date }}</div>
                         <div class="d-flex align-items-center gap-2">
-                            <h6 class="header-title mb-0">Gestion des Bons de Livraison</h6>
+                            <h6 class="header-title mb-0">Gestion des bordereaux de livraison</h6>
                             <span class="badge bg-soft-success text-success rounded-pill">
                                 <i class="fas fa-check fs-xs me-1"></i>
                                 {{ $livraisons->where('statut', 'valide')->count() }} livraison(s) validée(s)

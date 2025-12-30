@@ -272,7 +272,7 @@
 
                     @can('vente.livraisons.view')
                     <li><a class="dropdown-item" href="{{ route('vente.livraisons.index') }}">
-                            <div class="dropdown-item-wrapper">Bons de Livraison</div>
+                            <div class="dropdown-item-wrapper">Bordereau de livraison</div>
                         </a></li>
 
                     <li><a class="dropdown-item" href="{{ route('vente.marchand-back.index') }}">
