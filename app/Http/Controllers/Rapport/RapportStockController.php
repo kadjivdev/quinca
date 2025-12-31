@@ -127,14 +127,13 @@ class RapportStockController extends Controller
                  */
 
                 $articleStocks
-                    ->map(function ($stock) use ($article) {
+                    ->map(function ($stock) use ($article, &$depot) {
                         $conversion = $this->serviceEntree
                             ->rechercherConversion(
                                 $stock->unite_mesure_id,
                                 $stock->article->unite_mesure_id,
                                 $stock->article_id
                             );
-
 
                         // Qte relle
                         $stock->quantite_reelle = $conversion ? $this->serviceEntree
@@ -170,14 +169,19 @@ class RapportStockController extends Controller
                 $article->qteTotalVendu = $articleStocks->sum("qteTotalVendu");
                 $article->stockMesure = $articleStocks->first()->uniteMesure;
 
-                // qte de depart
-                $article->qteDepart = $article->lastInventaireDetail($depot->id)?->qte_reel ?? 0;
+                $lastInventaire = $article->lastInventaireDetail($depot->id);
+
+                // unite de mesure inventorié
+                $article->inventUniteMesure = $lastInventaire?->stockDepot?->uniteMesure?->libelle_unite;
+                // // qte de depart
+                $article->qteDepart = $lastInventaire?->qte_reel ?? 0;
 
                 // inventaire date
-                $article->inventaire_date = $article->lastInventaireDetail($depot->id)?->created_at;
+                $article->inventaire_date = $lastInventaire?->created_at;
 
                 // qte approvisionnee
-                $article->qteAppro = $articleStocks->sum("quantite_reelle") - $article->qteDepart;
+                $article->qteAppro = $article->stocks()?->firstWhere("depot_id", $depot->id)?->quantite_reelle - $article->qteDepart; // $articleStocks->sum("quantite_reelle") - $article->qteDepart;
+
                 //stock disponible
                 $article->stockDisponible = $article->qteAppro > 0 ? $article->qteAppro + $article->qteDepart : $article->qteDepart;
                 // reste en stock
