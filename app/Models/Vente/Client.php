@@ -67,7 +67,9 @@ class Client extends Model
     /**Compte Client */
     public function compteClient(): HasMany
     {
-        return $this->hasMany(CompteClient::class, "client_id")->with("client");
+        return $this->hasMany(CompteClient::class, "client_id")
+            ->orderByDesc("date_op")
+            ->with("client");
     }
 
     // Relations
