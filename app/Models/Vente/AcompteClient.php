@@ -18,6 +18,7 @@ class AcompteClient extends Model
     const TYPE_ESPECE = 'espece';
     const TYPE_VIREMENT = 'virement';
     const TYPE_CHEQUE = 'cheque';
+    const TYPE_AUTRES = 'autres';
 
     // Constantes pour les statuts
     const STATUT_EN_ATTENTE = 'en_attente';
@@ -29,6 +30,7 @@ class AcompteClient extends Model
         'reference',
         'type_paiement',
         'montant',
+        'preuve',
         'client_id',
         'observation',
         'point_de_vente_id',
@@ -170,7 +172,8 @@ class AcompteClient extends Model
             'type_paiement' => 'required|in:' . implode(',', [
                 self::TYPE_ESPECE,
                 self::TYPE_VIREMENT,
-                self::TYPE_CHEQUE
+                self::TYPE_CHEQUE,
+                self::TYPE_AUTRES
             ]),
             'client_id' => 'required|exists:clients,id',
             'observation' => 'nullable|string',
@@ -179,7 +182,8 @@ class AcompteClient extends Model
                 self::STATUT_VALIDE,
                 self::STATUT_REJETE
             ]),
-            'montant' => 'required|numeric'
+            'montant' => 'required|numeric',
+            'preuve' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
     }
 

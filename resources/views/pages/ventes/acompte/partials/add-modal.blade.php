@@ -15,7 +15,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="#" method="POST" id="addAcompteForm" class="needs-validation" novalidate>
+            <form action="#" method="POST" id="addAcompteForm" class="needs-validation" novalidate enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body p-4">
                     <div class="row g-4">
@@ -52,6 +52,7 @@
                                                 <option value="espece">Espèce</option>
                                                 <option value="cheque">Chèque</option>
                                                 <option value="virement">Virement</option>
+                                                <option value="autres">Autres</option>
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner un type de paiement</div>
                                         </div>
@@ -72,6 +73,14 @@
                                         </div>
 
                                         <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Preuve</label>
+                                            <input type="file" class="form-control" name="preuve" accept=".jpg,.jpeg,.png,.pdf">
+                                            @error('preuve')
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-12">
                                             <label class="form-label fw-medium">Observation</label>
                                             <textarea class="form-control" name="observation" rows="2"
                                                 placeholder="Observation ou note concernant l'acompte"></textarea>

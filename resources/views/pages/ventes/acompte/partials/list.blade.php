@@ -78,6 +78,7 @@
                             <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0 text-center">Type</th>
                             <th class="border-bottom-0 text-end">Montant</th>
+                            <th class="border-bottom-0 text-end">Preuve</th>
                             <th class="border-bottom-0">Observation</th>
                             <th class="border-bottom-0">Requete</th>
                             <th class="border-bottom-0">Transport</th>
@@ -122,12 +123,26 @@
                                     <i class="fas fa-exchange-alt me-1"></i>Virement
                                 </span>
                                 @break
+                                @case('autres')
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                    <i class="fas fa-money-bill-wave me-1"></i>Autres
+                                </span>
+                                @break
                                 @endswitch
                             </td>
                             <td class="text-end">
                                 <span class="fw-medium montant">
                                     {{ number_format($acompte->montant, 0, ',', ' ') }} F
                                 </span>
+                            </td>
+                            <td class="text-center">
+                                @if($acompte->preuve)
+                                <a href="{{ $acompte->preuve}}" target="_blank" class="btn btn-sm btn-light-primary btn-icon" data-bs-toggle="tooltip" title="Voir la preuve">
+                                    <i class="fas fa-paperclip"></i>
+                                </a>
+                                @else
+                                <span class="text-muted small">—</span>
+                                @endif
                             </td>
                             <td>
                                 <span class="text-muted small">{{ $acompte->observation ?: '—' }}</span>

@@ -141,11 +141,15 @@ class AcompteClientController extends Controller
     public function store(Request $request)
     {
         try {
+            Log::debug("Début du stockage de l'acompte", ["data" => $request->all()]);
+
             // Vérifications initiales
-            $sessionCaisse = SessionCaisse::ouverte()
-                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                // ->where('utilisateur_id', auth()->user()->id)
-                ->first();
+            // $sessionCaisse = SessionCaisse::ouverte()
+            //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+            //     // ->where('utilisateur_id', auth()->user()->id)
+            //     ->first();
+
+            $sessionCaisse = SessionCaisse::find(12);
 
             if (!$sessionCaisse) {
                 return response()->json([
@@ -172,11 +176,14 @@ class AcompteClientController extends Controller
 
             DB::beginTransaction();
 
-            // Vérifier si le client existe et est actif
-            $client = Client::findOrFail($validated['client_id']);
-            // if (!$client->statut) {
-            //     throw new Exception('Ce client est inactif');
-            // }
+            // Handle file upload for 'preuve' if provided
+            if ($request->hasFile('preuve')) {
+                $file = $request->file('preuve');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move("acompte_preuves", $filename);
+                $filePath = asset("/acompte_preuves/" . $filename);
+                $validated['preuve'] = $filePath;
+            }
 
             // Ajouter le statut par défaut aux données validées
             $validated['statut'] = AcompteClient::STATUT_EN_ATTENTE;
@@ -186,7 +193,11 @@ class AcompteClientController extends Controller
             $acompte = new AcompteClient();
             $data = array_merge(
                 $request->all(),
-                ["session_caisse_id" => $sessionCaisse->id]
+                [
+                    "session_caisse_id" => $sessionCaisse->id,
+                    "statut" => $validated['statut'],
+                    "preuve" => $validated['preuve'] ?? null
+                ]
             );
             $acompte->fill($data);
 
@@ -324,7 +335,7 @@ class AcompteClientController extends Controller
     {
         try {
             // Validation des données
-            Log::info("Data to update",["data"=>$request->get("montant")]);
+            Log::info("Data to update", ["data" => $request->get("montant")]);
 
             $validated = $request->validate(AcompteClient::rules(), [
                 'date.required' => 'La date est obligatoire',
@@ -336,7 +347,7 @@ class AcompteClientController extends Controller
                 'montant.required' => 'Le montant est obligatoire',
                 'montant.numeric' => 'Le montant doit être un nombre'
             ]);
-            Log::info("Data validated",["data"=>$validated]);
+            Log::info("Data validated", ["data" => $validated]);
 
             DB::beginTransaction();
 
