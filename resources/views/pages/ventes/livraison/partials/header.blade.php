@@ -36,7 +36,7 @@
                 <button type="button" class="btn btn-warning btn-sm d-flex align-items-center" data-bs-toggle="modal"
                     data-bs-target="#addLivraisonModal">
                     <i class="fas fa-plus me-2"></i>
-                    Nouveau Bon de Livraison
+                    Nouveau Bordereau de Livraison
                 </button>
             </div>
         </div>
