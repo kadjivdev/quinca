@@ -45,11 +45,22 @@ use Carbon\Carbon;
 Route::get("/debug", function () {
 
     // Journée du 05
-    $accompte05 = AcompteClient::where("created_by", 3)
-        ->whereDate("created_at", Carbon::create(2025, 12, 5))
-        ->get();
+    $accompteLaurenda05 = AcompteClient::with("createdBy")
+        ->where("created_by", 3)
+        ->whereDate("created_at", Carbon::create(2026, 1, 5));
+    $accompteLaurenda05->update(["session_caisse_id" => 311]);
 
-    return $accompte05;
+    $accompteIsaac05 = AcompteClient::with("createdBy")
+        ->where("created_by", 25)
+        ->whereDate("created_at", Carbon::create(2026, 1, 5));
+    $accompteIsaac05->update(["session_caisse_id" => 310]);
+
+    // Journée du 07
+    $accompteLaurenda05 = AcompteClient::with("createdBy")
+        ->where("created_by", 3)
+        ->whereDate("created_at", Carbon::create(2026, 1, 7));
+    $accompteLaurenda05->update(["session_caisse_id" => 314]);
+
     // === Regulation des factures revendeurs liées aux inventaires du pr Fahim === //
     // $_factureRevsQuery = FactureRevendeur::with("createdBy", "inventaire.auteur");
 
@@ -101,10 +112,10 @@ Route::get("/debug", function () {
     //     ->whereBetween('created_at', ['2025-12-10 16:00:00', '2025-12-24 00:00:00']);
     // $facturesDjougou->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
 
-    $facturesParakou = FactureRevendeur::with("inventaire", "createdBy")
-        ->where("created_by", 12)
-        ->whereBetween('created_at', ['2025-12-18 00:00:00', '2025-12-25 00:00:00']);
-    $facturesParakou->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
+    // $facturesParakou = FactureRevendeur::with("inventaire", "createdBy")
+    //     ->where("created_by", 12)
+    //     ->whereBetween('created_at', ['2025-12-18 00:00:00', '2025-12-25 00:00:00']);
+    // $facturesParakou->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
 
     // $facturesKandi = FactureRevendeur::with("inventaire", "createdBy")
     //     ->where("created_by", 17)
