@@ -27,6 +27,7 @@ use App\Models\Catalogue\Article;
 use App\Models\Catalogue\Inventaire;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\AcompteClient;
 use App\Models\Vente\CompteClient;
 use App\Models\Vente\FactureClient;
 use Carbon\Carbon;
@@ -43,6 +44,12 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
+    // Journée du 05
+    $accompte05 = AcompteClient::where("created_by", 3)
+        ->whereDate("created_at", Carbon::create(2025, 12, 5))
+        ->get();
+
+    return $accompte05;
     // === Regulation des factures revendeurs liées aux inventaires du pr Fahim === //
     // $_factureRevsQuery = FactureRevendeur::with("createdBy", "inventaire.auteur");
 

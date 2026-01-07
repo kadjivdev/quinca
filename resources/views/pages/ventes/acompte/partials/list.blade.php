@@ -74,6 +74,7 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">Référence</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Session</th>
                             <th class="border-bottom-0">Date</th>
                             <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0 text-center">Type</th>
@@ -91,6 +92,9 @@
                         <tr>
                             <td class="text-nowrap py-3">
                                 <span class="code-reference">{{ $acompte->reference }}</span>
+                            </td>
+                            <td class="text-nowrap py-3">
+                                <span class="code-reference">{{$acompte->sessionCaisse? "##". $acompte->sessionCaisse?->id :'--'}}</span>
                             </td>
                             <td class="text-nowrap">
                                 {{ $acompte->date->format('d/m/Y') }}

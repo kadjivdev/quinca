@@ -144,12 +144,12 @@ class AcompteClientController extends Controller
             Log::debug("Début du stockage de l'acompte", ["data" => $request->all()]);
 
             // Vérifications initiales
-            // $sessionCaisse = SessionCaisse::ouverte()
-            //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-            //     // ->where('utilisateur_id', auth()->user()->id)
-            //     ->first();
+            $sessionCaisse = SessionCaisse::ouverte()
+                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                // ->where('utilisateur_id', auth()->user()->id)
+                ->first();
 
-            $sessionCaisse = SessionCaisse::find(12);
+            // $sessionCaisse = SessionCaisse::find(12);
 
             if (!$sessionCaisse) {
                 return response()->json([
