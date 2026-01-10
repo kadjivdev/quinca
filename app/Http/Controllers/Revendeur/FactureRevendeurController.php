@@ -215,19 +215,20 @@ class FactureRevendeurController extends Controller
                  * Recherche de la conversion
                  */
                 $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
-                $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
+                // $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
                 $article = Article::findOrFail($ligne['article_id']);
 
                 $conversion = $this->serviceStockEntree
                     ->rechercherConversion(
                         $ligne['unite_vente_id'],
-                        $stock->unite_mesure_id,
+                        $article->unite_mesure_id, // $stock->unite_mesure_id,
                         $stock->article_id
                     );
+
                 if (!$conversion) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ($stockUnite->libelle_unite) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
+                        'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ({{$article->uniteMesure?->libelle_unite}}) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
                     ], 500);
                 }
 
@@ -235,17 +236,21 @@ class FactureRevendeurController extends Controller
                  * Obtention de la quantité convertie
                  */
 
+                // stock existant en unité de base d el'article
+                $resteStock = isset($ligne["depot_stock"]) ? $ligne["depot_stock"] : 0;
+
+                // unite de vente vers unite de base de l'article
                 $QteConvertie = $this->serviceStockEntree
                     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
-                $QteStockConvertie = $this->serviceStockEntree
-                    ->convertirQuantite($stock->article->reste($stock->depot_id), $conversion, $ligne['unite_vente_id']);
+                // $QteStockConvertie = $this->serviceStockEntree
+                //     ->convertirQuantite($resteStock, $conversion, $ligne['unite_vente_id']);
 
                 // on verifie la quantité restante de l'article dans le depot est suffisante
-                if ($QteStockConvertie < $QteConvertie) {
+                if ($resteStock < $QteConvertie) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Le reste du stock de l'article ($article->designation) est de $QteStockConvertie $venteUnite->libelle_unite dans le depôt ({$stock->depot->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
+                        'message' => "Le reste du stock de l'article ($article->designation) est de $resteStock {{$article->uniteMesure?->libelle_unite}} dans le depôt ({$stock->depot?->libelle_depot})! Vous avez saisi $QteConvertie {{$article->uniteMesure?->libelle_unite}}!  Stock insuiffisant par rapport à la quantité saisie"
                     ], 500);
                 }
             }
@@ -358,56 +363,6 @@ class FactureRevendeurController extends Controller
         }
     }
 
-    // public function searchArticles(Request $request)
-    // {
-    //     $search = $request->get('q');
-    //     Log::info("Terme de recherche:", ["terme" => $search]);
-    //     $user = auth()->user();
-
-    //     $stocks = StockDepot::with('article')
-    //         ->get()
-    //         ->filter(function ($stock) use ($search, $user) {
-    //             /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
-    //             if ($user->hasRole('Super Administrateur') || $user->hasRole('CHARGE DES STOCKS ET SUIVI DES ACHATS')) {
-    //                 return (
-    //                     str_contains(strtolower($stock->article->designation), strtolower($search)) ||
-    //                     str_contains(strtolower($stock->article->code_article), strtolower($search))
-    //                 );
-    //             }
-
-    //             /** ON FILTRE LES STOCKS SELON LES POINT DE VENTE DU USER */
-    //             $userPv = auth()->user()->pointDeVente;
-    //             $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
-
-    //             if (in_array($stock->depot_id, $userPv_depotIds)) {
-
-    //                 return (str_contains(strtolower($stock->article->designation), strtolower($search)) ||
-    //                     str_contains(strtolower($stock->article->code_article), strtolower($search))
-    //                 );
-    //             }
-    //         });
-
-    //     return response()->json([
-    //         'results' => $stocks->map(function ($stock) {
-    //             /**
-    //              * @param $resteStock Reste du stock dans le depot
-    //              */
-
-    //             $resteStock = $stock->article
-    //                 ->reste($stock->depot_id);
-
-    //             return [
-    //                 'id' => $stock->article->id,
-    //                 'text' => $stock->article->designation,
-    //                 'code_article' => $stock->article->code_article,
-    //                 'depot' => $stock->depot,
-    //                 'unite_mesure' => $stock->uniteMesure, //->libelle_unite,
-    //                 'stock' => $resteStock ?? 00,
-    //             ];
-    //         })
-    //     ]);
-    // }
-
     public function searchArticles(Request $request)
     {
         // dd("gogo");
@@ -469,7 +424,7 @@ class FactureRevendeurController extends Controller
                     'text' => $stock->article->designation,
                     'code_article' => $stock->article->code_article,
                     'depot' => $stock->depot,
-                    'unite_mesure' => $stock->uniteMesure, //->libelle_unite,
+                    'unite_mesure' => $stock->article->uniteMesure, // $stock->uniteMesure, //->libelle_unite,
                     'stock' => $resteStock ?? 00,
                 ];
             })

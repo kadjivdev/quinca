@@ -413,10 +413,15 @@ class FactureManager {
         const row = $(`select[name="lignes[${index}][article_id]"]`).closest('tr');
 
         const depotSelect = document.querySelector(`input[name="lignes[${index}][depot_id]"]`);
+        const depotStock = document.querySelector(`input[name="lignes[${index}][depot_stock]"]`);
         const depotQuantite = document.querySelector(`input[name="lignes[${index}][quantite]"]`);
         const depotLibelle = document.querySelector(`input[name="lignes[${index}][depot_libelle]"]`);
 
         const data = e.params.data
+
+        console.log("Data sélectionnée:", data);
+        
+        depotStock.value = data.stock;
         depotSelect.value = data.depot.id;
         depotLibelle.value = `${data.depot.libelle_depot} | stock: ${data.stock} ${data.unite_mesure.libelle_unite} `;
         depotQuantite.min = 0

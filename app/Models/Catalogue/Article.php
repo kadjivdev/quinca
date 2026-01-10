@@ -310,22 +310,22 @@ class Article extends Model
 
         $factureRevendeurs = $this->facturesVenteRevendeur($depotId);
 
-        $qteVenteConvertie = 0;
+        $qteVente = 0;
         if ($factureVentes->isEmpty() && $factureRevendeurs->isEmpty()) {
-            $qteVenteConvertie = 0;
+            $qteVente = 0;
         }
 
         /**Conversion qteVendu Client*/
         if ($factureVentes->isNotEmpty()) {
-            $qteVenteConvertie += $factureVentes->sum("quantite_base");
+            $qteVente += $factureVentes->sum("quantite_base");
         }
 
         /**Conversion qteVendu Revendeur*/
         if ($factureRevendeurs->isNotEmpty()) {
-            $qteVenteConvertie += $factureRevendeurs->sum("quantite_base");
+            $qteVente += $factureRevendeurs->sum("quantite_base");
         }
 
-        return $qteVenteConvertie;
+        return $qteVente;
     }
 
     /**

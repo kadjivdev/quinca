@@ -340,6 +340,7 @@ class SpecialController extends Controller
 
     public function searchArticles(Request $request)
     {
+        // dd("gogo");
         $search = $request->get('q');
         Log::info("Terme de recherche:", ["terme" => $search]);
         $user = auth()->user();
@@ -349,7 +350,6 @@ class SpecialController extends Controller
             ->filter(function ($stock) use ($search, $user) {
                 /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
                 if ($user->hasRole('Super Administrateur') || $user->hasRole('CHARGE DES STOCKS ET SUIVI DES ACHATS')) {
-                    Log::info("Ce user est un admin", $user->getRoleNames()->toArray());
                     return (
                         str_contains(strtolower($stock->article->designation), strtolower($search)) ||
                         str_contains(strtolower($stock->article->code_article), strtolower($search))
@@ -372,17 +372,35 @@ class SpecialController extends Controller
                 /**
                  * @param $resteStock Reste du stock dans le depot
                  */
+                $conversion = $this->serviceStockEntree
+                    ->rechercherConversion(
+                        $stock->unite_mesure_id,
+                        $stock->article->unite_mesure_id,
+                        $stock->article_id
+                    );
 
-                $resteStock = $stock->article
-                    ->reste($stock->depot_id);
+                /**Qte de Base */
+                $qantiteBase = $conversion ? $this->serviceStockEntree
+                    ->convertirQuantite(
+                        $stock->quantite_reelle,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    ) : 00;
+
+
+                /**Qte Vendue */
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+
+                /**Qte Reste */
+                $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
 
                 return [
                     'id' => $stock->article->id,
                     'text' => $stock->article->designation,
                     'code_article' => $stock->article->code_article,
                     'depot' => $stock->depot,
-                    'unite_mesure' => $stock->uniteMesure, //->libelle_unite,
-                    'stock' => $resteStock ? number_format($resteStock, 0, " ", " ") : 00,
+                    'unite_mesure' =>$stock->article->uniteMesure, // $stock->uniteMesure, //->libelle_unite,
+                    'stock' => $resteStock ?? 00,
                 ];
             })
         ]);

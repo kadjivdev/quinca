@@ -312,7 +312,6 @@ class FactureClientController extends Controller
         }
     }
 
-
     public function store(Request $request)
     {
         try {
@@ -781,12 +780,11 @@ class FactureClientController extends Controller
 
     public function searchArticles(Request $request)
     {
-        // dd("gogo");
         $search = $request->get('q');
         Log::info("Terme de recherche:", ["terme" => $search]);
         $user = auth()->user();
 
-        $stocks = StockDepot::with('article')
+        $stocks = StockDepot::with('article.uniteMesure', 'depot')
             ->get()
             ->filter(function ($stock) use ($search, $user) {
                 /** POUR UN ADMIN OU UN CHARGE DES STOCKS, ON NE FAIT PAS DE FILTRE */
@@ -813,6 +811,7 @@ class FactureClientController extends Controller
                 /**
                  * @param $resteStock Reste du stock dans le depot
                  */
+
                 $conversion = $this->serviceStockEntree
                     ->rechercherConversion(
                         $stock->unite_mesure_id,
@@ -828,7 +827,6 @@ class FactureClientController extends Controller
                         $stock->unite_mesure_id
                     ) : 00;
 
-
                 /**Qte Vendue */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
 
@@ -840,7 +838,7 @@ class FactureClientController extends Controller
                     'text' => $stock->article->designation,
                     'code_article' => $stock->article->code_article,
                     'depot' => $stock->depot,
-                    'unite_mesure' => $stock->uniteMesure, //->libelle_unite,
+                    'unite_mesure' =>$stock->article->uniteMesure, // $stock->uniteMesure, //->libelle_unite,
                     'stock' => $resteStock ?? 00,
                 ];
             })
