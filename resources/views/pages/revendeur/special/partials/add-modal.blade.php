@@ -280,6 +280,7 @@
         </td>
         <td>
             <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
+            <input type="number" _hidden name="lignes[__INDEX__][depot_stock]" class="form-control">
             <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
             <div class="invalid-feedback">Le depôt est requis</div>
         </td>
@@ -332,7 +333,7 @@
         const filter = searchInput.value.toLowerCase();
         for (let i = 0; i < items.length; i++) {
             const text = items[i].textContent.toLowerCase();
-            items[i].style.display = text.includes(filter) ?"" : "none";
+            items[i].style.display = text.includes(filter) ? "" : "none";
         }
     })
 </script>

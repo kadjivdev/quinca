@@ -123,11 +123,11 @@ class RapportStockController extends Controller
                     ->where("depot_id", $depot->id);
 
                 /**
-                 * Stocks de l'article
+                 * Stocks de l'article dans le depot $depot
                  */
 
                 $articleStocks
-                    ->map(function ($stock) use ($article, &$depot) {
+                    ->map(function ($stock) use ($article) {
                         $conversion = $this->serviceEntree
                             ->rechercherConversion(
                                 $stock->unite_mesure_id,
@@ -135,7 +135,7 @@ class RapportStockController extends Controller
                                 $stock->article_id
                             );
 
-                        // Qte relle
+                        // // Qte relle
                         $stock->quantite_reelle = $conversion ? $this->serviceEntree
                             ->convertirQuantite(
                                 $stock->quantite_reelle,
@@ -144,25 +144,28 @@ class RapportStockController extends Controller
                                 // $article->unite_mesure_id
                             ) : 00;
 
-                        /**Qte de Base */
-                        $stock->qantiteBase = $conversion ? $this->serviceEntree
-                            ->convertirQuantite(
-                                $stock->quantite_reelle,
-                                $conversion,
-                                // $stock->unite_mesure_id,
-                                $article->unite_mesure_id
-                            ) : 00;
+                        // /**Qte de Base */
+                        // $stock->qantiteBase = $conversion ? $this->serviceEntree
+                        //     ->convertirQuantite(
+                        //         $stock->quantite_reelle,
+                        //         $conversion,
+                        //         // $stock->unite_mesure_id,
+                        //         $article->unite_mesure_id
+                        //     ) : 00;
 
                         /**Qte Vendue */
-                        $stock->qteTotalVendu = $conversion ? $this->serviceEntree
-                            ->convertirQuantite(
-                                session()->get("date_ftr") ? $article->qteVenduAtDate($stock->depot_id, session()->get("date_ftr")) : $article->qteVendu($stock->depot_id),
-                                $conversion,
-                                $stock->unite_mesure_id,
-                                // $article->unite_mesure_id
-                            ) : 00;
-
+                        $stock->qteTotalVendu = session()->get("date_ftr") ?
+                            $article->qteVenduAtDate($stock->depot_id, session()->get("date_ftr")) : $article->qteVendu($stock->depot_id);
+                        /**Reste en stock */
                         $stock->resteStock = $stock->quantite_reelle - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
+
+                        if ($article->code_article === "ART-805") {
+                            Log::debug("Debug ART-805", [
+                                "qteRelle" => $stock->quantite_reelle,
+                                "qteVendu" => $stock->qteTotalVendu,
+                                "resteStock" => $stock->resteStock
+                            ]);
+                        }
                     });
 
                 $article->resteStock = $articleStocks->sum("resteStock");
@@ -184,8 +187,8 @@ class RapportStockController extends Controller
 
                 //stock disponible
                 $article->stockDisponible = $article->qteAppro > 0 ? $article->qteAppro + $article->qteDepart : $article->qteDepart;
-                // reste en stock
-                // $article->resteStock = $article->stockDisponible - $article->qteTotalVendu;
+                // unité du stock
+                $article->unite_mesure = $articleStocks->first()?->uniteMesure?->libelle_unite;
 
                 return $article;
             });

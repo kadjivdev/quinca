@@ -191,6 +191,52 @@ class SpecialController extends Controller
             }
 
             // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
+            // foreach ($request->lignes as $ligne) {
+            //     $depot = Depot::find($ligne["depot_id"]);
+            //     // 
+            //     $stock = StockDepot::where('depot_id', $ligne["depot_id"])
+            //         ->where('article_id', $ligne['article_id'])
+            //         ->first();
+
+            //     /**
+            //      * Recherche de la conversion
+            //      */
+            //     $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
+            //     $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
+            //     $article = Article::findOrFail($ligne['article_id']);
+
+            //     $conversion = $this->serviceStockEntree
+            //         ->rechercherConversion(
+            //             $ligne['unite_vente_id'],
+            //             $stock->unite_mesure_id,
+            //             $stock->article_id
+            //         );
+            //     if (!$conversion) {
+            //         return response()->json([
+            //             'status' => false,
+            //             'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ($stockUnite->libelle_unite) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
+            //         ], 500);
+            //     }
+
+            //     /**
+            //      * Obtention de la quantité convertie
+            //      */
+
+            //     $QteConvertie = $this->serviceStockEntree
+            //         ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
+
+            //     $QteStockConvertie = $this->serviceStockEntree
+            //         ->convertirQuantite($stock->article->reste($stock->depot_id), $conversion, $ligne['unite_vente_id']);
+
+            //     // on verifie la quantité restante de l'article dans le depot est suffisante
+            //     if ($QteStockConvertie < $QteConvertie) {
+            //         return response()->json([
+            //             'status' => false,
+            //             'message' => "Le reste du stock de l'article ($article->designation) est de $QteStockConvertie $venteUnite->libelle_unite dans le depôt ({$stock->depot->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
+            //         ], 500);
+            //     }
+            // }
+
             foreach ($request->lignes as $ligne) {
                 $depot = Depot::find($ligne["depot_id"]);
                 // 
@@ -202,19 +248,20 @@ class SpecialController extends Controller
                  * Recherche de la conversion
                  */
                 $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
-                $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
+                // $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
                 $article = Article::findOrFail($ligne['article_id']);
 
                 $conversion = $this->serviceStockEntree
                     ->rechercherConversion(
                         $ligne['unite_vente_id'],
-                        $stock->unite_mesure_id,
+                        $article->unite_mesure_id, // $stock->unite_mesure_id,
                         $stock->article_id
                     );
+
                 if (!$conversion) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ($stockUnite->libelle_unite) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
+                        'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ({{$article->uniteMesure?->libelle_unite}}) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
                     ], 500);
                 }
 
@@ -222,17 +269,21 @@ class SpecialController extends Controller
                  * Obtention de la quantité convertie
                  */
 
+                // stock existant en unité de base d el'article
+                $resteStock = isset($ligne["depot_stock"]) ? $ligne["depot_stock"] : 0;
+
+                // unite de vente vers unite de base de l'article
                 $QteConvertie = $this->serviceStockEntree
                     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
-                $QteStockConvertie = $this->serviceStockEntree
-                    ->convertirQuantite($stock->article->reste($stock->depot_id), $conversion, $ligne['unite_vente_id']);
+                // $QteStockConvertie = $this->serviceStockEntree
+                //     ->convertirQuantite($resteStock, $conversion, $ligne['unite_vente_id']);
 
                 // on verifie la quantité restante de l'article dans le depot est suffisante
-                if ($QteStockConvertie < $QteConvertie) {
+                if ($resteStock < $QteConvertie) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Le reste du stock de l'article ($article->designation) est de $QteStockConvertie $venteUnite->libelle_unite dans le depôt ({$stock->depot->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
+                        'message' => "Le reste du stock de l'article ($article->designation) est de $resteStock {{$article->uniteMesure?->libelle_unite}} dans le depôt ({$stock->depot?->libelle_depot})! Vous avez saisi $QteConvertie {{$article->uniteMesure?->libelle_unite}}!  Stock insuiffisant par rapport à la quantité saisie"
                     ], 500);
                 }
             }
@@ -399,7 +450,7 @@ class SpecialController extends Controller
                     'text' => $stock->article->designation,
                     'code_article' => $stock->article->code_article,
                     'depot' => $stock->depot,
-                    'unite_mesure' =>$stock->article->uniteMesure, // $stock->uniteMesure, //->libelle_unite,
+                    'unite_mesure' => $stock->article->uniteMesure, // $stock->uniteMesure, //->libelle_unite,
                     'stock' => $resteStock ?? 00,
                 ];
             })

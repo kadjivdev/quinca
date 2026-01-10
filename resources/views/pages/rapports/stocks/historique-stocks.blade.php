@@ -38,7 +38,9 @@
                         <th class="border-bottom-0">Inventorié le:</th>
                         <th class="border-bottom-0">Approvisionné</th>
                         <th class="border-bottom-0">Stock disponible</th>
+                        <th class="border-bottom-0">Unité de Stock</th>
                         <th class="border-bottom-0">Vente</th>
+                        <th class="border-bottom-0">Unité de vente</th>
                         <th class="border-bottom-0">Stock final</th>
                         <th class="border-bottom-0">Unité</th>
                     </tr>
@@ -53,7 +55,9 @@
                         <td><span class="badge bg-light text-dark">{{Carbon\carbon::parse($article->inventaire_date)->locale('fr')->isoFormat("D MMMM YYYY H:m:s")}} </span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteAppro,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->stockDisponible,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{$article->unite_mesure}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">({{$article->uniteMesure?->libelle_unite}})</span></td>
                     </tr>
