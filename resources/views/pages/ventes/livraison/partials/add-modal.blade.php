@@ -43,8 +43,7 @@
                                             <select class="form-select" name="depot_id" id="depotSelect" required>
                                                 <option value="">Sélectionner un magasin</option>
                                                 @foreach ($depots as $depot)
-                                                <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
-                                                </option>
+                                                <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}</option>
                                                 @endforeach
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner un magasin</div>

@@ -34,7 +34,7 @@
                     let factures = response.data;
                     console.log(`Les factures : ${JSON.stringify(response)}`);
 
-                    // mise a jour des options de factures
+                    // mise à jour des options de factures
                     if (factures.length > 0) {
                         let options = '<option value="">Sélectionner une facture</option>';
                         factures.forEach(function(facture) {
@@ -345,10 +345,17 @@
         });
 
         // Initialisation de Select2
-        $('#factureSelect, #depotSelect').select2({
+        $('#factureSelect').select2({
             theme: 'bootstrap-5',
             width: '100%',
             placeholder: 'Sélectionner une facture',
+            dropdownParent: $('#addLivraisonModal')
+        });
+
+        $('#depotSelect').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Sélectionner un dépôt',
             dropdownParent: $('#addLivraisonModal')
         });
     });
