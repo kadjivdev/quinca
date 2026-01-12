@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Rapport;
 
 use App\Http\Controllers\Controller;
 use App\Models\Catalogue\{Article, FamilleArticle};
+use App\Models\Parametre\Agent;
 use App\Models\Vente\{AcompteClient, FactureClient, SessionCaisse, ReglementClient, ReglementRevendeur};
 use App\Models\Vente\Client;
 use App\Models\Parametre\PointDeVente;
@@ -377,6 +378,7 @@ class RapportVenteController extends Controller
         ));
     }
 
+    // ventes journalières
     public function ventesJournalieres(Request $request)
     {
         try {
@@ -492,6 +494,140 @@ class RapportVenteController extends Controller
             }
         } catch (\Exception $e) {
             \Log::error('Erreur générale: ' . $e->getMessage());
+            return back()
+                ->with('error', 'Une erreur inattendue est survenue: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    // ventes journalières
+    public function ventesAgents(Request $request)
+    {
+        try {
+            $agent = $request->agent_id ? Agent::findOrFail($request->agent_id) : Agent::findOrFail(1); //agent par défaut
+            $agents = Agent::all();
+
+            try {
+                $factureClients = FactureClient::whereNotNull("validated_by")
+                    ->with([
+                        'client.agent',
+                        'createdBy',
+                        'lignes.article', // Ajout des lignes et de l'article
+                        'reglements' => function ($query) {
+                            $query->where('statut', ReglementClient::STATUT_VALIDE);
+                        }
+                    ])
+                    ->whereHas("client", function ($q) use ($agent) {
+                        $q->where('agent_id', $agentId ?? $agent->id);
+                    })
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $factureRevendeurs = FactureRevendeur::whereNotNull("validated_by")
+                    ->with([
+                        'client',
+                        'createdBy',
+                        'lignes.article', // Ajout des lignes et de l'article
+                        'reglements' => function ($query) {
+                            $query->where('statut', ReglementRevendeur::STATUT_VALIDE);
+                        }
+                    ])
+                    ->whereHas("client", function ($q) use ($agent) {
+                        $q->where('agent_id', $agentId ?? $agent->id);
+                    })
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $factureRevendeurs->map(function ($vente) {
+                    $vente->revendeur = true;
+                    return $vente;
+                });
+
+                $ventes = $factureClients->concat($factureRevendeurs);
+
+                if ($ventes->isEmpty()) {
+                    return view('pages.rapports.ventes.vente-agent')
+                        ->with('warning', 'Aucune vente trouvée pour cette date')
+                        ->with('ventes', collect([]))
+                        ->with('totaux', [
+                            'total_global' => 0,
+                            'total_comptant' => 0,
+                            'total_credit' => 0,
+                        ])
+                        ->with('agent', $agent)
+                        ->with('agents', $agents);
+                }
+                // Mapping des données
+                $ventesFormatted = $ventes->map(function ($facture) {
+                    try {
+                        $type_vente = 'Crédit';
+                        /**
+                         * On rajoute une marge de 5F 
+                         * au montant réglé
+                         * avant de le comparer au montant de la vente à solder
+                         */
+
+                        if ($facture->montant_regle + 5 >= $facture->montant_ttc) {
+                            $type_vente = 'Comptant';
+                        }
+
+                        // Préparation des lignes de détail
+                        $lignes = $facture->lignes->map(function ($ligne) {
+                            return [
+                                'produit' => $ligne->article->designation ?? 'N/A',
+                                'quantite' => $ligne->quantite ?? 0,
+                                'prix_unitaire' => $ligne->prix_unitaire_ht ?? 0,
+                                'total' => $ligne->montant_ttc ?? 0
+                            ];
+                        });
+
+                        return [
+                            'id' => $facture->id,
+                            'numero' => $facture->numero ?? 'N/A',
+                            'date_ecriture' => $facture->created_at->format('d/m/Y H:i'),
+                            'date_vente' => $facture->date_facture->format('d/m/Y'),
+                            'reference' => $facture->numero ?? 'N/A',
+                            'type_vente' => $type_vente,
+                            'moyen_reglement' => $facture->moyen_reglement,
+                            'revendeur' => $facture->revendeur,
+                            'createdBy' => $facture->createdBy,
+                            'categorie_vente' => $facture->client->categorie ?? 'N/A',
+                            'statut' => $facture->statut,
+                            'client' => $facture->client?->raison_sociale ?? '---',
+                            'agent' => $facture->client?->agent?->nom ?? '---',
+                            'montant_ttc' => $facture->montant_ttc ?? 0,
+                            'montant_regle' => $facture->montant_regle ?? 0,
+                            'reste_a_payer' => $facture->montant_ttc - ($facture->montant_regle ?? 0),
+                            'lignes' => $lignes, // Ajout des lignes de détail
+                        ];
+                    } catch (\Exception $e) {
+                        Log::error('Erreur lors du mapping de la facture #' . $facture->id . ': ' . $e->getMessage());
+                        return null;
+                    }
+                })->filter();
+
+                // Calcul des totaux
+                $totaux = [
+                    'total_global' => $ventesFormatted->sum('montant_ttc'),
+                    'total_regle' => $ventesFormatted->sum('montant_regle'),
+                    'total_comptant' => $ventesFormatted->where('type_vente', 'Comptant')->sum('montant_ttc'),
+                    'total_credit' => $ventesFormatted->where('type_vente', 'Crédit')->sum('montant_ttc'),
+                ];
+
+                // return $totaux;
+                return view('pages.rapports.ventes.vente-agent', [
+                    'ventes' => $ventesFormatted,
+                    'totaux' => $totaux,
+                    'agent' => $agent,
+                    'agents' => $agents
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Erreur lors de la récupération des ventes: ' . $e->getMessage());
+                return back()
+                    ->with('error', 'Une erreur est survenue lors de la récupération des données: ' . $e->getMessage());
+            }
+        } catch (\Exception $e) {
+            Log::error('Erreur générale: ' . $e->getMessage());
             return back()
                 ->with('error', 'Une erreur inattendue est survenue: ' . $e->getMessage())
                 ->withInput();

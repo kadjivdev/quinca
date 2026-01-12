@@ -1208,6 +1208,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/ventes-journalier', [RapportVenteController::class, 'ventesJournalieres'])
             ->name('rapports.vente-journaliere');
 
+        Route::get('/ventes-agent', [RapportVenteController::class, 'ventesAgents'])
+            ->name('rapports.vente-agent');
+
         // LES ENREGISTREMENTS NON VALIDES
         Route::get('/all-enregistrement', [RapportVenteController::class, 'enregistrementsAll'])
             ->name('rapports.enregistrementsAll');
@@ -1219,8 +1222,10 @@ Route::middleware('auth')->group(function () {
         // Route principale pour la session ouverte
         Route::get('/sessions', [RapportVenteController::class, 'sessionVente'])
             ->name('vente.sessions.rapport');
+
         Route::get('/sessions-reglements', [RapportVenteController::class, 'sessionReglement'])
             ->name('vente.sessions-reglements.rapport');
+
         Route::get('/sessions-accomptes', [RapportVenteController::class, 'sessionAccompte'])
             ->name('vente.sessions-accomptes.rapport');
 

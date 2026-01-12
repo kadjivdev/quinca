@@ -422,6 +422,10 @@
                             <div class="dropdown-item-wrapper">Ventes Journalière</div>
                         </a></li>
 
+                    <li><a class="dropdown-item" href="{{ route('rapports.vente-agent') }}">
+                            <div class="dropdown-item-wrapper">Ventes par agent</div>
+                        </a></li>
+
                     <!-- ENREGISTREMENTS (facturation vente clients dans le panel ventes) NON VALIDES -->
                     <li><a class="dropdown-item" href="{{ route('rapports.enregistrementsAll') }}">
                             <div class="dropdown-item-wrapper">Tous les enregistrements</div>
