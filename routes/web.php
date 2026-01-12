@@ -857,6 +857,9 @@ Route::middleware('auth')->group(function () {
             // Voir les détails d'une facture
             Route::get('/{id}', [FactureClientController::class, 'show'])->name('vente.facture.show');
 
+            // voir les factures d'un depot
+            Route::get('/factures-depot/{depotId}', [FactureClientController::class, 'getDepotFactures'])->name('vente.getDepotFactures');
+
             // Routes pour la recherche d'articles et récupération des données
             Route::prefix('api')->group(function () {
                 Route::get('/articles/search', [FactureClientController::class, 'searchArticles']);

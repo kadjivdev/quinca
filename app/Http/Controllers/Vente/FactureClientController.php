@@ -889,7 +889,7 @@ class FactureClientController extends Controller
                     'text' => $stock->article->designation,
                     'code_article' => $stock->article->code_article,
                     'depot' => $stock->depot,
-                    'unite_mesure' =>$stock->article->uniteMesure, // $stock->uniteMesure, //->libelle_unite,
+                    'unite_mesure' => $stock->article->uniteMesure, // $stock->uniteMesure, //->libelle_unite,
                     'stock' => $resteStock ?? 00,
                 ];
             })
@@ -1011,6 +1011,19 @@ class FactureClientController extends Controller
                 'message' => 'Erreur lors de la récupération des unités: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    // get depot's factures
+    function getDepotFactures($depotId)
+    {
+        $factures = FactureClient::whereHas('lignes', function ($ligne) use ($depotId) {
+            $ligne->where('depot', $depotId);
+        })
+            ->get(["id", "numero"]);
+
+        return response()->json([
+            'data' => $factures
+        ]);
     }
 
     public function show(Request $request, $id)

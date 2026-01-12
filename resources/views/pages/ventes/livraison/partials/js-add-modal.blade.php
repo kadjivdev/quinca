@@ -18,9 +18,45 @@
             updateSaveButton();
         });
 
-        // Gestion du changement de magasin
-        $('select[name="depot_id"]').on('change', function() {
-            updateSaveButton();
+        // Gestion du changement de depot
+        $('#depotSelect').on('change', function() {
+            const depotId = $(this).val();
+
+            $('#factureSelect').empty();
+
+            let route = '{{ route("vente.getDepotFactures", ":depotId") }}';
+            route = route.replace(':depotId', depotId);
+            // recuperation de toutes les factures de ce depot
+            console.log(route);
+            fetch(`${route}`)
+                .then(response => response.json())
+                .then(response => {
+                    let factures = response.data;
+                    console.log(`Les factures : ${JSON.stringify(response)}`);
+
+                    // mise a jour des options de factures
+                    if (factures.length > 0) {
+                        let options = '<option value="">Sélectionner une facture</option>';
+                        factures.forEach(function(facture) {
+                            options += `<option value="${facture.id}">${facture.numero}</option>`;
+                        });
+                        $('#factureSelect').html(options);
+                    } else {
+                        $('#factureSelect').html(
+                            '<option value="">Aucune facture disponible pour ce magasin</option>'
+                        );
+                    }
+
+                    updateSaveButton();
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des factures :', error);
+                });
+
+            // Gestion du changement de magasin
+            $('select[name="depot_id"]').on('change', function() {
+                updateSaveButton();
+            });
         });
 
         // Fonction pour charger les lignes de facture
@@ -309,7 +345,7 @@
         });
 
         // Initialisation de Select2
-        $('#factureSelect').select2({
+        $('#factureSelect, #depotSelect').select2({
             theme: 'bootstrap-5',
             width: '100%',
             placeholder: 'Sélectionner une facture',

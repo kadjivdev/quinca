@@ -38,35 +38,33 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 mb-3 mb-md-0">
-                                            <label class="form-label fw-medium required">Facture</label>
-                                            <select class="form-select" name="facture_id" id="factureSelect" required>
-                                                <option value="">Sélectionner une facture</option>
-                                                @foreach ($factures as $facture)
-                                                    <option value="{{ $facture->id }}">{{ $facture->numero }}</option>
-                                                @endforeach
-                                            </select>
-                                            <div class="invalid-feedback">Veuillez sélectionner une facture</div>
-                                        </div>
                                         <div class="col-md-4">
                                             <label class="form-label fw-medium required">Magasin source</label>
-                                            <select class="form-select" name="depot_id" required>
+                                            <select class="form-select" name="depot_id" id="depotSelect" required>
                                                 <option value="">Sélectionner un magasin</option>
                                                 @foreach ($depots as $depot)
-                                                    <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
-                                                    </option>
+                                                <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner un magasin</div>
                                         </div>
 
+                                        <div class="col-md-4 mb-3 mb-md-0">
+                                            <label class="form-label fw-medium required">Facture</label>
+                                            <select class="form-select" name="facture_id" id="factureSelect" required>
+                                                <!-- geré par js -->
+                                            </select>
+                                            <div class="invalid-feedback">Veuillez sélectionner une facture</div>
+                                        </div>
+
                                         <div class="col-md-12">
                                             <label class="form-label fw-medium">Magasin Destination Interne (pour une livraison sur un autre point de vente)</label>
-                                            <select class="form-select" name="depot_dest_id" >
+                                            <select class="form-select" name="depot_dest_id">
                                                 <option value="">Sélectionner un magasin de destination</option>
                                                 @foreach ($depots as $depot)
-                                                    <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
-                                                    </option>
+                                                <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner un magasin de destination interne</div>
