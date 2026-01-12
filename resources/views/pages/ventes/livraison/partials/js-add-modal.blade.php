@@ -355,7 +355,7 @@
         $('#depotSelect').select2({
             theme: 'bootstrap-5',
             width: '100%',
-            placeholder: 'Sélectionner un dépôt',
+            placeholder: 'Sélectionner un magasin',
             dropdownParent: $('#addLivraisonModal')
         });
     });
