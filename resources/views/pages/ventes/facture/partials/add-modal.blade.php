@@ -300,14 +300,22 @@
 <template id="ligneFactureTemplate">
     <tr class="ligne-facture">
         <td>
-            <select class="form-select select2-articles" name="lignes[__INDEX__][article_id]" required>
+            <select class="form-select select2-articles"
+                name="lignes[__INDEX__][article_id]"
+                required>
                 <option value="">Sélectionner un article</option>
             </select>
             <div class="invalid-feedback">L'article est requis</div>
-            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
-            <input type="number" hidden name="lignes[__INDEX__][depot_stock]" class="form-control">
-            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
-            <div class="invalid-feedback">Le depôt est requis</div>
+
+            <input type="hidden" name="lignes[__INDEX__][depot_id]">
+            <input type="hidden" name="lignes[__INDEX__][depot_stock]">
+
+            <input type="text"
+                readonly
+                name="lignes[__INDEX__][depot_libelle]"
+                class="form-control"
+                required>
+            <div class="invalid-feedback">Le dépôt est requis</div>
         </td>
         <td>
             <div class="input-group">
