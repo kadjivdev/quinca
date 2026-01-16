@@ -23,6 +23,7 @@
                 <table id="example1" class="example1 table table-hover align-middle mb-0" id="reglementsTable">
                     <thead class="bg-light">
                         <tr>
+                            <th class="border-bottom-0 text-nowrap py-3">ID</th>
                             <th class="border-bottom-0 text-nowrap py-3">Code</th>
                             <th class="border-bottom-0">Date Insertion</th>
                             <th class="border-bottom-0">Date Règlement</th>
@@ -38,6 +39,7 @@
                     <tbody>
                         @forelse($reglements as $reglement)
                         <tr>
+                            <td>{{$reglement->id}}</td>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
                                     <span class="code-reglement me-2">{{ $reglement->code }}</span>
@@ -164,7 +166,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {

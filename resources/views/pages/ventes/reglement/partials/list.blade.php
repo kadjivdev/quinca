@@ -27,6 +27,7 @@
                 <table id="example1" class="table table-hover align-middle mb-0" id="reglementsTable">
                     <thead class="bg-light">
                         <tr>
+                            <th class="border-bottom-0 text-nowrap py-3">ID</th>
                             <th class="border-bottom-0 text-nowrap py-3">N° Reçu</th>
                             <th class="border-bottom-0">Date Insertion</th>
                             <th class="border-bottom-0">Date règlement</th>
@@ -43,6 +44,7 @@
                     <tbody>
                         @forelse($reglements as $reglement)
                         <tr>
+                            <td>{{$reglement->id}}</td>
                             <td class="text-nowrap py-3">
                                 <span class="numero-recu me-2">{{ $reglement->numero }}</span>
                             </td>
@@ -287,7 +289,7 @@
             "autoWidth": false,
             "buttons": ["pdf", "print", "csv", "excel"],
             "order": [
-                [1, 'desc']
+                [0, 'desc']
             ],
             "pageLength": 15,
             language: {

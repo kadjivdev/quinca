@@ -73,6 +73,7 @@
                 <table id="example1" class="table table-hover align-middle mb-0" id="acomptesTable">
                     <thead class="bg-light">
                         <tr>
+                            <th class="border-bottom-0 text-nowrap py-3">ID</th>
                             <th class="border-bottom-0 text-nowrap py-3">Référence</th>
                             <th class="border-bottom-0 text-nowrap py-3">Session</th>
                             <th class="border-bottom-0">Date</th>
@@ -90,6 +91,7 @@
                     <tbody>
                         @forelse($acomptes as $acompte)
                         <tr>
+                            <td>{{$acompte->id}}</td>
                             <td class="text-nowrap py-3">
                                 <span class="code-reference">{{ $acompte->reference }}</span>
                             </td>
@@ -671,9 +673,9 @@
         "lengthChange": false,
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
-        // "order": [
-        //     [0, 'asc']
-        // ],
+        "order": [
+            [0, 'desc']
+        ],
         "pageLength": 15,
         language: {
             "emptyTable": "Aucune donnée disponible dans le tableau",

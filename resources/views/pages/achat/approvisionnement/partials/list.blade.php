@@ -6,6 +6,7 @@
                 <table id="example1" class="table table-hover align-middle mb-0" id="bonCommandesTable">
                     <thead class="bg-light">
                         <tr>
+                            <th class="border-bottom-0 text-nowrap py-3">Id</th>
                             <th class="border-bottom-0 text-nowrap py-3">Code</th>
                             <th class="border-bottom-0 text-nowrap py-3">Reference</th>
                             <th class="border-bottom-0">Founisseur</th>
@@ -21,6 +22,7 @@
                     <tbody>
                         @foreach($approvisionnements as $appro)
                         <tr>
+                            <td>{{$appro->id}}</td>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
                                     <span class="code-commande me-2">{{ $appro->fournisseur?->code_fournisseur }}</span>
@@ -346,7 +348,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {
