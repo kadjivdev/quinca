@@ -49,16 +49,20 @@
 
             <!-- Tableau des ventes -->
             <div class="card shadow-sm">
-                <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"> Légende: <span class="badge bg-light text-dark">Ecritures des Dépôts</span> |  <span class="border badge bg-white text-dark">Ecritures de la Direction</span></h5>
+                <!-- <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"> Légende: <span class="badge bg-light text-dark">Ecritures des Dépôts</span> | <span class="border badge bg-white text-dark">Ecritures de la Direction</span></h5>
                     <button class="btn btn-sm btn-outline-primary">
                         <i class="fas fa-file-excel me-2"></i>Exporter
                     </button>
                 </div>
-                <br>
-
-                <div class="card-body p-0">
+                <br> -->
+                <div class="card-body p-3">
                     <div class="table-responsive">
+                        <h5 class="d-flex mb-3">
+                            <span class="badge text-dark mx-2 bg-light border rounded shadow">Total Global: {{ number_format($totaux['total_global'], 0, ',', ' ') }} FCFA</span> |
+                            <span class="badge text-dark mx-2 bg-light border rounded shadow">Total Comptant: {{ number_format($totaux['total_comptant'], 0, ',', ' ') }} FCFA</span> |
+                            <span class="badge text-dark mx-2 bg-light border rounded shadow">Total Crédit: {{ number_format($totaux['total_credit'], 0, ',', ' ') }} FCFA</span>
+                        </h5>
                         <table id="example1" class="table table-hover table-striped mb-0">
                             <thead class="bg-light">
                                 <tr>
@@ -111,19 +115,12 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-4">
+                                    <td colspan="11" class="text-center py-4">
                                         <i class="fas fa-info-circle me-2"></i>Aucune vente pour cette date
                                     </td>
                                 </tr>
                                 @endforelse
                             </tbody>
-                            <tfoot class="bg-light fw-bold">
-                                <tr>
-                                    <td colspan="3" class="text-end">Total Global: {{ number_format($totaux['total_global'], 0, ',', ' ') }} FCFA</td>
-                                    <td colspan="3" class="text-end">Total Comptant: {{ number_format($totaux['total_comptant'], 0, ',', ' ') }} FCFA</td>
-                                    <td colspan="3" class="text-end">Total Crédit: {{ number_format($totaux['total_credit'], 0, ',', ' ') }} FCFA</td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
