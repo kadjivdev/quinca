@@ -346,6 +346,9 @@ class BonCommandeController extends Controller
             // Suppression des anciennes lignes
             $bonCommande->lignes()->delete();
 
+            // Suppression des anciennes factures
+            $bonCommande->factures()->delete();
+
             $programmation = ProgrammationAchat::with('lignes')->findOrFail($bonCommande->programmation_id);
 
             // Création des nouvelles lignes
@@ -399,6 +402,8 @@ class BonCommandeController extends Controller
 
             $bonCommande->lignes()->delete();
             $bonCommande->delete();
+
+            $bonCommande->factures()->delete();
 
             DB::commit();
 

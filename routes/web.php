@@ -22,6 +22,7 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Models\Achat\BonCommande;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\Inventaire;
@@ -44,22 +45,29 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
+    $bonCommande = BonCommande::firstWhere("code", "BC2601222443");
+
+    $bonCommande->update([
+        'validated_by'=>null,
+        'validated_at'=>null,
+    ]);
+
     // Journée du 05
-    $accompteLaurenda05 = AcompteClient::with("createdBy")
-        ->where("created_by", 3)
-        ->whereDate("created_at", Carbon::create(2026, 1, 5));
-    $accompteLaurenda05->update(["session_caisse_id" => 311]);
+    // $accompteLaurenda05 = AcompteClient::with("createdBy")
+    //     ->where("created_by", 3)
+    //     ->whereDate("created_at", Carbon::create(2026, 1, 5));
+    // $accompteLaurenda05->update(["session_caisse_id" => 311]);
 
-    $accompteIsaac05 = AcompteClient::with("createdBy")
-        ->where("created_by", 25)
-        ->whereDate("created_at", Carbon::create(2026, 1, 5));
-    $accompteIsaac05->update(["session_caisse_id" => 310]);
+    // $accompteIsaac05 = AcompteClient::with("createdBy")
+    //     ->where("created_by", 25)
+    //     ->whereDate("created_at", Carbon::create(2026, 1, 5));
+    // $accompteIsaac05->update(["session_caisse_id" => 310]);
 
-    // Journée du 07
-    $accompteLaurenda05 = AcompteClient::with("createdBy")
-        ->where("created_by", 3)
-        ->whereDate("created_at", Carbon::create(2026, 1, 7));
-    $accompteLaurenda05->update(["session_caisse_id" => 314]);
+    // // Journée du 07
+    // $accompteLaurenda05 = AcompteClient::with("createdBy")
+    //     ->where("created_by", 3)
+    //     ->whereDate("created_at", Carbon::create(2026, 1, 7));
+    // $accompteLaurenda05->update(["session_caisse_id" => 314]);
 
     // === Regulation des factures revendeurs liées aux inventaires du pr Fahim === //
     // $_factureRevsQuery = FactureRevendeur::with("createdBy", "inventaire.auteur");
@@ -122,7 +130,7 @@ Route::get("/debug", function () {
     //     ->whereBetween('created_at', ['2025-12-22 16:00:00', '2025-12-24 00:00:00']);
     // $facturesKandi->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
 
-    return "regularisation effectuée avec succès";
+    return "regularisation du bon BC2601222443 effectuée avec succès";
 });
 
 /**DETELE A STOCK */
