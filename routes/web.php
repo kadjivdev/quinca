@@ -13,7 +13,7 @@ use App\Http\Controllers\Parametre\ConversionUniteController;
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
 use App\Http\Controllers\Achat\{AccompteFournisseurController, AvanceController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
-use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, ReversementController, TransportController};
+use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, ReversementController, TransportController, VersementController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
@@ -48,8 +48,8 @@ Route::get("/debug", function () {
     $bonCommande = BonCommande::firstWhere("code", "BC2601222443");
 
     $bonCommande->update([
-        'validated_by'=>null,
-        'validated_at'=>null,
+        'validated_by' => null,
+        'validated_at' => null,
     ]);
 
     // Journée du 05
@@ -171,6 +171,7 @@ Route::middleware('auth')->group(function () {
         Route::post('{acompte}/reject', [AcompteClientController::class, 'reject'])
             ->name('acomptes.reject');
     });
+
     Route::resource('roles', RoleController::class);
     // Gestion des utilisateurs et rôles (nouveaux ajouts)
 
@@ -808,6 +809,13 @@ Route::middleware('auth')->group(function () {
                     ->name('vente.acomptes.stats');
             });
         });
+
+        // Routes pour les versements cheque & momos
+        Route::apiResource("versements", VersementController::class);
+        Route::post('/versements/validate/{versement}', [VersementController::class, 'validateVersement'])
+            ->name('vente.versements.validate');
+        Route::post('/versements/extourne/{versement}', [VersementController::class, 'extournerVersement'])
+            ->name('vente.versements.validate');
 
         // sessions
         Route::prefix('sessions')->group(function () {

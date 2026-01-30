@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+
 // use Illuminate\Validation\ValidationException;
 
 class AcompteClientController extends Controller
@@ -387,6 +389,11 @@ class AcompteClientController extends Controller
                 return response()->json(['error' => 'Requête non autorisée'], 403);
             }
 
+            // Qaund c'est un acompte generé par un versement
+            if ($acompte->versement_id) {
+                $request->validate(["versement_reference" => "required|unique:acompte_clients,versement_reference"]);
+            }
+
             // Vérifier si l'acompte peut être validé
             if (!$acompte->isEnAttente()) {
                 throw new Exception('Cet acompte ne peut pas être validé car il n\'est pas en attente');
@@ -396,6 +403,7 @@ class AcompteClientController extends Controller
 
             // Valider l'acompte
             $acompte->update([
+                'versement_reference'=>$request->versement_reference,
                 'statut' => AcompteClient::STATUT_VALIDE,
                 'validated_at' => now(),
                 'validated_by' => auth()->id()
@@ -418,9 +426,21 @@ class AcompteClientController extends Controller
                     'acompte' => $acompte->load(['client', 'createdBy', 'validatedBy'])
                 ]
             ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            Log::error('Erreur de validation lors de la validation de l\'acompte:', [
+                'acompte_id' => $acompte->id,
+                'errors' => $e->errors(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors de la validation de l\'acompte:', [
+            Log::error('Erreur de serveur lors de la validation de l\'acompte:', [
                 'acompte_id' => $acompte->id,
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -429,7 +449,7 @@ class AcompteClientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
-            ], 422);
+            ], 500);
         }
     }
 

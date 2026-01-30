@@ -19,6 +19,7 @@ class AcompteClient extends Model
     const TYPE_VIREMENT = 'virement';
     const TYPE_CHEQUE = 'cheque';
     const TYPE_AUTRES = 'autres';
+    const TYPE_MOMO = 'momo';
 
     // Constantes pour les statuts
     const STATUT_EN_ATTENTE = 'en_attente';
@@ -41,8 +42,9 @@ class AcompteClient extends Model
         'requete_id',
         'transport_id',
         'session_caisse_id',
-        'observation',
-        'deleted_by'
+        // 'observation',
+        'deleted_by',
+        'versement_reference'
     ];
 
     protected $casts = [
@@ -70,6 +72,11 @@ class AcompteClient extends Model
     public function requete(): BelongsTo
     {
         return $this->belongsTo(Requete::class, 'requete_id');
+    }
+
+    public function versement(): BelongsTo
+    {
+        return $this->belongsTo(Versement::class, 'versement_id');
     }
 
     public function transport(): BelongsTo
@@ -173,7 +180,8 @@ class AcompteClient extends Model
                 self::TYPE_ESPECE,
                 self::TYPE_VIREMENT,
                 self::TYPE_CHEQUE,
-                self::TYPE_AUTRES
+                self::TYPE_AUTRES,
+                self::TYPE_MOMO
             ]),
             'client_id' => 'required|exists:clients,id',
             'observation' => 'nullable|string',

@@ -235,6 +235,9 @@
                     <li><a class="dropdown-item" href="{{ route('vente.acomptes.index') }}">
                             <div class="dropdown-item-wrapper">Accomptes Clients</div>
                         </a></li>
+                    <li><a class="dropdown-item" href="{{ route('versements.index') }}">
+                            <div class="dropdown-item-wrapper">Chèque & MoMo</div>
+                        </a></li>
                     @endcan
 
                     @can('vente.sessions.view')

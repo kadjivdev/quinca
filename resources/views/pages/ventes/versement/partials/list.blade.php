@@ -4,13 +4,13 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body p-3">
                 <div class="row g-3">
-                    <form action="{{route('vente.acomptes.index')}}" method="get">
+                    <form action="{{route('versements.index')}}" method="get">
                         @csrf
                         <div class="row">
                             {{-- Filtre Client --}}
                             <div class="col-md-3">
                                 <label class="form-label small">Client</label>
-                                <select class="form-select form-select-sm" name="client_id" id="clientFilter">
+                                <select class="form-select alert-select2 form-select-sm" name="client_id" id="alert-select2">
                                     <option value="">Tous les clients</option>
                                     @foreach ($clients as $client)
                                     <option value="{{ $client->id }}">{{ $client->code_client }} - {{ $client->raison_sociale }}</option>
@@ -21,11 +21,10 @@
                             {{-- Filtre Type de Paiement --}}
                             <div class="col-md-2">
                                 <label class="form-label small">Type de paiement</label>
-                                <select class="form-select form-select-sm" id="typePaiementFilter" name="type_paiement">
+                                <select class="form-select form-select-sm" id="typePaiementFilter" name="type_op">
                                     <option value="">Tous les types</option>
-                                    <option value="espece">Espèce</option>
-                                    <option value="cheque">Chèque</option>
-                                    <option value="virement">Virement</option>
+                                    <option value="MoMo">MoMo</option>
+                                    <option value="Chèque">Chèque</option>
                                 </select>
                             </div>
 
@@ -36,19 +35,6 @@
                                     <input type="date" class="form-control" id="dateDebut" name="date_debut">
                                     <span class="input-group-text">au</span>
                                     <input type="date" class="form-control" id="dateFin" name="date_fin">
-                                </div>
-                            </div>
-
-                            {{-- Recherche --}}
-                            <div class="col-md-2">
-                                <label class="form-label small">Recherche</label>
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-search text-muted"></i>
-                                    </span>
-                                    <input type="text"
-                                        class="form-control form-control-sm border-start-0"
-                                        placeholder="Référence...">
                                 </div>
                             </div>
 
@@ -66,93 +52,83 @@
         </div>
     </div>
 
-    {{-- Table des acomptes --}}
+    {{-- Table des versements --}}
     <div class="col-12">
         <div class="card border-0 shadow-sm p-3">
             <div class="table-responsive">
-                <h4 class="">Légende: <span class="badge bg-warning text-white border shadow">Accompte venant des Chèques ou Momo</span></h4>
                 <table id="example1" class="table table-hover align-middle mb-0" id="acomptesTable">
                     <thead class="bg-light">
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">ID</th>
                             <th class="border-bottom-0 text-nowrap py-3">Référence</th>
-                            <th class="border-bottom-0 text-nowrap py-3">Session</th>
-                            <th class="border-bottom-0">Date</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Référence d'opération</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Accompte Client</th>
+                            <th class="border-bottom-0">Date opération</th>
+                            <th class="border-bottom-0">Date valeur</th>
                             <th class="border-bottom-0">Client</th>
+                            <th class="border-bottom-0">Banque</th>
                             <th class="border-bottom-0 text-center">Type</th>
                             <th class="border-bottom-0 text-end">Montant</th>
                             <th class="border-bottom-0 text-end">Preuve</th>
-                            <th class="border-bottom-0">Observation</th>
-                            <th class="border-bottom-0">Requete</th>
-                            <th class="border-bottom-0">Transport</th>
+                            <th class="border-bottom-0">Commentaire</th>
                             <th class="border-bottom-0">Créé par</th>
+                            <th class="border-bottom-0">Validé par</th>
+                            <th class="border-bottom-0">Extourné par</th>
                             <th class="border-bottom-0 text-end" style="min-width: 100px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($acomptes as $acompte)
-                        <tr class="@if($acompte->versement) bg-warning text-white @endif">
-                            <td>{{$acompte->id}}</td>
+                        @forelse($versements as $versement)
+                        <tr>
+                            <td>{{$loop->iteration}}</td>
                             <td class="text-nowrap py-3">
-                                <span class="code-reference">{{ $acompte->reference }}</span><br>
-                                @if($acompte->versement_id)
-                                / Reference versement :<span class="code-reference">{{ $acompte->versement_reference }}</span>
-                                @endif
+                                <span class="code-reference">{{ $versement->reference }}</span>
                             </td>
                             <td class="text-nowrap py-3">
-                                <span class="code-reference">{{$acompte->sessionCaisse? "##". $acompte->sessionCaisse?->id :'--'}}</span>
+                                <span class="code-reference">{{ $versement->reference_op }}</span>
+                            </td>
+                            <td class="text-nowrap py-3">
+                                <span class="badge bg-light text-dark bold">{{$versement->accompteClient?->reference??'--'}}</span>
                             </td>
                             <td class="text-nowrap">
-                                {{ $acompte->date->format('d/m/Y') }}
+                                {{ $versement->date_op->format('d/m/Y') }}
+                            </td>
+                            <td class="text-nowrap">
+                                {{ $versement->date_valeur->format('d/m/Y') }}
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-client me-2">
-                                        {{ $acompte->client?->code_client }} {{ substr($acompte->client?->raison_sociale, 0, 2) }}
-                                    </div>
                                     <div>
-                                        <div class="fw-medium">{{ $acompte->client?->raison_sociale }}</div>
-                                        <div class="text-muted small">{{ $acompte->client?->code_client }}</div>
+                                        <div class="fw-medium">{{ $versement->client?->raison_sociale }}</div>
+                                        <div class="text-muted small">{{ $versement->client?->code_client }}</div>
                                     </div>
                                 </div>
                             </td>
+                            <td class="text-nowrap">
+                                {{ $versement->banque }}
+                            </td>
                             <td class="text-center">
-                                @switch($acompte->type_paiement)
-                                @case('espece')
-                                <span class="badge bg-success bg-opacity-10 text-success">
-                                    <i class="fas fa-money-bill-wave me-1"></i>Espèce
-                                </span>
-                                @break
-                                @case('cheque')
+                                @switch($versement->type_op)
+                                @case('Chèque')
                                 <span class="badge bg-info bg-opacity-10 text-info">
                                     <i class="fas fa-money-check me-1"></i>Chèque
                                 </span>
                                 @break
-                                @case('momo')
-                                <span class="badge bg-info bg-opacity-10 text-info">
-                                    <i class="fas fa-money-check me-1"></i>MoMo
-                                </span>
-                                @break
-                                @case('virement')
+                                @case('MoMo')
                                 <span class="badge bg-primary bg-opacity-10 text-primary">
-                                    <i class="fas fa-exchange-alt me-1"></i>Virement
-                                </span>
-                                @break
-                                @case('autres')
-                                <span class="badge bg-secondary bg-opacity-10 text-secondary">
-                                    <i class="fas fa-money-bill-wave me-1"></i>Autres
+                                    <i class="fas fa-exchange-alt me-1"></i>MoMo
                                 </span>
                                 @break
                                 @endswitch
                             </td>
                             <td class="text-end">
                                 <span class="fw-medium montant">
-                                    {{ number_format($acompte->montant, 0, ',', ' ') }} F
+                                    {{ number_format($versement->montant, 0, ',', ' ') }} F
                                 </span>
                             </td>
                             <td class="text-center">
-                                @if($acompte->preuve)
-                                <a href="{{ $acompte->preuve}}" target="_blank" class="btn btn-sm btn-light-primary btn-icon" data-bs-toggle="tooltip" title="Voir la preuve">
+                                @if($versement->preuve)
+                                <a href="{{ $versement->preuve}}" target="_blank" class="btn btn-sm btn-light-primary btn-icon" data-bs-toggle="tooltip" title="Voir la preuve">
                                     <i class="fas fa-paperclip"></i>
                                 </a>
                                 @else
@@ -160,85 +136,85 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="text-muted small">{{ $acompte->observation ?: '—' }}</span>
+                                <span class="text-muted small">{{ $versement->comment ?: '—' }}</span>
                             </td>
                             <td>
-                                <span class="text-muted small">{{ $acompte->requete?'REQUETE': '—' }}</span>
+                                <span class="text-muted small">{{ $versement->createdBy?->name??'—' }}</span>
                             </td>
                             <td>
-                                <span class="text-muted small">{{ $acompte->transport?'TRANSPORT': '—' }}</span>
+                                <span class="text-muted small">{{ $versement->validatedBy?->name??'—' }}</span>
                             </td>
                             <td>
-                                <small class="text-muted">
-                                    {{ $acompte->createdBy?->name ?: '—' }}
-                                </small>
+                                <span class="text-muted small">{{ $versement->extournedBy?->name??'—' }}</span>
                             </td>
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Bouton voir détails - toujours visible --}}
                                     <button class="btn btn-sm btn-light-primary btn-icon"
-                                        onclick="showAcompte({{ $acompte->id }})"
+                                        onclick="showAcompte({{ $versement->id }})"
                                         data-bs-toggle="tooltip"
                                         title="Voir les détails">
                                         <i class="fas fa-eye"></i>
                                     </button>
 
-                                    <!-- quand l'accompte provient d'un versement
-                                     on ne peut update ni delete -->
-                                    @if(!$acompte->versement)
-                                    <!-- modification -->
-                                    @can("accomptes.edit")
-                                    @if($acompte->isEnAttente())
-                                    <button class="btn btn-sm btn-light-warning btn-icon ms-1"
-                                        onclick="editAcompte({{ $acompte->id }})"
-                                        data-bs-toggle="tooltip"
-                                        title="Modifier">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    @endif
-                                    @endcan
+                                    <!-- non extourné & non validé -->
+                                    @if(!$versement->extourned_by && !$versement->deleted_at)
+                                        @can("accomptes.edit")
+                                        @if(!$versement->validated_by)
+                                        <button class="btn btn-sm btn-light-warning btn-icon ms-1"
+                                            onclick="editAcompte({{ $versement->id }})"
+                                            data-bs-toggle="tooltip"
+                                            title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        @endif
+                                        @endcan
 
-                                    <!-- suppression -->
-                                    @can("accomptes.delete")
-                                    @if($acompte->isEnAttente())
-                                    <button class="btn btn-sm btn-light-danger btn-icon ms-1"
-                                        onclick="deleteAcompte({{ $acompte->id }})"
-                                        data-bs-toggle="tooltip"
-                                        title="Supprimer">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    @endif
-                                    @endcan
+                                        @can("accomptes.validate")
+                                        @if(!$versement->validated_by)
+                                        <button class="btn btn-sm btn-light-success btn-icon ms-1"
+                                            onclick="validateAcompte({{ $versement->id }})"
+                                            data-bs-toggle="tooltip"
+                                            title="Valider">
+                                            <i class="fas fa-check-circle"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                            onclick="rejectAcompte({{ $versement->id }})"
+                                            data-bs-toggle="tooltip"
+                                            title="Extourner">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                        @endif
+                                        @endcan
+
+                                        @if(!$versement->validated_at)
+                                        @can("accomptes.delete")
+                                        <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                            onclick="deleteAcompte({{ $versement->id }})"
+                                            data-bs-toggle="tooltip"
+                                            title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        @endcan
+                                        @endif
                                     @endif
 
-                                    <!-- on peut pas valider les accomptesdont le client est inconnu -->
-                                    @if($acompte->client_id!=env("INCONNU_CLIENT_ID"))
-                                    @can("accomptes.validate")
-                                    @if($acompte->isEnAttente())
-                                    <button class="btn btn-sm btn-light-success btn-icon ms-1"
-                                        onclick="validateAcompte({{ $acompte->id }},{{$acompte->versement_id}})"
-                                        data-bs-toggle="tooltip"
-                                        title="Valider">
-                                        <i class="fas fa-check-circle"></i>
-                                    </button>
-                                    @endif
-                                    @endcan
-                                    @endif
-
-                                    <!-- {{-- Badge de statut --}} -->
+                                    {{-- Badge de statut --}}
                                     <span class="ms-1">
-                                        @if($acompte->isValide())
-                                        <span class="badge bg-success" data-bs-toggle="tooltip" title="Validé par {{ $acompte->validatedBy?->name }} le {{ $acompte->validated_at?->format('d/m/Y H:i') }}">
+                                        @if($versement->validated_by)
+                                        <span class="badge bg-success" data-bs-toggle="tooltip" title="Validé par {{ $versement->validatedBy?->name }} le {{ $versement->validated_at?->format('d/m/Y H:i') }}">
                                             Validé
                                         </span>
-                                        @elseif($acompte->isRejete())
-                                        <span class="badge bg-danger" data-bs-toggle="tooltip" title="Rejeté par {{ $acompte->validatedBy?->name }} le {{ $acompte->validated_at?->format('d/m/Y H:i') }}">
-                                            Rejeté
+                                        @elseif($versement->extourned_by)
+                                        <span class="badge bg-danger" data-bs-toggle="tooltip" title="Rejeté par {{ $versement->extournedBy?->name }} le {{ $versement->extourned_at?->format('d/m/Y H:i') }}">
+                                            Extourné
                                         </span>
                                         @else
                                         <span class="badge bg-warning">En attente</span>
                                         @endif
                                     </span>
+
                                 </div>
                             </td>
                         </tr>
@@ -247,10 +223,10 @@
                             <td colspan="8" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
-                                    <h6 class="text-muted mb-1">Aucun acompte trouvé</h6>
-                                    <p class="text-muted small mb-3">Les acomptes que vous enregistrez apparaîtront ici</p>
+                                    <h6 class="text-muted mb-1">Aucun versement trouvé</h6>
+                                    <p class="text-muted small mb-3">Les versements que vous enregistrez apparaîtront ici</p>
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAcompteModal">
-                                        <i class="fas fa-plus me-2"></i>Nouvel acompte
+                                        <i class="fas fa-plus me-2"></i>Nouveau versement
                                     </button>
                                 </div>
                             </td>
@@ -297,10 +273,6 @@
 </style>
 
 <script>
-    $(document).ready(function() {
-        $("#form-select-sm").select2()
-    })
-
     function filterAcomptes() {
         // Afficher le loader
         Swal.fire({
@@ -335,24 +307,26 @@
     // Fonction pour voir les détails d'un acompte
     function showAcompte(id) {
         $.ajax({
-            url: `${apiUrl}/vente/acomptes/${id}`,
+            url: `${apiUrl}/vente/versements/${id}`,
             method: 'GET',
             success: function(response) {
                 if (response.success) {
                     // Afficher les détails dans un modal ou une carte
-                    const acompte = response.data.acompte;
+                    const versement = response.data.versement;
                     Swal.fire({
-                        title: 'Détails de l\'acompte',
+                        title: 'Détails du versement',
                         html: `
                         <div class="text-start">
-                            <p><strong>Référence:</strong> ${acompte.reference}</p>
-                            <p><strong>Date:</strong> ${acompte.date}</p>
-                            <p><strong>Client:</strong> ${acompte.client.raison_sociale}</p>
-                            <p><strong>Type:</strong> ${acompte.type_paiement}</p>
-                            <p><strong>Montant:</strong> ${acompte.montant.toLocaleString('fr-FR')} F</p>
-                            <p><strong>Observation:</strong> ${acompte.observation || '—'}</p>
-                            <p><strong>Créé par:</strong> ${acompte.created_by || '—'}</p>
-                            <p><strong>Date création:</strong> ${acompte.created_at}</p>
+                            <p><strong>Référence:</strong> ${versement.reference}</p>
+                            <p><strong>Référence opération:</strong> ${versement.reference_op}</p>
+                            <p><strong>Date opération:</strong> ${versement.date_op}</p>
+                            <p><strong>Client:</strong> ${versement.client?.raison_sociale}</p>
+                            <p><strong>Type:</strong> ${versement.type_op}</p>
+                            <p><strong>Montant:</strong> ${versement.montant.toLocaleString('fr-FR')} F</p>
+                            <p><strong>Commentaire:</strong> ${versement.comment || '—'}</p>
+                            <p><strong>Créé par:</strong> ${versement.created_by || '—'}</p>
+                            <p><strong>Date création:</strong> ${versement.created_at}</p>
+                            <p><strong>Validé par:</strong> ${versement.validated_by || '—'}</p>
                         </div>
                     `,
                         icon: 'info'
@@ -366,7 +340,7 @@
     function deleteAcompte(id) {
         Swal.fire({
             title: 'Confirmer la suppression',
-            text: "Voulez-vous vraiment supprimer cet acompte ?",
+            text: "Voulez-vous vraiment supprimer ce versement ?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -376,7 +350,7 @@
             showLoaderOnConfirm: true,
             preConfirm: () => {
                 return $.ajax({
-                        url: `${apiUrl}/vente/acomptes/${id}`,
+                        url: `${apiUrl}/vente/versements/${id}`,
                         type: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -399,7 +373,7 @@
             if (result.isConfirmed) {
                 Toast.fire({
                     icon: 'success',
-                    title: 'Acompte supprimé avec succès'
+                    title: 'Versement supprimé avec succès'
                 });
                 window.location.reload(); // Rafraîchir la liste
             }
@@ -409,47 +383,55 @@
     // Fonction pour voir les détails d'un acompte
     function showAcompte(id) {
         $.ajax({
-            url: `${apiUrl}/vente/acomptes/${id}`,
+            url: `${apiUrl}/vente/versements/${id}`,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
-                    const acompte = response.data.acompte;
+                    const versement = response.data.versement;
                     Swal.fire({
-                        title: `<strong>Détails de l'acompte</strong>`,
+                        title: `<strong>Détails du versement</strong>`,
                         html: `
                             <div class="text-start">
                                 <table id='example1' class="table table-sm">
                                     <tr>
                                         <td class="fw-bold">Référence:</td>
-                                        <td>${acompte.reference}</td>
+                                        <td>${versement.reference}</td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold">Date:</td>
-                                        <td>${acompte.date}</td>
+                                        <td class="fw-bold">Référence:</td>
+                                        <td>${versement.reference_op}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Date opération:</td>
+                                        <td>${versement.date_op}</td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">Client:</td>
-                                        <td>${acompte.client.code_client} - ${acompte.client.raison_sociale}</td>
+                                        <td>${versement.client?.code_client} - ${versement.client?.raison_sociale}</td>
+                                    </tr>
+                                     <tr>
+                                        <td class="fw-bold">Banque:</td>
+                                        <td>${versement.banque}</td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">Type:</td>
-                                        <td>${formatTypePaiement(acompte.type_paiement)}</td>
+                                        <td>${formatTypePaiement(versement.type_op)}</td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">Montant:</td>
-                                        <td>${formatMontant(acompte.montant)}</td>
+                                        <td>${formatMontant(versement.montant)}</td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold">Observation:</td>
-                                        <td>${acompte.observation || '-'}</td>
+                                        <td class="fw-bold">Commentaire:</td>
+                                        <td>${versement.comment || '-'}</td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">Créé par:</td>
-                                        <td>${acompte.created_by || '-'}</td>
+                                        <td>${versement.created_by || '-'}</td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">Date création:</td>
-                                        <td>${acompte.created_at}</td>
+                                        <td>${versement.created_at}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -488,9 +470,8 @@
     // Fonction pour formater le type de paiement
     function formatTypePaiement(type) {
         const types = {
-            'espece': '<span class="badge bg-success bg-opacity-10 text-success"><i class="fas fa-money-bill-wave me-1"></i>Espèce</span>',
-            'cheque': '<span class="badge bg-info bg-opacity-10 text-info"><i class="fas fa-money-check me-1"></i>Chèque</span>',
-            'virement': '<span class="badge bg-primary bg-opacity-10 text-primary"><i class="fas fa-exchange-alt me-1"></i>Virement</span>'
+            'MoMo': '<span class="badge bg-success bg-opacity-10 text-success"><i class="fas fa-money-bill-wave me-1"></i>MoMo</span>',
+            'Chèque': '<span class="badge bg-info bg-opacity-10 text-info"><i class="fas fa-money-check me-1"></i>Chèque</span>',
         };
         return types[type] || type;
     }
@@ -502,7 +483,7 @@
         $('[data-bs-toggle="tooltip"]').tooltip();
 
         // Initialisation de Select2 pour le filtre client
-        $('#clientFilter').select2({
+        $('#alert-select2').select2({
             theme: 'bootstrap-5',
             placeholder: 'Sélectionner un client',
             allowClear: true,
@@ -570,125 +551,77 @@
         if (stats) {
             $('#totalAcomptes').text(stats.total.toLocaleString('fr-FR'));
             $('#totalMontant').text(formatMontant(stats.total_montant));
-            $('#acomptesMois').text(stats.acomptes_mois.toLocaleString('fr-FR'));
+            $('#acomptesMois').text(stats.versement_mois.toLocaleString('fr-FR'));
             $('#montantMois').text(formatMontant(stats.montant_mois));
         }
     }
 </script>
 <script>
     // Fonction pour valider un acompte
-    function validateAcompte(id, versement_id = null) {
-        if (versement_id) {
-            Swal.fire({
-                title: 'Confirmer la validation',
-                text: 'Êtes-vous sûr de vouloir valider cet accompte ?',
-                icon: 'warning',
-                input: "text",
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Cet accompte vient d\'un versement! Veuillez entrez la reference!';
+    function validateAcompte(id) {
+        Swal.fire({
+            title: 'Confirmer la validation',
+            text: 'Êtes-vous sûr de vouloir valider ce versement ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, valider',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#dc3545'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `${apiUrl}/vente/versements/validate/${id}`,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Toast.fire({
+                                icon: 'success',
+                                title: response.message
+                            });
+                            window.location.reload();
+                        }
+                    },
+                    error: function(xhr) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: xhr.responseJSON?.message || 'Erreur lors de la validation'
+                        });
                     }
-                },
-                showLoaderOnConfirm: true,
-                showCancelButton: true,
-                confirmButtonText: 'Oui, valider',
-                cancelButtonText: 'Annuler',
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#dc3545',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `${apiUrl}/vente/acomptes/${id}/validate`,
-                        type: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data: {
-                            versement_reference: result.value
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: response.message
-                                });
-                                window.location.reload();
-                            }
-                        },
-                        error: function(xhr) {
-                            Toast.fire({
-                                icon: 'error',
-                                title: xhr.responseJSON?.message || 'Erreur lors de la validation'
-                            });
-                        }
-                    });
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Confirmer la validation',
-                text: 'Êtes-vous sûr de vouloir valider ce versement ?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Oui, valider',
-                cancelButtonText: 'Annuler',
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#dc3545'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `${apiUrl}/vente/acomptes/${id}/validate`,
-                        type: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: response.message
-                                });
-                                window.location.reload();
-                            }
-                        },
-                        error: function(xhr) {
-                            Toast.fire({
-                                icon: 'error',
-                                title: xhr.responseJSON?.message || 'Erreur lors de la validation'
-                            });
-                        }
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     }
 
     // Fonction pour rejeter un acompte
     function rejectAcompte(id) {
         Swal.fire({
             title: 'Motif du rejet',
-            text: 'Veuillez indiquer le motif du rejet',
+            text: 'Veuillez indiquer le motif d\'extournement',
             input: 'text',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Rejeter',
+            confirmButtonText: 'Extourner',
             cancelButtonText: 'Annuler',
             confirmButtonColor: '#dc3545',
             inputValidator: (value) => {
                 if (!value) {
-                    return 'Le motif du rejet est requis';
+                    return 'Le motif d\'extournement est requis';
                 }
             }
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: `${apiUrl}/vente/acomptes/${id}/reject`,
+                    url: `${apiUrl}/vente/versements/extourne/${id}`,
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     data: {
-                        motif_rejet: result.value
+                        extourned_comment: result.value
                     },
                     success: function(response) {
                         if (response.success) {
@@ -729,7 +662,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'desc']
+            [0, 'asc']
         ],
         "pageLength": 15,
         language: {
