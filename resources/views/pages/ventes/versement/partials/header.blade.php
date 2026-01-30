@@ -25,10 +25,10 @@
             </div>
 
             <div class="col-auto d-flex gap-2">
-                <button type="button" class="btn btn-light px-3 d-inline-flex align-items-center" onclick="refreshPage()">
+                <a href="{{route('versements.index')}}" type="button" class="btn btn-light px-3 d-inline-flex align-items-center" onclick="refreshPage()">
                     <i class="fas fa-sync-alt me-2"></i>
                     Actualiser
-                </button>
+                </a>
 
                 <button type="button"
                     class="btn btn-primary px-3 d-inline-flex align-items-center"
