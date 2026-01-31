@@ -1116,6 +1116,16 @@ class FactureClientController extends Controller
                         'user_id' => Auth::user()->id,
                         'type_op' => 'REG_CLT',
                     ]);
+                } else {
+                    $reglement->compteClient()
+                        ->first()
+                        ->update([
+                            'date_op' => $reglement->date_reglement,
+                            'montant_op' => $reglement->montant,
+                            'client_id' => $reglement->facture?->client_id,
+                            'user_id' => Auth::user()->id,
+                            'type_op' => 'REG_CLT',
+                        ]);
                 }
             }
 

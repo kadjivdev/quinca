@@ -45,11 +45,12 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $bonCommande = BonCommande::firstWhere("code", "BC2601222443");
+    $facture_FAC_20260129_0027 = FactureClient::firstWhere("numero", "FAC-20260129-0027");
 
-    $bonCommande->update([
+    $facture_FAC_20260129_0027->update([
+        'date_validation' => null,
         'validated_by' => null,
-        'validated_at' => null,
+        'statut' => 'brouillon'
     ]);
 
     // Journée du 05
