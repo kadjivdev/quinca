@@ -70,6 +70,7 @@ class FactureRevendeurController extends Controller
                 auth()->user()->hasRole("Super Administrateur")
                 || auth()->user()->hasRole("CONTROLE INTERNE")
                 || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
+                || auth()->user()->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")
             ) {
                 $factures = $query->get();
             } else {
