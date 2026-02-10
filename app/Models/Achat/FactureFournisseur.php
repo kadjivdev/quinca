@@ -41,6 +41,7 @@ class FactureFournisseur extends Model
     use SoftDeletes, HasFactory;
 
     protected $table = 'facture_fournisseurs';
+    protected $appends = ['code_facture_formatted'];
 
     protected $fillable = [
         'code',
@@ -114,6 +115,20 @@ class FactureFournisseur extends Model
         'validated_at',
         'deleted_at'
     ];
+
+    // Accessor pour le code de la facture formaté
+    public function getCodeFactureFormattedAttribute()
+    {
+        if (!$this->code) {
+            return null;
+        }
+
+        return substr($this->code, 0, 3)
+            . '-'
+            . substr($this->code, 3, -3)
+            . '-'
+            . substr($this->code, -3);
+    }
 
     // RESTE DU MONTANT D'UNE FACTURE
     public function facture_amont()

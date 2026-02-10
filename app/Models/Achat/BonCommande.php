@@ -35,10 +35,12 @@ class BonCommande extends Model
 {
     use SoftDeletes, HasFactory;
 
+    protected $appends = ['code_bon_commande_formatted'];
+
     /**
      * La table associée au modèle
      *
-     * @var string
+     * @var string  
      */
     protected $table = 'bon_commandes';
 
@@ -127,6 +129,20 @@ class BonCommande extends Model
         'validated_at',
         'deleted_at'
     ];
+
+    // Accessor pour le code de la facture formaté
+    public function getCodeBonCommandeFormattedAttribute()
+    {
+        if (!$this->code) {
+            return null;
+        }
+
+        return substr($this->code, 0, 2)
+            . '-'
+            . substr($this->code, 2, -3)
+            . '-'
+            . substr($this->code, -3);
+    }
 
     /**
      * Recherche de bons de commande

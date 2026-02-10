@@ -36,7 +36,8 @@ class BonLivraisonFournisseurController extends Controller
             'vehicule',
             'chauffeur',
             'lignes'
-        ])->orderBy('created_at', 'desc')
+        ])
+            ->orderBy('created_at', 'desc')
             ->get();
 
         // Récupération des factures validées sans bon de livraison ou partiellement livrées
