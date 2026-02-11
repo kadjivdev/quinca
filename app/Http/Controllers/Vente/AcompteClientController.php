@@ -151,14 +151,13 @@ class AcompteClientController extends Controller
                 // ->where('utilisateur_id', auth()->user()->id)
                 ->first();
 
-            // $sessionCaisse = SessionCaisse::find(12);
-
             if (!$sessionCaisse) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Session de caisse requise.'
                 ], 422);
             }
+            
             Log::info("Les entrées", $request->all());
 
             // Validation des données

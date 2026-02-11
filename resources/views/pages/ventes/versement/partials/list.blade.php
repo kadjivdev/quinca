@@ -172,12 +172,12 @@
 
                                         @can("accomptes.validate")
                                         @if(!$versement->validated_by)
-                                        <button class="btn btn-sm btn-light-success btn-icon ms-1"
+                                        <!-- <button class="btn btn-sm btn-light-success btn-icon ms-1"
                                             onclick="validateAcompte({{ $versement->id }})"
                                             data-bs-toggle="tooltip"
                                             title="Valider">
                                             <i class="fas fa-check-circle"></i>
-                                        </button>
+                                        </button> -->
 
                                         <button class="btn btn-sm btn-light-danger btn-icon ms-1"
                                             onclick="rejectAcompte({{ $versement->id }})"
