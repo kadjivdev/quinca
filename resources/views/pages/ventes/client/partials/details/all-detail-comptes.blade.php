@@ -102,7 +102,7 @@
                             @forelse($compteClients as $compte)
                             <tr>
                                 <td class="text-nowrap py-3">
-                                    <span class="code-client">{{ $loop->iteration }}</span>
+                                    <span class="code-client">{{ $loop->id }}</span>
                                 </td>
                                 <td><span class="badge bg-light border text-dark">{{$compte->client?->raison_sociale}}</span></td>
                                 <td><span class="badge bg-light border rounded text-dark">{{ $compte->createdDateFormated }} </span></td>
@@ -566,7 +566,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {

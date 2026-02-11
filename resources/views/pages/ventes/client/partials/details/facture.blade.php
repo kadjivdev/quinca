@@ -51,6 +51,7 @@
                     <table class="table table-sm" id="example1">
                         <thead>
                             <tr>
+                                <th>N°</th>
                                 <th>Numéro</th>
                                 <th>Date</th>
                                 <th class="text-end">Montant</th>
@@ -60,6 +61,7 @@
                         <tbody>
                             @foreach($client->facturesClient as $facture)
                             <tr>
+                                <td><span class="badge bg-light text-dark border">{{$facture->id}}</span></td>
                                 <td>{{$facture->numero}}</td>
                                 <td>{{$facture->date_facture}}</td>
                                 <td class="text-end">{{$facture->montant_ttc}} FCFA</td>
@@ -88,7 +90,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {

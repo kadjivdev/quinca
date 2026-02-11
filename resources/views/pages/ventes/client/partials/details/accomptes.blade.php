@@ -51,8 +51,9 @@
                     <table class="table table-sm" id="example1">
                         <thead>
                             <tr>
+                                <th>N°</th>
                                 <th>Numéro</th>
-                                <th>Date</th>
+                                <th>Inséré le</th>
                                 <th>status</th>
                                 <th>Facture</th>
                                 <th class="text-end">Montant</th>
@@ -61,6 +62,7 @@
                         <tbody>
                             @foreach($client->acomptes as $accompte)
                             <tr>
+                                <td><span class="badge bg-light text-dark border">{{$accompte->id}}</span></td>
                                 <td><span class="badge bg-light text-dark border">{{$accompte->reference}}</span></td>
                                 <td>{{$accompte->created_at}}</td>
                                 <td>{{$accompte->statut}}</td>
@@ -86,7 +88,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {

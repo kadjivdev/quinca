@@ -51,6 +51,7 @@
                     <table class="table table-sm" id="example1">
                         <thead>
                             <tr>
+                                <th>N°</th>
                                 <th>Numéro</th>
                                 <th>Reference</th>
                                 <th>Date</th>
@@ -64,6 +65,7 @@
                         <tbody>
                             @foreach($reglements as $reglement)
                             <tr>
+                                <td><span class="badge bg-light text-dark border">{{$reglement->id}}</span></td>
                                 <td>{{$reglement->numero}}</td>
                                 <td> <span class="badge bg-light text-dark border rounded"> {{ $reglement->reference_preuve }} / {{ $reglement->facture?->reference_recu }}</span> </td>
                                 <td>{{$reglement->date_reglement}}</td>
@@ -106,7 +108,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {
