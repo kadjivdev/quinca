@@ -24,7 +24,10 @@
                                 <select class="form-select form-select-sm" id="typePaiementFilter" name="type_op">
                                     <option value="">Tous les types</option>
                                     <option value="MoMo">MoMo</option>
+                                    <option value="MoMoPay">MoMoPay</option>
+                                    <option value="MoMoMarchand">MoMoMarchand</option>
                                     <option value="Chèque">Chèque</option>
+
                                 </select>
                             </div>
 
@@ -117,6 +120,16 @@
                                 @case('MoMo')
                                 <span class="badge bg-primary bg-opacity-10 text-primary">
                                     <i class="fas fa-exchange-alt me-1"></i>MoMo
+                                </span>
+                                @break
+                                @case('MoMoPay')
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    <i class="fas fa-exchange-alt me-1"></i>MoMoPay
+                                </span>
+                                @break
+                                @case('MoMoMarchand')
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    <i class="fas fa-exchange-alt me-1"></i>MoMoMarchand
                                 </span>
                                 @break
                                 @endswitch

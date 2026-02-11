@@ -149,7 +149,7 @@ class Versement extends Model
             'reference_op' => ["required", "string", Rule::unique("versements", "reference_op")->ignore($id)],
             'client_id' => "required|exists:clients,id",
             'date_op' => "required|date",
-            'type_op' => "required|in:Chèque,MoMo",
+            'type_op' => "required|in:Chèque,MoMo,MoMoPay,MoMoMarchand",
             'montant' => "required|numeric",
             'date_valeur' => "required|date",
             'comment' => "nullable|string",

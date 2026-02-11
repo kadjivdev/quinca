@@ -237,6 +237,7 @@ class VersementController extends Controller
      */
     public function destroy(Request $request, Versement $versement)
     {
+        Log::info("Tentative de suppression du versement", ["versement_id" => $versement->id]);
         if (!$request->ajax()) {
             return response()->json(['error' => 'Requête non autorisée'], 403);
         }

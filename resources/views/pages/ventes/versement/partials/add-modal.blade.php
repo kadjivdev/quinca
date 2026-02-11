@@ -75,6 +75,8 @@
                                             <select class="form-select" name="type_op" required>
                                                 <option value="">Sélectionner un type</option>
                                                 <option value="MoMo">Momo</option>
+                                                <option value="MoMoPay">MoMoPay</option>
+                                                <option value="MoMoMarchand">MoMoMarchand</option>
                                                 <option value="Chèque">Chèque</option>
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner un type de paiement</div>

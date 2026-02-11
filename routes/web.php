@@ -22,16 +22,8 @@ use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientCont
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
-use App\Models\Achat\BonCommande;
 use App\Models\Achat\FactureFournisseur;
-use App\Models\Catalogue\Article;
-use App\Models\Catalogue\Inventaire;
-use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
-use App\Models\Vente\AcompteClient;
-use App\Models\Vente\CompteClient;
-use App\Models\Vente\FactureClient;
-use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,14 +36,6 @@ use Carbon\Carbon;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-
-    $facture_FAC_20260129_0027 = FactureClient::firstWhere("numero", "FAC-20260129-0027");
-
-    $facture_FAC_20260129_0027->update([
-        'date_validation' => null,
-        'validated_by' => null,
-        'statut' => 'brouillon'
-    ]);
 
     // Journée du 05
     // $accompteLaurenda05 = AcompteClient::with("createdBy")

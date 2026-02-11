@@ -139,9 +139,9 @@ class BonCommande extends Model
 
         return substr($this->code, 0, 2)
             . '-'
-            . substr($this->code, 2, -3)
+            . substr($this->code, 2, -4)
             . '-'
-            . substr($this->code, -3);
+            . substr($this->code, -4);
     }
 
     /**

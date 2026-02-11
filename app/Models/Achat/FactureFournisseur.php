@@ -125,9 +125,9 @@ class FactureFournisseur extends Model
 
         return substr($this->code, 0, 3)
             . '-'
-            . substr($this->code, 3, -3)
+            . substr($this->code, 3, -4)
             . '-'
-            . substr($this->code, -3);
+            . substr($this->code, -4);
     }
 
     // RESTE DU MONTANT D'UNE FACTURE
