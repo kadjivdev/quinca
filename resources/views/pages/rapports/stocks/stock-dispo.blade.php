@@ -46,6 +46,7 @@
                                 <th>Unité</th>
                                 <th class="text-end">Dépôt</th>
                                 <th class="text-end">Qté Réelle</th>
+                                <th class="text-end">Qté Requête</th>
                                 <th class="text-end">Qté Disponible</th>
                                 <!-- <th class="text-end">Prix Moyen</th> -->
                                 <!-- <th class="text-end">Valeur Stock</th> -->
@@ -60,6 +61,7 @@
                                     <td>{{$stock["unite_stock"]}} </td>
                                     <td class="text-end">{{ $stock["depot"] }}</td>
                                     <td class="text-end">{{ number_format($stock['quantite_reelle'], 0, ',', ' ') }}</td>
+                                    <td class="text-end">{{ number_format($stock['quantite_requete'], 0, ',', ' ') }}</td>
                                     <td class="text-end">{{ number_format($stock['quantite_disponible'], 0, ',', ' ') }}</td>
                                     <td>
                                         @switch($stock['statut'])

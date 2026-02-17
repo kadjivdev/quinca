@@ -39,6 +39,7 @@
                         <th class="border-bottom-0">Approvisionné</th>
                         <th class="border-bottom-0">Stock disponible</th>
                         <th class="border-bottom-0">Unité de Stock</th>
+                        <th class="border-bottom-0">Stock Requête</th>
                         <th class="border-bottom-0">Vente</th>
                         <th class="border-bottom-0">Unité de vente</th>
                         <th class="border-bottom-0">Stock final</th>
@@ -56,6 +57,7 @@
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteAppro,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->stockDisponible,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{$article->unite_mesure}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qantiteRequete,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,"."," ")}}</span></td>

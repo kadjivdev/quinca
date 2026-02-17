@@ -878,11 +878,22 @@ class FactureClientController extends Controller
                         $stock->unite_mesure_id
                     ) : 00;
 
+                /**Qte de requete */
+                $stock->qantiteRequete = $conversion ? $this->serviceStockEntree
+                    ->convertirQuantite(
+                        $stock->quantite_requete,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    ) : 00;
+
                 /**Qte Vendue */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
 
                 /**Qte Reste */
-                $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
+                $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
+                Log::debug("La quantite requete :", ["qte" => $stock->qantiteRequete]);
+                Log::debug("La quantite reste :", ["qteReste" => $resteStock]);
+                // $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
 
                 return [
                     'id' => $stock->article->id,

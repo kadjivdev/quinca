@@ -21,7 +21,7 @@ class RequeteController extends Controller
      */
     public function index()
     {
-        $requetes = Requete::with('client')->with('articles')->get();
+        $requetes = Requete::with('client')->with('articles')->latest()->get();
         $clients = Client::all();
         $articles = Article::all();
         return view('pages.ventes.requete.index', compact([

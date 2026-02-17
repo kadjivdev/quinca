@@ -10,6 +10,7 @@ use App\Models\Catalogue\Article;
 use App\Models\Catalogue\DetailInventaire;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
+use App\Models\RequeteStock;
 use App\Models\Securite\User;
 use Exception;
 
@@ -49,8 +50,9 @@ class StockDepot extends Model
         'deleted_at' => 'datetime',
     ];
 
-    function inventaireDetails() : HasMany {
-        return $this->hasMany(DetailInventaire::class,"stock_depot_id");
+    function inventaireDetails(): HasMany
+    {
+        return $this->hasMany(DetailInventaire::class, "stock_depot_id");
     }
 
     // Relations
@@ -75,14 +77,24 @@ class StockDepot extends Model
     }
 
     // mouvements
-    public function mouvements() : HasMany {
-        return $this->hasMany(StockMouvement::class,"");
+    public function mouvements(): HasMany
+    {
+        return $this->hasMany(StockMouvement::class, "");
     }
 
     // Accesseurs
     public function getQuantiteDisponibleAttribute(): float
     {
         return $this->quantite_reelle - $this->quantite_reservee;
+    }
+
+    public function getQuantiteRequeteAttribute(): float
+    {
+        return RequeteStock::where("article_id", $this->article_id)
+            ->where("depot_id", $this->depot_id)
+            ->whereNotNull("validated_by")
+            ->whereNotNull("validated_at")
+            ->sum("quantite");
     }
 
     public function getValeurStockAttribute(): float

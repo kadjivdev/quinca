@@ -19,6 +19,7 @@ use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
 
 use App\Http\Controllers\Rapport\{RapportVenteController, SoldeInitialClientController, SoldeInitialFournisseurController, RapportAchatController, RapportStockController, RapportValorisationController, StockRotationController, StockAlertController, RapportCreanceController};
+use App\Http\Controllers\RequeteStockController;
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
@@ -1180,8 +1181,11 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('rapports')->middleware(['auth'])->group(function () {
 
-        Route::get('/rapports/compte-client', [RapportVenteController::class, 'rapportCompteClient'])->name('rapports.compte-client');
+        // requete de stock
+        Route::resource("requete_stock",RequeteStockController::class);
+        Route::post('/rapports/requete_stock/{requete_stock}', [RequeteStockController::class, 'validateRequete'])->name('requete_stock.validateRequete');
 
+        Route::get('/rapports/compte-client', [RapportVenteController::class, 'rapportCompteClient'])->name('rapports.compte-client');
         Route::get('/suivies-ventes', [RapportVenteController::class, 'suivieVente'])
             ->name('rapports.etat-ventes');
 
@@ -1289,9 +1293,6 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::get('/dashboard-vente', [RapportVenteController::class, 'index'])->name('rapports.dashboard-vente');
-        // Route::post('/{id}/validate', [FactureRevendeurController::class, 'validateFacture'])->name('revendeur.facture.validate');
-        // Route::delete('/{id}/delete', [FactureRevendeurController::class, 'destroy'])->name('revendeur.facture.delete');
-        // Route::get('/{facture}/print', [FactureRevendeurController::class, 'print'])->name('revendeur.facture.print');
     });
 
     Route::prefix('creances')->group(function () {

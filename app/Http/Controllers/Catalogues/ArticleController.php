@@ -9,7 +9,6 @@ use App\Models\Catalogue\FamilleArticle;
 use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
-use App\Models\Parametre\TypeTarif;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
@@ -24,11 +23,10 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
+use PhpOffice\PhpSpreadsheet\Style\{Fill, Border};
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Facades\Log;
 use Exception;
-// use Illuminate\Database\Eloquent\Collection;
 
 class ArticleController extends Controller
 {
@@ -44,7 +42,7 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Article::with("stocks")->orderBy('designation');
+        $query = Article::with("stocks")->orderBy('id');
 
         if ($request->depot && $request->depot != 'tous') {
             $articles = $query->get()->filter(function ($article) use ($request) {
@@ -76,10 +74,19 @@ class ArticleController extends Controller
                         $stock->unite_mesure_id
                     ) : 00;
 
+
+                /**Qte de requete */
+                $stock->qantiteRequete = $conversion ? $this->serviceStockEntree
+                    ->convertirQuantite(
+                        $stock->quantite_requete,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    ) : 00;
+
                 /**Qte Vendue */
                 $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
 
-                $stock->resteStock = $stock->qantiteBase - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
+                $stock->resteStock = ($stock->qantiteBase + $stock->qantiteRequete) - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
             });
         });
 
@@ -178,7 +185,7 @@ class ArticleController extends Controller
         ]));
     }
 
-    private static function getUnites($articleId)
+    public static function getUnites($articleId)
     {
         try {
             Log::info('Début récupération des unités', ['article_id' => $articleId]);
@@ -245,8 +252,6 @@ class ArticleController extends Controller
         }
     }
 
-
-
     /**
      * Recherche d'articles pour le select2
      */
@@ -265,7 +270,6 @@ class ArticleController extends Controller
                 'quantite_reelle.required' => "La quantité est réquise!",
                 'unite_mesure_id.required' => "L'unité de mesure est réquise!"
             ]);
-
 
             // 
             foreach ($request->depots as $depotId) {
@@ -382,11 +386,20 @@ class ArticleController extends Controller
                             $stockDepot->unite_mesure_id
                         ) : 00;
 
+                    /**Qte de requete */
+                    $stockDepot->qantiteRequete = $conversion ? $this->serviceStockEntree
+                        ->convertirQuantite(
+                            $stockDepot->quantite_requete,
+                            $conversion,
+                            $stockDepot->unite_mesure_id
+                        ) : 00;
+
 
                     /**Qte Vendue */
                     $stockDepot->qteTotalVendu = $article->qteVendu($stockDepot->depot_id);
 
-                    $stockDepot->resteStock = $stockDepot->qantiteBase - $stockDepot->qteTotalVendu; //$article->reste($stock->depot_id);
+                    $stockDepot->resteStock = ($stockDepot->qantiteBase + $stockDepot->qantiteRequete) - $stockDepot->qteTotalVendu; //$article->reste($stock->depot_id);
+                    // $stockDepot->resteStock = $stockDepot->qantiteBase - $stockDepot->qteTotalVendu; //$article->reste($stock->depot_id);
 
                     $stockDisponible = $stockDepot ?
                         $stockDepot->resteStock

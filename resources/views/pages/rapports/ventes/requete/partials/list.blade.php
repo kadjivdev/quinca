@@ -1,102 +1,137 @@
-<div class="col-12">
-    <div class="card p-3 border-0 shadow-sm">
-        <form action="#" method="post">
-            @csrf
-            @method("PATCH")
-            <!-- depots ids -->
-            <input type="text" name="depotIds" multiple hidden class="form-control" value="{{$depotIds}}">
+{{-- list-reglements.blade.php --}}
+<div class="row g-3">
+
+    {{-- Table des règlements --}}
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-3">
             <div class="table-responsive">
-                <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
+                <table id="example1" class=" table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <!-- <th class="border-bottom-0 text-nowrap py-3">N°</th> -->
-                            <th class="border-bottom-0">Code</th>
-                            <th class="border-bottom-0 text-center">Désignation</th>
-                            <th class="border-bottom-0">Famille</th>
-                            <th class="border-bottom-0">Unité de mesure</th>
-                            <!-- <th class="border-bottom-0">Stockable</th> -->
-                            <th class="border-bottom-0">Stock total</th>
-                            <th class="border-bottom-0" style="min-width: 150px;">Dépôts</th>
-                            <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
+                            <th class="border-bottom-0">N°</th>
+                            <th class="border-bottom-0">Reference</th>
+                            <th class="border-bottom-0">Article</th>
+                            <th class="border-bottom-0">Dépôt</th>
+                            <th class="border-bottom-0">Unité Mesure</th>
+                            <th class="border-bottom-0">Qte</th>
+                            <th class="border-bottom-0">Preuve</th>
+                            <th class="border-bottom-0">Commentaire</th>
+                            <th class="border-bottom-0">Insérée par:</th>
+                            <th class="border-bottom-0">Insérée le:</th>
+                            <th class="border-bottom-0">Validée par:</th>
+                            <th class="border-bottom-0">Validée le:</th>
+                            <th class="border-bottom-0">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($articles as $article)
+                        @foreach($requetes as $requete)
                         <tr>
-                            <!-- <td class="text-nowrap py-3">
-                                <span class="badge bg-light text-dark numero-bl me-2">{{ $loop->iteration }}</span>
-                            </td> -->
-                            <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
-                            <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
-                            <td><span class="badge bg-light text-dark">{{$article->famille?$article->famille->libelle_famille:'---'}}</span></td>
-                            <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
-                            <td class="text-center">
-                                <span class="badge bg-success">{{number_format($article->stocks->sum("qantiteBase"),3,","," ")}}</span>
+                            <td>{{$loop->index +1}}</td>
+                            <td><span class="badge bg-light text-dark rounded">{{$requete->numero}}</span></td>
+                            <td> {{ $requete->article?->code_article }} {{ $requete->article?->designation }}</td>
+                            <td> {{ $requete->depot?->code_depot }} {{ $requete->depot?->libelle_depot }}</td>
+                            <td>{{ $requete->uniteMesure?->libelle_unite }} ({{$requete->uniteMesure?->code_unite}})</td>
+                            <td>{{ $requete->quantite }}</td>
+                            <td> @if($requete->preuve) <a href="{{$requete->preuve}}" target="_blank" class="btn btn-light"><i class="fas fa-file"></i></a> @else --- @endif </td>
+                            <td>
+                                <textarea rows="2" placeholder="{{$requete->commentaire}}" class="form-control"></textarea>
                             </td>
+                            <td><span class="badge bg-light text-dark border rounded">{{$requete->createdBy?->name ?? '---'}}</span></td>
+                            <td><span class="badge bg-light text-dark border rounded">{{$requete->created_at}}</span></td>
 
-                            <td class="border p-0 m-0">
-                                <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
-                                    @forelse($article->stocks as $stock)
-                                    <li class="bg-warning rounded p-2" style="list-style-type: none">
-                                        <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
-                                        <span class="badge d-block d-flex text-dark">Qte base : {{$stock->qantiteBase}} ({{$article->uniteMesure->libelle_unite}}) </span>
-                                        <span class="badge d-block d-flex align-items-center text-dark">
-                                                Qte appro: ({{$stock->uniteMesure?->libelle_unite}}) : <input type="number" readonly class="form-control" value="{{$stock->quantite_reelle}}">
-                                        </span>
-                                        <span class="badge d-block d-flex align-items-center text-dark">
-                                                Requête: ({{$stock->article?->uniteMesure?->libelle_unite}}) : <input type="number" readonly class="form-control" value="{{$stock->qantiteRequete}}">
-                                        </span>
-                                        <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVendu,2,'.','')}} ({{$article->uniteMesure?->libelle_unite}})</span>
-                                        <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($stock->resteStock,2,'.','')}} ({{$article->uniteMesure?->libelle_unite}})</span>
+                            <td><span class="badge bg-light text-dark border rounded">{{$requete->validatedBy?->name ?? '---'}}</span></td>
+                            <td><span class="badge bg-light text-dark border rounded">{{$requete->validated_at}}</span></td>
 
-                                        <a href="{{route('stock.delete',$stock->id)}}" class="btn btn-sm btn-light border w-100 text-dark bg-white">Supprimer</a>
-                                    </li>
-                                    <hr>
-                                    @empty
-                                    <li class="text-center">Ce article n'est disponible dans aucun dépôt!</li>
-                                    @endforelse
-                                </ul>
-                            </td>
-                            <td class="text-end">
-                                <div class="btn-group w-100">
-                                    <button type="button" class="btn btn-outline-primary btn-sm"
-                                        onclick="editArticle({{ $article->id }})">
-                                        <i class="bi bi-pencil me-1"></i>Modifier
+                            <td>
+                                @if(!$requete->validate())
+                                <div class="dropdown">
+                                    <button class="w-100 btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-gear"></i>
                                     </button>
-                                    <a target="_blank" href="{{route('articles.show',$article->id)}}" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-pencil me-1"></i>Dépôts
-                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        @can("requetes.edit")
+                                        <li>
+                                            <a href="{{route('requete_stock.edit',['requete_stock'=> $requete->id])}}" data-bs-toggle="tooltip" class="dropdown-item" data-bs-placement="left" data-bs-title="Editer"> <i class="fas fa-pencil me-2"></i> Modifier </a>
+                                        </li>
+                                        @endcan
+
+                                        @can("requetes.validate")
+                                        <li>
+                                            <form action="{{route('requete_stock.validateRequete',['requete_stock'=> $requete->id])}}" method="POST">
+                                                @csrf
+                                                @method("POST")
+                                                <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Valider la requête" onclick="return confirm('Voulez-vous vraiment valider cette requete??')"><i class="fas fa-check"></i> Valider </button>
+                                            </form>
+                                        </li>
+                                        @endcan
+
+                                        @can("requetes.delete")
+                                        <li>
+                                            <form action="{{route('requete_stock.destroy',$requete->id)}}" method="post">
+                                                @csrf
+                                                @method("DELETE")
+                                                <button type="submit" class="dropdown-item" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Supprimer la requête" onclick="return confirm('Voulez-vous vraiment supprimer cette requete??')"><i class="fas fa-trash"></i> Supprimer</button>
+                                            </form>
+                                        </li>
+                                        @endcan
+                                    </ul>
                                 </div>
+                                @else
+                                ---
+                                @endif
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-
-            <!-- @can("inventaires.create")
-            <br>
-            <div class="row d-flex justify-content-center">
-                <div class="col-6">
-                    <button class="btn btn-sm w-100 btn-dark"><i class="bi bi-plus-lg me-2"></i> Enregistrer un eventaire</button>
-                </div>
-            </div>
-            @endcan -->
-        </form>
+        </div>
     </div>
 </div>
+<link href="{{ asset('css/theme/table.css') }}" rel="stylesheet">
 
-<!-- DATATABLES -->
-@push('scripts')
-<script>
+<style>
+    .numero-recu {
+        font-family: 'Monaco', 'Consolas', monospace;
+        color: var(--bs-primary);
+        font-weight: 500;
+        padding: 0.3rem 0.6rem;
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .avatar-client {
+        width: 40px;
+        height: 40px;
+        background-color: var(--bs-light);
+        color: var(--bs-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+    }
+</style>
+</div>
+
+@push("scripts")
+
+<script type="text/javascript">
     $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
-        // "order": [
-        //     [7, 'asc']
-        // ],
+        "order": [
+            [0, 'desc']
+        ],
         "pageLength": 15,
         language: {
             "emptyTable": "Aucune donnée disponible dans le tableau",

@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MouvementsStockExport;
+use App\Models\RequeteStock;
 use Illuminate\Support\Facades\Log;
 use PDF;
 
@@ -144,20 +145,37 @@ class RapportStockController extends Controller
                                 // $article->unite_mesure_id
                             ) : 00;
 
-                        // /**Qte de Base */
-                        // $stock->qantiteBase = $conversion ? $this->serviceEntree
-                        //     ->convertirQuantite(
-                        //         $stock->quantite_reelle,
-                        //         $conversion,
-                        //         // $stock->unite_mesure_id,
-                        //         $article->unite_mesure_id
-                        //     ) : 00;
+                        $requeteQuery = session()->get("date_ftr") ?
+                            RequeteStock::where("article_id", $stock->article_id)
+                            ->where("depot_id", $stock->depot_id)
+                            ->whereNotNull("validated_by")
+                            ->whereNotNull("validated_at")
+                            ->where("created_at", session()->get("date_ftr"))
+                            :
+                            RequeteStock::where("article_id", $stock->article_id)
+                            ->where("depot_id", $stock->depot_id)
+                            ->whereNotNull("validated_by")
+                            ->whereNotNull("validated_at");
+
+                        /**Qte de requete */
+                        $stock->qantiteRequete = $conversion ? $this->serviceEntree
+                            ->convertirQuantite(
+                                // $stock->quantite_requete,
+                                $requeteQuery
+                                    ->get()
+                                    ->sum("quantite"),
+                                $conversion,
+                                $stock->unite_mesure_id
+                            ) : 00;
+                        // $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
 
                         /**Qte Vendue */
                         $stock->qteTotalVendu = session()->get("date_ftr") ?
                             $article->qteVenduAtDate($stock->depot_id, session()->get("date_ftr")) : $article->qteVendu($stock->depot_id);
+
                         /**Reste en stock */
-                        $stock->resteStock = $stock->quantite_reelle - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
+                        // $stock->resteStock = $stock->quantite_reelle - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
+                        $stock->resteStock = ($stock->quantite_reelle + $stock->qantiteRequete) - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
 
                         if ($article->code_article === "ART-805") {
                             Log::debug("Debug ART-805", [
@@ -167,6 +185,9 @@ class RapportStockController extends Controller
                             ]);
                         }
                     });
+
+                $article->qantiteRequete = $articleStocks->sum("qantiteRequete");
+                Log::debug("qteRequete :", ["data" => $article->qantiteRequete]);
 
                 $article->resteStock = $articleStocks->sum("resteStock");
                 $article->qteTotalVendu = $articleStocks->sum("qteTotalVendu");
@@ -424,10 +445,19 @@ class RapportStockController extends Controller
                         $stock->unite_mesure_id
                     ) : 00;
 
+                /**Qte de requete */
+                $stock->qantiteRequete = $conversion ? $this->serviceEntree
+                    ->convertirQuantite(
+                        $stock->quantite_requete,
+                        $conversion,
+                        $stock->unite_mesure_id
+                    ) : 00;
+
                 /**Qte Vendue */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
 
-                $resteStock = $qantiteBase - $qteTotalVendu;
+                // $resteStock = $qantiteBase - $qteTotalVendu;
+                $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
 
                 return [
                     'article' => [
@@ -435,9 +465,10 @@ class RapportStockController extends Controller
                         'designation' => $stock->article->designation,
                         'unite' => $stock->article->uniteMesure?->libelle_unite,
                     ],
-                    'unite_stock' => $stock->uniteMesure->libelle_unite,
+                    'unite_stock' => $stock->uniteMesure?->libelle_unite,
                     'depot' => $stock->depot->libelle_depot,
-                    'quantite_reelle' => $stock->quantite_reelle,
+                    'quantite_reelle' => $qantiteBase, //$stock->quantite_reelle,
+                    'quantite_requete' => $stock->qantiteRequete,
                     'quantite_disponible' => $resteStock, // $stock->article->reste($selectedDepot->id),
                     'quantite_reservee' => $stock->quantite_reservee,
                     'prix_moyen' => $stock->prix_moyen,

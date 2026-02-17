@@ -487,11 +487,11 @@
                         </a></li>
                     @endcan
 
-                    <!-- @can('stock.rotation.view')
-                    <li><a class="dropdown-item" href="{{ route('stock.rotation.index') }}">
-                            <div class="dropdown-item-wrapper">Rotations de Stock</div>
+                    @can('rapports.stock-dispo.view')
+                    <li><a class="dropdown-item" href="{{ route('requete_stock.index') }}">
+                            <div class="dropdown-item-wrapper">Requête de stock</div>
                         </a></li>
-                    @endcan -->
+                    @endcan
                 </ul>
             </li>
             @endcanany
