@@ -37,8 +37,9 @@ class RequeteStockController extends Controller
         $articles = Article::with(["depots", "uniteMesure"])
             ->whereHas("depots")
             ->whereHas("uniteMesure")
-            ->get(['id', 'code_article', 'designation','unite_mesure_id'])
+            ->get(['id', 'code_article', 'designation', 'unite_mesure_id'])
             ->map(function ($article) {
+                $article->depots = $article->depots->unique("id")->values();
                 $article->unites = ArticleController::getUnites($article->id);
                 return $article;
             });

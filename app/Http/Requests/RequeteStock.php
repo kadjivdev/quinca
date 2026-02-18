@@ -25,7 +25,7 @@ class RequeteStock extends FormRequest
             'depot_id' => 'required|integer|exists:depots,id',
             'article_id' => 'required|integer|exists:articles,id',
             'unite_mesure_id' => 'required|integer|exists:unite_mesures,id',
-            'quantite' => 'required|numeric|min:0.01',
+            'quantite' => 'required',
             'commentaire' => 'nullable|string|max:1000',
             'preuve' => 'nullable|file|mimes:pdf,doc,docx,png,jpeg|max:2048',
         ];
@@ -48,8 +48,6 @@ class RequeteStock extends FormRequest
             'unite_mesure_id.exists' => 'L\'unité de mesure sélectionnée n\'existe pas.',
 
             'quantite.required' => 'La quantité est obligatoire.',
-            'quantite.numeric' => 'La quantité doit être un nombre.',
-            'quantite.min' => 'La quantité doit être supérieure à 0.',
 
             'commentaire.string' => 'Le commentaire doit être un texte.',
             'commentaire.max' => 'Le commentaire ne doit pas dépasser 1000 caractères.',
