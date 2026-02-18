@@ -74,18 +74,17 @@ class ArticleController extends Controller
                         $stock->unite_mesure_id
                     ) : 00;
 
-
                 /**Qte de requete */
-                $stock->qantiteRequete = $conversion ? $this->serviceStockEntree
-                    ->convertirQuantite(
-                        $stock->quantite_requete,
-                        $conversion,
-                        $stock->unite_mesure_id
-                    ) : 00;
+                $stock->qantiteRequete = $stock->quantite_requete;
+                // $conversion ? $this->serviceStockEntree
+                //     ->convertirQuantite(
+                //         $stock->quantite_requete,
+                //         $conversion,
+                //         $stock->unite_mesure_id
+                //     ) : 00;
 
                 /**Qte Vendue */
                 $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
-
                 $stock->resteStock = ($stock->qantiteBase + $stock->qantiteRequete) - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
             });
         });

@@ -25,6 +25,7 @@
                         <option value="">Choisir l'article </option>
                         @foreach ($articles as $article)
                         <option value="{{ $article->id }}"
+                            data-article="{{$article}}"
                             data-depots="{{$article->depots}}"
                             data-unites="{{$article->unites}}"
                             {{ old('article_id') == $article->id ? 'selected' : '' }}>

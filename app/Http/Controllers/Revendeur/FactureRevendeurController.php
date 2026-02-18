@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Revendeur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vente\Client;
-use App\Models\Catalogue\{Tarification, Article};
+use App\Models\Catalogue\{Article};
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
@@ -366,7 +366,6 @@ class FactureRevendeurController extends Controller
 
     public function searchArticles(Request $request)
     {
-        // dd("gogo");
         $search = $request->get('q');
         Log::info("Terme de recherche:", ["terme" => $search]);
         $user = auth()->user();
@@ -415,12 +414,13 @@ class FactureRevendeurController extends Controller
 
 
                 /**Qte de requete */
-                $stock->qantiteRequete = $conversion ? $this->serviceStockEntree
-                    ->convertirQuantite(
-                        $stock->quantite_requete,
-                        $conversion,
-                        $stock->unite_mesure_id
-                    ) : 00;
+                $stock->qantiteRequete = $stock->quantite_requete;
+                // $conversion ? $this->serviceStockEntree
+                //     ->convertirQuantite(
+                //         $stock->quantite_requete,
+                //         $conversion,
+                //         $stock->unite_mesure_id
+                //     ) : 00;
 
                 /**Qte Vendue */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);

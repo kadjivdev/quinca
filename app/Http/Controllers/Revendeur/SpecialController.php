@@ -438,12 +438,15 @@ class SpecialController extends Controller
                         $stock->unite_mesure_id
                     ) : 00;
 
+                // quantité requete
+                $stock->qantiteRequete = $stock->quantite_requete;
 
                 /**Qte Vendue */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
 
                 /**Qte Reste */
-                $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
+                // $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);
+                $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
 
                 return [
                     'id' => $stock->article->id,

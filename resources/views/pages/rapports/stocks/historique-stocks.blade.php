@@ -57,7 +57,7 @@
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteAppro,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->stockDisponible,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{$article->unite_mesure}}</span></td>
-                        <td><span class="badge bg-light text-dark">{{number_format($article->qantiteRequete,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qantiteRequete,2,"."," ")}} ({{$article->uniteMesure?->libelle_unite}})</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,"."," ")}}</span></td>

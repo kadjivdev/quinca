@@ -46,8 +46,10 @@
         let oldMesureId = "{{ old('unite_mesure_id',$requete->unite_mesure_id??'') }}";
 
         $('#article_id').on('select2:select', function(e) {
-            // alert(e.params.data.id); // ou e.params.data.text selon ce que tu veux
+            alert("e.params.data.id"); // ou e.params.data.text selon ce que tu veux
             const selected = $(this).find(':selected');
+
+            const article = selected.data('article');
             const unites = selected.data('unites');
             const depots = selected.data('depots');
 
@@ -65,17 +67,21 @@
             // gestion du select des unites
             $("#unite_mesure_id").empty()
             let unitesOptions = '<option value="">Choisir une unité </option>'
-            unites.forEach(unite => {
-                let selected = (oldMesureId == unite.id) ? 'selected' : '';
-                unitesOptions += `<option value="${unite.id}" ${selected}>
-                            ${unite.text }
-                        </option>`
-            });
-            $("#unite_mesure_id").append(unitesOptions)
+            // unites.forEach(unite => {
+            //     let selected = (oldMesureId == unite.id) ? 'selected' : '';
+            //     unitesOptions += `<option value="${unite.id}" ${selected}>
+            //                 ${unite.text }
+            //             </option>`
+            // });
+            // $("#unite_mesure_id").append(unitesOptions)
+            let selectedUnite = (oldMesureId == article.unite_mesure.id) ? 'selected' : '';
+            $("#unite_mesure_id").append(`<option value="${article.unite_mesure.id}" ${selectedUnite}>
+                            ${article.unite_mesure.libelle_unite }
+                        </option>`)
 
 
             // console
-            // console.log(`Les unités concernées : ${JSON.stringify(unites)}`)
+            console.log(`L'article concernées : ${JSON.stringify(article)}`)
             // console.log(`Les dépôts concernés : ${JSON.stringify(depots)}`)
         });
     });

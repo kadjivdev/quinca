@@ -158,15 +158,19 @@ class RapportStockController extends Controller
                             ->whereNotNull("validated_at");
 
                         /**Qte de requete */
-                        $stock->qantiteRequete = $conversion ? $this->serviceEntree
-                            ->convertirQuantite(
-                                // $stock->quantite_requete,
-                                $requeteQuery
-                                    ->get()
-                                    ->sum("quantite"),
-                                $conversion,
-                                $stock->unite_mesure_id
-                            ) : 00;
+                        $stock->qantiteRequete = $requeteQuery
+                            ->get()
+                            ->sum("quantite");
+
+                        // $conversion ? $this->serviceEntree
+                        //     ->convertirQuantite(
+                        //         $requeteQuery
+                        //             ->get()
+                        //             ->sum("quantite"),
+                        //         $conversion,
+                        //         $stock->unite_mesure_id,
+                        //         // $article->unite_mesure_id,
+                        //     ) : 00;
                         // $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
 
                         /**Qte Vendue */
@@ -446,12 +450,13 @@ class RapportStockController extends Controller
                     ) : 00;
 
                 /**Qte de requete */
-                $stock->qantiteRequete = $conversion ? $this->serviceEntree
-                    ->convertirQuantite(
-                        $stock->quantite_requete,
-                        $conversion,
-                        $stock->unite_mesure_id
-                    ) : 00;
+                $stock->qantiteRequete = $stock->quantite_requete;
+                // $conversion ? $this->serviceEntree
+                //     ->convertirQuantite(
+                //         $stock->quantite_requete,
+                //         $conversion,
+                //         $stock->unite_mesure_id
+                //     ) : 00;
 
                 /**Qte Vendue */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
