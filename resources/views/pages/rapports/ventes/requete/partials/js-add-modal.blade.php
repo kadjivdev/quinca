@@ -46,7 +46,7 @@
         let oldMesureId = "{{ old('unite_mesure_id',$requete->unite_mesure_id??'') }}";
 
         $('#article_id').on('select2:select', function(e) {
-            alert("e.params.data.id"); // ou e.params.data.text selon ce que tu veux
+            // alert("e.params.data.id"); // ou e.params.data.text selon ce que tu veux
             const selected = $(this).find(':selected');
 
             const article = selected.data('article');
