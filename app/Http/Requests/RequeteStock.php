@@ -25,7 +25,7 @@ class RequeteStock extends FormRequest
             'depot_id' => 'required|integer|exists:depots,id',
             'article_id' => 'required|integer|exists:articles,id',
             'unite_mesure_id' => 'required|integer|exists:unite_mesures,id',
-            'quantite' => 'required',
+            'quantite' => 'required|numeric',
             'commentaire' => 'nullable|string|max:1000',
             'preuve' => 'nullable|file|mimes:pdf,doc,docx,png,jpeg|max:2048',
         ];

@@ -74,6 +74,7 @@ class RequeteStockController extends Controller
      */
     public function store(RequestsRequeteStock $request)
     {
+        Log::info("Début d'insertion de la requete stock");
         try {
             DB::beginTransaction();
             $requete = RequeteStock::create($request->validated());
@@ -89,7 +90,7 @@ class RequeteStockController extends Controller
                 ->withErrors($e->errors());
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error("Erreure d'exception lors de la création de la requete", ["error" => $e->getMessage()]);
+            Log::debug("Erreure d'exception lors de la création de la requete", ["error" => $e->getMessage()]);
             return back()->withInput()->with("error", "Une erreure d'exception est survenue lors de la création de la requete");
         }
     }

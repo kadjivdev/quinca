@@ -40,7 +40,7 @@ return new class extends Migration
                 ->onUpdate('CASCADE')
                 ->onDelete('set null');
             $table->decimal("quantite", 8, 2);
-            $table->text('commentaire');
+            $table->text('commentaire')->nullable();
             $table->string('preuve')->nullable();
             $table->date("validated_at")->nullable();
             $table->softDeletes();
