@@ -40,6 +40,9 @@ use App\Models\Vente\FactureClient;
 Route::get("/debug", function () {
 
     $facture_FAC_20260219_0016 = FactureClient::firstWhere("numero", "FAC-20260219-0016");
+    if ($facture_FAC_20260219_0016) {
+        $facture_FAC_20260219_0016->update(["reference_recu" => "KAD20115"]);
+    }
     return response()->json($facture_FAC_20260219_0016);
 
     // Journée du 05
