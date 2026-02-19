@@ -47,15 +47,6 @@ class BonLivraisonFournisseurController extends Controller
             ->whereNull('rejected_at')
             ->orderBy('date_facture', 'desc')
             ->get();
-            // ->filter(function ($facture) {
-            //     $qteTotalFacture = $facture->lignes->sum(function ($ligne) {
-            //         return $ligne->quantite_base ?? $ligne->quantite;
-            //     });
-
-            //     // on recupere juste les factures non encore totalement livrées
-            //     $totalLivres = $facture->lignes()->sum('quantite_livree');
-            //     return ($totalLivres < $qteTotalFacture) || $totalLivres == 0;
-            // });
 
         // Récupération des véhicules actifs
         $vehicules = Vehicule::where('statut', true)
@@ -163,6 +154,12 @@ class BonLivraisonFournisseurController extends Controller
 
             DB::beginTransaction();
 
+            // traitement du document
+            $document = $request->file("document");
+            $name = time() . "_" . $document->getClientOriginalName();
+            $document->move("livraison_docs", $name);
+            $documentUrl = asset("/livraison_docs/" . $name);
+
             // Création du bon de livraison avec le point de vente et le fournisseur automatiques
             $bonLivraison = BonLivraisonFournisseur::create([
                 'code' => $this->generateCode(),
@@ -174,7 +171,8 @@ class BonLivraisonFournisseurController extends Controller
                 'vehicule_id' => $validated['vehicule_id'],
                 'chauffeur_id' => $validated['chauffeur_id'],
                 'commentaire' => $validated['commentaire'],
-                'created_by' => Auth::id()
+                'created_by' => Auth::id(),
+                "document" => $documentUrl
             ]);
 
             Log::debug("Les lignes entrante", ["data" => $validated['lignes']]);

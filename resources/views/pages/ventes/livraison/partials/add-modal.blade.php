@@ -106,6 +106,15 @@
                         </div>
                     </div>
 
+                    <!-- Document -->
+                    <div class="mb-3">
+                        <label for="document">Document justificatif(facultatif)</label>
+                        <input type="file" name="document" id="document" class="form-control" name="document">
+                        @error("document")
+                        <span class="text-danger">{{$message}}</span>
+                        @enderror
+                    </div>
+
                     {{-- Notes --}}
                     <div class="row">
                         <div class="col-12">

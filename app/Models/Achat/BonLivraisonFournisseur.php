@@ -70,7 +70,8 @@ class BonLivraisonFournisseur extends Model
         'validated_at',
         'rejected_by',
         'rejected_at',
-        'deleted_by'
+        'deleted_by',
+        'document'
     ];
 
     /**

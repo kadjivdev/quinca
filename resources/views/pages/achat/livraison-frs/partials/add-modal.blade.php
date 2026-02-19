@@ -79,7 +79,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <label class="form-label small text-muted mb-2 required">Chauffeur</label>
                             <select class="form-select select2 rounded-pill" name="chauffeur_id" required>
@@ -109,7 +109,7 @@
                                         <!-- <th class="py-3 text-center">Quantité facturée</th> -->
                                         <th class="py-3 text-center">Déjà reçue</th>
                                         <th class="py-3 text-center">À recevoir</th>
-                                        <th class="py-3 text-center" >Quantité</th>
+                                        <th class="py-3 text-center">Quantité</th>
                                         <th class="py-3 text-center">Qté supplémentaire</th>
                                     </tr>
                                 </thead>
@@ -129,6 +129,15 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    <!-- Document -->
+                    <div class="mb-3">
+                        <label for="document">Document justificatif (facultatif)</label>
+                        <input type="file" name="document" id="document" class="form-control" name="document">
+                        @error("document")
+                        <span class="text-danger">{{$message}}</span>
+                        @enderror
                     </div>
 
                     {{-- Notes --}}

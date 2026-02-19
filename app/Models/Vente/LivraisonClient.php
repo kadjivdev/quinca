@@ -38,7 +38,8 @@ class LivraisonClient extends Model
         'created_by',
         'validated_by',
         'validated_at',
-        'deleted_by'
+        'deleted_by',
+        'document'
     ];
 
     protected $casts = [

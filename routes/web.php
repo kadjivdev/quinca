@@ -935,7 +935,6 @@ Route::middleware('auth')->group(function () {
             // IMPRESSION EN PDF
             Route::post('/{livraison}/bordereau-livraison', [LivraisonClientController::class, 'bordereauLivraison'])->name('vente.bordereauLivraison');
 
-
             // Créer une nouvelle livraison
             Route::post('/', [LivraisonClientController::class, 'store'])->name('vente.livraisons.store');
 

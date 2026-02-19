@@ -15,6 +15,8 @@
                                 <th class="py-3 text-secondary small text-uppercase">Magasin</th>
                                 <th class="py-3 text-secondary small text-uppercase">Transport</th>
                                 <th class="py-3 text-secondary small text-uppercase">Articles</th>
+                                <th class="border-bottom-0">Document</th>
+
                                 <th class="py-3 text-secondary small text-uppercase text-center">Statut</th>
                                 <th class="pe-4 py-3 text-end" style="min-width: 150px;"></th>
                             </tr>
@@ -80,6 +82,13 @@
                                     <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3">
                                         {{ $livraison->lignes->count() }} article(s)
                                     </span>
+                                </td>
+                                <td>
+                                    @if($livraison->document)
+                                    <a href="{{$livraison->document}}" target="_blank" class="badge bg-light border rounded shadow text-dark"> <i class="fas fa-fill"></i></a>
+                                    @else
+                                    ---
+                                    @endif
                                 </td>
                                 <td class="py-3 text-center">
                                     @if ($livraison->validated_at)

@@ -16,6 +16,7 @@
                             <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0">Magasin(source/Destination)</th>
                             <th class="border-bottom-0">Articles</th>
+                            <th class="border-bottom-0">Document</th>
                             <th class="border-bottom-0 text-center">Statut</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
@@ -60,6 +61,13 @@
                                 <span class="badge bg-primary">
                                     {{ $livraison->lignes->count() }} article(s)
                                 </span>
+                            </td>
+                            <td>
+                                @if($livraison->document)
+                                <a href="{{$livraison->document}}" target="_blank" class="badge bg-light border rounded shadow text-dark"> <i class="fas fa-fill"></i></a>
+                                @else
+                                ---
+                                @endif
                             </td>
                             <td class="text-center">
                                 @switch($livraison->statut)

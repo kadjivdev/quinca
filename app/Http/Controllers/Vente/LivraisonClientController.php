@@ -5,19 +5,17 @@ namespace App\Http\Controllers\Vente;
 use App\Http\Controllers\Controller;
 use App\Models\Vente\{Client, LivraisonClient, FactureClient, LigneFacture, LigneLivraisonClient};
 use App\Models\Catalogue\Article;
-use App\Models\Parametre\{Depot, ConversionUnite};
+use App\Models\Parametre\{Depot};
 use App\Models\Stock\StockDepot;
 use App\Services\ServiceStockSortie;
 use App\Services\ServiceStockEntree;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Codedge\Fpdf\Fpdf\ChiffreEnLettre;
 use Codedge\Fpdf\Fpdf\PDF_MC_Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\{DB, Log};
 use Exception;
 use Illuminate\Validation\ValidationException;
-use Psr\Http\Message\ResponseInterface;
 
 class LivraisonClientController extends Controller
 {
@@ -148,7 +146,8 @@ class LivraisonClientController extends Controller
                 'lignes.*.quantite' => 'required|numeric|min:0',
                 'lignes.*.quantite_supplementaire' => 'required|numeric|min:0',
                 'lignes.*.prix_unitaire' => 'required|numeric|min:0',
-                'notes' => 'nullable|string'
+                'notes' => 'nullable|string',
+                'document'             => 'nullable|file|mimes:pdf,doc,docx|max:5120', // max en Ko (5 Mo)
             ]);
 
             $facture = FactureClient::findOrFail($validated['facture_id']);
@@ -164,6 +163,12 @@ class LivraisonClientController extends Controller
 
             DB::beginTransaction();
 
+            // traitement du document
+            $document = $request->file("document");
+            $name = time() . "_" . $document->getClientOriginalName();
+            $document->move("livraison_docs", $name);
+            $documentUrl = asset("/livraison_docs/" . $name);
+
             // Création de la livraison
             $livraison = new LivraisonClient();
             $livraison->facture_client_id = $validated['facture_id'];
@@ -174,6 +179,7 @@ class LivraisonClientController extends Controller
             $livraison->statut = 'brouillon';
             $livraison->notes = $validated['notes'];
             $livraison->created_by = auth()->id();
+            $livraison->document = $documentUrl;
             $livraison->save();
 
             Log::info("Data des lignes", ["data" => $validated['lignes']]);
