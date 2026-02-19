@@ -25,6 +25,7 @@ use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\FactureClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,9 @@ use App\Models\Stock\StockDepot;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
+
+    $facture_FAC_20260219_0016 = FactureClient::firstWhere("reference", "FAC-20260219-0016");
+    return response()->json($facture_FAC_20260219_0016);
 
     // Journée du 05
     // $accompteLaurenda05 = AcompteClient::with("createdBy")
@@ -1181,7 +1185,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('rapports')->middleware(['auth'])->group(function () {
 
         // requete de stock
-        Route::resource("requete_stock",RequeteStockController::class);
+        Route::resource("requete_stock", RequeteStockController::class);
         Route::post('/rapports/requete_stock/{requete_stock}', [RequeteStockController::class, 'validateRequete'])->name('requete_stock.validateRequete');
 
         Route::get('/rapports/compte-client', [RapportVenteController::class, 'rapportCompteClient'])->name('rapports.compte-client');

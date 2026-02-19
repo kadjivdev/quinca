@@ -709,7 +709,6 @@ class BonCommandeController extends Controller
             ->select('*')
             ->get();
 
-
         $tot_ht = 0;
         foreach ($bcde->lignes  as $ligne_commande) {
             // return $ligne_commande;
