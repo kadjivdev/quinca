@@ -73,7 +73,6 @@ class BonCommandeController extends Controller
             ->orderBy('validated_at', 'desc')
             ->get();
 
-
         // Statistiques pour le point de vente spécifique
         $totalBonCommandes = BonCommande::where('point_de_vente_id', $user->point_de_vente_id)->count();
         $montantTotal = BonCommande::where('point_de_vente_id', $user->point_de_vente_id)->sum('montant_total');
@@ -571,19 +570,7 @@ class BonCommandeController extends Controller
             $request->validate([
                 'code' => 'required|unique:facture_fournisseurs,code',
                 'date_facture' => 'required|date',
-                // 'bon_commande_id' => 'required|exists:bon_commandes,id',
-                // 'point_de_vente_id' => 'required|exists:point_de_ventes,id',
-                // 'fournisseur_id' => 'required|exists:fournisseurs,id',
                 'type_facture' => 'required|in:SIMPLE,NORMALISE',
-                // 'articles' => 'required|array',
-
-                // 'articles.*.unite_mesure_id' => 'required|numeric',
-                // 'articles.*.quantite' => 'required|numeric|min:0',
-
-                // 'articles.*.unite_mesure_base_id' => 'nullable|numeric',
-                // 'articles.*.quantite_base' => 'nullable|numeric|min:0',
-
-                // 'articles.*.prix_unitaire' => 'required|numeric|min:0',
             ]);
 
             Log::info("Fin du chargement des lignes", ["data" => $request->articles]);
