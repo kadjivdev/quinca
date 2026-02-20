@@ -164,10 +164,13 @@ class LivraisonClientController extends Controller
             DB::beginTransaction();
 
             // traitement du document
-            $document = $request->file("document");
-            $name = time() . "_" . $document->getClientOriginalName();
-            $document->move("livraison_docs", $name);
-            $documentUrl = asset("/livraison_docs/" . $name);
+            $documentUrl = null;
+            if ($request->hasFile("document")) {
+                $document = $request->file("document");
+                $name = time() . "_" . $document->getClientOriginalName();
+                $document->move("livraison_docs", $name);
+                $documentUrl = asset("/livraison_docs/" . $name);
+            }
 
             // Création de la livraison
             $livraison = new LivraisonClient();

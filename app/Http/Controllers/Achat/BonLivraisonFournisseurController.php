@@ -155,10 +155,13 @@ class BonLivraisonFournisseurController extends Controller
             DB::beginTransaction();
 
             // traitement du document
-            $document = $request->file("document");
-            $name = time() . "_" . $document->getClientOriginalName();
-            $document->move("livraison_docs", $name);
-            $documentUrl = asset("/livraison_docs/" . $name);
+            $documentUrl = null;
+            if ($request->hasFile("document")) {
+                $document = $request->file("document");
+                $name = time() . "_" . $document->getClientOriginalName();
+                $document->move("livraison_docs", $name);
+                $documentUrl = asset("/livraison_docs/" . $name);
+            }
 
             // Création du bon de livraison avec le point de vente et le fournisseur automatiques
             $bonLivraison = BonLivraisonFournisseur::create([
