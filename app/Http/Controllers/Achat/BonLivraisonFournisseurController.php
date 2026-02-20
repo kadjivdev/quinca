@@ -46,7 +46,11 @@ class BonLivraisonFournisseurController extends Controller
             ->whereNotNull("validated_by")
             ->whereNull('rejected_at')
             ->orderBy('date_facture', 'desc')
-            ->get();
+            ->get()
+            ->filter(function ($facture) {
+                return $facture->lignes->sum('quantite_livree') !=
+                    $facture->lignes->sum('quantite_base');
+            });
 
         // Récupération des véhicules actifs
         $vehicules = Vehicule::where('statut', true)

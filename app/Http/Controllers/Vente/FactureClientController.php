@@ -1026,12 +1026,22 @@ class FactureClientController extends Controller
     }
 
     // get depot's factures
-    function getDepotFactures($depotId)
+    public static function getDepotFactures($depotId)
     {
+        Log::debug("Id de la facture :", ["id" => $depotId]);
         $factures = FactureClient::whereHas('lignes', function ($ligne) use ($depotId) {
-            $ligne->where('depot', $depotId);
-        })
-            ->get(["id", "numero"]);
+            $ligne->where('depot', $depotId)
+                /**on recupere seulement les lignes qui disposent encore de quantité */
+                ->where(function ($q) {
+                    $q->whereNull('quantite_livree_simple')
+                        ->orWhere(function ($subQ) {
+                            $subQ->whereNotNull('quantite_livree_simple')
+                                ->where('quantite', '>', DB::raw('quantite_livree_simple'));
+                        });
+                });
+        })->get(["id", "numero"]);
+
+        Log::debug("Les factures recupérées :", ["data" => $factures]);
 
         return response()->json([
             'data' => $factures

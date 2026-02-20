@@ -29,8 +29,8 @@ class LivraisonClientController extends Controller
 
     public function index(Request $request)
     {
-        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
+        $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
         // Récupération des données avec pagination
         $livraisons = LivraisonClient::with([
             'facture.client',
@@ -413,22 +413,8 @@ class LivraisonClientController extends Controller
                         });
                 });
             })
-            // ->whereRaw('quantite > IFNULL((
-            //     SELECT SUM(llc.quantite)
-            //     FROM ligne_livraison_clients llc
-            //     JOIN livraison_clients lc ON llc.livraison_client_id = lc.id
-            //     WHERE llc.ligne_facture_id = ligne_facture_clients.id
-            //     AND lc.statut = "valide"
-            // ), 0)')
             ->get()
             ->map(function ($ligne) use ($request) {
-                // Calculer la quantité déjà livrée
-                $_quantiteLivree = DB::table('ligne_livraison_clients')
-                    ->join('livraison_clients', 'livraison_clients.id', '=', 'ligne_livraison_clients.livraison_client_id')
-                    ->where('ligne_livraison_clients.ligne_facture_id', $ligne->id)
-                    ->where('livraison_clients.statut', 'valide')
-                    ->sum('ligne_livraison_clients.quantite');
-
                 /**
                  * Qte livrée
                  */
@@ -436,13 +422,6 @@ class LivraisonClientController extends Controller
 
                 // Récupérer le stock disponible
                 $stockDisponible = $ligne->quantite - $quantiteLivree;
-                // if ($request->filled('depot_id')) {
-                //     $stock = StockDepot::where([
-                //         'article_id' => $ligne->article_id,
-                //         'depot_id' => $request->depot_id
-                //     ])->first();
-                //     $stockDisponible = $stock ? $stock->quantite_reelle : 0;
-                // }
 
                 return [
                     'id' => $ligne->id,

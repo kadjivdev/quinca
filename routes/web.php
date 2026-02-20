@@ -26,6 +26,7 @@ use App\Http\Controllers\Revendeur\SpecialController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
+use App\Models\Vente\LivraisonClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,11 +40,15 @@ use App\Models\Vente\FactureClient;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $facture_FAC_20260219_0016 = FactureClient::firstWhere("numero", "FAC-20260219-0016");
-    if ($facture_FAC_20260219_0016) {
-        $facture_FAC_20260219_0016->update(["reference_recu" => "KAD20115"]);
-    }
-    return response()->json($facture_FAC_20260219_0016);
+    // return FactureClientController::getDepotFactures(3);
+    $facture_FAC_20250715_0004 = FactureClient::with("lignes")
+    ->whereHas('lignes', function ($ligne) {
+        $ligne->where('depot', 3)
+        ->whereColumn("quantite_livree","!=","quantite_base");
+    })
+        ->firstWhere("numero", "FAC-20250715-0004");
+
+    return response()->json($facture_FAC_20250715_0004);
 
     // Journée du 05
     // $accompteLaurenda05 = AcompteClient::with("createdBy")

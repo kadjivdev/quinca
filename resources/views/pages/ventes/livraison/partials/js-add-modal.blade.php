@@ -34,6 +34,7 @@
                     let factures = response.data;
                     console.log(`Les factures : ${JSON.stringify(response)}`);
 
+                    console.log(`Le nombre de facture :`,factures.length)
                     // mise à jour des options de factures
                     if (factures.length > 0) {
                         let options = '<option value="">Sélectionner une facture</option>';
