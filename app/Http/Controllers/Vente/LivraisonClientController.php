@@ -415,6 +415,7 @@ class LivraisonClientController extends Controller
             })
             ->get()
             ->map(function ($ligne) use ($request) {
+                // Log::debug("La quantité facturée : ", ["data" => $ligne]);
                 /**
                  * Qte livrée
                  */
