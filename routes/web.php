@@ -43,6 +43,11 @@ Route::get("/debug", function () {
     $facture_FAC_20260223_0015 = FactureClient::with("lignes")
         ->firstWhere("numero", "FAC-20260223-0015");
 
+    $facture_FAC_20260223_0015->lignes
+        ->update([
+            "quantite_livree" => 0,
+            "quantite_livree_simple" => null
+        ]);
     return response()->json($facture_FAC_20260223_0015);
 
     // Journée du 05
