@@ -39,16 +39,11 @@ use App\Models\Vente\LivraisonClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-
     // return FactureClientController::getDepotFactures(3);
-    $facture_FAC_20250715_0004 = FactureClient::with("lignes")
-    ->whereHas('lignes', function ($ligne) {
-        $ligne->where('depot', 3)
-        ->whereColumn("quantite_livree","!=","quantite_base");
-    })
-        ->firstWhere("numero", "FAC-20250715-0004");
+    $facture_FAC_20260223_0015 = FactureClient::with("lignes")
+        ->firstWhere("numero", "FAC-20260223-0015");
 
-    return response()->json($facture_FAC_20250715_0004);
+    return response()->json($facture_FAC_20260223_0015);
 
     // Journée du 05
     // $accompteLaurenda05 = AcompteClient::with("createdBy")

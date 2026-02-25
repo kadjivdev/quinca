@@ -661,7 +661,6 @@ class LivraisonClientController extends Controller
                 ], 422);
             }
 
-
             $validated = $request->validate([
                 'depot_id' => 'required|exists:depots,id',
                 'lignes' => 'required|array',
@@ -685,7 +684,6 @@ class LivraisonClientController extends Controller
 
             // Supprimer les anciennes lignes
             $livraisonClient->lignes()->delete();
-
 
             // Création des lignes
             foreach ($validated['lignes'] as $data) {
