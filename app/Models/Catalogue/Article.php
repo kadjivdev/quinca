@@ -299,16 +299,42 @@ class Article extends Model
             })->get();
     }
 
+    function facturesVenteAll($depotId = null)
+    {
+
+        return $this->hasMany(LigneFacture::class, "article_id")
+            ->where("depot", $depotId)
+            ->whereHas("factureClient", function ($query) {
+                $query
+                    // ->whereNotNull("validated_by")
+                    ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
+            })->get();
+    }
+
+    /**
+     * Qte vendue revendeur dans un depot
+     */
+    function facturesVenteRevendeurAll($depotId = null)
+    {
+        return $this->hasMany(LigneFactureRevendeur::class, "article_id")
+            ->where("depot", $depotId)
+            ->whereHas("factureRevendeur", function ($query) {
+                $query
+                    // ->whereNotNull("validated_by")
+                    ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
+            })->get();
+    }
+
     /**
      * Calcul de la quantité vendue (vente client, vente revendeurs, vente speciale) de l'article dans un depot
      */
 
-    function qteVendu($depotId = null)
+    function qteVendu($depotId = null, $all = false)
     {
         //Vente à la directeur
-        $factureVentes = $this->facturesVente($depotId);
+        $factureVentes = $all ? $this->facturesVenteAll($depotId) : $this->facturesVente($depotId);
 
-        $factureRevendeurs = $this->facturesVenteRevendeur($depotId);
+        $factureRevendeurs = $all ? $this->facturesVenteRevendeurAll($depotId) : $this->facturesVenteRevendeur($depotId);
 
         $qteVente = 0;
         if ($factureVentes->isEmpty() && $factureRevendeurs->isEmpty()) {

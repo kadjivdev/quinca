@@ -832,7 +832,7 @@ class FactureClientController extends Controller
     public function searchArticles(Request $request)
     {
         $search = $request->get('q');
-        Log::info("Terme de recherche:", ["terme" => $search]);
+        Log::info("Terme de recherche gogo:", ["terme" => $search]);
         $user = auth()->user();
 
         $stocks = StockDepot::with('article.uniteMesure', 'depot')
@@ -888,7 +888,8 @@ class FactureClientController extends Controller
                 //     ) : 00;
 
                 /**Qte Vendue */
-                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+                // $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id,true);
 
                 /**Qte Reste */
                 $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
