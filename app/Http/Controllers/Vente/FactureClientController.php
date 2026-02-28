@@ -22,6 +22,7 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class FactureClientController extends Controller
 {
@@ -889,7 +890,7 @@ class FactureClientController extends Controller
 
                 /**Qte Vendue */
                 // $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
-                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id,true);
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id, true);
 
                 /**Qte Reste */
                 $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
@@ -1095,6 +1096,7 @@ class FactureClientController extends Controller
 
     public function validateFacture($id)
     {
+        Log::debug("Debut de validation de la facture", ["data" => $id]);
         try {
             DB::beginTransaction();
 
@@ -1107,7 +1109,7 @@ class FactureClientController extends Controller
 
             $sessionCaisse = SessionCaisse::ouverte()
                 ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                ->first();
+                ->first() ?? SessionCaisse::latest()->first();
 
             if (!$sessionCaisse) {
                 throw new Exception('Session de caisse requise');
