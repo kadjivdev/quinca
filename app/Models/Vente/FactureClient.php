@@ -75,7 +75,6 @@ class FactureClient extends Model
      * Format: FAC-AAAAMMJJ-XXXX
      * où XXXX est un numéro séquentiel
      */
-
     public static function generateNumero()
     {
         $prefix = 'FAC';

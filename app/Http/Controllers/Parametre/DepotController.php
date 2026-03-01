@@ -455,7 +455,13 @@ class DepotController extends Controller
 
             // Pour les depots de cotonou
             if (in_array($depot->id, [3, 4, 6])) {
-                FactureClient::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+                // on recupère les fcatures de ce depot
+                FactureClient::whereNull("inventaire_id")
+                    ->whereHas('lignes', function ($ligne) use ($depotId) {
+                        $ligne->where('depot', $depotId);
+                    })
+                    ->update(["inventaire_id" => $inventaire->id]);
+                // FactureClient::whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
             }
 
             // Pour les depots des revendeurs
