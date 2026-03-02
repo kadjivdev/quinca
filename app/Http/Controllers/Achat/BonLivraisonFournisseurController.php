@@ -49,7 +49,9 @@ class BonLivraisonFournisseurController extends Controller
             ->get()
             ->filter(function ($facture) {
                 return $facture->lignes->sum('quantite_livree') !=
-                    $facture->lignes->sum('quantite_base');
+                    $facture->lignes->sum(function ($ligne) {
+                        return $ligne->quantite_base ?? $ligne->quantite;
+                    });
             });
 
         // Récupération des véhicules actifs
