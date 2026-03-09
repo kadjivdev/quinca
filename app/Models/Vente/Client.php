@@ -324,10 +324,10 @@ class Client extends Model
     public static function rules($id = null): array
     {
         return [
-            'raison_sociale' => 'required|string|max:255',
+            'raison_sociale' => 'required|string|max:255|unique:clients,raison_sociale,' . $id,
             'ifu' => 'nullable|string|unique:clients,ifu,' . $id,
             'rccm' => 'nullable|string|unique:clients,rccm,' . $id,
-            'telephone' => 'nullable|string|max:20',
+            'telephone' => 'nullable|string|max:20|unique:clients,telephone,' . $id,
             'email' => 'nullable|email',
             'adresse' => 'nullable|string',
             'ville' => 'nullable|string',
