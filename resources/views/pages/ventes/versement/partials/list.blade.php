@@ -75,7 +75,7 @@
                             <th class="border-bottom-0 text-end">Preuve</th>
                             <th class="border-bottom-0">Commentaire</th>
                             <th class="border-bottom-0">Créé par</th>
-                            <th class="border-bottom-0">Validé par</th>
+                            <!-- <th class="border-bottom-0">Validé par</th> -->
                             <th class="border-bottom-0">Extourné par</th>
                             <th class="border-bottom-0 text-end" style="min-width: 100px;">Actions</th>
                         </tr>
@@ -154,9 +154,9 @@
                             <td>
                                 <span class="text-muted small">{{ $versement->createdBy?->name??'—' }}</span>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <span class="text-muted small">{{ $versement->validatedBy?->name??'—' }}</span>
-                            </td>
+                            </td> -->
                             <td>
                                 <span class="text-muted small">{{ $versement->extournedBy?->name??'—' }}</span>
                             </td>

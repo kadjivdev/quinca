@@ -27,6 +27,7 @@ use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LivraisonClient;
+use App\Models\Vente\Versement;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,16 +41,11 @@ use App\Models\Vente\LivraisonClient;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     // return FactureClientController::getDepotFactures(3);
-    $FAC_20260223_0016 = FactureClient::with("lignes.article")
-        ->firstWhere("numero", "FAC-20260223-0016");
+    $VERS20260013 = Versement::firstWhere("reference", "VERS20260013");
 
-    $FAC_20260223_0016->lignes()
-        ->update([
-            "quantite_livree" => 0,
-            "quantite_livree_simple" => null
-        ]);
+    return $VERS20260013;
 
-    return response()->json($FAC_20260223_0016->lignes->pluck("quantite_livree","quantite_livree_simple"));
+    // return response()->json($FAC_20260223_0016->lignes->pluck("quantite_livree","quantite_livree_simple"));
 
     // Journée du 05
     // $accompteLaurenda05 = AcompteClient::with("createdBy")
