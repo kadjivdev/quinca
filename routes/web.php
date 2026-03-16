@@ -13,7 +13,7 @@ use App\Http\Controllers\Parametre\ConversionUniteController;
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
 use App\Http\Controllers\Achat\{AccompteFournisseurController, AvanceController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
-use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, ReversementController, TransportController, VersementController};
+use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, ReversementController, TransportController, TransportMouvementController, VersementController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
@@ -1048,6 +1048,10 @@ Route::middleware('auth')->group(function () {
         // TRANSPORTS
         Route::resource('transports', TransportController::class);
         Route::post('/valider-transport/{id}', [TransportController::class, 'validateRequete'])->name('valider-transport');
+
+        // Mouvement des transport
+        Route::resource("transport-mouvements", TransportMouvementController::class);
+        Route::post("transport-mouvements/{mouvement}/valide", [TransportMouvementController::class, "validateTransportMouvement"]);
     });
 
     Route::prefix('revendeurs')->group(function () {

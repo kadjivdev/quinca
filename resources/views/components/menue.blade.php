@@ -243,6 +243,12 @@
                         </a></li>
                     @endcan
 
+                    @can("vehicule.view")
+                    <li><a class="dropdown-item" href="{{ route('transport-mouvements.index') }}">
+                            <div class="dropdown-item-wrapper">Tricycle & Camionnette</div>
+                        </a></li>
+                    @endcan
+
                     @can('vente.sessions.view')
                     <li><a class="dropdown-item" href="{{ route('vente.sessions.index') }}">
                             <div class="dropdown-item-wrapper">Ouverture/Fermeture Caisse</div>

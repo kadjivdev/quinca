@@ -48,12 +48,9 @@
     @include('pages.ventes.transport-mouvement.partials.add-modal')
     @include('pages.ventes.transport-mouvement.partials.show-modal')
     @include('pages.ventes.transport-mouvement.partials.edit-modal')
-    @include('pages.ventes.transport-mouvement.partials.import-modal')
 @endsection
 
 @push('scripts')
 @include('pages.ventes.transport-mouvement.partials.js-add-modal')
 @include('pages.ventes.transport-mouvement.partials.js-edit-modal')
-@include('pages.ventes.transport-mouvement.partials.js-delete-modal')
-@include('pages.ventes.transport-mouvement.partials.js-import-modal')
 @endpush
