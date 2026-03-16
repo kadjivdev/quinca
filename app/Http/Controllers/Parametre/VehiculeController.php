@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
+use PhpOffice\PhpSpreadsheet\Style\{Fill, Border};
 
 class VehiculeController extends Controller
 {

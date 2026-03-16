@@ -518,7 +518,6 @@
 
     // Fonction pour rejeter un acompte
     function rejectAcompte(id) {
-        alert("gogo....")
         Swal.fire({
             title: 'Motif du rejet',
             text: 'Veuillez indiquer le motif du rejet',

@@ -23,6 +23,7 @@ use App\Http\Controllers\RequeteStockController;
 use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
+use App\Http\Controllers\TransportationController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
@@ -297,6 +298,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/template/download', [VehiculeController::class, 'downloadTemplate'])->name('vehicule.template');
             Route::post('/import', [VehiculeController::class, 'import'])->name('vehicule.import');
         });
+
+        // Transportation
+        Route::resource("transportation", TransportationController::class);
     });
 
     Route::prefix('catalogue')->middleware(['auth'])->group(function () {
