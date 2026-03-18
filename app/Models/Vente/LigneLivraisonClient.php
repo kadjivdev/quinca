@@ -40,11 +40,16 @@ class LigneLivraisonClient extends Model
         'montant_total' => 'decimal:3'
     ];
 
+    function livraisonClient(): BelongsTo
+    {
+        return $this->belongsTo(LivraisonClient::class, "livraison_client_id");
+    }
+
     function ligneFactureClient(): BelongsTo
     {
         return $this->belongsTo(LigneFacture::class, 'ligne_facture_id');
     }
-    
+
     public function uniteVente(): BelongsTo
     {
         return $this->belongsTo(UniteMesure::class, 'unite_vente_id');

@@ -81,6 +81,11 @@ class LigneFacture extends Model
         return $this->belongsTo(Depot::class, "depot");
     }
 
+    function ligneLivraisons(): HasMany
+    {
+        return $this->hasMany(LigneLivraisonClient::class, "ligne_facture_id");
+    }
+
     // Convertit la quantité de l'unité de vente vers l'unité de base
     public function convertirEnUniteBase(float $quantite): float
     {

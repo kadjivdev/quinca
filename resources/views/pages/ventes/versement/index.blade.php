@@ -39,21 +39,21 @@
 
 @section('content')
     <div class="content">
-        @include('pages.ventes.transport-mouvement.partials.header')
+        @include('pages.ventes.versement.partials.header')
         <div class="row g-3 list mt-3" id="stockEntriesList">
-            @include('pages.ventes.transport-mouvement.partials.list')
+            @include('pages.ventes.versement.partials.list')
         </div>
     </div>
 
-    @include('pages.ventes.transport-mouvement.partials.add-modal')
-    @include('pages.ventes.transport-mouvement.partials.show-modal')
-    @include('pages.ventes.transport-mouvement.partials.edit-modal')
-    @include('pages.ventes.transport-mouvement.partials.import-modal')
+    @include('pages.ventes.versement.partials.add-modal')
+    @include('pages.ventes.versement.partials.show-modal')
+    @include('pages.ventes.versement.partials.edit-modal')
+    @include('pages.ventes.versement.partials.import-modal')
 @endsection
 
 @push('scripts')
-@include('pages.ventes.transport-mouvement.partials.js-add-modal')
-@include('pages.ventes.transport-mouvement.partials.js-edit-modal')
-@include('pages.ventes.transport-mouvement.partials.js-delete-modal')
-@include('pages.ventes.transport-mouvement.partials.js-import-modal')
+@include('pages.ventes.versement.partials.js-add-modal')
+@include('pages.ventes.versement.partials.js-edit-modal')
+@include('pages.ventes.versement.partials.js-delete-modal')
+@include('pages.ventes.versement.partials.js-import-modal')
 @endpush

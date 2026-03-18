@@ -290,25 +290,39 @@ class Article extends Model
      */
     function facturesVenteRevendeur($depotId = null)
     {
-        return $this->hasMany(LigneFactureRevendeur::class, "article_id")
+        $query = $this->hasMany(LigneFactureRevendeur::class, "article_id")
             ->where("depot", $depotId)
             ->whereHas("factureRevendeur", function ($query) {
                 $query
                     ->whereNotNull("validated_by")
                     ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
-            })->get();
+            });
+
+        // Appliquer le filtre seulement si $depotId existe
+        if (!is_null($depotId)) {
+            $query->where("depot", $depotId);
+        }
+
+        return $query->get();
     }
 
     function facturesVenteAll($depotId = null)
     {
 
-        return $this->hasMany(LigneFacture::class, "article_id")
+        $query = $this->hasMany(LigneFacture::class, "article_id")
             ->where("depot", $depotId)
             ->whereHas("factureClient", function ($query) {
                 $query
                     // ->whereNotNull("validated_by")
                     ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
-            })->get();
+            });
+
+        // Appliquer le filtre seulement si $depotId existe
+        if (!is_null($depotId)) {
+            $query->where("depot", $depotId);
+        }
+
+        return $query->get();
     }
 
     /**
@@ -316,13 +330,41 @@ class Article extends Model
      */
     function facturesVenteRevendeurAll($depotId = null)
     {
-        return $this->hasMany(LigneFactureRevendeur::class, "article_id")
-            ->where("depot", $depotId)
+        $query = $this->hasMany(LigneFactureRevendeur::class, "article_id")
             ->whereHas("factureRevendeur", function ($query) {
                 $query
                     // ->whereNotNull("validated_by")
                     ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
-            })->get();
+            });
+
+        // Appliquer le filtre seulement si $depotId existe
+        if (!is_null($depotId)) {
+            $query->where("depot", $depotId);
+        }
+
+        return $query->get();
+    }
+
+    // Qte reellemet vendue
+    function getQteReelleVendue($depotId = null)
+    {
+        $query = $this->hasMany(LigneFacture::class, "article_id")
+            ->whereHas("ligneLivraisons", function ($query) {
+                $query->whereHas("livraisonClient", function ($q) {
+                    $q->whereNotNull("validated_by"); //les ventes dont les livraisons sont validées
+                });
+            })
+            ->whereHas("factureClient", function ($query) {
+                $query->whereNotNull("validated_by")
+                    ->whereNull("inventaire_id");
+            });
+
+        // Appliquer le filtre seulement si $depotId existe
+        if (!is_null($depotId)) {
+            $query->where("depot", $depotId);
+        }
+
+        return $query->sum("quantite_base");
     }
 
     /**

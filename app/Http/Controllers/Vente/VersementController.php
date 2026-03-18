@@ -290,7 +290,7 @@ class VersementController extends Controller
     /**
      * Valider un versement
      */
-    
+
     public function validateVersement(Request $request, Versement $versement)
     {
         try {

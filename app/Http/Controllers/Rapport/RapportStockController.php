@@ -464,6 +464,8 @@ class RapportStockController extends Controller
                 // $resteStock = $qantiteBase - $qteTotalVendu;
                 $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
 
+                $resteStockReel = ($qantiteBase + $stock->qantiteRequete) - $stock->article->getQteReelleVendue($stock->depot_id);
+
                 return [
                     'article' => [
                         'code' => $stock->article->code_article,
@@ -474,6 +476,7 @@ class RapportStockController extends Controller
                     'depot' => $stock->depot->libelle_depot,
                     'quantite_reelle' => $qantiteBase, //$stock->quantite_reelle,
                     'quantite_requete' => $stock->qantiteRequete,
+                    'quantite_reelle_disponible' => $resteStockReel, // $stock->article->reste($selectedDepot->id),
                     'quantite_disponible' => $resteStock, // $stock->article->reste($selectedDepot->id),
                     'quantite_reservee' => $stock->quantite_reservee,
                     'prix_moyen' => $stock->prix_moyen,
