@@ -42,9 +42,12 @@ use App\Models\Vente\Versement;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     // return FactureClientController::getDepotFactures(3);
-    $VERS20260013 = Versement::firstWhere("reference", "VERS20260013");
+    $FAC_20260317_0029 = FactureClient::withTrashed()->firstWhere("numero", "FAC-20260317-0029");
 
-    return $VERS20260013;
+    if ($FAC_20260317_0029) {
+        $FAC_20260317_0029->restore();
+    }
+    return $FAC_20260317_0029;
 
     // return response()->json($FAC_20260223_0016->lignes->pluck("quantite_livree","quantite_livree_simple"));
 
