@@ -48,9 +48,9 @@ Route::get("/debug", function () {
         $FAC_20260317_0029->restore();
 
         $FAC_20260317_0029->update([
-           "validated_by"=>null, 
+            "validated_by" => null,
+            'statut' => 'brouillon'
         ]);
-
     }
     $FAC_20260317_0029->refresh();
     return $FAC_20260317_0029;
