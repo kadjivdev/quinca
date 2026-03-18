@@ -349,14 +349,18 @@ class Article extends Model
     function getQteReelleVendue($depotId = null)
     {
         $query = $this->hasMany(LigneFacture::class, "article_id")
-            ->whereHas("ligneLivraisons", function ($query) {
-                $query->whereHas("livraisonClient", function ($q) {
-                    $q->whereNotNull("validated_by"); //les ventes dont les livraisons sont validées
-                });
-            })
+            // ->whereHas("ligneLivraisons", function ($query) {
+            //     $query->whereHas("livraisonClient", function ($q) {
+            //         $q->whereNotNull("validated_by"); //les ventes dont les livraisons sont validées
+            //     });
+            // })
             ->whereHas("factureClient", function ($query) {
                 $query->whereNotNull("validated_by")
-                    ->whereNull("inventaire_id");
+                    ->whereNull("inventaire_id")
+                    ->whereHas("livraisons", function ($q) {
+                        // Toutes les livraisons doivent être validées
+                        $q->whereNotNull('validated_by'); // Vérifier que chaque livraison est validée
+                    });
             });
 
         // Appliquer le filtre seulement si $depotId existe
