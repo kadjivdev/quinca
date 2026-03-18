@@ -46,7 +46,13 @@ Route::get("/debug", function () {
 
     if ($FAC_20260317_0029) {
         $FAC_20260317_0029->restore();
+
+        $FAC_20260317_0029->update([
+           "validated_by"=>null, 
+        ]);
+
     }
+    $FAC_20260317_0029->refresh();
     return $FAC_20260317_0029;
 
     // return response()->json($FAC_20260223_0016->lignes->pluck("quantite_livree","quantite_livree_simple"));
