@@ -213,21 +213,6 @@
                                         @endif
                                     @endif
 
-                                    {{-- Badge de statut --}}
-                                    <span class="ms-1">
-                                        @if($versement->validated_by)
-                                        <span class="badge bg-success" data-bs-toggle="tooltip" title="Validé par {{ $versement->validatedBy?->name }} le {{ $versement->validated_at?->format('d/m/Y H:i') }}">
-                                            Validé
-                                        </span>
-                                        @elseif($versement->extourned_by)
-                                        <span class="badge bg-danger" data-bs-toggle="tooltip" title="Rejeté par {{ $versement->extournedBy?->name }} le {{ $versement->extourned_at?->format('d/m/Y H:i') }}">
-                                            Extourné
-                                        </span>
-                                        @else
-                                        <span class="badge bg-warning">En attente</span>
-                                        @endif
-                                    </span>
-
                                 </div>
                             </td>
                         </tr>

@@ -455,7 +455,7 @@ class DepotController extends Controller
 
             // Pour les depots de cotonou
             if (in_array($depot->id, [3, 4, 6])) {
-                // on recupère les fcatures de ce depot
+                // on recupère les factures de ce depot
                 FactureClient::whereNull("inventaire_id")
                     ->whereHas('lignes', function ($ligne) use ($depotId) {
                         $ligne->where('depot', $depotId);
