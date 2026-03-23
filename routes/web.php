@@ -26,6 +26,7 @@ use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
+use App\Models\Vente\AcompteClient;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LivraisonClient;
 use App\Models\Vente\Versement;
@@ -42,18 +43,9 @@ use App\Models\Vente\Versement;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     // return FactureClientController::getDepotFactures(3);
-    $FAC_20260317_0029 = FactureClient::withTrashed()->firstWhere("numero", "FAC-20260317-0029");
+    $ACP20260058 = AcompteClient::withTrashed()->firstWhere("reference", "ACP20260058");
 
-    if ($FAC_20260317_0029) {
-        $FAC_20260317_0029->restore();
-
-        $FAC_20260317_0029->update([
-            "validated_by" => null,
-            'statut' => 'brouillon'
-        ]);
-    }
-    $FAC_20260317_0029->refresh();
-    return $FAC_20260317_0029;
+    return $ACP20260058;
 
     // return response()->json($FAC_20260223_0016->lignes->pluck("quantite_livree","quantite_livree_simple"));
 
