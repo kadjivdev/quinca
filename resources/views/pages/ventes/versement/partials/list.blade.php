@@ -27,7 +27,6 @@
                                     <option value="MoMoPay">MoMoPay</option>
                                     <option value="MoMoMarchand">MoMoMarchand</option>
                                     <option value="Chèque">Chèque</option>
-
                                 </select>
                             </div>
 
@@ -41,6 +40,16 @@
                                 </div>
                             </div>
 
+                            {{-- Filtre Statut de versement --}}
+                            <div class="col-md-2">
+                                <label class="form-label small">Status du versement</label>
+                                <select class="form-select form-select-sm" name="status_op">
+                                    <option value="">Tous les status</option>
+                                    <option value="VALIDE">Validé</option>
+                                    <option value="ATTENTE">En attente</option>
+                                    <option value="EXTOURNER">Extourner</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="d-flex justify-content-center">
                             {{-- Bouton réinitialiser --}}
@@ -58,6 +67,10 @@
     {{-- Table des versements --}}
     <div class="col-12">
         <div class="card border-0 shadow-sm p-3">
+            @if(request()->get("status_op"))
+            <h4 class="">Versements <span class="badge bg-{{request()->get('status_op')==='ATTENTE'?'warning':'success'}} text-dark">{{request()->get("status_op")}}</span> </h4>
+            @endif
+
             <div class="table-responsive">
                 <table id="example1" class="table table-hover align-middle mb-0" id="acomptesTable">
                     <thead class="bg-light">
@@ -172,46 +185,54 @@
 
                                     <!-- non extourné & non validé -->
                                     @if(!$versement->extourned_by && !$versement->deleted_at)
-                                        @can("accomptes.edit")
-                                        @if(!$versement->validated_by)
-                                        <button class="btn btn-sm btn-light-warning btn-icon ms-1"
-                                            onclick="editAcompte({{ $versement->id }})"
-                                            data-bs-toggle="tooltip"
-                                            title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        @endif
-                                        @endcan
-
-                                        @can("accomptes.validate")
-                                        @if(!$versement->validated_by)
-                                        <!-- <button class="btn btn-sm btn-light-success btn-icon ms-1"
-                                            onclick="validateAcompte({{ $versement->id }})"
-                                            data-bs-toggle="tooltip"
-                                            title="Valider">
-                                            <i class="fas fa-check-circle"></i>
-                                        </button> -->
-
-                                        <button class="btn btn-sm btn-light-danger btn-icon ms-1"
-                                            onclick="rejectAcompte({{ $versement->id }})"
-                                            data-bs-toggle="tooltip"
-                                            title="Extourner">
-                                            <i class="fas fa-times-circle"></i>
-                                        </button>
-                                        @endif
-                                        @endcan
-
-                                        @if(!$versement->validated_at)
-                                        @can("accomptes.delete")
-                                        <button class="btn btn-sm btn-light-danger btn-icon ms-1"
-                                            onclick="deleteAcompte({{ $versement->id }})"
-                                            data-bs-toggle="tooltip"
-                                            title="Supprimer">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        @endcan
-                                        @endif
+                                    @can("accomptes.edit")
+                                    @if(!$versement->accompteClient?->validated_by)
+                                    <button class="btn btn-sm btn-light-warning btn-icon ms-1"
+                                        onclick="editAcompte({{ $versement->id }})"
+                                        data-bs-toggle="tooltip"
+                                        title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                     @endif
+                                    @endcan
+
+                                    @can("accomptes.validate")
+                                    @if(!$versement->accompteClient?->validated_by)
+                                    <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                        onclick="rejectAcompte({{ $versement->id }})"
+                                        data-bs-toggle="tooltip"
+                                        title="Extourner">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                    @endif
+                                    @endcan
+
+                                    @if(!$versement->accompteClient?->validated_by)
+                                    @can("accomptes.delete")
+                                    <button class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                        onclick="deleteAcompte({{ $versement->id }})"
+                                        data-bs-toggle="tooltip"
+                                        title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    @endcan
+                                    @endif
+                                    @endif
+
+                                    {{-- Badge de statut --}}
+                                    <span class="ms-1">
+                                        @if($versement->accompteClient?->validated_by)
+                                        <span class="badge bg-success" data-bs-toggle="tooltip" title="Validé par {{ $versement->validatedBy?->name }} le {{ $versement->validated_at?->format('d/m/Y H:i') }}">
+                                            Validé
+                                        </span>
+                                        @elseif($versement->extourned_by)
+                                        <span class="badge bg-danger" data-bs-toggle="tooltip" title="Rejeté par {{ $versement->extournedBy?->name }} le {{ $versement->extourned_at?->format('d/m/Y H:i') }}">
+                                            Extourné
+                                        </span>
+                                        @else
+                                        <span class="badge bg-warning">En attente</span>
+                                        @endif
+                                    </span>
 
                                 </div>
                             </td>

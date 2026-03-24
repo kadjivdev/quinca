@@ -214,7 +214,7 @@
                                     <!-- on peut pas valider les accomptesdont le client est inconnu -->
                                     @if($acompte->client_id!=env("INCONNU_CLIENT_ID"))
                                     @can("accomptes.validate")
-                                    @if($acompte->isEnAttente())
+                                    @if($acompte->isEnAttente() && !$acompte->versement?->extourned_by)
                                     <button class="btn btn-sm btn-light-success btn-icon ms-1"
                                         onclick="validateAcompte({{ $acompte->id }},{{$acompte->versement_id}})"
                                         data-bs-toggle="tooltip"
@@ -235,6 +235,8 @@
                                         <span class="badge bg-danger" data-bs-toggle="tooltip" title="Rejeté par {{ $acompte->validatedBy?->name }} le {{ $acompte->validated_at?->format('d/m/Y H:i') }}">
                                             Rejeté
                                         </span>
+                                        @elseif($acompte->versement?->extourned_by)
+                                        <span class="badge bg-warning">MoMo ou Chèque Extourné</span>
                                         @else
                                         <span class="badge bg-warning">En attente</span>
                                         @endif

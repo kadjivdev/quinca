@@ -811,7 +811,7 @@ Route::middleware('auth')->group(function () {
         });
 
         // Routes pour les versements cheque & momos
-        Route::apiResource("versements", VersementController::class);
+        Route::resource("versements", VersementController::class);
         Route::post('/versements/validate/{versement}', [VersementController::class, 'validateVersement'])
             ->name('vente.versements.validate');
         Route::post('/versements/extourne/{versement}', [VersementController::class, 'extournerVersement'])

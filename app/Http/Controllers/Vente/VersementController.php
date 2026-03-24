@@ -21,7 +21,7 @@ class VersementController extends Controller
     {
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
-        // Récupération des données avec pagination
+        // Récupération des données avec 
         $versementsQuery = Versement::with(['client', 'createdBy', "accompteClient", "validatedBy", "extournedBy"])
             ->latest();
 
@@ -39,6 +39,29 @@ class VersementController extends Controller
                 Carbon::parse($request->date_debut)->startOfDay(),
                 Carbon::parse($request->date_fin)->endOfDay()
             ]);
+        }
+
+        if ($request->filled("status_op")) {
+            switch ($request->status_op) {
+                case 'VALIDE':
+                    $versementsQuery->whereHas("accompteClient", function ($query) {
+                        $query->whereNotNull("validated_by"); //les versements dont les accomptes sont validés
+                    });
+                    break;
+
+                case 'ATTENTE':
+                    $versementsQuery->whereHas("accompteClient", function ($query) {
+                        $query->whereNull("validated_by"); //les versements dont les accomptes ne sont pas validés
+                    });
+                    break;
+
+                case 'EXTOURNER':
+                    $versementsQuery->whereNotNull("extourned_at");
+                    break;
+                default:
+                    # code...
+                    break;
+            }
         }
 
         $versements = $versementsQuery->get();
