@@ -47,6 +47,7 @@
         <div class="col-10">
             <div class="card p-3">
                 <h5 class="mb-5">Les accomptes du client : <strong>{{$client->raison_sociale}}</strong></h5>
+                <h5 class="mb-5"><span class="badge shadow bg-warning">Accomptes venant des versements chèque ou Momo</span></h5>
                 <div class="table-responsive">
                     <table class="table table-sm" id="example1">
                         <thead>
@@ -61,7 +62,7 @@
                         </thead>
                         <tbody>
                             @foreach($client->acomptes as $accompte)
-                            <tr>
+                            <tr class="@if($accompte->versement) bg-warning @endif">
                                 <td><span class="badge bg-light text-dark border">{{$accompte->id}}</span></td>
                                 <td><span class="badge bg-light text-dark border">{{$accompte->reference}}</span></td>
                                 <td>{{$accompte->created_at}}</td>

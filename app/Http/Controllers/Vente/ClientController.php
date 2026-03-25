@@ -741,7 +741,7 @@ class ClientController extends Controller
         // Charger les relations nécessaires
         $client->load([
             'facturesRevendeur.lignes.article',
-            'acomptes',
+            'acomptes.versement',
             'createdBy'
         ]);
 
