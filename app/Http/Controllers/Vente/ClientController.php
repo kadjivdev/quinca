@@ -885,15 +885,6 @@ class ClientController extends Controller
     }
 
     /**
-     * Télécharger le template d'import
-     */
-    // public function downloadTemplate()
-    // {
-    //     $filePath = storage_path('app/templates/import_clients_template.xlsx');
-    //     return response()->download($filePath, 'modele_import_clients.xlsx');
-    // }
-
-    /**
      * Importer des clients depuis un fichier Excel
      */
     public function import(Request $request)

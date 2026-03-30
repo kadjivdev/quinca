@@ -24,12 +24,9 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
-use App\Models\Achat\FactureFournisseur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\AcompteClient;
 use App\Models\Vente\FactureClient;
-use App\Models\Vente\LivraisonClient;
-use App\Models\Vente\Versement;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,10 +39,28 @@ use App\Models\Vente\Versement;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    // return FactureClientController::getDepotFactures(3);
-    $ACP20260058 = AcompteClient::withTrashed()->firstWhere("reference", "ACP20260058");
+    $acompte = AcompteClient::firstWhere("reference", 'KAD16524');
 
-    return $ACP20260058;
+    if ($acompte) {
+        $acompte->update([
+            "reference" => "KAD18524",
+        ]);
+    }
+
+    $references = [
+        2259 => "KAD17403",
+        2413 => "KAD18539",
+        2414 => "KAD18540",
+        2258 => "KAD17404",
+    ];
+
+    $factures = FactureClient::whereIn("id", array_keys($references))->get();
+    foreach ($factures as $facture) {
+        $facture->update([
+            "reference_recu" => $references[$facture->id]
+        ]);
+    }
+    return "{{$factures->count()}} factures mises à jour avec succès!";
 
     // return response()->json($FAC_20260223_0016->lignes->pluck("quantite_livree","quantite_livree_simple"));
 
@@ -127,7 +142,7 @@ Route::get("/debug", function () {
     //     ->whereBetween('created_at', ['2025-12-22 16:00:00', '2025-12-24 00:00:00']);
     // $facturesKandi->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
 
-    return "regularisation du bon BC2601222443 effectuée avec succès";
+    // return "regularisation du bon BC2601222443 effectuée avec succès";
 });
 
 /**DETELE A STOCK */
