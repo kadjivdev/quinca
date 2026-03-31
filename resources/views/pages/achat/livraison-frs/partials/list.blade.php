@@ -93,7 +93,7 @@
                                 <td class="py-3 text-center">
                                     @if ($livraison->validated_at)
                                     <span
-                                        class="badge rounded-pill bg-success bg-opacity-10 text-success px-3">Validé</span>
+                                        class="badge rounded-pill bg-success bg-opacity-10 text-success px-3">Validé | Par : {{ $livraison->validator->name ?? '---' }}</span>
                                     @elseif($livraison->rejected_at)
                                     <span
                                         class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3">Rejeté</span>
