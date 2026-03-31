@@ -40,18 +40,39 @@ use App\Models\Vente\FactureClient;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     $acompte = AcompteClient::firstWhere("reference", 'KAD16524');
-
     if ($acompte) {
         $acompte->update([
             "reference" => "KAD18524",
         ]);
     }
 
+    $KAD17182 = AcompteClient::firstWhere("reference", 'KAD17182');
+    if ($KAD17182) {
+        $KAD17182->update([
+            "reference" => "KAD17181",
+        ]);
+    }
+
+    $KAD1894 = AcompteClient::firstWhere("reference", 'KAD1894');
+    if ($KAD1894) {
+        $KAD1894->update([
+            "reference" => "KAD18945",
+        ]);
+    }
+
     $references = [
+        // première vague
         2259 => "KAD17403",
         2413 => "KAD18539",
         2414 => "KAD18540",
         2258 => "KAD17404",
+
+        // deuxieme vague
+        1504 => "KAD17151",
+        1504 => "KAD17151",
+        1795 => "KAD18191",
+        3049 => "KAD19089",
+        3048 => "KAD0019088"
     ];
 
     $factures = FactureClient::whereIn("id", array_keys($references))->get();
