@@ -41,7 +41,7 @@ class BonLivraisonFournisseurController extends Controller
             ->get();
 
         // Récupération des factures validées sans bon de livraison ou partiellement livrées
-        $factures = FactureFournisseur::with(['fournisseur','validator'])
+        $factures = FactureFournisseur::with(['fournisseur', 'validator'])
             ->whereNotNull('validated_at')
             ->whereNotNull("validated_by")
             ->whereNull('rejected_at')
@@ -238,7 +238,7 @@ class BonLivraisonFournisseurController extends Controller
 
                 /**
                  * Actualisation de la quantite_livree_simple
-                 */
+                 **/
                 $QteLivreSimple = $ligneFacture->quantite_livree_simple + $ligne['quantite'] + $QteBaseSupplementaire;
                 Log::info("Qte totale livre simple", ["data" => $QteLivreSimple]);
 

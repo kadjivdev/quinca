@@ -232,7 +232,6 @@ class FactureFournisseurController extends Controller
     
     public function details(FactureFournisseur $facture)
     {
-        // dd("gogo");
         $facture->load([
             'bonCommande',
             'pointVente',
@@ -267,7 +266,7 @@ class FactureFournisseurController extends Controller
                                     ->orWhereColumn('quantite_base', '>', 'quantite_livree_simple');
                             });
                     })
-                        /**quantite */
+                        /**quantite **/
                         ->orWhere(function ($subQ) {
                             $subQ->whereNull('quantite_base')
                                 ->where(function ($x) {

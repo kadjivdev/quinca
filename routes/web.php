@@ -377,9 +377,6 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{article}/update', [ArticleController::class, 'update'])->name('articles.update');
             Route::delete('/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
 
-            // inventaires
-            Route::patch('/inventaires/store', [ArticleController::class, 'storeMultipleInventaires'])->name('articles.storeMultipleInventaires');
-
             // Routes additionnelles pour les fonctionnalités spécifiques
             Route::get('/search', [ArticleController::class, 'search'])->name('articles.search');
             Route::get('/filter', [ArticleController::class, 'filter'])->name('articles.filter');
