@@ -93,7 +93,7 @@ class MarchandBackController extends Controller
 
                 'depot_id' => 'required|exists:depots,id',
 
-                'documents' => 'nullable|file|mimes:jpg,png,jpeg,gif,svg',
+                'documents' => 'nullable|file|mimes:jpg,png,jpeg,gif,svg,pdf',
 
                 //les lignes
                 'lignes' => 'array',
@@ -102,7 +102,7 @@ class MarchandBackController extends Controller
                 'lignes*prix_unitaire' => "required",
                 'lignes*unite_vente_id' => "required|exists:unite_mesures,id",
 
-            ], ["documents.mimes" => "Le document doit être de type jpg,png,jpeg,gif,svg"]);
+            ], ["documents.mimes" => "Le document doit être de type jpg,png,jpeg,gif,svg,pdf"]);
 
             if ($request->hasFile("documents")) {
                 $fileName = $request->file('documents')->getClientOriginalName();
