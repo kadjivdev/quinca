@@ -103,8 +103,8 @@ class FactureFournisseurController extends Controller
             ->with(['pointVente', 'fournisseur'])
             ->get();
 
-        
-            // Retour de la vue avec toutes les données nécessaires
+
+        // Retour de la vue avec toutes les données nécessaires
         return view('pages.achat.facture-frs.index', [
             "fournisseurs" => $fournisseurs,
             // Données principales
@@ -229,9 +229,11 @@ class FactureFournisseurController extends Controller
     /**
      * Affiche les détails avec filtre d'une facture
      */
-    
+
     public function details(FactureFournisseur $facture)
     {
+        Log::debug("Chargement des détails de la facture", ["facture_id" => $facture->id]);
+
         $facture->load([
             'bonCommande',
             'pointVente',
@@ -439,7 +441,7 @@ class FactureFournisseurController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
-    
+
     /**
      * Met à jour le statut de livraison
      */

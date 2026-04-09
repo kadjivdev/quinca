@@ -241,7 +241,7 @@
 
         // Génération du HTML des lignes
         generateLignesHtml: function(lignes, unites) {
-            // alert("gogo")
+            console.log("Les lignes concernées :", lignes)
             if (!lignes || lignes.length === 0) return '<p class="text-center">Aucun élement disponible! Les articles concernés sont déjà livrés</p>';
 
             return lignes.map(ligne => {
@@ -252,10 +252,12 @@
                 const quantite_base = ligne.quantite_base ?? ligne.quantite;
 
                 // S'assurer que la quantité livrée est un nombre
-                const quantiteLivree = parseFloat(ligne.quantite_livree_simple) || 0;
+                const quantiteLivree = parseFloat(ligne.qte_deja_livrer).toFixed(2);
                 const quantiteTotale = parseFloat(quantite_base) || 0;
                 const resteALivrer = Math.max(0, quantiteTotale - quantiteLivree)
                     .toFixed(2);
+
+                console.log(`Article: ${ligne.article.designation}, Quantité livrée: ${quantiteLivree}`);
 
                 // Formater les nombres pour l'affichage
                 const quantiteLivreeFormatted = this.formatNumber(quantiteLivree);

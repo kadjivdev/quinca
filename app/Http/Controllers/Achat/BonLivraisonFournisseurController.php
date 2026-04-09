@@ -341,7 +341,6 @@ class BonLivraisonFournisseurController extends Controller
     /**
      * Met à jour un bon de livraison
      */
-
     public function update(Request $request, BonLivraisonFournisseur $bonLivraison)
     {
         if ($bonLivraison->validated_at || $bonLivraison->rejected_at) {

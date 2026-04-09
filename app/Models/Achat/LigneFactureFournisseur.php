@@ -45,7 +45,9 @@ class LigneFactureFournisseur extends Model
      *
      * @var string
      */
+
     protected $table = 'ligne_facture_fournisseurs';
+    protected $appends = ["qte_deja_livrer"];
 
     /**
      * Les attributs assignables en masse
@@ -141,6 +143,29 @@ class LigneFactureFournisseur extends Model
         'validated_at',
         'deleted_at'
     ];
+
+    /**
+     * Les getters personnalisés
+     */
+    function getQteDejaLivrerAttribute()
+    {
+        $ligneBonLivraison = $this->facture?->bonLivraison
+            ?->flatMap(fn ($bon) => $bon->lignes)
+            ?->firstWhere("article_id", $this->article_id);
+        Log::info("Ligne bon de livraison retrouvée", ["data" => $this->facture->load("bonLivraison.lignes")]);
+
+        // quantite supplementaire convertie en unite de base
+        $qteSupplementaire = 0;
+        if ($ligneBonLivraison) {
+            $qteSupplementaire = $ligneBonLivraison->unite_supplementaire_id ? $this->getQuantiteTotaleSupplement(
+                $ligneBonLivraison->unite_supplementaire_id,
+                $ligneBonLivraison->unite_mesure_id,
+                $ligneBonLivraison->quantite_supplementaire
+            ) : 0;
+        }
+
+        return $this->quantite_livree_simple - $qteSupplementaire;
+    }
 
     /**
      * Relation avec la facture
