@@ -453,21 +453,21 @@ class DepotController extends Controller
              * on considère seulement les factures crées par les gérants du dépôt
              */
 
-            // // Pour les depots de cotonou
-            // if (in_array($depot->id, [3, 4, 6])) {
-            //     // on recupère les factures de ce depot
-            //     FactureClient::whereNull("inventaire_id")
-            //         ->whereHas('lignes', function ($ligne) use ($depotId) {
-            //             $ligne->where('depot', $depotId);
-            //         })
-            //         ->update(["inventaire_id" => $inventaire->id]);
-            // }
+            // Pour les depots de cotonou
+            if (in_array($depot->id, [3, 4, 6])) {
+                // on recupère les factures de ce depot
+                FactureClient::whereNull("inventaire_id")
+                    ->whereHas('lignes', function ($ligne) use ($depotId) {
+                        $ligne->where('depot', $depotId);
+                    })
+                    ->update(["inventaire_id" => $inventaire->id]);
+            }
 
-            // // Pour les depots des revendeurs
-            // if (in_array($depot->id, [1, 2, 5])) {
-            //     FactureRevendeur::whereIn("created_by", $gerantsDepot->pluck("id")->toArray())
-            //         ->whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
-            // }
+            // Pour les depots des revendeurs
+            if (in_array($depot->id, [1, 2, 5])) {
+                FactureRevendeur::whereIn("created_by", $gerantsDepot->pluck("id")->toArray())
+                    ->whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
+            }
 
             /** CREATION DES DETAILS INVENTAIRES */
             $inventaire->details()
