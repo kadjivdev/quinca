@@ -607,9 +607,9 @@ class BonLivraisonFournisseurController extends Controller
                 Log::info("QTe de facture", ["data" => (($ligneFact->quantite_base ?? $ligneFact->quantite) + $QteBaseSupplementaire)]);
 
 
-                // if ($ligneFact->quantite_livree > (($ligneFact->quantite_base ?? $ligneFact->quantite))) {
-                //     throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
-                // }
+                if ($ligneFact->quantite_livree > (($ligneFact->quantite_base ?? $ligneFact->quantite))) {
+                    throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
+                }
 
                 $entrees[] = [
                     'depot_id' => $bonLivraison->depot_id,
