@@ -623,7 +623,6 @@ class BonLivraisonFournisseurController extends Controller
                     'document_id' => $bonLivraison->id,
                     'notes' => $bonLivraison->commentaire,
                     'user_id' => Auth::id(),
-                    // 'livraison' => $bonLivraison->id,
                 ];
             }
 
