@@ -39,52 +39,29 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $acompte = AcompteClient::firstWhere("reference", 'KAD16524');
-    if ($acompte) {
-        $acompte->update([
-            "reference" => "KAD18524",
-        ]);
+    $acomptes = AcompteClient::whereIn("reference", ['ACP20260193', 'ACP20260155', 'ACP20260117'])->get();
+
+    foreach ($acomptes as $acompte) {
+
+        switch ($acompte->reference) {
+            case 'ACP20260193':
+                $acompte->update(["versement_reference" => '11686785207']);
+                break;
+
+            case 'ACP20260155':
+                $acompte->update(["versement_reference" => '20738']);
+                break;
+
+            case 'ACP20260117':
+                $acompte->update(["versement_reference" => '11581174441']);
+                break;
+
+            default:
+                break;
+        }
     }
 
-    $KAD17182 = AcompteClient::firstWhere("reference", 'KAD17182');
-    if ($KAD17182) {
-        $KAD17182->update([
-            "reference" => "KAD17181",
-        ]);
-    }
-
-    $KAD1894 = AcompteClient::firstWhere("reference", 'KAD1894');
-    if ($KAD1894) {
-        $KAD1894->update([
-            "reference" => "KAD18945",
-        ]);
-    }
-
-    $references = [
-        // première vague
-        2259 => "KAD17403",
-        2413 => "KAD18539",
-        2414 => "KAD18540",
-        2258 => "KAD17404",
-
-        // deuxieme vague
-        1504 => "KAD17151",
-        1504 => "KAD17151",
-        1795 => "KAD18191",
-        3049 => "KAD19089",
-        3048 => "KAD0019088"
-    ];
-
-    $factures = FactureClient::whereIn("id", array_keys($references))->get();
-    foreach ($factures as $facture) {
-        $facture->update([
-            "reference_recu" => $references[$facture->id]
-        ]);
-    }
-    return "{{$factures->count()}} factures mises à jour avec succès!";
-
-    // return response()->json($FAC_20260223_0016->lignes->pluck("quantite_livree","quantite_livree_simple"));
-
+    return "Mise à jour des acomptes effectuée avec succès!";
     // Journée du 05
     // $accompteLaurenda05 = AcompteClient::with("createdBy")
     //     ->where("created_by", 3)
