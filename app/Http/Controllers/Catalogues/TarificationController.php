@@ -28,7 +28,6 @@ class TarificationController extends Controller
     public function index()
     {
         try {
-
             $tarifications = Tarification::with(['article', 'typeTarif'])->get();
             $articles = Article::where('statut', 'actif')->get();
             $typesTarifs = TypeTarif::where('statut', true)->get();

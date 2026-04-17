@@ -75,8 +75,9 @@
                             <td class="text-end">
                                 <div class="d-flex align-items-center justify-content-end gap-2">
                                     @if($tarifications->isNotEmpty())
-
                                     @foreach($tarifications as $tarification)
+                                    <!-- un commercial n'a pas le droit de voir les prix Special & Hyper Grossiste -->
+                                    @continue(auth()->user()->hasRole('COMMERCIAL') && ($tarification->type_tarif_id==1 || $tarification->type_tarif_id==2))
                                     <div class="tarif-value d-flex align-items-center justify-content-between">
                                         <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA ({{$tarification->uniteMesure?->libelle_unite}}) | {{$tarification->depotTarif?->libelle_depot}}</span>
                                         <div class="btn-group btn-group-sm ms-3 action-buttons">
@@ -86,18 +87,16 @@
                                                 title="Modifier ce tarif">
                                                 <i class="far fa-edit"></i>
                                             </button>
-                                            @endcan
                                             <button class="btn btn-link p-0 text-danger ms-2 btn-animated"
                                                 onclick="toggleTarificationStatus({{ $tarification->id }})"
                                                 title="{{ $tarification->statut ? 'Désactiver' : 'Activer' }} ce tarif">
                                                 <i class="fas {{ $tarification->statut ? 'fa-ban' : 'fa-check' }}"></i>
                                             </button>
+                                            @endcan
                                         </div>
                                     </div>
                                     @endforeach
-
                                     @endif
-
                                     <!-- else -->
                                     @can("tarification.create")
                                     <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
