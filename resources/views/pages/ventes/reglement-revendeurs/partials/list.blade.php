@@ -19,6 +19,8 @@
                             {{-- <th class="border-bottom-0 text-end">Mode Règlement</th> --}}
                             <th class="border-bottom-0">Référence</th>
                             <th class="border-bottom-0 text-center">Statut</th>
+                            <th class="border-bottom-0 text-center">Inséré par</th>
+                            <th class="border-bottom-0 text-center">Inséré le</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
                     </thead>
@@ -35,7 +37,7 @@
                                     <a href="#" class="text-decoration-none"
                                         data-bs-toggle="modal"
                                         data-bs-target="#reglementFactureModal">
-                                        {{ $reglement->facture?->numero }}
+                                        {{ $reglement->facture?->numero??'---' }}
                                     </a>
                                 </span>
                             </td>
@@ -80,6 +82,8 @@
                                 <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulé</span>
                                 @endswitch
                             </td>
+                            <td class="text-center"><span class="badge bg-light border rounded text-dark">{{$reglement->createdBy?->name}}</span> </td>
+                            <td class="text-center"><span class="badge bg-light border rounded text-dark">{{$reglement->created_at}}</span> </td>
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
@@ -133,7 +137,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="11" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-money-bill-wave fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucun règlement trouvé</h6>

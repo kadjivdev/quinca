@@ -20,7 +20,7 @@ class ReglementRevendeurController extends Controller
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
         // Récupération des réglements avec pagination et relations
-        $reglements = ReglementRevendeur::with([
+        $reglementQuery = ReglementRevendeur::with([
             'facture.client',
             'facture.lignes.article',
             'createdBy',
@@ -29,29 +29,29 @@ class ReglementRevendeurController extends Controller
 
         // Application des filtres
         if ($request->filled('client_id')) {
-            $reglements->whereHas('facture', function ($query) use ($request) {
+            $reglementQuery->whereHas('facture', function ($query) use ($request) {
                 $query->where('client_id', $request->client_id);
             });
         }
 
         if ($request->filled('facture_id')) {
-            $reglements->where('facture_revendeur_id', $request->facture_id);
+            $reglementQuery->where('facture_revendeur_id', $request->facture_id);
         }
 
         if ($request->filled('type_reglement')) {
-            $reglements->where('type_reglement', $request->type_reglement);
+            $reglementQuery->where('type_reglement', $request->type_reglement);
         }
 
         if ($request->filled('statut')) {
-            $reglements->where('statut', $request->statut);
+            $reglementQuery->where('statut', $request->statut);
         }
 
         if ($request->filled('date_debut')) {
-            $reglements->whereDate('date_reglement', '>=', $request->date_debut);
+            $reglementQuery->whereDate('date_reglement', '>=', $request->date_debut);
         }
 
         if ($request->filled('date_fin')) {
-            $reglements->whereDate('date_reglement', '<=', $request->date_fin);
+            $reglementQuery->whereDate('date_reglement', '<=', $request->date_fin);
         }
 
         if (
@@ -59,7 +59,7 @@ class ReglementRevendeurController extends Controller
             || auth()->user()->hasRole("CONTROLE INTERNE")
             || auth()->user()->hasRole("CONTROLE EXTERNE ET CELLULE DE REQUETE")
         ) {
-            $reglements = $reglements->get();
+            $reglements = $reglementQuery->get();
 
             // Statistiques pour le header
             $statsReglements = [
@@ -87,44 +87,46 @@ class ReglementRevendeurController extends Controller
                     ->get()
             ];
         } else {
-            $reglements = $reglements
-                ->whereHas("facture", function ($query) {
-                    // $query->where('point_de_vente_id', Auth()->user()->point_de_vente_id);
-                    $query->where("created_by", Auth::id());
-                })
-                ->get();
+            $reglements = $reglementQuery->get();
+
+            $reglementQuery
+                ->where("created_by", Auth::id());
 
             // Statistiques pour le header
             $statsReglements = [
                 // Total des règlements du mois
-                'total_mois' => ReglementRevendeur::where("created_by", Auth::id())
+                'total_mois' => $reglementQuery
                     ->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year)
                     ->where('statut', 'validee')
                     ->sum('montant'),
 
                 // Total des règlements
-                'total_reglements' => ReglementRevendeur::where("created_by", Auth::id())
+                'total_reglements' => $reglementQuery
                     ->where('statut', 'validee')
                     ->sum('montant'),
 
                 // Nombre de règlements en attente
-                'reglements_en_attente' => ReglementRevendeur::where("created_by", Auth::id())
+                'reglements_en_attente' => $reglementQuery
                     ->where('statut', 'brouillon')->count(),
 
+
                 // Montant des règlements en attente
-                'montant_en_attente' => ReglementRevendeur::where("created_by", Auth::id())
+                'montant_en_attente' => $reglementQuery
                     ->where('statut', 'brouillon')
                     ->sum('montant'),
 
                 // Répartition par mode de paiement
-                'repartition_modes' => ReglementRevendeur::where("created_by", Auth::id())
+                'repartition_modes' => $reglementQuery
                     ->where('statut', 'valide')
                     ->select('type_reglement', DB::raw('COUNT(*) as count'), DB::raw('SUM(montant) as total'))
                     ->groupBy('type_reglement')
                     ->get()
             ];
         }
+
+
+        // 
 
         // Données pour les filtres et le modal d'ajout
         $clients = Client::orderBy('raison_sociale')
@@ -133,8 +135,6 @@ class ReglementRevendeurController extends Controller
                 $query->withSum('reglements', 'montant');
             }])
             ->get();
-
-
 
         // Récupérer les factures non soldées pour le modal d'ajout
         $factures = FactureRevendeur::with(["reglements"])

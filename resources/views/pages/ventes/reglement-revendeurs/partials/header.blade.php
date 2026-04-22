@@ -21,7 +21,7 @@
                                 @if($statsReglements['reglements_en_attente'] ?? $reglements->where('statut', 'brouillon')->count() > 0)
                                     <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
                                         <i class="fas fa-clock me-1"></i>
-                                        {{ $statsReglements['reglements_en_attente'] ?? $reglements->where('statut', 'brouillon')->count() }} en attente
+                                        {{ $statsReglements['reglements_en_attente']}} en attente
                                     </span>
                                 @endif
                             </div>
