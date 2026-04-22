@@ -600,16 +600,17 @@ class BonLivraisonFournisseurController extends Controller
                             $ligne->quantite_supplementaire
                         );
                 }
+                // Log::info("QTe Base Supplementaire", ["data" => $QteBaseSupplementaire]);
 
-                Log::info("QTe Base Supplementaire", ["data" => $QteBaseSupplementaire]);
+                // Log::info("QTe livré", ["data" => $ligneFact->quantite_livree]);
+                // Log::info("QTe de facture", ["data" => (($ligneFact->quantite_base ?? $ligneFact->quantite) + $QteBaseSupplementaire)]);
 
-                Log::info("QTe livré", ["data" => $ligneFact->quantite_livree]);
-                Log::info("QTe de facture", ["data" => (($ligneFact->quantite_base ?? $ligneFact->quantite) + $QteBaseSupplementaire)]);
+                $vraiQteLivree = $ligneFact->quantite_livree - $QteBaseSupplementaire;
+                Log::debug("Vraie qtelivrée :", ["data" => $vraiQteLivree]);
 
-
-                // if ($ligneFact->quantite_livree > (($ligneFact->quantite_base ?? $ligneFact->quantite))) {
-                //     throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
-                // }
+                if (($vraiQteLivree) > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
+                    throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
+                }
 
                 $entrees[] = [
                     'depot_id' => $bonLivraison->depot_id,
