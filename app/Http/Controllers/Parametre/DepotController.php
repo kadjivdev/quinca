@@ -471,7 +471,9 @@ class DepotController extends Controller
             }
 
             // classement des requetes stocks
-            RequeteStock::where("depot_id", $depotId)->update(["inventaire_id" => $inventaire->id]);
+            RequeteStock::where("depot_id", $depotId)
+                ->whereNull("inventaire_id")
+                ->update(["inventaire_id" => $inventaire->id]);
 
             /** CREATION DES DETAILS INVENTAIRES */
             $inventaire->details()
