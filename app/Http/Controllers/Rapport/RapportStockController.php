@@ -155,6 +155,7 @@ class RapportStockController extends Controller
                             //     :
                             RequeteStock::where("article_id", $stock->article_id)
                             ->where("depot_id", $stock->depot_id)
+                            ->whereNull("inventaire_id")
                             ->whereNotNull("validated_by")
                             ->whereNotNull("validated_at");
 

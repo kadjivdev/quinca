@@ -8,6 +8,7 @@ use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
 use App\Models\Parametre\TypeDepot;
+use App\Models\RequeteStock;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
@@ -468,6 +469,9 @@ class DepotController extends Controller
                 FactureRevendeur::whereIn("created_by", $gerantsDepot->pluck("id")->toArray())
                     ->whereNull("inventaire_id")->update(["inventaire_id" => $inventaire->id]);
             }
+
+            // classement des requetes stocks
+            RequeteStock::where("depot_id", $depotId)->update(["inventaire_id" => $inventaire->id]);
 
             /** CREATION DES DETAILS INVENTAIRES */
             $inventaire->details()
