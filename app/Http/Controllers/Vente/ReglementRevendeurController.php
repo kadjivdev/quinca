@@ -27,7 +27,7 @@ class ReglementRevendeurController extends Controller
             'validatedBy'
         ])->latest();
 
-        // quand il n'y a pas de période, on prend tous les reglements
+        // quand il n'y a pas de période, on prend tous les reglements du mois
         if (!$request->filled('date_debut') && !$request->filled('date_fin')) {
             $reglementQuery->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year);
@@ -53,11 +53,11 @@ class ReglementRevendeurController extends Controller
         }
 
         if ($request->filled('date_debut')) {
-            $reglementQuery->whereDate('date_reglement', '>=', $request->date_debut);
+            $reglementQuery->whereDate('created_at', '>=', $request->date_debut);
         }
 
         if ($request->filled('date_fin')) {
-            $reglementQuery->whereDate('date_reglement', '<=', $request->date_fin);
+            $reglementQuery->whereDate('created_at', '<=', $request->date_fin);
         }
 
         if (
@@ -93,7 +93,9 @@ class ReglementRevendeurController extends Controller
                     ->get()
             ];
         } else {
-            $reglements = $reglementQuery->get();
+            $reglements = $reglementQuery
+                ->where("created_by", Auth::id())
+                ->get();
 
             $reglementQuery
                 ->where("created_by", Auth::id());
