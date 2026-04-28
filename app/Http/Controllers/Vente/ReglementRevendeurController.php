@@ -27,6 +27,12 @@ class ReglementRevendeurController extends Controller
             'validatedBy'
         ])->latest();
 
+        // quand il n'y a pas de période, on prend tous les reglements
+        if (!$request->filled('date_debut') && !$request->filled('date_fin')) {
+            $reglementQuery->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        };
+
         // Application des filtres
         if ($request->filled('client_id')) {
             $reglementQuery->whereHas('facture', function ($query) use ($request) {
@@ -124,9 +130,6 @@ class ReglementRevendeurController extends Controller
                     ->get()
             ];
         }
-
-
-        // 
 
         // Données pour les filtres et le modal d'ajout
         $clients = Client::orderBy('raison_sociale')

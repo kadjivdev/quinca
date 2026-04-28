@@ -19,10 +19,10 @@
                                     {{ $statsReglements['reglements_valides'] ?? $reglements->where('statut', 'valide')->count() }} validés
                                 </span>
                                 @if($statsReglements['reglements_en_attente'] ?? $reglements->where('statut', 'brouillon')->count() > 0)
-                                    <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
-                                        <i class="fas fa-clock me-1"></i>
-                                        {{ $statsReglements['reglements_en_attente']}} en attente
-                                    </span>
+                                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ $statsReglements['reglements_en_attente']}} en attente
+                                </span>
                                 @endif
                             </div>
                         </div>
@@ -31,15 +31,15 @@
             </div>
 
             <div class="col-auto d-flex gap-2">
-                <button type="button" class="btn btn-light px-3 d-inline-flex align-items-center" onclick="refreshList()">
+                <a href="{{route('vente.reglement-revendeurs.index')}}" type="button" class="btn btn-light px-3 d-inline-flex align-items-center" onclick="refreshList()">
                     <i class="fas fa-sync-alt me-2"></i>
                     Actualiser
-                </button>
+                </a>
 
                 <button type="button"
-                        class="btn btn-primary px-3 d-inline-flex align-items-center"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addReglementModal">
+                    class="btn btn-primary px-3 d-inline-flex align-items-center"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addReglementModal">
                     <i class="fas fa-plus me-2"></i>
                     Nouveau Règlement
                 </button>
@@ -138,18 +138,18 @@
                             </div>
                         </div>
                         @php
-                            $modesPaiement = $statsReglements['repartition_modes'] ?? collect();
-                            $modePrincipal = $modesPaiement->sortByDesc('total')->first();
+                        $modesPaiement = $statsReglements['repartition_modes'] ?? collect();
+                        $modePrincipal = $modesPaiement->sortByDesc('total')->first();
                         @endphp
                         @if($modePrincipal)
-                            <div class="d-flex align-items-baseline">
-                                <h4 class="mb-0 me-2 text-capitalize">{{ str_replace('_', ' ', $modePrincipal->type_reglement) }}</h4>
-                                <small class="text-info">
-                                    {{ number_format(($modePrincipal->total / $statsReglements['total_reglements'] * 100), 1) }}% du total
-                                </small>
-                            </div>
+                        <div class="d-flex align-items-baseline">
+                            <h4 class="mb-0 me-2 text-capitalize">{{ str_replace('_', ' ', $modePrincipal->type_reglement) }}</h4>
+                            <small class="text-info">
+                                {{ number_format(($modePrincipal->total / $statsReglements['total_reglements'] * 100), 1) }}% du total
+                            </small>
+                        </div>
                         @else
-                            <div class="text-muted">Aucune donnée</div>
+                        <div class="text-muted">Aucune donnée</div>
                         @endif
                     </div>
                 </div>
@@ -160,108 +160,108 @@
 <link href="{{ asset('css/theme/header.css') }}" rel="stylesheet">
 
 <style>
-.page-header {
-    margin-bottom: 2rem;
-}
+    .page-header {
+        margin-bottom: 2rem;
+    }
 
-.stats-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-.header-icon .icon-wrapper {
-    transition: transform 0.3s ease;
-}
+    .header-icon .icon-wrapper {
+        transition: transform 0.3s ease;
+    }
 
-.header-icon:hover .icon-wrapper {
-    transform: scale(1.1);
-}
+    .header-icon:hover .icon-wrapper {
+        transform: scale(1.1);
+    }
 
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08) !important;
-}
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+    }
 
-.badge {
-    padding: 0.5rem 0.75rem;
-}
+    .badge {
+        padding: 0.5rem 0.75rem;
+    }
 
-.btn {
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    transition: all 0.3s ease;
-}
+    .btn {
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
 
-.btn:hover {
-    transform: translateY(-1px);
-}
+    .btn:hover {
+        transform: translateY(-1px);
+    }
 
-.btn i {
-    transition: transform 0.3s ease;
-}
+    .btn i {
+        transition: transform 0.3s ease;
+    }
 
-.btn:active i {
-    transform: scale(0.9);
-}
+    .btn:active i {
+        transform: scale(0.9);
+    }
 </style>
 
 <script>
-// Animation de rafraîchissement
-function refreshList() {
-    const icon = document.querySelector('.fa-sync-alt');
-    icon.classList.add('fa-spin');
+    // Animation de rafraîchissement
+    function refreshList() {
+        const icon = document.querySelector('.fa-sync-alt');
+        icon.classList.add('fa-spin');
 
-    // Appel AJAX pour rafraîchir les données
-    $.ajax({
-        url: '{{ route("vente.reglement.refresh") }}',
-        type: 'GET',
-        success: function(response) {
-            // Mettre à jour le contenu
-            $('#reglementsList').html(response.html);
+        // Appel AJAX pour rafraîchir les données
+        $.ajax({
+            url: '{{ route("vente.reglement.refresh") }}',
+            type: 'GET',
+            success: function(response) {
+                // Mettre à jour le contenu
+                $('#reglementsList').html(response.html);
 
-            // Mettre à jour les statistiques
-            updateStats(response.stats);
+                // Mettre à jour les statistiques
+                updateStats(response.stats);
 
-            // Notification
-            Toast.fire({
-                icon: 'success',
-                title: 'Liste actualisée'
-            });
-        },
-        error: function() {
-            Toast.fire({
-                icon: 'error',
-                title: 'Erreur lors de l\'actualisation'
-            });
-        },
-        complete: function() {
-            // Arrêter l'animation après un délai
-            setTimeout(() => {
-                icon.classList.remove('fa-spin');
-            }, 500);
-        }
-    });
-}
-
-// Fonction pour mettre à jour les statistiques
-function updateStats(stats) {
-    // Mettre à jour chaque statistique
-    Object.keys(stats).forEach(key => {
-        const element = document.querySelector(`[data-stat="${key}"]`);
-        if (element) {
-            if (key.includes('montant')) {
-                element.textContent = new Intl.NumberFormat('fr-FR').format(stats[key]) + ' F';
-            } else {
-                element.textContent = stats[key];
+                // Notification
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Liste actualisée'
+                });
+            },
+            error: function() {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Erreur lors de l\'actualisation'
+                });
+            },
+            complete: function() {
+                // Arrêter l'animation après un délai
+                setTimeout(() => {
+                    icon.classList.remove('fa-spin');
+                }, 500);
             }
-        }
-    });
-}
+        });
+    }
+
+    // Fonction pour mettre à jour les statistiques
+    function updateStats(stats) {
+        // Mettre à jour chaque statistique
+        Object.keys(stats).forEach(key => {
+            const element = document.querySelector(`[data-stat="${key}"]`);
+            if (element) {
+                if (key.includes('montant')) {
+                    element.textContent = new Intl.NumberFormat('fr-FR').format(stats[key]) + ' F';
+                } else {
+                    element.textContent = stats[key];
+                }
+            }
+        });
+    }
 </script>

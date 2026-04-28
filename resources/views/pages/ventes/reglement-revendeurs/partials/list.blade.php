@@ -1,4 +1,31 @@
 {{-- list-reglements.blade.php --}}
+<!--  -->
+<div class="row d-flex justify-content-center">
+    <div class="col-md-6 border bg-light rounded p-3">
+        <!-- FILTRAGE PAR DEPOT -->
+        <form action="{{route('vente.reglement-revendeurs.index')}}" method="GET">
+            @csrf
+            <div class="row">
+                <div class="col-6">
+                    <label for="debut">Date de début</label>
+                    <input type="date" name="date_debut" required class="form-control" id="debut" value="{{request()->get('date_debut')}}">
+                </div>
+                <div class="col-6">
+                    <label for="debut">Date de fin</label>
+                    <input type="date" name="date_fin" required class="form-control" id="fin" value="{{request()->get('date_fin')}}">
+                </div>
+            </div>
+            <button class="w-100 btn btn-primary mt-2 px-4">
+                <i class="fas fa-save me-2"></i>Filtrer
+            </button>
+        </form>
+
+        @if(request()->get("date_debut") || request()->get("date_fin"))
+        <p class="text-success my-2 border">Période du {{request()->get("date_debut")}} au {{request()->get("date_fin")}}</p>
+        @endif
+    </div>
+</div>
+
 <div class="row g-3">
     {{-- Filtres --}}
 
@@ -154,7 +181,6 @@
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 </div>
@@ -192,7 +218,6 @@
 </div>
 
 @push("scripts")
-
 <script type="text/javascript">
     // 
     function getDateString(d) {
