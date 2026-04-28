@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Catalogue\Article;
+use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Securite\User;
@@ -29,6 +30,8 @@ class RequeteStock extends Model
         "preuve",
         'validated_by',
         'validated_at',
+
+        'inventaire_id'
     ];
 
     protected $casts = [
@@ -66,6 +69,11 @@ class RequeteStock extends Model
     public function depot(): BelongsTo
     {
         return $this->belongsTo(Depot::class, "depot_id");
+    }
+
+    public function inventaire(): BelongsTo
+    {
+        return $this->belongsTo(Inventaire::class, "inventaire_id");
     }
 
     public function createdBy(): BelongsTo

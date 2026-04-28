@@ -103,7 +103,6 @@ class FactureFournisseurController extends Controller
             ->with(['pointVente', 'fournisseur'])
             ->get();
 
-
         // Retour de la vue avec toutes les données nécessaires
         return view('pages.achat.facture-frs.index', [
             "fournisseurs" => $fournisseurs,

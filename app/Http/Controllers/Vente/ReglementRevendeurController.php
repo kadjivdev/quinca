@@ -7,7 +7,7 @@ use App\Models\Revendeur\FactureRevendeur;
 use Illuminate\Http\Request;
 
 use App\Models\Vente\{ReglementRevendeur};
-use App\Models\Vente\{SessionCaisse, Client};
+use App\Models\Vente\{Client};
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\{Auth, DB, Log};
 use Illuminate\Validation\ValidationException;

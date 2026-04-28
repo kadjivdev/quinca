@@ -1049,7 +1049,7 @@ class FactureClientController extends Controller
         ]);
     }
 
-    public function show(Request $request, $id)
+    public function show($id)
     {
         try {
             Log::info('Début du chargement des détails de la facture', ['facture_id' => $id]);

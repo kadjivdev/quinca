@@ -27,7 +27,12 @@
                         @foreach($requetes as $requete)
                         <tr>
                             <td>{{$loop->index +1}}</td>
-                            <td><span class="badge bg-light text-dark rounded">{{$requete->numero}}</span></td>
+                            <td>
+                                <span class="badge bg-light text-dark rounded">{{$requete->numero}}</span>
+                                @if($requete->inventaire)
+                                <span class="badge bg-light text-warning rounded">Inventorié: {{$requete->inventaire_id}}</span>
+                                @endif
+                            </td>
                             <td> {{ $requete->article?->code_article }} {{ $requete->article?->designation }}</td>
                             <td> {{ $requete->depot?->code_depot }} {{ $requete->depot?->libelle_depot }}</td>
                             <td>{{ $requete->uniteMesure?->libelle_unite }} ({{$requete->uniteMesure?->code_unite}})</td>

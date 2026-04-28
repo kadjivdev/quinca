@@ -92,6 +92,7 @@ class StockDepot extends Model
     {
         return RequeteStock::where("article_id", $this->article_id)
             ->where("depot_id", $this->depot_id)
+            ->whereNull("inventaire_id")
             ->whereNotNull("validated_by")
             ->whereNotNull("validated_at")
             ->sum("quantite");

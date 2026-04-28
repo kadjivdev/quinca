@@ -24,8 +24,10 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
+use App\Models\Parametre\Depot;
+use App\Models\RequeteStock;
+use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
-use App\Models\Vente\AcompteClient;
 use App\Models\Vente\FactureClient;
 
 /*
@@ -39,108 +41,14 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $acomptes = AcompteClient::whereIn("reference", ['ACP20260193', 'ACP20260155', 'ACP20260117'])->get();
+    RequeteStock::where("depot_id", 1)->update(["inventaire_id" => 355]);
+    return "regularisation des requetes stocks du depot de PARAKOU";
 
-    foreach ($acomptes as $acompte) {
+    // $FAC_20260424_0018 = FactureClient::with("lignes")->firstWhere("numero", "FAC-20260424-0018");
+    // return $FAC_20260424_0018->lignes;
+    // $facturesParakou = FactureRevendeur::with("lignes.facturedepot", "createdBy", "pointDeVente")
+    //     ->whereBetween('created_at', ['2026-04-24 09:30:00', '2026-04-28 00:00:00']);
 
-        switch ($acompte->reference) {
-            case 'ACP20260193':
-                $acompte->update(["versement_reference" => '11686785207']);
-                break;
-
-            case 'ACP20260155':
-                $acompte->update(["versement_reference" => '20738']);
-                break;
-
-            case 'ACP20260117':
-                $acompte->update(["versement_reference" => '11581174441']);
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    return "Mise à jour des acomptes effectuée avec succès!";
-    // Journée du 05
-    // $accompteLaurenda05 = AcompteClient::with("createdBy")
-    //     ->where("created_by", 3)
-    //     ->whereDate("created_at", Carbon::create(2026, 1, 5));
-    // $accompteLaurenda05->update(["session_caisse_id" => 311]);
-
-    // $accompteIsaac05 = AcompteClient::with("createdBy")
-    //     ->where("created_by", 25)
-    //     ->whereDate("created_at", Carbon::create(2026, 1, 5));
-    // $accompteIsaac05->update(["session_caisse_id" => 310]);
-
-    // // Journée du 07
-    // $accompteLaurenda05 = AcompteClient::with("createdBy")
-    //     ->where("created_by", 3)
-    //     ->whereDate("created_at", Carbon::create(2026, 1, 7));
-    // $accompteLaurenda05->update(["session_caisse_id" => 314]);
-
-    // === Regulation des factures revendeurs liées aux inventaires du pr Fahim === //
-    // $_factureRevsQuery = FactureRevendeur::with("createdBy", "inventaire.auteur");
-
-    // $factureInventoriPrFahim =  $_factureRevsQuery->whereHas("inventaire", function ($query) {
-    //     $query->where("user_id", 21);
-    // })->update(["inventaire_id" => null]);
-
-    // return $factureInventoriPrFahim;
-
-    // $factureRevs = FactureRevendeur::with("compteClient", "reglements")
-    //     ->whereIn("numero", ["FAC-20251217-5701484e", "FAC-20251217-38a2a169"])
-    //     ->get();
-
-    // foreach ($factureRevs as $facture) {
-    //     $facture->compteClient()->delete();
-    //     $facture->reglements()->delete();
-    //     $facture->delete();
-    // }
-
-    // // DJOUGOU Inventaire ID: 236
-    // $beforeInventfactureRevsDjougou = FactureRevendeur::with("inventaire", "createdBy")
-    //     ->where("created_by", 20)
-    //     ->whereNull("inventaire_id")
-    //     ->whereBetween('created_at', ['2023-01-01 00:00:00', '2025-12-10 00:00:00']);
-    // $beforeInventfactureRevsDjougou->update(["inventaire_id" => 236]);// attachement de toutes les factures de cxette période au dernier inventaire du depot 
-
-    // $beforeInventfactureRevsDjougou = FactureRevendeur::with("inventaire", "createdBy")
-    //     ->where("created_by", 20)
-    //     // ->whereNull("inventaire_id")
-    //     ->whereBetween('created_at', ['2025-12-10 00:00:00', '2025-12-22 00:00:00']);
-    // $beforeInventfactureRevsDjougou->update(["inventaire_id" => null]); // dettachement de toutes les factures de cxette période au dernier inventaire du depot 
-
-    // $beforeInventfactureRevsKandi = FactureRevendeur::with("inventaire", "createdBy")
-    //     ->where("created_by", 17)
-    //     // ->whereNull("inventaire_id")
-    //     ->whereBetween('created_at', ['2025-12-17 00:00:00', '2025-12-22 00:00:00']);
-
-    // $beforeInventfactureRevsKandi->update(["inventaire_id" => null]); // dettachement de toutes les factures de cxette période au dernier inventaire du depot 
-
-    // // PARAKOU Inventaire ID: 241
-    // $beforeInventfactureRevsParakou = FactureRevendeur::with("inventaire", "createdBy")
-    //     ->where("created_by", 12)
-    //     ->whereNull("inventaire_id")
-    //     ->whereBetween('created_at', ['2023-01-01 00:00:00', '2025-12-14 00:00:00']);
-    // $beforeInventfactureRevsParakou->update(["inventaire_id" => 241]);// attachement de toutes les factures de cxette période au dernier inventaire du depot 
-
-    // $facturesDjougou = FactureRevendeur::with("inventaire", "createdBy")
-    //     ->where("created_by", 20)
-    //     ->whereBetween('created_at', ['2025-12-10 16:00:00', '2025-12-24 00:00:00']);
-    // $facturesDjougou->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
-
-    // $facturesParakou = FactureRevendeur::with("inventaire", "createdBy")
-    //     ->where("created_by", 12)
-    //     ->whereBetween('created_at', ['2025-12-18 00:00:00', '2025-12-25 00:00:00']);
-    // $facturesParakou->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
-
-    // $facturesKandi = FactureRevendeur::with("inventaire", "createdBy")
-    //     ->where("created_by", 17)
-    //     ->whereBetween('created_at', ['2025-12-22 16:00:00', '2025-12-24 00:00:00']);
-    // $facturesKandi->update(["inventaire_id" => null]); // liberation de toutes les factures de cette période 
-
-    // return "regularisation du bon BC2601222443 effectuée avec succès";
 });
 
 /**DETELE A STOCK */
