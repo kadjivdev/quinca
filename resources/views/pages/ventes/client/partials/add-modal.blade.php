@@ -65,6 +65,17 @@
                                         </div>
 
                                         <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Zone</label>
+                                            <select class="form-select" name="zone_id" id="zone_id" required>
+                                                <option value="">Choisissez une zone</option>
+                                                @foreach($zones as $zone)
+                                                <option value="{{$zone->id}}">{{$zone->libelle}}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">Veuillez sélectionner un agent</div>
+                                        </div>
+
+                                        <div class="col-md-6">
                                             <label class="form-label fw-medium required">Agent</label>
                                             <select class="form-select" name="agent_id" required>
                                                 @foreach($agents as $agent)

@@ -326,8 +326,8 @@ class Client extends Model
     {
         return [
             'raison_sociale' => 'required|string|max:255|unique:clients,raison_sociale,' . $id,
-            'ifu' => 'nullable|string|unique:clients,ifu,' . $id,
-            'rccm' => 'nullable|string|unique:clients,rccm,' . $id,
+            'ifu' => 'nullable|string',
+            'rccm' => 'nullable|string' ,
             'telephone' => ['nullable', 'string', 'max:20'],
             'email' => 'nullable|email',
             'adresse' => 'nullable|string',
@@ -340,7 +340,7 @@ class Client extends Model
             'notes' => 'nullable|string',
             'taux_aib' => 'nullable|numeric|min:0|max:100',
             'agent_id' => 'required|integer',
-            'zone_id' => 'nullable|integer',
+            'zone_id' => 'required|integer',
         ];
     }
 }
