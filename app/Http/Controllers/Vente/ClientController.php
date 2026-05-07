@@ -21,6 +21,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
+use Symfony\Component\ErrorHandler\Debug;
 
 class ClientController extends Controller
 {
@@ -757,6 +758,7 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
+        Log::debug("All data", ["data" => $request->all()]);
         if (!$request->ajax()) {
             return response()->json(['error' => 'Requête non autorisée'], 403);
         }
@@ -764,6 +766,8 @@ class ClientController extends Controller
         try {
             // Validation des données
             $validated = $request->validate(Client::rules($client->id));
+
+            Log::debug("Validated data", ["data" => $validated]);
 
             DB::beginTransaction();
 
@@ -780,7 +784,7 @@ class ClientController extends Controller
                 ], 422);
             }
 
-            $client->save();
+            $client->update();
 
             DB::commit();
 
@@ -806,6 +810,10 @@ class ClientController extends Controller
             ]);
         } catch (ValidationException $e) {
             DB::rollBack();
+            Log::debug('Erreur de validation lors de la modification du client:', [
+                'client_id' => $client->id,
+                'errors' => $e->errors()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',

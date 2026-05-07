@@ -14,6 +14,7 @@ use App\Models\Vente\SoldeInitialClient;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class Client extends Model
 {
@@ -327,7 +328,7 @@ class Client extends Model
             'raison_sociale' => 'required|string|max:255|unique:clients,raison_sociale,' . $id,
             'ifu' => 'nullable|string|unique:clients,ifu,' . $id,
             'rccm' => 'nullable|string|unique:clients,rccm,' . $id,
-            'telephone' => 'nullable|string|max:20|unique:clients,telephone,' . $id,
+            'telephone' => ['nullable', 'string', 'max:20'],
             'email' => 'nullable|email',
             'adresse' => 'nullable|string',
             'ville' => 'nullable|string',
