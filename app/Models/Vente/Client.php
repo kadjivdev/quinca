@@ -325,7 +325,10 @@ class Client extends Model
     public static function rules($id = null): array
     {
         return [
-            'raison_sociale' => 'required|string|max:255|unique:clients,raison_sociale,' . $id,
+            'raison_sociale' => array_merge(
+                ['required', 'string', 'max:255'],
+                $id ? [] : ['unique:clients,raison_sociale']
+            ),
             'ifu' => 'nullable|string',
             'rccm' => 'nullable|string' ,
             'telephone' => ['nullable', 'string', 'max:20'],
