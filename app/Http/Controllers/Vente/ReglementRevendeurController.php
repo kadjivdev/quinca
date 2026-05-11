@@ -82,6 +82,9 @@ class ReglementRevendeurController extends Controller
                 // Nombre de règlements en attente
                 'reglements_en_attente' => ReglementRevendeur::where('statut', 'brouillon')->count(),
 
+                // Nombre de règlements validee
+                'reglements_valides' => ReglementRevendeur::where('statut', 'validee')->count(),
+
                 // Montant des règlements en attente
                 'montant_en_attente' => ReglementRevendeur::where('statut', 'brouillon')
                     ->sum('montant'),
@@ -93,45 +96,59 @@ class ReglementRevendeurController extends Controller
                     ->get()
             ];
         } else {
-            $reglements = $reglementQuery
+
+            $reglements = ReglementRevendeur::with([
+                'facture.client',
+                'facture.lignes.article',
+                'createdBy',
+                'validatedBy'
+            ])->latest()
                 ->where("created_by", Auth::id())
+                // les reglements du mois
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
                 ->get();
 
-            $reglementQuery
-                ->where("created_by", Auth::id());
+            // return $reglementQuery
+            //     ->where("created_by", Auth::id())
+            //     ->where('statut', 'brouillon')->count();
 
             // Statistiques pour le header
             $statsReglements = [
                 // Total des règlements du mois
-                'total_mois' => $reglementQuery
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)
-                    ->where('statut', 'validee')
-                    ->sum('montant'),
+                'total_mois' => $reglements
+                    // ->where('statut', 'validee')
+                    ->sum(fn($reg) => $reg->montant),
 
                 // Total des règlements
-                'total_reglements' => $reglementQuery
+                'total_reglements' => $reglements
                     ->where('statut', 'validee')
-                    ->sum('montant'),
+                    ->sum(fn($reg) => $reg->montant),
+
 
                 // Nombre de règlements en attente
-                'reglements_en_attente' => $reglementQuery
+                'reglements_en_attente' => $reglements
                     ->where('statut', 'brouillon')->count(),
+
+                // Nombre de règlements validee
+                'reglements_valides' => $reglements
+                    ->where('statut', 'validee')->count(),
 
 
                 // Montant des règlements en attente
-                'montant_en_attente' => $reglementQuery
+                'montant_en_attente' =>  $reglements
                     ->where('statut', 'brouillon')
                     ->sum('montant'),
 
                 // Répartition par mode de paiement
-                'repartition_modes' => $reglementQuery
+                'repartition_modes' => $reglements
                     ->where('statut', 'valide')
                     ->select('type_reglement', DB::raw('COUNT(*) as count'), DB::raw('SUM(montant) as total'))
                     ->groupBy('type_reglement')
-                    ->get()
             ];
         }
+
+        // dd($statsReglements["reglements_en_attente"]);
 
         // Données pour les filtres et le modal d'ajout
         $clients = Client::orderBy('raison_sociale')
@@ -316,27 +333,15 @@ class ReglementRevendeurController extends Controller
             DB::beginTransaction();
 
             // Récupérer le règlement avec sa facture et les relations nécessaires
-            $reglement = ReglementRevendeur::with(['facture.reglements'])
+            $reglement = ReglementRevendeur::with(['facture'])
                 ->findOrFail($id);
 
-            // Vérifier si on a une session de caisse ouverte
-            // $sessionCaisse = SessionCaisse::where('utilisateur_id', auth()->id())
-            //     ->where('statut', 'ouverte')
-            //     ->first();
-
-            // if (!$sessionCaisse) {
-            //     throw new \Exception('Vous devez avoir une session de caisse ouverte pour valider un règlement');
-            // }
+            Log::debug("Le reglement concerné :", ["data" => $reglement]);
 
             // Valider le règlement
             if (!$reglement->valider(auth()->id())) {
                 throw new \Exception("Erreur lors de la validation du règlement");
             }
-
-            // Mettre à jour la session caisse
-            // if (method_exists($sessionCaisse, 'mettreAJourTotaux')) {
-            //     $sessionCaisse->mettreAJourTotaux();
-            // }
 
             $reglement->compteClient()->create([
                 'date_op' => $reglement->date_reglement,

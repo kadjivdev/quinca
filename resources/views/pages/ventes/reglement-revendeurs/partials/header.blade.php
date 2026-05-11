@@ -16,9 +16,9 @@
                             <div class="d-flex gap-2 align-items-center ms-3">
                                 <span class="badge bg-success bg-opacity-10 text-success rounded-pill">
                                     <i class="fas fa-check-circle me-1"></i>
-                                    {{ $statsReglements['reglements_valides'] ?? $reglements->where('statut', 'valide')->count() }} validés
+                                    {{ $statsReglements['reglements_valides']  }} validés
                                 </span>
-                                @if($statsReglements['reglements_en_attente'] ?? $reglements->where('statut', 'brouillon')->count() > 0)
+                                @if($statsReglements['reglements_en_attente'])
                                 <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
                                     <i class="fas fa-clock me-1"></i>
                                     {{ $statsReglements['reglements_en_attente']}} en attente
@@ -60,7 +60,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h6 class="mb-0">Total du Mois</h6>
-                                <small class="text-muted">Règlements validés</small>
+                                <small class="text-muted">Règlements total</small>
                             </div>
                         </div>
                         <div class="d-flex align-items-baseline">

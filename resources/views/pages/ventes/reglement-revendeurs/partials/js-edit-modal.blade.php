@@ -25,8 +25,8 @@
 
                         // Remplir les champs
                         $('#editReglementId').val(reglement.id);
-                        $('#editFactureDisplay').text(reglement.facture.numero);
-                        $('#editClientDisplay').text(reglement.facture.client.raison_sociale);
+                        $('#editFactureDisplay').text(reglement.facture?.numero);
+                        $('#editClientDisplay').text(reglement.facture?.client.raison_sociale);
                         $('#editTypeReglement').val(reglement.type_reglement);
                         $('#editMontant').val(reglement.montant);
                         $('#editDateReglement').val(reglement.date_reglement);
@@ -36,7 +36,7 @@
                         $('#editNotes').val(reglement.notes);
 
                         // Afficher le reste à payer
-                        const resteAPayer = reglement.facture.montant_ttc - reglement.facture.montant_regle;
+                        const resteAPayer = reglement.facture?.montant_ttc - reglement.facture?.montant_regle;
                         $('#editResteAPayer').html(`Reste à payer: <strong>${formatMontant(resteAPayer)} F</strong>`);
 
                         // Configurer le montant maximum
