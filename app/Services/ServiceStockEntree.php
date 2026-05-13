@@ -25,7 +25,7 @@ class ServiceStockEntree
             DB::beginTransaction();
 
             // Ajout de logs de debug
-            \Log::debug("Début traitement entrée stock", ['donnees' => $donnees]);
+            Log::debug("Début traitement entrée stock", ['donnees' => $donnees]);
 
             // 1. Validation de base
             $this->validerDonneesEntree($donnees);
@@ -72,7 +72,6 @@ class ServiceStockEntree
                 $unite_dest_id,
                 $article->id
             );
-
 
             Log::debug('Convertion retrouvée:', ["data" => $conversion]);
 

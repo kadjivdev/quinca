@@ -300,6 +300,28 @@ class LivraisonClientController extends Controller
                             ->quantite_livree + $livraisonLigne->quantite
                     ]);
 
+                // Créer le mouvement de sortie
+                $mouvementSortie = $this->serviceStockSortie->traiterSortieStock([
+                    'date_mouvement' => $livraisonClient->date_livraison,
+                    'depot_id' => $livraisonClient->depot_id,
+                    'article_id' => $livraisonLigne->article_id,
+                    'unite_mesure_id' => $livraisonLigne->article->unite_mesure_id,
+                    'quantite' => $ligneFactureClient->quantite_livree, // $livraisonLigne->quantite_base,
+                    'reference_mouvement' => $livraisonClient->numero,
+                    'document_type' => 'LIVRAISON_CLIENT',
+                    'document_id' => $livraisonClient->id,
+                    'user_id' => auth()->id(),
+                    'notes' => "Livraison client #{$livraisonClient->numero}"
+                ]);
+
+                if (!$mouvementSortie['succes']) {
+                    throw new Exception($mouvementSortie['message']);
+                }
+
+                // Associer le mouvement à la ligne
+                $livraisonLigne->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];
+                $livraisonLigne->save();
+
                 /** DATA POUR APPROVISIONNEMENT */
                 if ($livraisonClient->depot_dest_id) {
                     //cette opération se fait seulement quand un dépôt de destination est choisi
@@ -368,6 +390,7 @@ class LivraisonClientController extends Controller
             ], 422);
         }
     }
+
 
     /**
      * Bordereau de livraison

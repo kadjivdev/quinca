@@ -530,7 +530,8 @@ class BonLivraisonFournisseurController extends Controller
             foreach ($bonLivraison->lignes as $ligne) {
                 Log::info("Ligne bon de livraison avant update", ["data" => $bonLivraison->lignes]);
 
-                $ligneFact = $bonLivraison->facture->lignes()->firstWhere("article_id", $ligne->article_id);
+                $ligneFact = $bonLivraison->facture->lignes()
+                    ->firstWhere("article_id", $ligne->article_id);
 
                 $prixUnitaires[$ligneFact->article_id] = $ligneFact->prix_unitaire;
             }
@@ -600,6 +601,7 @@ class BonLivraisonFournisseurController extends Controller
                             $ligne->quantite_supplementaire
                         );
                 }
+
                 // Log::info("QTe Base Supplementaire", ["data" => $QteBaseSupplementaire]);
 
                 // Log::info("QTe livré", ["data" => $ligneFact->quantite_livree]);

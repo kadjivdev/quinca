@@ -54,6 +54,7 @@ class RapportStockController extends Controller
         $selectedDepot = $request->depot_id ?
             Depot::findOrFail($request->depot_id) :
             $depots->first();
+
         $stats = $this->getStats($selectedDepot->id);
         $stockDisponible = $this->getStockDisponible($selectedDepot->id);
         $mouvements = $this->getMouvements($request);
@@ -344,11 +345,16 @@ class RapportStockController extends Controller
 
     private function getMouvements(Request $request)
     {
+
         $query = StockMouvement::with(['article', 'depot', 'uniteMesure', 'user'])
             ->orderBy('date_mouvement', 'desc');
 
         if ($request->filled('depot_id')) {
             $query->where('depot_id', $request->depot_id);
+        }
+
+        if ($request->filled('statut_id')) {
+            $query->where('type_mouvement', $request->statut_id);
         }
 
         if ($request->filled('article_id')) {

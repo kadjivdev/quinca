@@ -7,6 +7,8 @@ use App\Models\Catalogue\Article;
 use App\Models\Parametre\{UniteMesure, ConversionUnite};
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ServiceStockSortie
 {
@@ -21,7 +23,7 @@ class ServiceStockSortie
         try {
             DB::beginTransaction();
 
-            \Log::debug("Début traitement sortie stock", ['donnees' => $donnees]);
+            Log::debug("Début traitement sortie stock", ['donnees' => $donnees]);
 
             // 1. Validation de base
             $this->validerDonneesSortie($donnees);
@@ -41,55 +43,74 @@ class ServiceStockSortie
             $unite_origine_id = $donnees['unite_mesure_id'];
 
             // 4. Conversion si nécessaire
-            if ($unite_origine_id !== $article->unite_mesure_id) {
-                $uniteSource = UniteMesure::findOrFail($unite_origine_id);
-                $uniteBase = $article->uniteMesure;
+            $uniteSource = UniteMesure::findOrFail($unite_origine_id);
+            $uniteBase = $article->uniteMesure;
 
-                $conversion = $this->rechercherConversion(
-                    $unite_origine_id,
-                    $article->unite_mesure_id,
-                    $article->id
-                );
+            // Récupération ou 
+            $stockExiste = StockDepot::firstWhere([
+                'depot_id' => $donnees['depot_id'],
+                'article_id' => $article->id,
+                // 'unite_mesure_id' => $donnees["unite_mesure_id"],
+            ]);
 
-                if (!$conversion) {
-                    throw new Exception(sprintf(
-                        "Aucune conversion trouvée de l'unité %s vers %s pour l'article %s",
-                        $uniteSource->code_unite,
-                        $uniteBase->code_unite,
-                        $article->code_article
-                    ));
+            ## determination de l'unité de destination
+            if (isset($donnees["appro"]) || isset($donnees["livraison"])) {
+                // quand le stock existe déjà, l'approvisionnement se fera en l'unité de mesure existante déjà
+                if ($stockExiste) {
+                    $unite_dest_id = $stockExiste->unite_mesure_id;
+                } else {
+                    $unite_dest_id = $article->unite_mesure_id;
                 }
-
-                $quantite_base = $this->convertirQuantite(
-                    $donnees['quantite'],
-                    $conversion,
-                    $unite_origine_id
-                );
-
-                \Log::debug("Conversion effectuée", [
-                    'quantite_origine' => $donnees['quantite'],
-                    'unite_origine' => $uniteSource->code_unite,
-                    'quantite_base' => $quantite_base,
-                    'unite_base' => $uniteBase->code_unite
-                ]);
+            } else {
+                $unite_dest_id = $article->unite_mesure_id;
             }
 
-            // 5. Vérification de la disponibilité du stock
-            $stock = StockDepot::where([
-                'depot_id' => $donnees['depot_id'],
-                'article_id' => $article->id
-            ])->first();
+            $conversion = $this->rechercherConversion(
+                $unite_origine_id,
+                $unite_dest_id,
+                $article->id
+            );
 
-            if (!$stock || $stock->quantite_reelle < $quantite_base) {
+            Log::debug('Convertion retrouvée:', ["data" => $conversion]);
+
+            if (!$conversion) {
                 throw new Exception(sprintf(
-                    "Stock insuffisant pour l'article %s (Demandé: %s, Disponible: %s)",
-                    $article->code_article,
-                    $quantite_base,
-                    $stock ? $stock->quantite_reelle : 0
+                    "Aucune conversion trouvée de l'unité (%s) vers (%s) pour l'article %s ni l'inverse! Veuillez créer la conversion avant de continuer",
+                    $uniteSource->libelle_unite,
+                    $uniteBase->libelle_unite,
+                    $article->code_article
                 ));
             }
 
-            // 6. Création du mouvement de stock
+            $quantite_base = $this->convertirQuantite(
+                $donnees['quantite'],
+                $conversion,
+                $unite_origine_id
+            );
+
+            Log::debug("Conversion effectuée", [
+                'quantite_origine' => $donnees['quantite'],
+                'unite_origine' => $uniteSource->id,
+                'quantite_base' => $quantite_base,
+                'unite_base' => $uniteBase->id
+            ]);
+
+            // 5. création du stock
+            if ($stockExiste) {
+                $stock = $stockExiste;
+            } else {
+                $stock = StockDepot::create([
+                    'depot_id' => $donnees['depot_id'],
+                    'article_id' => $article->id,
+                    'user_id' => Auth::id(),
+                    'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
+                ]);
+            }
+
+            $ancien_stock = $stock->quantite_reelle ?? 0;
+            $ancien_cump = $stock->prix_moyen ?? 0;
+
+            // 7. Création du mouvement de stock
             $mouvement = StockMouvement::create([
                 'code' => $this->genererCodeMouvement(),
                 'depot_id' => $donnees['depot_id'],
@@ -108,16 +129,20 @@ class ServiceStockSortie
                 'user_id' => $donnees['user_id']
             ]);
 
-            // 7. Mise à jour du stock
-            $stock->update([
-                'quantite_reelle' => $stock->quantite_reelle - $quantite_base,
+            // 8. Mise à jour du stock
+            $stock->fill([
+                'quantite_reelle' => $ancien_stock + $quantite_base, //old $quantite_base,
+                'prix_moyen' => 0.00,
                 'date_dernier_mouvement' => $donnees['date_mouvement'],
-                'user_id' => $donnees['user_id']
+                'user_id' => $donnees['user_id'],
+                // 'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
             ]);
+
+            $stock->save();
 
             DB::commit();
 
-            \Log::debug("Sortie de stock réussie", [
+            Log::debug("Sortie de stock réussie", [
                 'mouvement_id' => $mouvement->id,
                 'nouveau_stock' => $stock->quantite_reelle
             ]);
@@ -135,10 +160,9 @@ class ServiceStockSortie
                     'nouveau_stock' => $stock->quantite_reelle
                 ]
             ];
-
         } catch (Exception $e) {
             DB::rollBack();
-            \Log::error("Erreur traitement sortie stock", [
+            Log::error("Erreur traitement sortie stock", [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'donnees' => $donnees
@@ -249,9 +273,13 @@ class ServiceStockSortie
     private function validerDonneesSortie(array $donnees): void
     {
         $required = [
-            'depot_id', 'article_id', 'unite_mesure_id',
-            'quantite', 'date_mouvement',
-            'reference_mouvement', 'user_id'
+            'depot_id',
+            'article_id',
+            'unite_mesure_id',
+            'quantite',
+            'date_mouvement',
+            'reference_mouvement',
+            'user_id'
         ];
 
         foreach ($required as $field) {

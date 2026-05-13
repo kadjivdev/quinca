@@ -10,16 +10,7 @@
         <div class="card-body">
             <form id="filterForm" class="row g-3">
                 <input type="hidden" name="depot_id" value="{{ $selectedDepot->id }}">
-                <!-- <div class="col-md-3">
-                    <label class="form-label">Type de mouvement</label>
-                    <select class="form-select" name="type_mouvement">
-                        <option value="">Tous</option>
-                        <option value="{{ \App\Models\Stock\StockMouvement::TYPE_ENTREE }}">Entrées</option>
-                        <option value="{{ \App\Models\Stock\StockMouvement::TYPE_SORTIE }}">Sorties</option>
-                        <option value="{{ \App\Models\Stock\StockMouvement::TYPE_TRANSFERT }}">Transferts</option>
-                        <option value="{{ \App\Models\Stock\StockMouvement::TYPE_AJUSTEMENT }}">Ajustements</option>
-                    </select>
-                </div> -->
+
                 <div class="col-md-4">
                     <label class="form-label">Période</label>
                     <div class="input-group">
@@ -73,13 +64,33 @@
         </div>
     </div>
 
+    <!--  -->
+    <div class="row d-flex justify-content-center">
+        <div class="col-6">
+            <div class="border rounded shadow-sm p-2">
+                <form action="{{route('rapports.mouvement-stock')}}" method="get">
+                    <select name="depot_id" value="{{old('depot_id')}}" class="form-control">
+                        <option value="">Choisissez un dépôt ...</option>
+                        @foreach($depots as $depot)
+                        <option value="{{$depot->id}}">{{$depot->libelle_depot}}</option>
+                        @endforeach
+                    </select>
+                    <select name="statut_id" value="{{old('statut_id')}}" class="form-control my-1">
+                        <option value="">Choisissez un statut ...</option>
+                        <option value="ENTREE">Entrée</option>
+                        <option value="SORTIE">Sortie</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-success w-100 my-2">Filtrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <br>
+
     <!-- Table des mouvements -->
     <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Mouvements de Stock</h5>
-            <!-- <button class="btn btn-sm btn-primary" onclick="exportMouvements()">
-                <i class="fas fa-file-excel me-1"></i> Exporter
-            </button> -->
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -88,8 +99,9 @@
                         <tr>
                             <th>Code</th>
                             <th>Date</th>
-                            <!-- <th>Type</th> -->
+                            <th>Type</th>
                             <th>Article</th>
+                            <th>Depôt</th>
                             <th>Unité</th>
                             <th class="text-end">Quantité</th>
                             <th class="text-end">Prix Unitaire</th>
@@ -102,7 +114,7 @@
                         <tr>
                             <td class="text-monospace">{{ $mouvement->code }}</td>
                             <td>{{ $mouvement->date_mouvement->format('d/m/Y') }}</td>
-                            <!-- <td>
+                            <td>
                                 @switch($mouvement->type_mouvement)
                                 @case('ENTREE')
                                 <span class="badge bg-success">Entrée</span>
@@ -119,12 +131,13 @@
                                 @default
                                 <span class="badge bg-secondary">Ajustement</span>
                                 @endswitch
-                            </td> -->
-                            <td>{{ $mouvement->article->designation }}</td>
-                            <td>{{ $mouvement->uniteMesure->libelle_unite }}</td>
+                            </td>
+                            <td>{{ $mouvement->article?->designation }} | {{$mouvement->article?->code_article}}</td>
+                            <td>{{ $mouvement->depot?->libelle_depot }}</td>
+                            <td>{{ $mouvement->uniteMesure?->libelle_unite }}</td>
                             <td class="text-end">{{ number_format($mouvement->quantite, 2, ',', ' ') }}</td>
-                            <!-- <td class="text-end">{{ number_format($mouvement->prix_unitaire, 0, ',', ' ') }} FCFA -->
-                            <td class="text-end">---</td>
+                            <td class="text-end">{{ number_format($mouvement->prix_unitaire, 0, ',', ' ') }} FCFA
+                                <!-- <td class="text-end">---</td> -->
                             <td>{{ $mouvement->document_type }} {{ $mouvement->document_id }}</td>
                             <td>{{ $mouvement->user->name }}</td>
                         </tr>
