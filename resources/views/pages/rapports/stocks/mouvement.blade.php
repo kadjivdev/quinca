@@ -106,6 +106,7 @@
                             <th class="text-end">Quantité</th>
                             <th class="text-end">Prix Unitaire</th>
                             <th>Document</th>
+                            <th>Commentaire</th>
                             <th>Utilisateur</th>
                         </tr>
                     </thead>
@@ -137,8 +138,10 @@
                             <td>{{ $mouvement->uniteMesure?->libelle_unite }}</td>
                             <td class="text-end">{{ number_format($mouvement->quantite, 2, ',', ' ') }}</td>
                             <td class="text-end">{{ number_format($mouvement->prix_unitaire, 0, ',', ' ') }} FCFA
-                                <!-- <td class="text-end">---</td> -->
                             <td>{{ $mouvement->document_type }} {{ $mouvement->document_id }}</td>
+                            <td>
+                                <textarea class="form-control">{{$mouvement->notes}}</textarea>
+                            </td>
                             <td>{{ $mouvement->user->name }}</td>
                         </tr>
                         @endforeach
