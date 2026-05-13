@@ -9,6 +9,7 @@ use App\Http\Requests\RequeteStock as RequestsRequeteStock;
 use App\Models\Catalogue\Article;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
+use App\Models\Stock\StockDepot;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +22,7 @@ class RequeteStockController extends Controller
      */
     public function index(Request $request)
     {
-        $requetesQuery = RequeteStock::with(["article", "depot", "uniteMesure", "createdBy", "validatedBy",'inventaire']);
+        $requetesQuery = RequeteStock::with(["article", "depot", "uniteMesure", "createdBy", "validatedBy", 'inventaire']);
 
         // query's conditions
         if ($request->get("filtre_article_id")) {
@@ -77,6 +78,11 @@ class RequeteStockController extends Controller
         Log::info("Début d'insertion de la requete stock");
         try {
             DB::beginTransaction();
+
+            if (!StockDepot::firstWhere(["depot_id" => $request->depot_id, "article_id" => $request->article_id])) {
+                throw new Exception("L'article n'existe pas dans ce depot", 1);
+            }
+
             $requete = RequeteStock::create($request->validated());
             DB::commit();
             Log::info("Requete de stock crée avec succès!", ["data" => $requete]);
@@ -138,6 +144,10 @@ class RequeteStockController extends Controller
 
         try {
             DB::beginTransaction();
+
+            if (!StockDepot::firstWhere(["depot_id" => $request->depot_id, "article_id" => $request->article_id])) {
+                throw new Exception("L'article n'existe pas dans ce depot", 1);
+            }
             Log::debug("Validated datas", ["data" => $request->validated()]);
 
             $requete = $requeteStock->update($request->validated());
