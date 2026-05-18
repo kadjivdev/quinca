@@ -150,7 +150,7 @@
                         @foreach($inventaires as $inventaire)
                         <tr>
                             <td class="text-nowrap py-3">
-                                <span class="badge bg-light text-dark numero-bl me-2">#{{$loop->iteration}} | ID: {{$inventaire->id}}</span>
+                                <span class="badge bg-light text-dark numero-bl me-2">{{$inventaire->id}}</span>
                             </td>
                             <td class="text-center"><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($inventaire->date_inventaire)->locale('fr')->isoFormat('D MMMM YYYY H:m:s')}}</span></td>
                             <td class="text-center"><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($inventaire->created_at)->locale('fr')->isoFormat('D MMMM YYYY H:m:s')}}</span></td>
@@ -196,6 +196,9 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "pageLength": 15,
+        "order": [
+            [0, 'desc']
+        ],
         language: {
             "emptyTable": "Aucune donnée disponible dans le tableau",
             "lengthMenu": "Afficher _MENU_ éléments",
