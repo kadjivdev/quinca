@@ -53,7 +53,7 @@
                         <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteDepart,2,"."," ")}} </span></td>
                         <td><span class="badge bg-light text-dark">({{$article->inventUniteMesure}}) </span></td>
-                        <td><span class="badge bg-light text-dark">{{Carbon\carbon::parse($article->inventaire_date)->locale('fr')->isoFormat("D MMMM YYYY H:m:s")}} </span></td>
+                        <td><span class="badge bg-light text-dark">{{$article->inventaire?->id}} | {{Carbon\carbon::parse($article->inventaire_date)->locale('fr')->isoFormat("D MMMM YYYY H:m:s")}} </span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->qteAppro,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->stockDisponible,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">{{$article->unite_mesure}}</span></td>

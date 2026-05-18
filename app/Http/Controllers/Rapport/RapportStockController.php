@@ -233,9 +233,12 @@ class RapportStockController extends Controller
 
                 $lastInventaire = $article->lastInventaireDetail($depot->id);
 
+                $article->inventaire = $lastInventaire?->inventaire;
+
                 // unite de mesure inventorié
                 $article->inventUniteMesure = $lastInventaire?->stockDepot?->uniteMesure?->libelle_unite;
-                // // qte de depart
+
+                // qte de depart
                 $article->qteDepart = $lastInventaire?->qte_reel ?? 0;
 
                 // inventaire date
