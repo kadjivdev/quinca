@@ -239,7 +239,7 @@ class RapportStockController extends Controller
                 $article->qteDepart = $lastInventaire?->qte_reel ?? 0;
 
                 // inventaire date
-                $article->inventaire_date = $lastInventaire?->created_at;
+                $article->inventaire_date = $lastInventaire?->inventaire?->created_at;
 
                 // qte approvisionnee
                 $article->qteAppro = $article->stocks()?->firstWhere("depot_id", $depot->id)?->quantite_reelle - $article->qteDepart; // $articleStocks->sum("quantite_reelle") - $article->qteDepart;

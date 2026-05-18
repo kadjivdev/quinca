@@ -111,7 +111,10 @@ class Article extends Model
     function lastInventaireDetail($depotId)
     {
         return DetailInventaire::whereHas("stockDepot", function ($query) use ($depotId) {
-            $query->where(["depot_id" => $depotId, "article_id" => $this->id]);
+            $query->where([
+                "depot_id" => $depotId,
+                "article_id" => $this->id
+            ]);
         })->latest()->first();
     }
 
