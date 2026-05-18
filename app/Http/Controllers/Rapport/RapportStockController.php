@@ -192,9 +192,12 @@ class RapportStockController extends Controller
                             ->whereNotNull("validated_at");
 
                         /**Qte de requete */
-                        $stock->qantiteRequete = $requeteQuery
-                            ->get()
-                            ->sum("quantite");
+                        // $stock->qantiteRequete = $requeteQuery
+                        //     ->get()
+                        //     ->sum("quantite");
+
+                        $stock->qantiteRequete = $stock->quantite_requete;
+
 
                         // $conversion ? $this->serviceEntree
                         //     ->convertirQuantite(

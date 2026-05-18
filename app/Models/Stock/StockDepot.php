@@ -18,6 +18,8 @@ class StockDepot extends Model
 {
     use SoftDeletes;
 
+    protected $appends = ["quantite_requete"];
+
     protected $fillable = [
         'depot_id',
         'article_id',

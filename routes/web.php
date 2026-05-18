@@ -41,14 +41,8 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    RequeteStock::where("depot_id", 1)->update(["inventaire_id" => 355]);
-    return "regularisation des requetes stocks du depot de PARAKOU";
-
-    // $FAC_20260424_0018 = FactureClient::with("lignes")->firstWhere("numero", "FAC-20260424-0018");
-    // return $FAC_20260424_0018->lignes;
-    // $facturesParakou = FactureRevendeur::with("lignes.facturedepot", "createdBy", "pointDeVente")
-    //     ->whereBetween('created_at', ['2026-04-24 09:30:00', '2026-04-28 00:00:00']);
-
+    $factureClients = FactureClient::where("inventaire_id", 345)->get();
+    return $factureClients;
 });
 
 /**DETELE A STOCK */

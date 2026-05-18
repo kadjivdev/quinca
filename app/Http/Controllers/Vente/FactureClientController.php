@@ -11,6 +11,7 @@ use App\Models\Parametre\PointDeVente;
 use App\Models\Vente\{FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
+use App\Models\RequeteStock;
 use App\Models\Stock\StockDepot;
 use App\Models\Zone;
 use Illuminate\Http\Request;
@@ -832,7 +833,7 @@ class FactureClientController extends Controller
     public function searchArticles(Request $request)
     {
         $search = $request->get('q');
-        Log::info("Terme de recherche gogo:", ["terme" => $search]);
+        Log::info("Terme de recherche :", ["terme" => $search]);
         $user = auth()->user();
 
         $stocks = StockDepot::with('article.uniteMesure', 'depot')
@@ -880,19 +881,16 @@ class FactureClientController extends Controller
 
                 /**Qte de requete */
                 $stock->qantiteRequete = $stock->quantite_requete;
-                // $conversion ? $this->serviceStockEntree
-                //     ->convertirQuantite(
-                //         $stock->quantite_requete,
-                //         $conversion,
-                //         $stock->unite_mesure_id
-                //     ) : 00;
 
                 /**Qte Vendue */
-                // $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+                /**
+                 * on precise true pour préciser que c'est toutes les ventes(validée ou pas) qui sont considerées
+                 * */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id, true);
 
                 /**Qte Reste */
                 $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
+
                 Log::debug("La quantite requete :", ["qte" => $stock->qantiteRequete]);
                 Log::debug("La quantite reste :", ["qteReste" => $resteStock]);
                 // $resteStock = $qantiteBase - $qteTotalVendu; //$article->reste($stock->depot_id);

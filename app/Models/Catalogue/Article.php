@@ -321,9 +321,9 @@ class Article extends Model
             });
 
         // Appliquer le filtre seulement si $depotId existe
-        if (!is_null($depotId)) {
-            $query->where("depot", $depotId);
-        }
+        // if (!is_null($depotId)) {
+        //     $query->where("depot", $depotId);
+        // }
 
         return $query->get();
     }
