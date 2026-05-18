@@ -485,7 +485,6 @@
                         </a></li>
                     @endcan
 
-
                     @can('rapports.mouvement-stock.view')
                     <li><a class="dropdown-item" href="{{ route('rapports.historique-stock') }}">
                             <div class="dropdown-item-wrapper">Historique des Stocks</div>
@@ -493,6 +492,10 @@
 
                     <li><a class="dropdown-item" href="{{ route('rapports.mouvement-stock') }}">
                             <div class="dropdown-item-wrapper">Mouvements de Stock</div>
+                        </a></li>
+
+                    <li><a class="dropdown-item" href="{{ route('rapports.resume-stock') }}">
+                            <div class="dropdown-item-wrapper">Résumé de Stock</div>
                         </a></li>
                     @endcan
 

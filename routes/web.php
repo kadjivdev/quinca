@@ -1139,6 +1139,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/stock-mouvements', [RapportStockController::class, 'mouvementReport'])
             ->name('rapports.mouvement-stock');
 
+        Route::get('/stock-resumes', [RapportStockController::class, 'resumeStocks'])
+            ->name('rapports.resume-stock');
+
         Route::get('/stock-dispo', [RapportStockController::class, 'rapportStockDisponible'])
             ->name('rapports.stock-dispo');
 

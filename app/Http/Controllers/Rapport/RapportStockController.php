@@ -93,6 +93,37 @@ class RapportStockController extends Controller
             });
     }
 
+    /**Resumes des stocks par article */
+    function resumeStocks(Request $request)
+    {
+        if ($request->depot_id) {
+            $depot = Depot::find($request->depot_id);
+        } else {
+            $depot = Depot::find(1);
+        }
+
+        // date de filtre
+        if ($request->date_ftr) {
+            session()->put("date_ftr", Carbon::parse($request->date_ftr));
+        } else {
+            session()->forget("date_ftr");
+        }
+
+        $date_ftr = session()->get("date_ftr");
+        $depots = Depot::all();
+
+        return "En cours de développement......";
+
+        $stocks = StockDepot::with(["article", "depot", "uniteMesure"])
+            ->get()
+            ->groupBy('article_id')
+            ->flatten();
+
+        return $stocks;
+
+        return view('pages.rapports.stocks.resume-stocks', compact('stocks', 'depot', "depots", "date_ftr"));
+    }
+
     /**
      * Historiques des stocks
      */
@@ -220,7 +251,6 @@ class RapportStockController extends Controller
 
                 return $article;
             });
-
 
             $depots = Depot::all();
             return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr"));

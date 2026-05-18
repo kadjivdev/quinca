@@ -1,200 +1,108 @@
-@extends('layouts.parametre.point_vente')
+@extends('layouts.rapport.facture')
+
+@section('title', ' Résumé des stocks')
+@section('content')
+<br><br>
+<div class="col-12">
+    <div class="card p-3 border-0 shadow-sm">
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <form action="" method="get">
+                    <div class="mb-3">
+                        <select name="depot_id" class="form-control" id="depot_select" required>
+                            @foreach($depots as $dep)
+                            <option value="{{$dep->id}}" @selected($dep->id==$depot->id)>{{$dep->libelle_depot}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="">
+                        <input type="date" name="date_ftr" class="form-control">
+                    </div>
+                    <br>
+                    <button class="btn btn-success w-100">Rechercher....</button>
+                </form>
+            </div>
+        </div>
+
+        <br>
+        <h4 class="">Résumé du stock du dépôt : <span class="badge bg-light rounded borded text-success">{{$depot->libelle_depot}} @if($date_ftr) - Date filtrée : {{\Carbon\Carbon::parse($date_ftr)->format('d/m/Y')}} @endif </span> </h4>
+
+        <div class="table-responsive">
+            <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="border-bottom-0">Code</th>
+                        <th class="border-bottom-0 text-center">Désignation</th>
+                        <th class="border-bottom-0">Stock départ</th>
+                        <th class="border-bottom-0">Mesure inventaire</th>
+                        <th class="border-bottom-0">Inventorié le:</th>
+                        <th class="border-bottom-0">Approvisionné</th>
+                        <th class="border-bottom-0">Stock disponible</th>
+                        <th class="border-bottom-0">Unité de Stock</th>
+                        <th class="border-bottom-0">Stock Requête</th>
+                        <th class="border-bottom-0">Vente</th>
+                        <th class="border-bottom-0">Unité de vente</th>
+                        <th class="border-bottom-0">Stock final</th>
+                        <th class="border-bottom-0">Unité</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($stocks as $articleId=>$stockResume)
+                    <tr>
+                        <td><span class="badge bg-light text-dark">{{$article->code_article}}</span></td>
+                        <td class="text-center"><span class="badge bg-light text-dark"> {{$article->designation}} </span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qteDepart,2,"."," ")}} </span></td>
+                        <td><span class="badge bg-light text-dark">({{$article->inventUniteMesure}}) </span></td>
+                        <td><span class="badge bg-light text-dark">{{Carbon\carbon::parse($article->inventaire_date)->locale('fr')->isoFormat("D MMMM YYYY H:m:s")}} </span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qteAppro,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->stockDisponible,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{$article->unite_mesure}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qantiteRequete,2,"."," ")}} ({{$article->uniteMesure?->libelle_unite}})</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->qteTotalVendu,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,"."," ")}}</span></td>
+                        <td><span class="badge bg-light text-dark">({{$article->uniteMesure?->libelle_unite}})</span></td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@endsection
 
 @push('styles')
-@include('pages.parametre.depot.partials.styles')
-
 <style>
-    .page-header {
-        background: #fff;
-        padding: 1rem 1.25rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
+    .text-monospace {
+        font-family: 'Monaco', 'Consolas', monospace;
     }
 
-    .header-icon {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: rgba(var(--bs-primary-rgb), 0.1);
-        border-radius: 0.5rem;
+    .table-responsive {
+        min-height: 300px;
     }
 
-    .header-pretitle {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #6c757d;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-    }
-
-    .header-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #2c3e50;
-        margin: 0;
-    }
-
-    .btn-primary {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        border-radius: 0.375rem;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        transition: all 0.15s ease-in-out;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Animation subtile pour l'icône */
-    .header-icon i {
-        transition: transform 0.2s ease;
-    }
-
-    .header-icon:hover i {
-        transform: scale(1.1);
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 576px) {
-        .page-header {
-            padding: 0.75rem 1rem;
-        }
-
-        .header-icon {
-            width: 35px;
-            height: 35px;
-        }
-
-        .header-title {
-            font-size: 1rem;
-        }
-
-        .btn-primary {
-            padding: 0.4rem 0.75rem;
-        }
+    .badge {
+        font-size: 85%;
     }
 </style>
 @endpush
 
-@section('content')
-<div class="content">
-
-    {{-- En-tête de la page --}}
-    <div class="page-header">
-        <div class="container-fluid p-0">
-            <div class="d-flex align-items-center justify-content-between">
-                {{-- Section gauche --}}
-                <div class="d-flex align-items-center gap-3">
-                    <div class="header-icon">
-                        <i class="fas fa-warehouse fs-4 text-primary"></i>
-                    </div>
-                    <div>
-                        <div class="header-pretitle">{{ $date }}</div>
-                        <h6 class="header-title mb-0">Gestion des inventaires</h6>
-                    </div>
-                </div>
-
-                {{-- Section droite --}}
-                @can("inventaires.create")
-                <button type="button" class="btn btn-warning btn-sm d-flex align-items-center" id="showAddInventaireModalBtn">
-                    <i class="fas fa-plus me-2"></i>
-                    Ajouter un Inventaire
-                </button>
-                @endcan
-            </div>
-        </div>
-    </div>
-
-    {{-- Liste des dépôts --}}
-    <div class="row g-3 list mt-3" id="depotsList">
-        <!-- les erreurs -->
-        @if($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
-        @if(session()->has("success"))
-        <div class="alert alert-success">{{session()->get("success")}}</div>
-        @elseif(session()->has("error"))
-        <div class="alert alert-danger">{{session()->get("error")}}</div>
-        @endif
-
-        <div class="card">
-            <div class="card-header">
-                <h6 class="modal-title fs-5" id="">Dépôt : <span class="badge bg-warning depot-title"> ID: {{$depot?->id}} | {{$depot?->libelle_depot}}</span></h6>
-            </div>
-            <div class="card-body">
-                <table class="table table-hover align-middle mb-0" id="example1">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="border-bottom-0 text-nowrap py-3">N°</th>
-                            <th class="border-bottom-0 text-center">Date Inventaire</th>
-                            <th class="border-bottom-0 text-center">Inserée le</th>
-                            <th class="border-bottom-0 text-center">Auteur</th>
-                            <th class="border-bottom-0 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="">
-                        @foreach($inventaires as $inventaire)
-                        <tr>
-                            <td class="text-nowrap py-3">
-                                <span class="badge bg-light text-dark numero-bl me-2">#{{$loop->iteration}} | ID: {{$inventaire->id}}</span>
-                            </td>
-                            <td class="text-center"><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($inventaire->date_inventaire)->locale('fr')->isoFormat('D MMMM YYYY H:m:s')}}</span></td>
-                            <td class="text-center"><span class="badge bg-light text-dark">{{\Carbon\carbon::parse($inventaire->created_at)->locale('fr')->isoFormat('D MMMM YYYY H:m:s')}}</span></td>
-                            <td class="text-center"><span class="badge bg-light text-dark"> {{$inventaire->auteur?->name}} </span></td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="w-100 btn btn-icon btn-light" type="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li>
-                                            <a target="__blank" class="dropdown-item text-dark" href="{{route('depot.inventaire.details',$inventaire->id)}}">
-                                                <i class="fa fa-eye"></i> Voir les détails
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item text-danger" href="{{route('depot.inventaireDelete',$inventaire->id)}}">
-                                                <i class="far fa-trash-alt me-2"></i>
-                                                Supprimer
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    @include('pages.parametre.depot.partials.add-inventaire-modal')
-</div>
-@endsection
 
 <!-- DATATABLES -->
 @push('scripts')
 <script>
+    $(document).ready(function() {
+        $("#depot_select").select2();
+    });
+
     $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
+        // "order": [
+        //     [7, 'asc']
+        // ],
         "pageLength": 15,
         language: {
             "emptyTable": "Aucune donnée disponible dans le tableau",
