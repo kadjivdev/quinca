@@ -50,7 +50,7 @@ class RequeteStock extends Model
      */
     public function getCreatedAtAttribute($value)
     {
-        return Carbon::parse($value)->locale("fr")->isoFormat("D MMMM YYYY");
+        return Carbon::parse($value)->locale("fr")->isoFormat("D MMMM YYYY H:m:s");
     }
 
     public function getValidatedAtAttribute($value)

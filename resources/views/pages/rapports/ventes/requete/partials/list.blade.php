@@ -10,6 +10,7 @@
                         <tr>
                             <th class="border-bottom-0">N°</th>
                             <th class="border-bottom-0">Reference</th>
+                            <th class="border-bottom-0">Insérée le:</th>
                             <th class="border-bottom-0">Article</th>
                             <th class="border-bottom-0">Dépôt</th>
                             <th class="border-bottom-0">Unité Mesure</th>
@@ -17,7 +18,6 @@
                             <th class="border-bottom-0">Preuve</th>
                             <th class="border-bottom-0">Commentaire</th>
                             <th class="border-bottom-0">Insérée par:</th>
-                            <th class="border-bottom-0">Insérée le:</th>
                             <th class="border-bottom-0">Validée par:</th>
                             <th class="border-bottom-0">Validée le:</th>
                             <th class="border-bottom-0">Action</th>
@@ -33,6 +33,7 @@
                                 <span class="badge bg-light text-warning rounded">Inventorié: {{$requete->inventaire_id}}</span>
                                 @endif
                             </td>
+                            <td><span class="badge bg-light text-dark border rounded">{{$requete->created_at}}</span></td>
                             <td> {{ $requete->article?->code_article }} {{ $requete->article?->designation }}</td>
                             <td> {{ $requete->depot?->code_depot }} {{ $requete->depot?->libelle_depot }}</td>
                             <td>{{ $requete->uniteMesure?->libelle_unite }} ({{$requete->uniteMesure?->code_unite}})</td>
@@ -42,7 +43,6 @@
                                 <textarea rows="2" placeholder="{{$requete->commentaire}}" class="form-control"></textarea>
                             </td>
                             <td><span class="badge bg-light text-dark border rounded">{{$requete->createdBy?->name ?? '---'}}</span></td>
-                            <td><span class="badge bg-light text-dark border rounded">{{$requete->created_at}}</span></td>
 
                             <td><span class="badge bg-light text-dark border rounded">{{$requete->validatedBy?->name ?? '---'}}</span></td>
                             <td><span class="badge bg-light text-dark border rounded">{{$requete->validated_at}}</span></td>
@@ -134,9 +134,9 @@
         "lengthChange": false,
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
-        "order": [
-            [0, 'desc']
-        ],
+        // "order": [
+        //     [0, 'desc']
+        // ],
         "pageLength": 15,
         language: {
             "emptyTable": "Aucune donnée disponible dans le tableau",

@@ -7,6 +7,14 @@
             @csrf
             <div class="row">
                 <div class="col-6">
+                    <select class="form-select form-control _select2-form" name="depot_id" id="">
+                        <option value="">Sélectionner un dépôt</option>
+                        @foreach($depots as $depot)
+                        <option value="{{$depot->id}}">{{$depot->libelle_depot}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-6">
                     <select class="form-select form-control _select2-form" name="point_vente_id" id="">
                         <option value="">Sélectionner un point de vente</option>
                         @foreach($pointsVentes as $pointVente)
@@ -14,6 +22,9 @@
                         @endforeach
                     </select>
                 </div>
+            </div>
+            <br>
+            <div class="row">
                 <div class="col-6">
                     <select class="form-select form-control _select2-form" name="client_id" id="">
                         <option value="">Sélectionner un client</option>
@@ -22,10 +33,7 @@
                         @endforeach
                     </select>
                 </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-12">
+                <div class="col-6">
                     <select class="form-select form-control _select2-form" name="zone_id" id="">
                         <option value="">Sélectionner une zone</option>
                         @foreach($zones as $zone)
@@ -104,7 +112,7 @@
                             </td>
                             <td class="border p-0">
                                 <ul class="m-0" style="width:100%;height:100px!important;overflow-y:scroll;">
-                                    @forelse($facture->lignes as $ligne)
+                                    @forelse($facture->lignes->unique("id")->values() as $ligne)
                                     <li class="bg-light text-dark rounded p-2" style="list-style-type: none">
                                         <span class="badge d-block text-dark">{{$ligne->facturedepot?->libelle_depot}}</span>
                                     </li>

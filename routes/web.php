@@ -24,11 +24,10 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
-use App\Models\Parametre\Depot;
 use App\Models\RequeteStock;
-use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
+use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,8 +40,38 @@ use App\Models\Vente\FactureClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $factureClients = FactureClient::where("inventaire_id", 345)->get();
-    return $factureClients;
+
+    // les requetes
+    RequeteStock::whereNull('inventaire_id')
+        ->where('depot_id', 3)
+        ->whereBetween('created_at', [
+            Carbon::create(2026, 1, 1)->startOfDay(), // 1 er janvier
+            Carbon::create(2026, 3, 22)->endOfDay(), // 22 Mars 
+        ])
+        ->update(["inventaire_id" => 302]);
+
+    // les ventes
+    FactureClient::whereNull("inventaire_id")
+        ->whereHas('lignes', function ($ligne) {
+            $ligne->where('depot', 3);
+        })
+        ->whereBetween('created_at', [
+            Carbon::create(2026, 1, 1)->startOfDay(), // 1 er janvier
+            Carbon::create(2026, 3, 22)->endOfDay(), // 22 Mars 
+        ])
+        ->update(["inventaire_id" => 302]); //attachement des ventes de la période à l'inventaire
+
+    FactureClient::query()
+        ->whereHas('lignes', function ($ligne) {
+            $ligne->where('depot', 3);
+        })
+        ->whereBetween('created_at', [
+            Carbon::create(2026, 3, 23)->endOfDay(), // 22 Mars 
+            now(), // maintenant
+        ])
+        ->update(["inventaire_id" => null]); //dettachement des ventes de la période à l'inventaire;
+
+    return "regularisation éffectuée avec succès!";
 });
 
 /**DETELE A STOCK */

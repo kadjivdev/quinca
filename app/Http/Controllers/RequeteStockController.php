@@ -22,7 +22,8 @@ class RequeteStockController extends Controller
      */
     public function index(Request $request)
     {
-        $requetesQuery = RequeteStock::with(["article", "depot", "uniteMesure", "createdBy", "validatedBy", 'inventaire']);
+        $requetesQuery = RequeteStock::with(["article", "depot", "uniteMesure", "createdBy", "validatedBy", 'inventaire'])
+            ->orderByDesc("created_at");
 
         // query's conditions
         if ($request->get("filtre_article_id")) {
