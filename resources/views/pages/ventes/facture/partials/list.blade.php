@@ -14,14 +14,14 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-6">
+                <!-- <div class="col-6">
                     <select class="form-select form-control _select2-form" name="point_vente_id" id="">
                         <option value="">Sélectionner un point de vente</option>
                         @foreach($pointsVentes as $pointVente)
                         <option value="{{$pointVente->id}}" class="">{{$pointVente->nom_pv}} ({{$pointVente->id}})</option>
                         @endforeach
                     </select>
-                </div>
+                </div> -->
             </div>
             <br>
             <div class="row">
