@@ -45,15 +45,17 @@ class ArticleController extends Controller
         $query = Article::with("stocks")->orderBy('id');
 
         if ($request->depot && $request->depot != 'tous') {
-            $articles = $query->get()->filter(function ($article) use ($request) {
-                $depotIds = $article->stocks->pluck("depot_id");
+            $articles = $query
+                ->get()->filter(function ($article) use ($request) {
+                    $depotIds = $article->stocks->pluck("depot_id");
 
-                foreach ($depotIds as $depotId) {
-                    return $request->depot == $depotId;
-                }
-            });
+                    foreach ($depotIds as $depotId) {
+                        return $request->depot == $depotId;
+                    }
+                });
         } else {
-            $articles = $query->get();
+            $articles = $query
+                ->get();
         }
 
         $articles->map(function ($article) {

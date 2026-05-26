@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MouvementsStockExport;
+use App\Models\Catalogue\Article;
 use App\Models\RequeteStock;
 use Illuminate\Support\Facades\Log;
 use PDF;
@@ -211,20 +212,14 @@ class RapportStockController extends Controller
                         // $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
 
                         /**Qte Vendue */
-                        $stock->qteTotalVendu = session()->get("date_ftr") ?
-                            $article->qteVenduAtDate($stock->depot_id, session()->get("date_ftr")) : $article->qteVendu($stock->depot_id);
+                        // $stock->qteTotalVendu = session()->get("date_ftr") ?
+                        //     $article->qteVenduAtDate($stock->depot_id, session()->get("date_ftr")) : $article->qteVendu($stock->depot_id);
+
+                        $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
 
                         /**Reste en stock */
                         // $stock->resteStock = $stock->quantite_reelle - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
                         $stock->resteStock = ($stock->quantite_reelle + $stock->qantiteRequete) - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
-
-                        if ($article->code_article === "ART-805") {
-                            Log::debug("Debug ART-805", [
-                                "qteRelle" => $stock->quantite_reelle,
-                                "qteVendu" => $stock->qteTotalVendu,
-                                "resteStock" => $stock->resteStock
-                            ]);
-                        }
                     });
 
                 $article->qantiteRequete = $articleStocks->sum("qantiteRequete");
@@ -257,6 +252,8 @@ class RapportStockController extends Controller
 
                 return $article;
             });
+
+            // return $articles->pluck("inventaire");
 
             $depots = Depot::all();
             return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr"));

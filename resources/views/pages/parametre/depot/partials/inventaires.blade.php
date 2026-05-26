@@ -166,12 +166,12 @@
                                                 <i class="fa fa-eye"></i> Voir les détails
                                             </a>
                                         </li>
-                                        <li>
+                                        <!-- <li>
                                             <a class="dropdown-item text-danger" href="{{route('depot.inventaireDelete',$inventaire->id)}}">
                                                 <i class="far fa-trash-alt me-2"></i>
                                                 Supprimer
                                             </a>
-                                        </li>
+                                        </li> -->
                                     </ul>
                                 </div>
                             </td>

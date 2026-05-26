@@ -11,6 +11,7 @@ use App\Models\Parametre\TypeDepot;
 use App\Models\RequeteStock;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
+use App\Models\Stock\StockMouvement;
 use App\Models\Vente\FactureClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -472,6 +473,11 @@ class DepotController extends Controller
 
             // classement des requetes stocks
             RequeteStock::where("depot_id", $depotId)
+                ->whereNull("inventaire_id")
+                ->update(["inventaire_id" => $inventaire->id]);
+
+            // classement des stocks mouvement
+            StockMouvement::where("depot_id", $depotId)
                 ->whereNull("inventaire_id")
                 ->update(["inventaire_id" => $inventaire->id]);
 

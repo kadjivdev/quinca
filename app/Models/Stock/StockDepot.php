@@ -2,6 +2,7 @@
 
 namespace App\Models\Stock;
 
+use App\Models\Achat\BonLivraisonFournisseur;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -76,6 +77,11 @@ class StockDepot extends Model
     public function uniteMesure(): BelongsTo
     {
         return $this->belongsTo(UniteMesure::class, "unite_mesure_id");
+    }
+
+    public function livraison(): BelongsTo
+    {
+        return $this->belongsTo(BonLivraisonFournisseur::class, "livraison");
     }
 
     // mouvements

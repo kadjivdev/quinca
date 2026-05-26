@@ -20,11 +20,18 @@ class LigneMarchandise extends Model
         'prix_unitaire',
     ];
 
-    function article() : BelongsTo {
-        return $this->belongsTo(Article::class,"article_id");
+    function article(): BelongsTo
+    {
+        return $this->belongsTo(Article::class, "article_id");
     }
 
-    function uniteVente() : BelongsTo {
-        return $this->belongsTo(UniteMesure::class,"unite_vente_id");
+    function uniteVente(): BelongsTo
+    {
+        return $this->belongsTo(UniteMesure::class, "unite_vente_id");
+    }
+
+    function marchandBack(): BelongsTo
+    {
+        return $this->belongsTo(MarchandBack::class, "marchandise");
     }
 }

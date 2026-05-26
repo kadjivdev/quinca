@@ -20,7 +20,13 @@ class DetailInventaire extends Model
         'stock_depot_id'
     ];
 
-    function stockDepot() : BelongsTo {
-        return $this->belongsTo(StockDepot::class,'stock_depot_id');
+    function stockDepot(): BelongsTo
+    {
+        return $this->belongsTo(StockDepot::class, 'stock_depot_id');
+    }
+
+    function inventaire(): BelongsTo
+    {
+        return $this->belongsTo(Inventaire::class, "inventaire_id");
     }
 }

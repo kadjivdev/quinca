@@ -36,6 +36,11 @@ class Inventaire extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function deletedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+
     // à revoir
     public function depots()
     {

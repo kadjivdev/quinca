@@ -28,7 +28,9 @@ class StockMouvement extends Model
         'depot_source_id',
         'depot_dest_id',
         'user_id',
-        'notes'
+        'notes',
+
+        'inventaire_id'
     ];
 
     protected $casts = [

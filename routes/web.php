@@ -24,9 +24,16 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
+use App\Models\Achat\BonLivraisonFournisseur;
+use App\Models\Achat\LigneBonLivraisonFournisseur;
+use App\Models\Catalogue\Article;
+use App\Models\Catalogue\DetailInventaire;
+use App\Models\Catalogue\Inventaire;
 use App\Models\RequeteStock;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
+use App\Models\Vente\LigneFacture;
+use App\Models\Vente\LigneMarchandise;
 use Carbon\Carbon;
 
 /*
@@ -41,35 +48,94 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    // les requetes
-    RequeteStock::whereNull('inventaire_id')
-        ->where('depot_id', 3)
-        ->whereBetween('created_at', [
-            Carbon::create(2026, 1, 1)->startOfDay(), // 1 er janvier
-            Carbon::create(2026, 3, 22)->endOfDay(), // 22 Mars 
-        ])
-        ->update(["inventaire_id" => 302]);
+    // return Article::firstWhere("code_article","ART-1545");
 
-    // les ventes
-    FactureClient::whereNull("inventaire_id")
-        ->whereHas('lignes', function ($ligne) {
-            $ligne->where('depot', 3);
-        })
-        ->whereBetween('created_at', [
-            Carbon::create(2026, 1, 1)->startOfDay(), // 1 er janvier
-            Carbon::create(2026, 3, 22)->endOfDay(), // 22 Mars 
-        ])
-        ->update(["inventaire_id" => 302]); //attachement des ventes de la période à l'inventaire
+    // return DetailInventaire::whereHas("stockDepot.article", function ($query) {
+    //     $query->where(["article_id" => 619]);
+    // })
+    //     ->with(["stockDepot.article","stockDepot.depot"])
+    //     ->get();
 
-    FactureClient::query()
-        ->whereHas('lignes', function ($ligne) {
-            $ligne->where('depot', 3);
-        })
-        ->whereBetween('created_at', [
-            Carbon::create(2026, 3, 23)->endOfDay(), // 22 Mars 
-            now(), // maintenant
-        ])
-        ->update(["inventaire_id" => null]); //dettachement des ventes de la période à l'inventaire;
+    // return StockDepot::where(["article_id" => 619])
+    //     // ->with("article", "depot", "uniteMesure", "livraison.facture.lignes")
+    //     ->with("article", "depot")
+    //     ->get();
+
+    // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
+    //     ->whereHas("lignes", function ($query) {
+    //         $query->where(["article_id" => 1544, "depot_id" => 4]);
+    //     })
+    //     ->whereNotNull("validated_at")
+    //     ->whereBetween('created_at', [
+    //         Carbon::create(2026, 3, 1)->startOfDay(), // 1 Mars 
+    //         now(), // maintenant
+    //     ])
+    //     ->get();
+
+    // $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 1544)
+    //     ->with("bonLivraison", "uniteMesure")
+    //     ->whereHas("bonLivraison", function ($query) {
+    //         $query->where("depot_id", 4)
+    //             ->whereNotNull("validated_at");
+    //     })
+    //     ->whereBetween('created_at', [
+    //         Carbon::create(2026, 3, 1)->startOfDay(), // 1 Mars 
+    //         now(), // maintenant
+    //     ])
+    //     ->get();
+
+    // return $lignesBonLivraison;
+
+    // retour des marchandises
+    // $backLignes = LigneMarchandise::with("marchandBack", "article")
+    //     ->whereHas("marchandBack", function ($query) {
+    //         $query->where("depot_id", 4)
+    //             ->whereNotNull("validated_by");
+    //     })
+    //     // ->where("article_id", 383)
+    //     ->get();
+
+    // return $backLignes->pluck("article.code_article");
+
+    // regularisation des ventes du magasin 2 Cotonou
+    // FactureClient::whereNull("inventaire_id")
+    //     ->whereHas('lignes', function ($ligne) {
+    //         $ligne->where('depot', 4); //magasin 2
+    //     })
+    //     ->whereBetween('created_at', [
+    //         Carbon::create(2025, 1, 1)->startOfDay(), // 1 er janvier 2025
+    //         Carbon::create(2026, 3, 1)->endOfDay(), // 01 Mars  2026
+    //     ])
+    //     ->update(["inventaire_id" => 289]); //attachement des ventes de la période à l'inventaire 289 fini inseré en mars
+
+    // $lignesVentes = LigneFacture::where("article_id", 1546)
+    //     ->where("depot", 4)
+    //     ->with("article", "factureClient", "facturedepot", "uuniteVente")
+    //     ->whereHas("factureClient", function ($query) {
+    //         $query
+    //             ->whereNotNull("validated_by")
+    //             ->whereNull("inventaire_id");
+    //     })
+    //     ->whereBetween('created_at', [
+    //         Carbon::create(2026, 3, 1)->startOfDay(), // 1 Mars 
+    //         now(), // maintenant
+    //     ])
+    //     ->get();
+
+    // return $lignesVentes->sum("quantite_base");
+
+
+    // $requetesQuery = RequeteStock::with("article", "depot")->where([
+    //     "article_id" => 1544,
+    //     "depot_id" => 4
+    // ])
+    //     // ->whereBetween('created_at', [
+    //     //     Carbon::create(2025, 1, 1)->startOfDay(), // 1 er janvier 2025
+    //     //     Carbon::create(2026, 3, 1)->endOfDay(), // 01 Mars  2026
+    //     // ])
+    // ;
+
+    // return $requetesQuery->get();
 
     return "regularisation éffectuée avec succès!";
 });

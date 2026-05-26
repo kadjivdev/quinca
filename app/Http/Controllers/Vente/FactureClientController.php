@@ -11,7 +11,6 @@ use App\Models\Parametre\PointDeVente;
 use App\Models\Vente\{FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
-use App\Models\RequeteStock;
 use App\Models\Stock\StockDepot;
 use App\Models\Zone;
 use Illuminate\Http\Request;
@@ -326,9 +325,10 @@ class FactureClientController extends Controller
             Log::info('Début création facture', ['request' => $request->all()]);
 
             // Vérifications initiales
-            $sessionCaisse =  SessionCaisse::ouverte()
-                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                ->first();
+            $sessionCaisse = SessionCaisse::find(12);
+            //   SessionCaisse::ouverte()
+            //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+            //     ->first();
 
             if (!$sessionCaisse) {
                 return response()->json([

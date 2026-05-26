@@ -28,7 +28,7 @@
                                     <span class="fw-semibold text-warning">{{ $livraison->code }}</span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="fw-semibold text-warning">{{ $livraison->facture?->bonCommande->code }}</span>
+                                    <span class="fw-semibold text-warning">{{ $livraison->facture?->bonCommande?->code ?? '---' }}</span>
                                 </td>
                                 <td class="px-4 py-3">
                                     <span class="fw-semibold text-warning">{{ $livraison->facture?->code }}</span>

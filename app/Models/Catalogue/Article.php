@@ -278,14 +278,20 @@ class Article extends Model
 
     function facturesVente($depotId = null)
     {
-
-        return $this->hasMany(LigneFacture::class, "article_id")
-            ->where("depot", $depotId)
+        $query = $this->hasMany(LigneFacture::class, "article_id")
+            // ->where("depot", $depotId)
             ->whereHas("factureClient", function ($query) {
                 $query
                     ->whereNotNull("validated_by")
                     ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
-            })->get();
+            });
+
+             // Appliquer le filtre seulement si $depotId existe
+        if (!is_null($depotId)) {
+            $query->where("depot", $depotId);
+        }
+
+        return $query->get();
     }
 
     /**
@@ -294,7 +300,7 @@ class Article extends Model
     function facturesVenteRevendeur($depotId = null)
     {
         $query = $this->hasMany(LigneFactureRevendeur::class, "article_id")
-            ->where("depot", $depotId)
+            // ->where("depot", $depotId)
             ->whereHas("factureRevendeur", function ($query) {
                 $query
                     ->whereNotNull("validated_by")
@@ -313,7 +319,7 @@ class Article extends Model
     {
 
         $query = $this->hasMany(LigneFacture::class, "article_id")
-            ->where("depot", $depotId)
+            // ->where("depot", $depotId)
             ->whereHas("factureClient", function ($query) {
                 $query
                     // ->whereNotNull("validated_by")
@@ -321,9 +327,9 @@ class Article extends Model
             });
 
         // Appliquer le filtre seulement si $depotId existe
-        // if (!is_null($depotId)) {
-        //     $query->where("depot", $depotId);
-        // }
+        if (!is_null($depotId)) {
+            $query->where("depot", $depotId);
+        }
 
         return $query->get();
     }
@@ -381,14 +387,13 @@ class Article extends Model
     function qteVendu($depotId = null, $all = false)
     {
         //Vente à la directeur
-        $factureVentes = $all ? $this->facturesVenteAll($depotId) : $this->facturesVente($depotId);
+        $factureVentes = $all ? $this->facturesVenteAll($depotId) :
+            $this->facturesVente($depotId);
 
-        $factureRevendeurs = $all ? $this->facturesVenteRevendeurAll($depotId) : $this->facturesVenteRevendeur($depotId);
+        $factureRevendeurs = $all ? $this->facturesVenteRevendeurAll($depotId) :
+            $this->facturesVenteRevendeur($depotId);
 
         $qteVente = 0;
-        if ($factureVentes->isEmpty() && $factureRevendeurs->isEmpty()) {
-            $qteVente = 0;
-        }
 
         /**Conversion qteVendu Client*/
         if ($factureVentes->isNotEmpty()) {

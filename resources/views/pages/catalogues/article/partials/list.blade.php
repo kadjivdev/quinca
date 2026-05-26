@@ -41,10 +41,10 @@
                                         <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
                                         <span class="badge d-block d-flex text-dark">Qte base : {{$stock->qantiteBase}} ({{$article->uniteMesure->libelle_unite}}) </span>
                                         <span class="badge d-block d-flex align-items-center text-dark">
-                                                Qte appro: ({{$stock->uniteMesure?->libelle_unite}}) : <input type="number" readonly class="form-control" value="{{$stock->quantite_reelle}}">
+                                            Qte appro: ({{$stock->uniteMesure?->libelle_unite}}) : <input type="number" readonly class="form-control" value="{{$stock->quantite_reelle}}">
                                         </span>
                                         <span class="badge d-block d-flex align-items-center text-dark">
-                                                Requête: ({{$stock->article?->uniteMesure?->libelle_unite}}) : <input type="number" readonly class="form-control" value="{{$stock->qantiteRequete}}">
+                                            Requête: ({{$stock->article?->uniteMesure?->libelle_unite}}) : <input type="number" readonly class="form-control" value="{{$stock->qantiteRequete}}">
                                         </span>
                                         <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVendu,2,'.','')}} ({{$article->uniteMesure?->libelle_unite}})</span>
                                         <span class="badge d-block d-flex text-dark">Qte restante: {{number_format($stock->resteStock,2,'.','')}} ({{$article->uniteMesure?->libelle_unite}})</span>
@@ -63,9 +63,11 @@
                                         onclick="editArticle({{ $article->id }})">
                                         <i class="bi bi-pencil me-1"></i>Modifier
                                     </button>
+                                    @if(Auth::id()==1 || Auth::id()==14)
                                     <a target="_blank" href="{{route('articles.show',$article->id)}}" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-pencil me-1"></i>Dépôts
                                     </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

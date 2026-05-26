@@ -102,8 +102,8 @@
                                     <span class="badge bg-info bg-opacity-10 text-info">Proforma</span>
                                     @endif
                                 </div>
-                                @if($facture->inventaire)
-                                <span class="text-dark">Inventorié: {{ $facture->inventaire?->id }}</span>
+                                @if($facture->inventaire_id)
+                                <span class="text-dark">Inventorié: {{ $facture->inventaire_id }}</span>
                                 @endif
                             </td>
                             <td><span class="badge bg-light text-dark border">#{{$facture->sessionCaisse?->id}}</span></td>
