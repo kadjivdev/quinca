@@ -75,6 +75,7 @@ class FactureRevendeur extends Model
      * où XXXX est un numéro séquentiel
      * @throws \Exception si impossible de générer un numéro unique après plusieurs tentatives
      */
+    
     public static function generateNumero()
     {
         $maxAttempts = 5;

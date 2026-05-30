@@ -199,7 +199,6 @@ class RapportStockController extends Controller
 
                         $stock->qantiteRequete = $stock->quantite_requete;
 
-
                         // $conversion ? $this->serviceEntree
                         //     ->convertirQuantite(
                         //         $requeteQuery
@@ -243,7 +242,7 @@ class RapportStockController extends Controller
                 $article->inventaire_date = $lastInventaire?->inventaire?->created_at;
 
                 // qte approvisionnee
-                $article->qteAppro = $article->stocks()?->firstWhere("depot_id", $depot->id)?->quantite_reelle - $article->qteDepart; // $articleStocks->sum("quantite_reelle") - $article->qteDepart;
+                $article->qteAppro = ($article->stocks()?->firstWhere("depot_id", $depot->id)?->quantite_reelle ?? 0) - $article->qteDepart; // $articleStocks->sum("quantite_reelle") - $article->qteDepart;
 
                 //stock disponible
                 $article->stockDisponible = $article->qteAppro > 0 ? $article->qteAppro + $article->qteDepart : $article->qteDepart;

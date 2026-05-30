@@ -194,6 +194,9 @@ class LigneBonLivraisonFournisseur extends Model
         return $this->belongsTo(UniteMesure::class, 'unite_mesure_id');
     }
 
+    /**
+     * 
+     */
     public function uniteSupplementaire()
     {
         return $this->belongsTo(UniteMesure::class, 'unite_supplementaire_id');
