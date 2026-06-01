@@ -325,10 +325,9 @@ class FactureClientController extends Controller
             Log::info('Début création facture', ['request' => $request->all()]);
 
             // Vérifications initiales
-            $sessionCaisse = SessionCaisse::find(12);
-            //   SessionCaisse::ouverte()
-            //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-            //     ->first();
+            $sessionCaisse = SessionCaisse::ouverte()
+                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                ->first();
 
             if (!$sessionCaisse) {
                 return response()->json([
