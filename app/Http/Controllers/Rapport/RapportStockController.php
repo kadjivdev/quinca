@@ -261,6 +261,7 @@ class RapportStockController extends Controller
             return back()->with("error", "Une erreure est survenue lors du chargement du stock :" . $e->getMessage());
         }
     }
+    // rapportStockDisponible
 
     private function getStats(int $depotId)
     {
@@ -472,7 +473,7 @@ class RapportStockController extends Controller
 
         $stocks = StockDepot::with(['article.uniteMesure', 'depot'])
             ->where('depot_id', $selectedDepot->id)
-            ->where('quantite_reelle', '>', 0)
+            // ->where('quantite_reelle', '>', 0)
             ->get()
             ->map(function ($stock) use ($selectedDepot) {
                 $conversion = $this->serviceEntree
