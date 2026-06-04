@@ -592,12 +592,9 @@ class FactureClientController extends Controller
             Log::info('Début mise à jour facture', ['request' => $request->all(), 'facture_id' => $id]);
 
             // Vérifications initiales
-            $sessionCaisse = SessionCaisse::findOrFail(12);
-            
-            // ouverte()
-            //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-            //     ->first()
-                ;
+            $sessionCaisse = SessionCaisse::ouverte()
+                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                ->first();
 
             if (!$sessionCaisse) {
                 return response()->json([
@@ -678,7 +675,7 @@ class FactureClientController extends Controller
                         ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
                     Log::debug("Quantité convertie", [
-                        "depot_stock"=>$ligne["depot_stock"],
+                        "depot_stock" => $ligne["depot_stock"],
                         "quantite_saisie" => $ligne['quantite'],
                         "quantite_convertie" => $QteConvertie,
                         "unite_vente" => $venteUnite->libelle_unite,
