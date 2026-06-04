@@ -49,21 +49,22 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return FactureClient::query()
-        ->whereNull("inventaire_id")
-        ->whereHas("lignes", function ($query) {
-            $query->where("article_id", 1777);
-        })->get();
+    // return FactureClient::query()
+    //     ->whereNull("inventaire_id")
+    //     ->whereHas("lignes", function ($query) {
+    //         $query->where("article_id", 1777);
+    //     })->get();
 
     // return Article::firstWhere("code_article","ART-FJ3DUSEC");
     // return FactureClient::withTrashed()
     //     ->with("lignes", "lignes.article", "lignes.uniteMesure")
     //     ->where("numero", "FAC-20260603-0011")->first();
 
-    return StockDepot::where("article_id", 1777)
-        ->where("depot_id", 3)
-        ->with("article", "depot")
-        ->get();
+    // return StockDepot::where("article_id", 1777)
+    //     ->where("depot_id", 3)
+    //     ->with("article", "depot")
+    //     ->get();
+
     // return DetailInventaire::whereHas("stockDepot.article", function ($query) {
     //     $query->where(["article_id" => 619]);
     // })
