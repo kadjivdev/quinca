@@ -153,7 +153,7 @@
                                         <i class="fas fa-money-bill-wave me-2"></i>Règlement
                                     </h6>
                                 </div>
-                                
+
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-md-6">
@@ -256,12 +256,21 @@
 <template id="updateLineTemplate">
     <tr class="ligne-facture">
         <td>
-            <select class="form-select select2-articles" name="lignes[__INDEX__][article_id]" required>
+            <select class="form-select select2-articles"
+                name="lignes[__INDEX__][article_id]"
+                required>
                 <option value="">Sélectionner un article</option>
             </select>
             <div class="invalid-feedback">L'article est requis</div>
-            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control depot-input">
-            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control depot-libelle">
+
+            <input type="hidden" name="lignes[__INDEX__][depot_id]" class="form-control depot-input">
+            <input type="hidden" name="lignes[__INDEX__][depot_stock]" classe="depot_stock">
+
+            <input type="text"
+                readonly
+                name="lignes[__INDEX__][depot_libelle]"
+                class="form-control depot-libelle"
+                required>
             <div class="invalid-feedback">Le depôt est requis</div>
         </td>
         <td>
@@ -275,8 +284,13 @@
             <div class="invalid-feedback">La quantité est requise</div>
         </td>
         <td>
-            <input type="number" class="form-control text-end select2-tarifs"
-                name="lignes[__INDEX__][tarification_id]" placeholder="0.00" required min="0.01" step="0.01">
+            <input type="number"
+                class="form-control text-end select2-tarifs"
+                name="lignes[__INDEX__][tarification_id]"
+                placeholder="0.00"
+                required
+                min="0.01"
+                step="0.01">
             <div class="invalid-feedback">Le prix est requis</div>
         </td>
         <td>
@@ -285,6 +299,7 @@
         </td>
         <td>
             <div class="input-group">
+                <span class="input-group-text">FCFA</span>
                 <input type="text" class="form-control text-end total-ligne" readonly value="0">
             </div>
         </td>
@@ -295,3 +310,14 @@
         </td>
     </tr>
 </template>
+
+@push("scripts")
+<script>
+    // gestion des selects
+    $(".select2").select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        dropdownParent: $('#updateFactureModal'),
+    })
+</script>
+@endpush

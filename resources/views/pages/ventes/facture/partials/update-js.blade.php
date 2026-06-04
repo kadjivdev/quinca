@@ -79,6 +79,7 @@
                 const data = e.params.data;
                 $line.find('.depot-input').val(data.depot.id);
                 $line.find('.depot-libelle').val(`${data.depot.libelle_depot} | Stock ${data.stock} (${data.unite_mesure.libelle_unite}) `);
+                $line.find('.depot_stock').val(data.stock);
                 $line.find('.quantite-input').attr("max", data.stock)
 
                 // Mettre à jour les prix
@@ -137,6 +138,7 @@
         async fillLine($line, data) {
             // Article
             const articleSelect = $line.find('.select2-articles');
+
             const articleOption = new Option(
                 `${data.article.code_article} - ${data.article.designation}`,
                 data.article_id,

@@ -22,6 +22,7 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Facades\Auth;
+use Psy\Readline\Hoa\Console;
 
 class FactureClientController extends Controller
 {
@@ -165,7 +166,7 @@ class FactureClientController extends Controller
             $zones = Zone::all();
             $depots = Depot::all();
 
-            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'zones','depots'));
+            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'zones', 'depots'));
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement de la liste des factures', [
                 'error' => $e->getMessage(),
@@ -399,68 +400,6 @@ class FactureClientController extends Controller
             }
 
             // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
-            // foreach ($request->lignes as $ligne) {
-            //     $depot = Depot::find($ligne["depot_id"]);
-
-            //     // 
-            //     $stock = StockDepot::where('depot_id', $ligne["depot_id"])
-            //         ->where('article_id', $ligne['article_id'])
-            //         ->first();
-
-            //     /**
-            //      * Recherche de la conversion
-            //      */
-            //     $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
-            //     $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
-            //     $article = Article::findOrFail($ligne['article_id']);
-
-            //     $conversion = $this->serviceStockEntree
-            //         ->rechercherConversion(
-            //             $ligne['unite_vente_id'],
-            //             $stock->unite_mesure_id,
-            //             $stock->article_id
-            //         );
-
-            //     if (!$conversion) {
-            //         return response()->json([
-            //             'status' => false,
-            //             'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ($stockUnite->libelle_unite) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
-            //         ], 500);
-            //     }
-
-            //     /**Qte convertie en base */
-            //     $qantiteConvertie = $conversion ? $this->serviceStockEntree
-            //         ->convertirQuantite(
-            //             $ligne['quantite'],
-            //             $conversion,
-            //             $ligne['unite_vente_id']
-            //         ) : 00;
-
-            //     /**Qte Restante */
-            //     $resteStock = $ligne["stock"] ?? 0; //$article->reste($stock->depot_id);
-
-            //     Log::debug("Vérification stock", [
-            //         // "conversion" => $conversion->load("uniteSource", "uniteDest"),
-            //         "article" => $article->designation . ' ' . $article->code_article,
-            //         "depot" => $depot->libelle_depot,
-            //         "unite_stock" => $stockUnite->libelle_unite,
-            //         "unite_vente" => $venteUnite->libelle_unite,
-            //         "qte_saisie" => $ligne['quantite'],
-            //         "qte_convertie" => $qantiteConvertie,
-            //         "reste_stock" => $resteStock,
-            //     ]);
-
-            //     // if ($resteStock < 0) {
-            //     //     throw new Exception("Le stock est négatif pour n'article ($article->designation - $article->code_article)! Veuillez approvisionne le stock");
-            //     // }
-            //     // // on verifie la quantité restante de l'article dans le depot est suffisante
-            //     // if ($resteStock < $qantiteConvertie) {
-            //     //     return response()->json([
-            //     //         'status' => false,
-            //     //         'message' => "Le reste du stock de l'article ($article->designation - $article->code_article) est de $resteStock $venteUnite->libelle_unite dans le depôt ({$stock->depot?->libelle_depot})! Stock insuiffisant par rapport à la quantité saisie"
-            //     //     ], 500);
-            //     // }
-            // }
 
             foreach ($request->lignes as $ligne) {
                 $depot = Depot::find($ligne["depot_id"]);
@@ -473,7 +412,6 @@ class FactureClientController extends Controller
                  * Recherche de la conversion
                  */
                 $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
-                // $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
                 $article = Article::findOrFail($ligne['article_id']);
 
                 $conversion = $this->serviceStockEntree
@@ -494,15 +432,19 @@ class FactureClientController extends Controller
                  * Obtention de la quantité convertie
                  */
 
-                // stock existant en unité de base d el'article
+                // stock existant en unité de base de l'article
                 $resteStock = isset($ligne["depot_stock"]) ? $ligne["depot_stock"] : 0;
 
                 // unite de vente vers unite de base de l'article
                 $QteConvertie = $this->serviceStockEntree
                     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
-                // $QteStockConvertie = $this->serviceStockEntree
-                //     ->convertirQuantite($resteStock, $conversion, $ligne['unite_vente_id']);
+                Log::debug("Quantité convertie", [
+                    "quantite_saisie" => $ligne['quantite'],
+                    "quantite_convertie" => $QteConvertie,
+                    "unite_vente" => $venteUnite->libelle_unite,
+                    "unite_article" => $article->uniteMesure?->libelle_unite,
+                ]);
 
                 // on verifie la quantité restante de l'article dans le depot est suffisante
                 if ($resteStock < $QteConvertie) {
@@ -650,9 +592,12 @@ class FactureClientController extends Controller
             Log::info('Début mise à jour facture', ['request' => $request->all(), 'facture_id' => $id]);
 
             // Vérifications initiales
-            $sessionCaisse = SessionCaisse::ouverte()
-                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                ->first();
+            $sessionCaisse = SessionCaisse::findOrFail(12);
+            
+            // ouverte()
+            //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+            //     ->first()
+                ;
 
             if (!$sessionCaisse) {
                 return response()->json([
@@ -662,8 +607,6 @@ class FactureClientController extends Controller
             }
 
             $facture = FactureClient::findOrFail($id);
-            // $client = Client::findOrFail($request->client_id);
-            // $configuration = Societe::firstOrFail();
 
             // Validation
             $validator = Validator::make($request->all(), [
@@ -694,6 +637,63 @@ class FactureClientController extends Controller
             DB::beginTransaction();
 
             try {
+                // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
+
+                foreach ($request->lignes as $ligne) {
+                    $depot = Depot::find($ligne["depot_id"]);
+                    // 
+                    $stock = StockDepot::where('depot_id', $ligne["depot_id"])
+                        ->where('article_id', $ligne['article_id'])
+                        ->first();
+
+                    /**
+                     * Recherche de la conversion
+                     */
+                    $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
+                    $article = Article::findOrFail($ligne['article_id']);
+
+                    $conversion = $this->serviceStockEntree
+                        ->rechercherConversion(
+                            $ligne['unite_vente_id'],
+                            $article->unite_mesure_id, // $stock->unite_mesure_id,
+                            $stock->article_id
+                        );
+
+                    if (!$conversion) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ({{$article->uniteMesure?->libelle_unite}}) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
+                        ], 500);
+                    }
+
+                    /**
+                     * Obtention de la quantité convertie
+                     */
+
+                    // stock existant en unité de base de l'article
+                    $resteStock = isset($ligne["depot_stock"]) ? $ligne["depot_stock"] : 0;
+
+                    // unite de vente vers unite de base de l'article
+                    $QteConvertie = $this->serviceStockEntree
+                        ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
+
+                    Log::debug("Quantité convertie", [
+                        "depot_stock"=>$ligne["depot_stock"],
+                        "quantite_saisie" => $ligne['quantite'],
+                        "quantite_convertie" => $QteConvertie,
+                        "unite_vente" => $venteUnite->libelle_unite,
+                        "unite_article" => $article->uniteMesure?->libelle_unite,
+                    ]);
+
+                    // on verifie la quantité restante de l'article dans le depot est suffisante
+                    if ($resteStock < $QteConvertie) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Le reste du stock de l'article ($article->designation) est de $resteStock {{$article->uniteMesure?->libelle_unite}} dans le depôt ({$stock->depot?->libelle_depot})! Vous avez saisi $QteConvertie {{$article->uniteMesure?->libelle_unite}}!  Stock insuiffisant par rapport à la quantité saisie"
+                        ], 500);
+                    }
+                }
+
                 // Mise à jour de la facture
                 $facture->update([
                     'date_facture' => Carbon::parse($request->date_facture)->startOfDay(),
@@ -1320,6 +1320,7 @@ class FactureClientController extends Controller
 
     public function getDetailsFacture(FactureClient $facture)
     {
+        Log::debug("Récupération des détails de la facture", ["facture_id" => $facture->id]);
         // Changement dans le chargement des relations
         $facture->load([
             'client',
