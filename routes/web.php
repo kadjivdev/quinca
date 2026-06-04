@@ -49,7 +49,9 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    // return Article::firstWhere("code_article","ART-30Z0QRKS");
+    return FactureClient::withTrashed()->where("numero", "FAC-20260603-0011")->first();
+
+    // return Article::firstWhere("code_article","ART-NZJR1FPQ");
 
     // return DetailInventaire::whereHas("stockDepot.article", function ($query) {
     //     $query->where(["article_id" => 619]);
@@ -73,16 +75,21 @@ Route::get("/debug", function () {
     //     ])
     //     ->get();
 
-    // $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 1927)
+    // return StockDepot::where("article_id", 2207)
+    //     ->where("depot_id", 4)
+    //     ->with("article", "depot")
+    //     ->get();
+
+    // $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 2207)
     //     ->with("article","bonLivraison", "uniteMesure")
     //     ->whereHas("bonLivraison", function ($query) {
-    //         $query->where("depot_id", 3)
+    //         $query->where("depot_id", 4)
     //             ->whereNotNull("validated_at");
     //     })
-    //     ->whereBetween('created_at', [
-    //         Carbon::create(2026, 3, 23)->startOfDay(), // 23 Mars 
-    //         now(), // maintenant
-    //     ])
+    //     // ->whereBetween('created_at', [
+    //     //     Carbon::create(2026, 3, 23)->startOfDay(), // 23 Mars 
+    //     //     now(), // maintenant
+    //     // ])
     //     ->get();
 
     // return $lignesBonLivraison->sum("quantite");
@@ -90,13 +97,12 @@ Route::get("/debug", function () {
     // retour des marchandises
     // $backLignes = LigneMarchandise::with("marchandBack", "marchandBack.depot", "article")
     //     ->whereHas("marchandBack", function ($query) {
-    //         $query->where("depot_id", 3)
+    //         $query->where("depot_id", 4)
     //             ->whereNotNull("validated_by");
     //     })
-    //     // ->where("article_id", 1698)
+    //     ->where("article_id", 2207)
     //     ->get();
 
-    // return $backLignes;
 
     // regularisation des ventes du magasin 2 Cotonou
     // FactureClient::whereNull("inventaire_id")

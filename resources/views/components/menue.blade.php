@@ -402,6 +402,7 @@
             @endcanany
 
             <!-- RAPPORTS VENTES -->
+            
             @canany(['rapports.ventes-articles.view', 'rapports.ventes-familles.view', 'rapports.ventes-clients.view',
             'rapports.vente-journaliere.view', 'rapports.creances.view', 'vente.sessions.rapport.view',
             'rapports.compte-client.view'])

@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MouvementsStockExport;
+use App\Models\Achat\LigneBonLivraisonFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\RequeteStock;
 use Illuminate\Support\Facades\Log;
@@ -241,7 +242,24 @@ class RapportStockController extends Controller
                 // inventaire date
                 $article->inventaire_date = $lastInventaire?->inventaire?->created_at;
 
-                // qte approvisionnee
+                // // entree via livraison
+                // $ligneQuery = LigneBonLivraisonFournisseur::where("article_id", $article->id)
+                //     ->with("article", "bonLivraison", "uniteMesure")
+                //     ->whereHas("bonLivraison", function ($query) use ($depot) {
+                //         $query->where("depot_id", $depot->id)
+                //             ->whereNull("inventaire_id")
+                //             ->whereNotNull("validated_at");
+                //     });
+
+                // $lignesBonLivraison = $lastInventaire?->inventaire && $article->inventaire_date ?
+                //     $ligneQuery->whereBetween('created_at', [
+                //         Carbon::parse($article->inventaire_date)->startOfDay(),
+                //         now(),
+                //     ]) : $ligneQuery;
+
+                // $article->qteEntreeLivraison = $lignesBonLivraison->sum("quantite");
+
+                // qte approvisionnement
                 $article->qteAppro = ($article->stocks()?->firstWhere("depot_id", $depot->id)?->quantite_reelle ?? 0) - $article->qteDepart; // $articleStocks->sum("quantite_reelle") - $article->qteDepart;
 
                 //stock disponible
@@ -252,8 +270,6 @@ class RapportStockController extends Controller
                 return $article;
             });
 
-            // return $articles->pluck("inventaire");
-
             $depots = Depot::all();
             return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr"));
         } catch (\Exception $e) {
@@ -261,7 +277,6 @@ class RapportStockController extends Controller
             return back()->with("error", "Une erreure est survenue lors du chargement du stock :" . $e->getMessage());
         }
     }
-    // rapportStockDisponible
 
     private function getStats(int $depotId)
     {
