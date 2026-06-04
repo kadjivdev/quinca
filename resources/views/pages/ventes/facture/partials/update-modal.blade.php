@@ -310,14 +310,3 @@
         </td>
     </tr>
 </template>
-
-@push("scripts")
-<script>
-    // gestion des selects
-    $(".select2").select2({
-        theme: 'bootstrap-5',
-        width: '100%',
-        dropdownParent: $('#updateFactureModal'),
-    })
-</script>
-@endpush
