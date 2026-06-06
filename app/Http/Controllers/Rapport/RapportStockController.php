@@ -149,7 +149,9 @@ class RapportStockController extends Controller
             $date_ftr = session()->get("date_ftr");
 
             $stocks = StockDepot::with("article", "depot")
-                ->where("depot_id", $depot->id)->get();
+                ->where("depot_id", $depot->id)
+                // ->limit(1000)
+                ->get();
 
             $articles = $stocks->pluck("article");
 

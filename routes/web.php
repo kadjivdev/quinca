@@ -49,10 +49,13 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
+    // return Article::firstWhere("code_article", "ART-1707");
+
     // return FactureClient::query()
     //     ->whereNull("inventaire_id")
+    //     ->whereNull("validated_by")
     //     ->whereHas("lignes", function ($query) {
-    //         $query->where("article_id", 1777);
+    //         $query->where("article_id", 1698);
     //     })->get();
 
     // return Article::firstWhere("code_article","ART-FJ3DUSEC");
@@ -92,19 +95,19 @@ Route::get("/debug", function () {
     //     ->with("article", "depot")
     //     ->get();
 
-    // $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 2207)
-    //     ->with("article","bonLivraison", "uniteMesure")
-    //     ->whereHas("bonLivraison", function ($query) {
-    //         $query->where("depot_id", 4)
-    //             ->whereNotNull("validated_at");
-    //     })
-    //     // ->whereBetween('created_at', [
-    //     //     Carbon::create(2026, 3, 23)->startOfDay(), // 23 Mars 
-    //     //     now(), // maintenant
-    //     // ])
-    //     ->get();
+    $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 1698)
+        ->with("article","bonLivraison", "uniteMesure")
+        ->whereHas("bonLivraison", function ($query) {
+            $query->where("depot_id", 3)
+                ->whereNotNull("validated_at");
+        })
+        // ->whereBetween('created_at', [
+        //     Carbon::create(2026, 6, 05)->startOfDay(), // 23 Mars 
+        //     now(), // maintenant
+        // ])
+        ->get();
 
-    // return $lignesBonLivraison->sum("quantite");
+    return $lignesBonLivraison->pluck("created_at");
 
     // retour des marchandises
     // $backLignes = LigneMarchandise::with("marchandBack", "marchandBack.depot", "article")
