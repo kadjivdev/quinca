@@ -254,7 +254,7 @@ class ArticleController extends Controller
     }
 
     /**
-     * Recherche d'articles pour le select2
+     * Approvisionnement du compte des articles
      */
 
     function articleAffect(Request $request, Article $article)

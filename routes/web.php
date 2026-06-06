@@ -49,6 +49,14 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
+    $facture = FactureClient::firstWhere("numero", "FAC-20260605-0014");
+
+    if ($facture) {
+        $facture->delete();
+
+        return "Facture FAC-20260605-0014 supprimée avec succès!";
+    }
+
     // return Article::firstWhere("code_article", "ART-1707");
 
     // return FactureClient::query()
@@ -96,7 +104,7 @@ Route::get("/debug", function () {
     //     ->get();
 
     $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 1698)
-        ->with("article","bonLivraison", "uniteMesure")
+        ->with("article", "bonLivraison", "uniteMesure")
         ->whereHas("bonLivraison", function ($query) {
             $query->where("depot_id", 3)
                 ->whereNotNull("validated_at");
