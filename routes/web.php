@@ -49,13 +49,13 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $facture = FactureClient::firstWhere("numero", "FAC-20260605-0014");
+    // $facture = FactureClient::firstWhere("numero", "FAC-20260605-0014");
 
-    if ($facture) {
-        $facture->delete();
+    // if ($facture) {
+    //     $facture->delete();
 
-        return "Facture FAC-20260605-0014 supprimée avec succès!";
-    }
+    //     return "Facture FAC-20260605-0014 supprimée avec succès!";
+    // }
 
     // return Article::firstWhere("code_article", "ART-1707");
 
@@ -109,13 +109,13 @@ Route::get("/debug", function () {
             $query->where("depot_id", 3)
                 ->whereNotNull("validated_at");
         })
-        // ->whereBetween('created_at', [
-        //     Carbon::create(2026, 6, 05)->startOfDay(), // 23 Mars 
-        //     now(), // maintenant
-        // ])
+        ->whereBetween('created_at', [
+            Carbon::create(2026, 6, 05)->startOfDay(), // 23 Mars 
+            now(), // maintenant
+        ])
         ->get();
 
-    return $lignesBonLivraison->pluck("created_at");
+    return $lignesBonLivraison;
 
     // retour des marchandises
     // $backLignes = LigneMarchandise::with("marchandBack", "marchandBack.depot", "article")
