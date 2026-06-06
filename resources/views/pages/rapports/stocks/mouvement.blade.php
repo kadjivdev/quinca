@@ -100,6 +100,7 @@
                         <tr>
                             <th>Code</th>
                             <th>Date</th>
+                            <th>Inseré le</th>
                             <th>Type</th>
                             <th>Article</th>
                             <th>Depôt</th>
@@ -116,6 +117,7 @@
                         <tr>
                             <td class="text-monospace">{{ $mouvement->code }}</td>
                             <td>{{ $mouvement->date_mouvement->format('d/m/Y') }}</td>
+                            <td>{{ $mouvement->created_at->format('d/m/Y') }}</td>
                             <td>
                                 @switch($mouvement->type_mouvement)
                                 @case('ENTREE')
