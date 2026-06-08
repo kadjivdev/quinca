@@ -264,7 +264,8 @@ class MarchandBackController extends Controller
         try {
             DB::beginTransaction();
 
-            $marchand = MarchandBack::with("livraison.lignes")->findOrFail($id);
+            $marchand = MarchandBack::with("livraison.lignes")
+                ->findOrFail($id);
 
             if ($marchand->validated_by) {
                 throw new Exception('Marchandise déjà validée');

@@ -35,6 +35,7 @@ use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneFacture;
 use App\Models\Vente\LigneMarchandise;
+use App\Models\Vente\LivraisonClient;
 use Carbon\Carbon;
 
 /*
@@ -49,15 +50,14 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    // $facture = FactureClient::firstWhere("numero", "FAC-20260605-0014");
-
-    // if ($facture) {
-    //     $facture->delete();
-
-    //     return "Facture FAC-20260605-0014 supprimée avec succès!";
-    // }
-
     // return Article::firstWhere("code_article", "ART-1707");
+
+    // $stocks =  StockDepot::where("article_id", 1698)
+    //     ->with("depot", "article", "uniteMesure")
+    //     ->where("depot_id", 3)
+    //     ->get();
+
+    // return $stocks;
 
     // return FactureClient::query()
     //     ->whereNull("inventaire_id")
@@ -103,6 +103,16 @@ Route::get("/debug", function () {
     //     ->with("article", "depot")
     //     ->get();
 
+    // les livraisons
+    // return LivraisonClient::query()
+    //     ->with("lignes.article", "lignes.uniteVente")
+    //     ->where("depot_dest_id",3)
+    //     // ->whereIn("id", [918, 941])
+    //     ->whereHas("lignes", function ($ligne) {
+    //         $ligne->where("article_id", 1698);
+    //     })
+    //     ->get();
+
     $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 1698)
         ->with("article", "bonLivraison", "uniteMesure")
         ->whereHas("bonLivraison", function ($query) {
@@ -110,12 +120,12 @@ Route::get("/debug", function () {
                 ->whereNotNull("validated_at");
         })
         ->whereBetween('created_at', [
-            Carbon::create(2026, 6, 05)->startOfDay(), // 23 Mars 
+            Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
             now(), // maintenant
         ])
         ->get();
 
-    return $lignesBonLivraison;
+    return $lignesBonLivraison->pluck("id");
 
     // retour des marchandises
     // $backLignes = LigneMarchandise::with("marchandBack", "marchandBack.depot", "article")

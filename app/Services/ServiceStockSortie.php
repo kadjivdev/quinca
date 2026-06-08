@@ -39,7 +39,7 @@ class ServiceStockSortie
             }
 
             // 3. Initialisation quantité de base
-            $quantite_base = $donnees['quantite'];
+            // $quantite_base = $donnees['quantite'];
             $unite_origine_id = $donnees['unite_mesure_id'];
 
             // 4. Conversion si nécessaire
@@ -69,6 +69,12 @@ class ServiceStockSortie
                 $unite_origine_id,
                 $unite_dest_id,
                 $article->id
+            );
+
+            $quantite_base = $this->convertirQuantite(
+                $donnees['quantite'],
+                $conversion,
+                $unite_origine_id
             );
 
             Log::debug('Convertion retrouvée:', ["data" => $conversion]);

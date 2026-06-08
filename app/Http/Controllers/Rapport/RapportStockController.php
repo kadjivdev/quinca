@@ -150,7 +150,6 @@ class RapportStockController extends Controller
 
             $stocks = StockDepot::with("article", "depot")
                 ->where("depot_id", $depot->id)
-                // ->limit(1000)
                 ->get();
 
             $articles = $stocks->pluck("article");
@@ -395,8 +394,8 @@ class RapportStockController extends Controller
 
     private function getMouvements(Request $request)
     {
-
         $query = StockMouvement::with(['article', 'depot', 'uniteMesure', 'user'])
+            ->whereNull("inventaire_id") //seuls les stocks nont inventoriés sont considéres
             ->orderBy('date_mouvement', 'desc');
 
         if ($request->filled('depot_id')) {

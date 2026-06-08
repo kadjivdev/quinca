@@ -41,7 +41,7 @@ class ServiceStockEntree
             }
 
             // 3. Initialisation quantité de base
-            $quantite_base = $donnees['quantite'];
+            // $quantite_base = $donnees['quantite'];
             $unite_origine_id = $donnees['unite_mesure_id'];
 
             // 4. Conversion si nécessaire
@@ -129,7 +129,7 @@ class ServiceStockEntree
                 'type_mouvement' => StockMouvement::TYPE_ENTREE,
                 'quantite' => $quantite_base,
                 'quantite_origine' => $donnees['quantite'],
-                'unite_mesure_id' => $donnees["unite_mesure_id"],
+                'unite_mesure_id' => $unite_origine_id,
                 'unite_mesure_origine_id' => $unite_origine_id,
                 'prix_unitaire' => $donnees['prix_unitaire'],
                 'reference_mouvement' => $donnees['reference_mouvement'] ?? null,
