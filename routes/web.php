@@ -50,7 +50,7 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return BonLivraisonFournisseur::with("lignes.article")
+    return BonLivraisonFournisseur::with("facture", "lignes.article")
         ->where("code", "BLF2606080004")
         ->get();
 
