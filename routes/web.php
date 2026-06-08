@@ -52,7 +52,8 @@ Route::get("/debug", function () {
 
     // return Article::firstWhere("code_article", "ART-1707");
 
-    return BonLivraisonFournisseur::where("code", "BLF2606080004")
+    return BonLivraisonFournisseur::with("lignes")
+        ->where("code", "BLF2606080004")
         ->get();
 
     // $stocks =  StockDepot::where("article_id", 1698)
