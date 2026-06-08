@@ -52,6 +52,9 @@ Route::get("/debug", function () {
 
     // return Article::firstWhere("code_article", "ART-1707");
 
+    return BonLivraisonFournisseur::where("code", "BLF2606080004")
+        ->get();
+
     // $stocks =  StockDepot::where("article_id", 1698)
     //     ->with("depot", "article", "uniteMesure")
     //     ->where("depot_id", 3)
@@ -82,9 +85,9 @@ Route::get("/debug", function () {
     //     ->with(["stockDepot.article","stockDepot.depot"])
     //     ->get();
 
-    // return StockDepot::where(["article_id" => 619])
-    //     // ->with("article", "depot", "uniteMesure", "livraison.facture.lignes")
-    //     ->with("article", "depot")
+    // return StockDepot::where(["article_id" => 1698])
+    //     ->where("depot_id", 3)
+    //     ->with("article", "depot","uniteMesure")
     //     ->get();
 
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
@@ -98,11 +101,6 @@ Route::get("/debug", function () {
     //     ])
     //     ->get();
 
-    // return StockDepot::where("article_id", 2207)
-    //     ->where("depot_id", 4)
-    //     ->with("article", "depot")
-    //     ->get();
-
     // les livraisons
     // return LivraisonClient::query()
     //     ->with("lignes.article", "lignes.uniteVente")
@@ -113,29 +111,30 @@ Route::get("/debug", function () {
     //     })
     //     ->get();
 
-    $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 1698)
-        ->with("article", "bonLivraison", "uniteMesure")
-        ->whereHas("bonLivraison", function ($query) {
-            $query->where("depot_id", 3)
-                ->whereNotNull("validated_at");
-        })
-        ->whereBetween('created_at', [
-            Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
-            now(), // maintenant
-        ])
-        ->get();
+    // $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 1698)
+    //     ->with("article", "bonLivraison", "uniteMesure")
+    //     ->whereHas("bonLivraison", function ($query) {
+    //         $query->where("depot_id", 3)
+    //             ->whereNotNull("validated_at");
+    //     })
+    //     ->whereBetween('created_at', [
+    //         Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
+    //         now(), // maintenant
+    //     ])
+    //     ->get();
 
-    return $lignesBonLivraison->pluck("id");
+    // return $lignesBonLivraison;
 
     // retour des marchandises
     // $backLignes = LigneMarchandise::with("marchandBack", "marchandBack.depot", "article")
-    //     ->whereHas("marchandBack", function ($query) {
-    //         $query->where("depot_id", 4)
-    //             ->whereNotNull("validated_by");
-    //     })
-    //     ->where("article_id", 2207)
+    //     // ->whereHas("marchandBack", function ($query) {
+    //     //     $query->where("depot_id", 3)
+    //     //         ->whereNotNull("validated_by");
+    //     // })
+    //     ->where("article_id", 1698)
     //     ->get();
 
+    // return $backLignes;
 
     // regularisation des ventes du magasin 2 Cotonou
     // FactureClient::whereNull("inventaire_id")
