@@ -52,7 +52,7 @@ Route::get("/debug", function () {
 
     // return Article::firstWhere("code_article", "ART-1707");
 
-    return BonLivraisonFournisseur::with("lignes")
+    return BonLivraisonFournisseur::with("lignes.article")
         ->where("code", "BLF2606080004")
         ->get();
 
