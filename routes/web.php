@@ -50,11 +50,10 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return FactureClient::whereHas("lignes", function ($query) {
-        $query->where("article_id", 384)
-            ->where("depot", 6);
-    })
-        ->with("lignes.article", "lignes.facturedepot")
+    return
+        LigneFacture::where("article_id", 384)
+        ->where("depot", 6)
+        ->with("article", "facturedepot")
         ->whereNull("inventaire_id")
         ->whereNull("validated_by")
         ->get();
