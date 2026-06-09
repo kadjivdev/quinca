@@ -51,7 +51,7 @@ use Carbon\Carbon;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    
+
     // return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
     //     ->where("code", "BLF2606080005")//BC2606086871
     //     ->get();
@@ -132,12 +132,12 @@ Route::get("/debug", function () {
         ->with("article", "bonLivraison", "uniteMesure")
         ->whereHas("bonLivraison", function ($query) {
             $query->where("depot_id", 6)
-                ->whereNotNull("validated_at");
+                ->whereNotNull("validated_at")
+                ->whereBetween('created_at', [
+                    Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
+                    now(), // maintenant
+                ]);
         })
-        // ->whereBetween('created_at', [
-        //     Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
-        //     now(), // maintenant
-        // ])
         ->get();
 
     return $lignesBonLivraison;
