@@ -34,6 +34,7 @@ use App\Models\Catalogue\Inventaire;
 use App\Models\RequeteStock;
 use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Stock\StockDepot;
+use App\Models\Stock\StockMouvement;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneFacture;
 use App\Models\Vente\LigneMarchandise;
@@ -52,9 +53,11 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
-        ->whereIn("code", ["BLF2606080004","BLF2606080005"])//BC2606086871
-        ->get();
+    return StockMouvement::find(7609);
+
+    // return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
+    //     ->whereIn("code", ["BLF2606080004","BLF2606080005"])//BC2606086871
+    //     ->get();
 
     // return
     //     LigneFacture::where("article_id", 384)
