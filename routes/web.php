@@ -31,6 +31,7 @@ use App\Models\Achat\LigneBonLivraisonFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\DetailInventaire;
 use App\Models\Catalogue\Inventaire;
+use App\Models\Parametre\Agent;
 use App\Models\RequeteStock;
 use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Stock\StockDepot;
@@ -40,6 +41,8 @@ use App\Models\Vente\LigneFacture;
 use App\Models\Vente\LigneMarchandise;
 use App\Models\Vente\LivraisonClient;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Securite\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,81 +56,17 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    // $stock = StockMouvement::find(7609);
-    // $stock->update(["quantite" => 2025]);
+    $agents = Agent::get();
+    foreach ($agents as $agent) {
+        User::create([
+            'name' => $agent->nom,
+            'email' => "agent" . $agent->id . "@gmail.com",
+            'password' => Hash::make($agent->nom),
+            'point_de_vente_id' => 1
+        ]);
+    }
 
-    // $lastStockDepot = StockDepot::where("article_id", 384)
-    //     ->where("depot_id", 6)
-    //     ->orderByDesc('id')
-    //     ->first();
-
-    // $lastStockDepot = StockDepot::where("article_id", 384)
-    //     ->where("depot_id", 6)
-    //     ->orderByDesc('id')
-    //     ->first();
-
-    // $lastStockDepot->update([
-    //     "quantite_reelle" => 36585.15 + 2025,
-    //     // "quantite_reelle" => 36585.15,
-    // ]);
-
-    // return $lastStockDepot;
-
-    // return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
-    //     ->whereIn("code", ["BLF2606080004","BLF2606080005"])//BC2606086871
-    //     ->get();
-
-    // return
-    //     LigneFacture::where("article_id", 384)
-    //     ->where("depot", 6)
-    //     ->with("facturedepot", "factureClient","uniteVente")
-    //     ->whereHas("factureClient", function ($query) {
-    //         $query
-    //             ->whereNull("inventaire_id")
-    //             ->whereNull("validated_by");
-    //     })
-    //     ->get();
-
-    // return StockDepot::with("article", "depot", "uniteMesure")
-    //     ->where("article_id", 384)
-    //     ->where("depot_id", 6)
-    //     ->get();
-
-    // $stocks =  StockDepot::where("article_id", 1698)
-    //     ->with("depot", "article", "uniteMesure")
-    //     ->where("depot_id", 3)
-    //     ->get();
-
-    // return $stocks;
-
-    // return FactureClient::query()
-    //     ->whereNull("inventaire_id")
-    //     ->whereNull("validated_by")
-    //     ->whereHas("lignes", function ($query) {
-    //         $query->where("article_id", 1698);
-    //     })->get();
-
-    // return Article::firstWhere("code_article","ART-FJ3DUSEC");
-    // return FactureClient::withTrashed()
-    //     ->with("lignes", "lignes.article", "lignes.uniteMesure")
-    //     ->where("numero", "FAC-20260603-0011")->first();
-
-    // return StockDepot::where("article_id", 1777)
-    //     ->where("depot_id", 3)
-    //     ->with("article", "depot")
-    //     ->get();
-
-    // return DetailInventaire::whereHas("stockDepot.article", function ($query) {
-    //     $query->where(["article_id" => 619]);
-    // })
-    //     ->with(["stockDepot.article","stockDepot.depot"])
-    //     ->get();
-
-    // return StockDepot::where(["article_id" => 1698])
-    //     ->where("depot_id", 3)
-    //     ->with("article", "depot","uniteMesure")
-    //     ->get();
-
+    return "Compte agents crée avec succès";
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {
     //         $query->where(["article_id" => 1544, "depot_id" => 4]);
