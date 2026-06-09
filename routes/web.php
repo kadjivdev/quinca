@@ -53,7 +53,7 @@ use Carbon\Carbon;
 Route::get("/debug", function () {
 
     return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
-        ->where("code", "BC2606086871")
+        ->where("code", "BLF2606080005")//BC2606086871
         ->get();
 
     // return
