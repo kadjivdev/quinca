@@ -53,7 +53,7 @@ Route::get("/debug", function () {
     return
         LigneFacture::where("article_id", 384)
         ->where("depot", 6)
-        ->with("article", "facturedepot")
+        ->with("facturedepot")
         ->whereNull("inventaire_id")
         ->whereNull("validated_by")
         ->get();
