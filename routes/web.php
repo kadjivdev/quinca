@@ -51,9 +51,9 @@ use Carbon\Carbon;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
-        ->where("code", "BLF2606080005")//BC2606086871
-        ->get();
+    // return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
+    //     ->where("code", "BLF2606080005")//BC2606086871
+    //     ->get();
 
     // return
     //     LigneFacture::where("article_id", 384)
@@ -127,19 +127,19 @@ Route::get("/debug", function () {
     //     })
     //     ->get();
 
-    // $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 1698)
-    //     ->with("article", "bonLivraison", "uniteMesure")
-    //     ->whereHas("bonLivraison", function ($query) {
-    //         $query->where("depot_id", 3)
-    //             ->whereNotNull("validated_at");
-    //     })
-    //     ->whereBetween('created_at', [
-    //         Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
-    //         now(), // maintenant
-    //     ])
-    //     ->get();
+    $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 384)
+        ->with("article", "bonLivraison", "uniteMesure")
+        ->whereHas("bonLivraison", function ($query) {
+            $query->where("depot_id", 6)
+                ->whereNotNull("validated_at");
+        })
+        // ->whereBetween('created_at', [
+        //     Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
+        //     now(), // maintenant
+        // ])
+        ->get();
 
-    // return $lignesBonLivraison;
+    return $lignesBonLivraison;
 
     // retour des marchandises
     // $backLignes = LigneMarchandise::with("marchandBack", "marchandBack.depot", "article")
