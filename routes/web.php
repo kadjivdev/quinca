@@ -50,9 +50,12 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return BonLivraisonFournisseur::with("facture", "lignes.article")
-        ->where("code", "BLF2606080004")
+    return StockDepot::where("article_id", 384)
         ->get();
+
+    // return BonLivraisonFournisseur::with("facture", "lignes.article")
+    //     ->where("code", "BLF2606080004")
+    //     ->get();
 
     // $stocks =  StockDepot::where("article_id", 1698)
     //     ->with("depot", "article", "uniteMesure")
