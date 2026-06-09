@@ -61,8 +61,8 @@ Route::get("/debug", function () {
         ->orderByDesc('id')
         ->first();
     $lastStockDepot->update([
-        // "quantite_reelle" => $lastStockDepot->quantite_reelle - 5670,
-        "quantite_reelle" => 36585.15,
+        "quantite_reelle" => $lastStockDepot->quantite_reelle + 2025,
+        // "quantite_reelle" => 36585.15,
     ]);
 
     return "Regularisation effectuée avec succès!";
