@@ -71,7 +71,7 @@ Route::get("/debug", function () {
         // "quantite_reelle" => 36585.15,
     ]);
 
-    return "Regularisation effectuée avec succès!";
+    return $lastStockDepot;
 
     // return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
     //     ->whereIn("code", ["BLF2606080004","BLF2606080005"])//BC2606086871
