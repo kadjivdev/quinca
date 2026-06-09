@@ -61,7 +61,7 @@ Route::get("/debug", function () {
         User::create([
             'name' => $agent->nom,
             'email' => "agent" . $agent->id . "@gmail.com",
-            'password' => Hash::make($agent->nom),
+            'password' => Hash::make("agent" . $agent->id . "@gmail.com"),
             'point_de_vente_id' => 1
         ]);
     }
