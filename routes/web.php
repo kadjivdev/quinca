@@ -61,17 +61,17 @@ Route::get("/debug", function () {
     //     ->orderByDesc('id')
     //     ->first();
 
-    $lastStockDepot = StockDepot::where("article_id", 384)
-        ->where("depot_id", 6)
-        ->orderByDesc('id')
-        ->first();
+    // $lastStockDepot = StockDepot::where("article_id", 384)
+    //     ->where("depot_id", 6)
+    //     ->orderByDesc('id')
+    //     ->first();
 
-    $lastStockDepot->update([
-        "quantite_reelle" => 36585.15 + 2025,
-        // "quantite_reelle" => 36585.15,
-    ]);
+    // $lastStockDepot->update([
+    //     "quantite_reelle" => 36585.15 + 2025,
+    //     // "quantite_reelle" => 36585.15,
+    // ]);
 
-    return $lastStockDepot;
+    // return $lastStockDepot;
 
     // return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
     //     ->whereIn("code", ["BLF2606080004","BLF2606080005"])//BC2606086871
