@@ -53,7 +53,22 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return StockMouvement::find(7609);
+    $stock = StockMouvement::find(7609);
+    if ($stock) {
+        $stock->update(["quantite" => 5670]);
+    }
+
+    $lastStockDepot = StockDepot::where("article_id", 384)
+        ->where("depot_id", 6)
+        ->orderByDesc('id')
+        ->first();
+    if ($lastStockDepot) {
+        $lastStockDepot->update([
+            "quantite_reelle" => $lastStockDepot->quantite_reelle + 5670,
+        ]);
+    }
+
+    return "Regularisation effectuée avec succès!";
 
     // return BonLivraisonFournisseur::with("facture", "depot", "lignes.article")
     //     ->whereIn("code", ["BLF2606080004","BLF2606080005"])//BC2606086871
