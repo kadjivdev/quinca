@@ -64,10 +64,6 @@ Route::get("/debug", function () {
     //     ->where("depot_id", 6)
     //     ->get();
 
-    // return BonLivraisonFournisseur::with("facture", "lignes.article")
-    //     ->where("code", "BLF2606080004")
-    //     ->get();
-
     // $stocks =  StockDepot::where("article_id", 1698)
     //     ->with("depot", "article", "uniteMesure")
     //     ->where("depot_id", 3)
