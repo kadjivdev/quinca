@@ -24,6 +24,7 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
+use App\Models\Achat\BonCommande;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\LigneBonLivraisonFournisseur;
@@ -51,7 +52,8 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return FactureFournisseur::where("code", "FAC26062963")
+    return BonLivraisonFournisseur::with("lignes.article", "depot")
+        ->where("code", "FAC26062963")
         ->get();
 
     // return
