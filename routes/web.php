@@ -54,9 +54,7 @@ use Carbon\Carbon;
 Route::get("/debug", function () {
 
     $stock = StockMouvement::find(7609);
-    if ($stock) {
-        $stock->update(["quantite" => 2025]);
-    }
+    $stock->update(["quantite" => 2025]);
 
     $lastStockDepot = StockDepot::where("article_id", 384)
         ->where("depot_id", 6)
@@ -64,7 +62,8 @@ Route::get("/debug", function () {
         ->first();
     if ($lastStockDepot) {
         $lastStockDepot->update([
-            "quantite_reelle" => $lastStockDepot->quantite_reelle - 5670,
+            // "quantite_reelle" => $lastStockDepot->quantite_reelle - 5670,
+            "quantite_reelle" => 36585.15,
         ]);
     }
 
