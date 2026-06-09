@@ -115,7 +115,7 @@
                     <tbody>
                         @foreach ($mouvements as $mouvement)
                         <tr>
-                            <td class="text-monospace">{{ $mouvement->code }}</td>
+                            <td class="text-monospace">{{ $mouvement->code }} | {{$mouvement->id}}</td>
                             <td>{{ $mouvement->date_mouvement->format('d/m/Y') }}</td>
                             <td>{{ $mouvement->created_at->format('d/m/Y') }}</td>
                             <td>
