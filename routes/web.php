@@ -64,7 +64,7 @@ Route::get("/debug", function () {
     $lastStockDepot = StockDepot::where("article_id", 384)
         ->where("depot_id", 6)
         ->orderByDesc('id')
-        ->get();
+        ->first();
 
     $lastStockDepot->update([
         "quantite_reelle" => 36585.15 + 2025,
