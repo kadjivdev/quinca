@@ -60,12 +60,10 @@ Route::get("/debug", function () {
         ->where("depot_id", 6)
         ->orderByDesc('id')
         ->first();
-    if ($lastStockDepot) {
-        $lastStockDepot->update([
-            // "quantite_reelle" => $lastStockDepot->quantite_reelle - 5670,
-            "quantite_reelle" => 36585.15,
-        ]);
-    }
+    $lastStockDepot->update([
+        // "quantite_reelle" => $lastStockDepot->quantite_reelle - 5670,
+        "quantite_reelle" => 36585.15,
+    ]);
 
     return "Regularisation effectuée avec succès!";
 
