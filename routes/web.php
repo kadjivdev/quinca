@@ -52,6 +52,7 @@ Route::get("/debug", function () {
 
     return StockDepot::with("article", "depot", "uniteMesure")
         ->where("article_id", 384)
+        ->where("depot_id", 6)
         ->get();
 
     // return BonLivraisonFournisseur::with("facture", "lignes.article")
