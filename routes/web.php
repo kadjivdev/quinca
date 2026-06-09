@@ -25,6 +25,7 @@ use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
 use App\Models\Achat\BonLivraisonFournisseur;
+use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\LigneBonLivraisonFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\DetailInventaire;
@@ -50,16 +51,19 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return
-        LigneFacture::where("article_id", 384)
-        ->where("depot", 6)
-        ->with("facturedepot", "factureClient","uniteVente")
-        ->whereHas("factureClient", function ($query) {
-            $query
-                ->whereNull("inventaire_id")
-                ->whereNull("validated_by");
-        })
+    return FactureFournisseur::where("code", "FAC26062963")
         ->get();
+
+    // return
+    //     LigneFacture::where("article_id", 384)
+    //     ->where("depot", 6)
+    //     ->with("facturedepot", "factureClient","uniteVente")
+    //     ->whereHas("factureClient", function ($query) {
+    //         $query
+    //             ->whereNull("inventaire_id")
+    //             ->whereNull("validated_by");
+    //     })
+    //     ->get();
 
     // return StockDepot::with("article", "depot", "uniteMesure")
     //     ->where("article_id", 384)
