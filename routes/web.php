@@ -54,6 +54,7 @@ Route::get("/debug", function () {
         $query->where("article_id", 384)
             ->where("depot", 6);
     })
+        ->with("lignes.article", "depot")
         ->whereNull("inventaire_id")
         ->whereNull("validated_by")
         ->get();
