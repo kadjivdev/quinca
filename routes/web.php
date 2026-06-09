@@ -53,13 +53,19 @@ use Carbon\Carbon;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $stock = StockMouvement::find(7609);
-    $stock->update(["quantite" => 2025]);
+    // $stock = StockMouvement::find(7609);
+    // $stock->update(["quantite" => 2025]);
 
-    $lastStockDepot = StockDepot::where("article_id", 384)
+    // $lastStockDepot = StockDepot::where("article_id", 384)
+    //     ->where("depot_id", 6)
+    //     ->orderByDesc('id')
+    //     ->first();
+
+    return StockDepot::where("article_id", 384)
         ->where("depot_id", 6)
         ->orderByDesc('id')
-        ->first();
+        ->get();
+
     $lastStockDepot->update([
         "quantite_reelle" => $lastStockDepot->quantite_reelle + 2025,
         // "quantite_reelle" => 36585.15,
