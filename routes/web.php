@@ -56,17 +56,17 @@ use App\Models\Securite\User;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    $agents = Agent::get();
-    foreach ($agents as $agent) {
-        User::create([
-            'name' => $agent->nom,
-            'email' => "agent" . $agent->id . "@gmail.com",
-            'password' => Hash::make("agent" . $agent->id . "@gmail.com"),
-            'point_de_vente_id' => 1
-        ]);
-    }
+    // $agents = Agent::get();
+    // foreach ($agents as $agent) {
+    //     User::create([
+    //         'name' => $agent->nom,
+    //         'email' => "agent" . $agent->id . "@gmail.com",
+    //         'password' => Hash::make("agent" . $agent->id . "@gmail.com"),
+    //         'point_de_vente_id' => 1
+    //     ]);
+    // }
 
-    return "Compte agents crée avec succès";
+    // return "Compte agents crée avec succès";
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {
     //         $query->where(["article_id" => 1544, "depot_id" => 4]);
