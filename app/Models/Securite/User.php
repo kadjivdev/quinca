@@ -2,6 +2,7 @@
 
 namespace App\Models\Securite;
 
+use App\Models\Parametre\Agent;
 use App\Models\Parametre\PointDeVente;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'is_active',
         'point_de_vente_id',
         "zone_id",
+        "agent_id"
     ];
 
     protected $hidden = [
@@ -44,6 +46,11 @@ class User extends Authenticatable
     function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class, "zone_id");
+    }
+
+    function agent(): BelongsTo
+    {
+        return $this->belongsTo(Agent::class, "agent_id");
     }
 
     public function pointDeVente()

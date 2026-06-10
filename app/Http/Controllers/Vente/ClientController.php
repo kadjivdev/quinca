@@ -48,6 +48,8 @@ class ClientController extends Controller
                 'agent',
                 'facturesClient.reglements' // Chargement des règlements via les factures
             ])->latest();
+        } elseif ($user->hasRole("AGENT")) {
+        //    $clients = Client::whereHas("agent")
         } else {
             $clients = Client::with([
                 'zone',
