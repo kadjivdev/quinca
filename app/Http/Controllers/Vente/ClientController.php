@@ -40,24 +40,23 @@ class ClientController extends Controller
 
         // Récupération des données avec pagination
         $user = auth()->user();
+
+        $query = $clients = Client::with([
+            'zone',
+            'facturesClient',
+            'departement',
+            'agent',
+            'facturesClient.reglements' // Chargement des règlements via les factures
+        ])->latest();
+
         if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
-            $clients = Client::with([
-                'zone',
-                'facturesClient',
-                'departement',
-                'agent',
-                'facturesClient.reglements' // Chargement des règlements via les factures
-            ])->latest();
+            $clients = $query;
         } elseif ($user->hasRole("AGENT")) {
-        //    $clients = Client::whereHas("agent")
+            $clients = $query
+                ->where('agent_id', Auth()->user()->agent_id);
         } else {
-            $clients = Client::with([
-                'zone',
-                'facturesClient',
-                'departement',
-                'agent',
-                'facturesClient.reglements' // Chargement des règlements via les factures
-            ])->where('point_de_vente_id', Auth()->user()->point_de_vente_id)->latest();
+            $clients = $query
+                ->where('point_de_vente_id', Auth()->user()->point_de_vente_id);
         }
 
         // SANDRINE,HIPPOLYTE,ASSOGBA AUBIN
@@ -160,7 +159,6 @@ class ClientController extends Controller
     /**
      * Affiche la liste des clients inactifs
      */
-
     public function inactifs(Request $request)
     {
         if (request()->ajax()) {
@@ -171,23 +169,24 @@ class ClientController extends Controller
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
         // Récupération des données avec pagination
+
         $user = auth()->user();
+        $query = $clients = Client::with([
+            'zone',
+            'facturesClient',
+            'departement',
+            'agent',
+            'facturesClient.reglements' // Chargement des règlements via les factures
+        ])->latest();
+
         if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
-            $clients = Client::with([
-                'zone',
-                'facturesClient',
-                'departement',
-                'agent',
-                'facturesClient.reglements' // Chargement des règlements via les factures
-            ])->latest();
+            $clients = $query;
+        } elseif ($user->hasRole("AGENT")) {
+            $clients = $query
+                ->where('agent_id', Auth()->user()->agent_id);
         } else {
-            $clients = Client::with([
-                'zone',
-                'facturesClient',
-                'departement',
-                'agent',
-                'facturesClient.reglements' // Chargement des règlements via les factures
-            ])->where('point_de_vente_id', Auth()->user()->point_de_vente_id)->latest();
+            $clients = $query
+                ->where('point_de_vente_id', Auth()->user()->point_de_vente_id);
         }
 
         // SANDRINE,HIPPOLYTE,ASSOGBA AUBIN

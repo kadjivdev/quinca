@@ -36,20 +36,21 @@ class ClientRevendeurController extends Controller
 
         // Récupération des données avec pagination
         $user = auth()->user();
+        $query = $clients = Client::with([
+            'facturesRevendeur',
+            'departement',
+            'agent',
+            'facturesRevendeur.reglements' // Chargement des règlements via les factures
+        ])->latest();
+
         if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
-            $clients = Client::with([
-                'facturesRevendeur',
-                'departement',
-                'agent',
-                'facturesRevendeur.reglements' // Chargement des règlements via les factures
-            ]);
+            $clients = $query;
+        } elseif ($user->hasRole("AGENT")) {
+            $clients = $query
+                ->where('agent_id', Auth()->user()->agent_id);
         } else {
-            $clients = Client::with([
-                'facturesRevendeur',
-                'departement',
-                'agent',
-                'facturesRevendeur.reglements' // Chargement des règlements via les factures
-            ])->where('point_de_vente_id', Auth()->user()->point_de_vente_id)->latest();
+            $clients = $query
+                ->where('point_de_vente_id', Auth()->user()->point_de_vente_id);
         }
 
         // Application des filtres si présents dans la requête
