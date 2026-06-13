@@ -18,6 +18,9 @@
                             <th class="border-bottom-0">Articles</th>
                             <th class="border-bottom-0">Document</th>
                             <th class="border-bottom-0 text-center">Statut</th>
+                            <th class="border-bottom-0 text-center">Inséré par</th>
+                            <th class="border-bottom-0 text-center">validé le</th>
+                            <th class="border-bottom-0 text-center">validé par</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
                     </thead>
@@ -39,7 +42,7 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-client me-2">
-                                        {{ substr($livraison->facture->client->raison_sociale, 0, 2) }}
+                                        {{ substr($livraison->facture?->client?->raison_sociale, 0, 2) }}
                                     </div>
                                     <div>
                                         <div class="fw-medium">{{ $livraison->facture->client->raison_sociale }}
@@ -83,6 +86,9 @@
                                 <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulé</span>
                                 @endswitch
                             </td>
+                            <td class="text-center"><span class="badge bg-light rounded text-dark border">{{$livraison->createdBy?->name}}</span> </td>
+                            <td class="text-center"><span class="badge bg-light rounded text-dark border">{{Carbon\Carbon::parse($livraison->validated_at)->locale('fr')->isoFormat("D MMMM YYYY")}}</span> </td>
+                            <td class="text-center"><span class="badge bg-light rounded text-dark border">{{$livraison->validatedBy?->name}}</span> </td>
                             <td class="text-end">
                                 <div class="btn-group">
                                     {{-- Voir détails --}}
@@ -137,7 +143,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="12" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-truck fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucun bon de livraison trouvé</h6>
