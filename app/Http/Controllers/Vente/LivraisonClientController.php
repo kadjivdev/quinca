@@ -29,7 +29,6 @@ class LivraisonClientController extends Controller
 
     public function index(Request $request)
     {
-
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
         // Récupération des données avec pagination
         $livraisons = LivraisonClient::with([
