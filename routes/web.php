@@ -56,11 +56,17 @@ use App\Models\Securite\User;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
-    return FactureClient::with("lignes","livraisons")
-        ->where("statut", "validee")
-        ->firstWhere("numero", "FAC-20260611-0009")
-        ->livraisons;
+    // $factureClient = FactureClient::with("lignes", "livraisons")
+    //     ->where("statut", "validee")
+    //     ->firstWhere("numero", "FAC-20260611-0009");
 
+    $factureClient = FactureClient::whereBetween('created_at', [
+        Carbon::create(2026, 06, 14)->startOfDay(), // 23 Mars 
+        now(), // maintenant
+    ]);
+
+    return $factureClient->get();
+    $factureClient->update(["session_caisse_id" => 545]);
     // return "Compte agents crée avec succès";
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {
@@ -93,10 +99,10 @@ Route::get("/debug", function () {
     //     ->whereHas("bonLivraison", function ($query) {
     //         $query->where("depot_id", 6)
     //             ->whereNotNull("validated_at")
-    //             ->whereBetween('created_at', [
-    //                 Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
-    //                 now(), // maintenant
-    //             ]);
+    // ->whereBetween('created_at', [
+    //     Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
+    //     now(), // maintenant
+    // ]);
     //     })
     //     ->get();
 
