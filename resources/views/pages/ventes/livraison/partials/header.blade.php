@@ -26,11 +26,10 @@
             {{-- Section droite avec les boutons d'action --}}
             <div class="col-auto d-flex gap-2">
                 {{-- Bouton de synchronisation --}}
-                <button type="button" class="btn btn-light-secondary btn-sm d-flex align-items-center"
-                    onclick="refreshPage()">
+                <a href="{{route('vente.livraisons.index')}}" class="btn btn-light-secondary btn-sm d-flex align-items-center">
                     <i class="fas fa-sync-alt me-2 refresh-icon"></i>
                     <span class="refresh-text">Actualiser</span>
-                </button>
+                </a>
 
                 {{-- Bouton d'ajout avec modal --}}
                 <button type="button" class="btn btn-warning btn-sm d-flex align-items-center" data-bs-toggle="modal"

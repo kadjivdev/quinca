@@ -55,18 +55,19 @@ class LivraisonClientController extends Controller
         }
 
         if ($request->filled('date_debut')) {
-            $livraisons->whereDate('date_livraison', '>=', $request->date_debut);
+            $livraisons->whereDate('created_at', '>=', $request->date_debut);
         }
 
         if ($request->filled('date_fin')) {
-            $livraisons->whereDate('date_livraison', '<=', $request->date_fin);
+            $livraisons->whereDate('created_at', '<=', $request->date_fin);
         }
 
         // $livraisons = $livraisons->paginate(10);
         $livraisons = $livraisons->get();
 
         // Données pour les filtres et le modal de création
-        $clients =  Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->orderBy('raison_sociale')->get();
+        $clients =  Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)
+            ->orderBy('raison_sociale')->get();
         $depots = Depot::actif()->orderBy('libelle_depot')->get();
 
         // Statistiques pour le header
@@ -389,7 +390,6 @@ class LivraisonClientController extends Controller
             ], 422);
         }
     }
-
 
     /**
      * Bordereau de livraison

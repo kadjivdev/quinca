@@ -68,16 +68,21 @@ Route::get("/debug", function () {
     //     ])
     //     ->get();
 
-    // les livraisons
+    // les livraisons cloients
     // return LivraisonClient::query()
-    //     ->with("lignes.article", "lignes.uniteVente")
-    //     ->where("depot_dest_id",3)
-    //     // ->whereIn("id", [918, 941])
-    //     ->whereHas("lignes", function ($ligne) {
-    //         $ligne->where("article_id", 1698);
+    //     ->with("createdBy","depotDestination")
+    //     ->whereNotNull("depot_dest_id")
+    //     ->wherehas("facture",function ($query) {
+    //         $query->whereIn("client_id",[])
     //     })
-    //     ->get();
+    //     ->whereBetween('created_at', [
+    //         Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
+    //         now(), // maintenant
+    //     ])
+    //     ->get()
+    //     ->pluck("depotDestination.libelle_depot");
 
+    // les livraisons fournisseurs
     // $lignesBonLivraison = LigneBonLivraisonFournisseur::where("article_id", 384)
     //     ->with("article", "bonLivraison", "uniteMesure")
     //     ->whereHas("bonLivraison", function ($query) {

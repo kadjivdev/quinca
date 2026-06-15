@@ -2,7 +2,6 @@
 
 <div class="row d-flex justify-content-center">
     <div class="col-md-6 border bg-light rounded p-3">
-        <!-- FILTRAGE PAR DEPOT -->
         <form action="{{route('vente.facture.index')}}" method="GET">
             @csrf
             <div class="row">

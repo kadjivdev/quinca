@@ -1,7 +1,47 @@
 {{-- list-livraisons.blade.php --}}
+<div class="row d-flex justify-content-center">
+    <div class="col-6">
+        {{-- Filtres --}}
+        <!-- FILTRAGE PAR DEPOT -->
+        <form action="{{route('vente.livraisons.index')}}" method="GET" class="border rounded shadow p-2">
+            @csrf
+            <div class="row">
+                <div class="col-6">
+                    <select class="form-select form-control select2-form" name="depot_id" id="">
+                        <option value="">Sélectionner un dépôt source</option>
+                        @foreach($depots as $depot)
+                        <option value="{{$depot->id}}">{{$depot->libelle_depot}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-6">
+                    <select class="form-select form-control select2-form" name="client_id" id="">
+                        <option value="">Sélectionner un client</option>
+                        @foreach($clients as $client)
+                        <option value="{{$client->id}}" class="">{{$client->raison_sociale}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-6">
+                    <label for="date_debut">Date de début</label>
+                    <input type="date" name="date_debut" class="form-control" id="date_debut">
+                </div>
+                <div class="col-6">
+                    <label for="date_fin">Date de fin</label>
+                    <input type="date" name="date_fin" class="form-control" id="date_fin">
+                </div>
+            </div>
+            <button class="w-100 btn btn-primary mt-2 px-4">
+                <i class="fas fa-save me-2"></i>Filtrer
+            </button>
+        </form>
+    </div>
+</div>
+<!--  -->
 <div class="row g-3">
-    {{-- Filtres --}}
-
     {{-- Table des livraisons --}}
     <div class="col-12">
         <div class="card p-3 border-0 shadow-sm">
@@ -200,6 +240,8 @@
 
 @push("scripts")
 <script>
+    $(".select2-form").select2()
+    
     $(document).on('click', '.generate-facture-btn', function(e) {
         e.preventDefault(); // Empêche le comportement par défaut du lien
         var type = $(this).data('type'); // Récupère la valeur de data-type
