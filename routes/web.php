@@ -65,8 +65,9 @@ Route::get("/debug", function () {
         now(), // maintenant
     ]);
 
-    return $factureClient->get();
     $factureClient->update(["session_caisse_id" => 545]);
+
+    return $factureClient->get();
     // return "Compte agents crée avec succès";
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {
