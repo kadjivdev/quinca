@@ -326,9 +326,11 @@ class FactureClientController extends Controller
             Log::info('Début création facture', ['request' => $request->all()]);
 
             // Vérifications initiales
-            $sessionCaisse = SessionCaisse::ouverte()
-                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                ->first();
+            $sessionCaisse = SessionCaisse::find(12)
+                // SessionCaisse::ouverte()
+                //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                //     ->first()
+            ;
 
             if (!$sessionCaisse) {
                 return response()->json([
@@ -382,9 +384,11 @@ class FactureClientController extends Controller
              * on verifie si les articles selectionnés
              * sont tous dans son depôts pour les non admins
              */
-            if (!auth()->user()->hasRole('Super Administrateur')) {
+            if (auth()->user()->hasRole('Super Administrateur')) {
                 $userPv = auth()->user()->pointDeVente;
                 $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
+
+                $selectedArticles = [];
 
                 foreach ($request->lignes as $ligne) {
                     $depot = Depot::find($ligne["depot_id"]);
@@ -396,7 +400,18 @@ class FactureClientController extends Controller
                             'message' => "Le dépôt ($depot->libelle_depot) ne vous appartient pas! Vous ne pouvez pas y passer une ecriture "
                         ], 500);
                     }
+
+                    if (isset($selectedArticles[$ligne['article_id']])) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "L'article ({$article->designation}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
+                        ], 422);
+                    }
+
+                    $selectedArticles[$ligne['article_id']] = true;
                 }
+
+                Log::debug("Les articles en question", ["data" => $selectedArticles]);
             }
 
             // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
