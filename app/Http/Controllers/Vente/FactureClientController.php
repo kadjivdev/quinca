@@ -326,10 +326,9 @@ class FactureClientController extends Controller
             Log::info('Début création facture', ['request' => $request->all()]);
 
             // Vérifications initiales
-            $sessionCaisse = SessionCaisse::find(12)
-                // SessionCaisse::ouverte()
-                //     ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                //     ->first()
+            $sessionCaisse = SessionCaisse::ouverte()
+                    ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                    ->first()
             ;
 
             if (!$sessionCaisse) {
@@ -1045,7 +1044,8 @@ class FactureClientController extends Controller
     // get depot's factures
     public static function getDepotFactures($depotId)
     {
-        Log::debug("Id de la facture :", ["id" => $depotId]);
+        Log::debug("Depot selectionné :", ["depot" => Depot::find($depotId)]);
+
         $factures = FactureClient::whereHas('lignes', function ($ligne) use ($depotId) {
             $ligne->where('depot', $depotId)
                 /**on recupere seulement les lignes qui disposent encore de quantité */

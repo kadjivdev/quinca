@@ -3,7 +3,7 @@
     <div class="col-6">
         {{-- Filtres --}}
         <!-- FILTRAGE PAR DEPOT -->
-        <form action="{{route('vente.livraisons.index')}}" method="GET" class="border rounded shadow p-2">
+        <form action="{{route('vente.livraisons.index')}}" method="GET" class="border rounded p-2">
             @csrf
             <div class="row">
                 <div class="col-6">

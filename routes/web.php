@@ -56,6 +56,11 @@ use App\Models\Securite\User;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
 
+    return FactureClient::with("lignes","livraisons")
+        ->where("statut", "validee")
+        ->firstWhere("numero", "FAC-20260611-0009")
+        ->livraisons;
+
     // return "Compte agents crée avec succès";
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {

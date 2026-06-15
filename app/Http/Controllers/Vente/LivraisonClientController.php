@@ -84,35 +84,10 @@ class LivraisonClientController extends Controller
             'total_articles_livres' => $totalArticlesLivres
         ];
 
-        // Recherche des factures valides pour le modal de création
-        $factures = FactureClient::where('statut', 'validee')
-            ->whereHas('lignes', function ($query) {
-                $query->whereRaw('quantite_base > IFNULL((
-                            SELECT SUM(llc.quantite_base)
-                            FROM ligne_livraison_clients llc
-                            JOIN livraison_clients lc ON llc.livraison_client_id = lc.id
-                            WHERE llc.ligne_facture_id = ligne_facture_clients.id
-                            AND lc.statut = "valide"
-                        ), 0)');
-            })
-            ->with(['client', 'lignes' => function ($query) {
-                $query->whereRaw('quantite_base > IFNULL((
-                            SELECT SUM(llc.quantite_base)
-                            FROM ligne_livraison_clients llc
-                            JOIN livraison_clients lc ON llc.livraison_client_id = lc.id
-                            WHERE llc.ligne_facture_id = ligne_facture_clients.id
-                            AND lc.statut = "valide"
-                        ), 0)')
-                    ->with(['article', 'uniteVente']);
-            }])
-            ->latest()
-            ->get();
-
         return view('pages.ventes.livraison.index', compact(
             'livraisons',
             'clients',
             'depots',
-            'factures',
             'stats',
             'date'
         ));
