@@ -30,6 +30,7 @@ class LivraisonClientController extends Controller
     public function index(Request $request)
     {
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
+        
         // Récupération des données avec pagination
         $livraisons = LivraisonClient::with([
             'facture.client',
@@ -408,7 +409,8 @@ class LivraisonClientController extends Controller
                             $subQ->whereNotNull('quantite_livree_simple')
                                 ->where('quantite', '>', DB::raw('quantite_livree_simple'));
                         });
-                });
+                })
+                ;
             })
             ->get()
             ->map(function ($ligne) use ($request) {

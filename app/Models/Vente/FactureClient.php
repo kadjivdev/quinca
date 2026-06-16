@@ -153,7 +153,7 @@ class FactureClient extends Model
     {
         return $this->hasMany(LigneFacture::class)
         
-        ->with("article")
+        // ->with("article")
         ;
     }
 

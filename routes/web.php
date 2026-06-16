@@ -55,19 +55,33 @@ use App\Models\Securite\User;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
+    // FAC-20260611-0020
+    // $livraisonDeleteds = LivraisonClient::onlyTrashed()
+    //     ->with("facture","lignes")
+    //     ->whereHas("facture", function ($query) {
+    //         $query->where("numero", "FAC-20260611-0020");
+    //     })
+    //     ->whereBetween("created_at", [
+    //         Carbon::create(2026, 3, 1)->startOfDay(), // 1 Mars 
+    //         now(), // maintenant
+    //     ])->get();
 
-    // $factureClient = FactureClient::with("lignes", "livraisons")
-    //     ->where("statut", "validee")
-    //     ->firstWhere("numero", "FAC-20260611-0009");
+    // return $livraisonDeleteds;
 
-    $factureClient = FactureClient::whereBetween('created_at', [
-        Carbon::create(2026, 06, 14)->startOfDay(), // 23 Mars 
-        now(), // maintenant
-    ]);
+    $factureClients = FactureClient::with("lignes")
+        ->where("statut", "validee")
+        ->whereIn("numero", ["FAC-20260611-0009", "FAC-20260611-0020"])
+        ->get();
 
-    $factureClient->update(["session_caisse_id" => 545]);
+    $factureClients->flatMap->lignes
+        ->each(function ($ligne) {
+            $ligne->update(["quantite_livree_simple" => 0]);
+        });
 
-    return $factureClient->get();
+    return $factureClients->flatMap->lignes
+        ->pluck("quantite_livree_simple");
+
+
     // return "Compte agents crée avec succès";
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {
