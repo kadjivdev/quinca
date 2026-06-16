@@ -59,6 +59,7 @@
                                             <div class="invalid-feedback">Le client est requis</div>
                                         </div>
 
+                                        
                                         <div class="col-md-3">
                                             <label class="form-label fw-medium required">Échéance</label>
                                             <div class="input-group">
@@ -188,7 +189,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
 
                                         <div class="col-md-6">

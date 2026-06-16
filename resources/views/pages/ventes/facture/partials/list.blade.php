@@ -13,17 +13,7 @@
                         @endforeach
                     </select>
                 </div>
-                <!-- <div class="col-6">
-                    <select class="form-select form-control _select2-form" name="point_vente_id" id="">
-                        <option value="">Sélectionner un point de vente</option>
-                        @foreach($pointsVentes as $pointVente)
-                        <option value="{{$pointVente->id}}" class="">{{$pointVente->nom_pv}} ({{$pointVente->id}})</option>
-                        @endforeach
-                    </select>
-                </div> -->
-            </div>
-            <br>
-            <div class="row">
+
                 <div class="col-6">
                     <select class="form-select form-control _select2-form" name="client_id" id="">
                         <option value="">Sélectionner un client</option>
@@ -32,6 +22,24 @@
                         @endforeach
                     </select>
                 </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <select class="form-select _select2-form" name="agent_id" required>
+                            <option value="">Sélectionner un agent</option>
+                            @foreach ($agents as $agent)
+                            <option value="{{ $agent->id }}"
+                                data-taux-aib="{{ $agent->id }}">
+                                {{ $agent->nom }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="invalid-feedback">L'agent est requis</div>
+                </div>
+
                 <div class="col-6">
                     <select class="form-select form-control _select2-form" name="zone_id" id="">
                         <option value="">Sélectionner une zone</option>
@@ -74,6 +82,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date facture</th>
                             <th class="border-bottom-0">Client</th>
+                            <th class="border-bottom-0">Agent</th>
                             <th class="border-bottom-0">Zone</th>
                             <!-- <th class="border-bottom-0">Etat</th> -->
                             <th class="border-bottom-0">Échéance</th>
@@ -133,6 +142,9 @@
                                         <div class="text-muted small">{{ $facture->client?->telephone }}</div>
                                     </div>
                                 </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light border rounded text-dark">{{ $facture->client?->agent?->nom?? '---' }}</span>
                             </td>
                             <td><span class="badge bg-light rounded border text-dark">{{$facture->client?->zone?->libelle??'---'}}</span></td>
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>

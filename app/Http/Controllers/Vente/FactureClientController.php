@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vente;
 use App\Http\Controllers\Controller;
 use App\Models\Vente\Client;
 use App\Models\Catalogue\{Article};
+use App\Models\Parametre\Agent;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
@@ -85,10 +86,16 @@ class FactureClientController extends Controller
             }
 
             if ($request->depot_id) {
-                $factures = FactureClient::query()
-                    ->whereHas('lignes', function ($ligne) use ($request) {
-                        $ligne->where('depot', $request->depot_id);
-                    })->get();
+                $factures = $query->get()
+                    ->filter(function ($facture) use ($request) {
+                        return ($facture->createdBy->point_de_vente_id == $request->point_vente_id && $facture->client_id == $request->client_id);
+                    });
+            }
+
+            if ($request->agent_id) {
+                $factures = $factures->filter(function ($facture) use ($request) {
+                    return $facture->client?->agent_id == $request->agent_id;
+                });
             }
 
             // Ajouter des attributs calculés pour chaque facture
@@ -165,8 +172,9 @@ class FactureClientController extends Controller
             $clients = Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
             $zones = Zone::all();
             $depots = Depot::all();
+            $agents = Agent::all();
 
-            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'zones', 'depots'));
+            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'zones', 'depots','agents'));
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement de la liste des factures', [
                 'error' => $e->getMessage(),
