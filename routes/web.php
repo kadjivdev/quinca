@@ -59,7 +59,7 @@ Route::get("/debug", function () {
     // $livraisonDeleteds = LivraisonClient::onlyTrashed()
     //     ->with("facture","lignes")
     //     ->whereHas("facture", function ($query) {
-    //         $query->where("numero", "FAC-20260611-0020");
+    //         $query->where("numero", "FAC-20260610-0022");
     //     })
     //     ->whereBetween("created_at", [
     //         Carbon::create(2026, 3, 1)->startOfDay(), // 1 Mars 
@@ -70,19 +70,19 @@ Route::get("/debug", function () {
 
     $factureClients = FactureClient::with("lignes")
         ->where("statut", "validee")
-        ->whereIn("numero", ["FAC-20260611-0009", "FAC-20260611-0020"])
-        ->get();
+        ->firstWhere("numero", "FAC-20260610-0022");
 
-    $factureClients->flatMap->lignes
+
+    $factureClients->lignes
         ->each(function ($ligne) {
             $ligne->update(["quantite_livree_simple" => 0]);
         });
 
-    return $factureClients->flatMap->lignes
+    return $factureClients->lignes
         ->pluck("quantite_livree_simple");
 
 
-    // return "Compte agents crée avec succès";
+    return "compte regularisé avec succès";
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {
     //         $query->where(["article_id" => 1544, "depot_id" => 4]);
