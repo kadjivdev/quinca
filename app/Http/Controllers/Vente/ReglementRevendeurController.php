@@ -109,10 +109,6 @@ class ReglementRevendeurController extends Controller
                 ->whereYear('created_at', now()->year)
                 ->get();
 
-            // return $reglementQuery
-            //     ->where("created_by", Auth::id())
-            //     ->where('statut', 'brouillon')->count();
-
             // Statistiques pour le header
             $statsReglements = [
                 // Total des règlements du mois

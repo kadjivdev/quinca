@@ -119,7 +119,7 @@
                 $('#montant')
                     .attr('max', resteAPayer)
                     .prop('disabled', false)
-                    .val('');
+                    .val(resteAPayer);
             } else {
                 // Réinitialiser les champs
                 $('#clientDisplay').text('Sélectionnez une facture');

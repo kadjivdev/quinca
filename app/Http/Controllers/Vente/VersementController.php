@@ -83,11 +83,14 @@ class VersementController extends Controller
             ->orderBy('raison_sociale')
             ->get(['id', 'raison_sociale', 'code_client']);
 
+        $versementMoisCount = $versements->whereBetween('date_op', [now()->startOfMonth(), now()->endOfMonth()])->count();
+
         return view('pages.ventes.versement.index', compact(
             'versements',
             'stats',
             'clients',
-            'date'
+            'date',
+            'versementMoisCount'
         ));
     }
 

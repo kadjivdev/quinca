@@ -71,6 +71,8 @@
             <h4 class="">Versements <span class="badge bg-{{request()->get('status_op')==='ATTENTE'?'warning':'success'}} text-dark">{{request()->get("status_op")}}</span> </h4>
             @endif
 
+            <h4 class="">Total: <span class="badge border text-dark shadow" id="total_montant"></span> FCFA </h4>
+
             <div class="table-responsive">
                 <table id="example1" class="table table-hover align-middle mb-0" id="acomptesTable">
                     <thead class="bg-light">
@@ -88,7 +90,6 @@
                             <th class="border-bottom-0 text-end">Preuve</th>
                             <th class="border-bottom-0">Commentaire</th>
                             <th class="border-bottom-0">Créé par</th>
-                            <!-- <th class="border-bottom-0">Validé par</th> -->
                             <th class="border-bottom-0">Extourné par</th>
                             <th class="border-bottom-0 text-end" style="min-width: 100px;">Actions</th>
                         </tr>
@@ -167,9 +168,6 @@
                             <td>
                                 <span class="text-muted small">{{ $versement->createdBy?->name??'—' }}</span>
                             </td>
-                            <!-- <td>
-                                <span class="text-muted small">{{ $versement->validatedBy?->name??'—' }}</span>
-                            </td> -->
                             <td>
                                 <span class="text-muted small">{{ $versement->extournedBy?->name??'—' }}</span>
                             </td>
@@ -675,7 +673,8 @@
 
 @push("scripts")
 <script>
-    $("#example1").DataTable({
+    // On garde une référence à l'instance DataTable
+    var table = $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,
         "autoWidth": false,
@@ -885,6 +884,41 @@
                 }
             }
         },
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
+
+    // On rattache les boutons séparément (au lieu de chainer directement)
+    table.buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+    // Formate un nombre comme PHP number_format($n, 2, '.', ' ')
+    function formatMontantTotal(nombre) {
+        let parts = nombre.toFixed(2).split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        return parts.join('.');
+    }
+
+    // Calcule le total des montants des lignes affichées (après recherche)
+    function calculerTotalMontant() {
+        let total = 0;
+
+        table.column(9, {
+            search: 'applied'
+        }).nodes().each(function(node) {
+            // .text() récupère le texte du <span class="montant">...</span>
+            let texte = $(node).text();
+            // on retire tout sauf chiffres, virgule, point puis on normalise la virgule en point
+            let valeur = parseFloat(
+                texte.replace(/[^\d,.-]/g, '').replace(',', '.')
+            ) || 0;
+            total += valeur;
+        });
+
+        $('#total_montant').text(formatMontantTotal(total));
+    }
+
+    // Recalcul à chaque "draw" (recherche, tri, pagination...)
+    table.on('draw', calculerTotalMontant);
+
+    // Calcul initial au chargement
+    calculerTotalMontant();
 </script>
 @endpush

@@ -16,7 +16,7 @@
                             <div class="d-flex gap-2 align-items-center ms-3">
                                 <span class="badge bg-success bg-opacity-10 text-success rounded-pill">
                                     <i class="fas fa-calendar-alt me-1"></i>
-                                    {{ $versements->whereBetween('date_op', [now()->startOfMonth(), now()->endOfMonth()])->count() }} ce mois
+                                    {{ $versementMoisCount }} ce mois
                                 </span>
                             </div>
                         </div>
