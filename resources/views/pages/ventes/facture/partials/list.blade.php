@@ -27,7 +27,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="input-group">
-                        <select class="form-select _select2-form" name="agent_id" required>
+                        <select class="form-select _select2-form" name="agent_id">
                             <option value="">Sélectionner un agent</option>
                             @foreach ($agents as $agent)
                             <option value="{{ $agent->id }}"
