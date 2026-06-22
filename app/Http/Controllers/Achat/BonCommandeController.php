@@ -209,9 +209,25 @@ class BonCommandeController extends Controller
                 'autre_cout' => $validated['autre_cout'],
             ]);
 
+            $selectedArticles = [];
+
             // Création des lignes
             foreach ($validated['lignes'] as $ligne) {
                 Log::info("Ligne d'article", ["data" => $ligne]);
+
+                $article = Article::findOrFail($ligne['article_id']);
+
+                /**
+                 * on verifie si l'article a été choisi deux fois
+                 */
+                if (isset($selectedArticles[$ligne['article_id']])) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "L'article ({$article->designation}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
+                    ], 422);
+                }
+                $selectedArticles[$ligne['article_id']] = true;//on compte cet article comme déjà selectionné
+
 
                 // Trouver la ligne de programmation correspondante pour obtenir l'unite_mesure_id
                 $ligneProgrammation = $programmation->lignes

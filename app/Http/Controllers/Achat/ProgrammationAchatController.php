@@ -85,6 +85,8 @@ class ProgrammationAchatController extends Controller
             // Récupérer le point de vente de l'utilisateur connecté
             $user = auth()->user();
             if (!$user->point_de_vente_id) {
+                Log::debug("Erreure de point de vente ", ["data" => $user]);
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Aucun point de vente associé à votre compte'
@@ -120,8 +122,27 @@ class ProgrammationAchatController extends Controller
                 // 'depot' => $request->depot,
             ]);
 
+
+            $selectedArticles = [];
+
             // Création des lignes
             foreach ($request->articles as $index => $articleId) {
+                $article = Article::findOrFail($articleId);
+
+                /**
+                 * on verifie si l'article a été choisi deux fois
+                 */
+                if (isset($selectedArticles[$articleId])) {
+                    Log::debug("L'article existe déjà",["data"=>$selectedArticles]);
+                    return response()->json([
+                        'status' => false,
+                        'message' => "L'article ({$article->designation}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
+                    ], 422);
+                }
+                $selectedArticles[$articleId] = true; //on compte cet article comme déjà selectionné
+
+
+                /** */
                 LigneProgrammationAchat::create([
                     'programmation_id' => $programmation->id,
                     'article_id' => $articleId,

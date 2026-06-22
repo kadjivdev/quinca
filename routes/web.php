@@ -71,7 +71,9 @@ Route::get("/debug", function () {
 
     $ligneFacture = LigneFactureFournisseur::find(1974);
 
-    $ligneFacture->update(["quantite_livree"=>2025]);
+    $ligneFacture->quantite_livree=2025;
+
+    $ligneFacture->save();
 
     return $ligneFacture;
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")

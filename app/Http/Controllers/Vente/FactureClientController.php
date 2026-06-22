@@ -174,7 +174,7 @@ class FactureClientController extends Controller
             $depots = Depot::all();
             $agents = Agent::all();
 
-            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'zones', 'depots','agents'));
+            return view('pages.ventes.facture.index', compact('factures', 'clients', 'date', 'tauxTva', 'statsFactures', 'pointsVentes', 'zones', 'depots', 'agents'));
         } catch (Exception $e) {
             Log::error('Erreur lors du chargement de la liste des factures', [
                 'error' => $e->getMessage(),
@@ -335,9 +335,8 @@ class FactureClientController extends Controller
 
             // Vérifications initiales
             $sessionCaisse = SessionCaisse::ouverte()
-                    ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                    ->first()
-            ;
+                ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
+                ->first();
 
             if (!$sessionCaisse) {
                 return response()->json([
@@ -380,26 +379,27 @@ class FactureClientController extends Controller
 
             if ($validator->fails()) {
                 Log::debug("Erreure lors de l'enregistrement de la facture ", ["error" => $validator->errors()]);
-
                 return response()->json([
                     'status' => 'error',
                     'errors' => $validator->errors()
                 ], 422);
             }
 
-            /**
-             * on verifie si les articles selectionnés
-             * sont tous dans son depôts pour les non admins
-             */
-            if (auth()->user()->hasRole('Super Administrateur')) {
-                $userPv = auth()->user()->pointDeVente;
-                $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
-                $selectedArticles = [];
+            /** */
+            $selectedArticles = [];
 
-                foreach ($request->lignes as $ligne) {
-                    $depot = Depot::find($ligne["depot_id"]);
-                    $article = Article::find($ligne['article_id']);
+            foreach ($request->lignes as $ligne) {
+                $depot = Depot::find($ligne["depot_id"]);
+                $article = Article::find($ligne['article_id']);
+
+                /**
+                 * on verifie si les articles selectionnés
+                 * sont tous dans son depôts pour les non admins
+                 */
+                if (!auth()->user()->hasRole('Super Administrateur')) {
+                    $userPv = auth()->user()->pointDeVente;
+                    $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
                     if (!in_array($ligne["depot_id"], $userPv_depotIds)) {
                         return response()->json([
@@ -407,25 +407,21 @@ class FactureClientController extends Controller
                             'message' => "Le dépôt ($depot->libelle_depot) ne vous appartient pas! Vous ne pouvez pas y passer une ecriture "
                         ], 500);
                     }
-
-                    if (isset($selectedArticles[$ligne['article_id']])) {
-                        return response()->json([
-                            'status' => false,
-                            'message' => "L'article ({$article->designation}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
-                        ], 422);
-                    }
-
-                    $selectedArticles[$ligne['article_id']] = true;
                 }
 
-                Log::debug("Les articles en question", ["data" => $selectedArticles]);
-            }
+                /**
+                 * on verifie si l'article a été choisi deux fois
+                 */
+                if (isset($selectedArticles[$ligne['article_id']])) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "L'article ({$article->designation}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
+                    ], 422);
+                }
+                $selectedArticles[$ligne['article_id']] = true;//on conpte cet article comme déjà selectionné
 
-            // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
 
-            foreach ($request->lignes as $ligne) {
-                $depot = Depot::find($ligne["depot_id"]);
-                // 
+                //On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
                 $stock = StockDepot::where('depot_id', $ligne["depot_id"])
                     ->where('article_id', $ligne['article_id'])
                     ->first();

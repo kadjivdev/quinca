@@ -169,7 +169,6 @@ class ProgrammationAchat {
         event.preventDefault();
         const form = event.target;
 
-
         if (form.checkValidity()) {
             this.saveProgrammation($(form));
         }
@@ -190,8 +189,8 @@ class ProgrammationAchat {
                 }
             },
             error: (xhr) => {
-                this.showError('Erreur lors de l\'enregistrement');
-                // console.error(xhr);
+                this.showError(xhr.responseJSON?.message);
+                console.log(xhr.responseJSON?.message);
                 console.log($form.serialize())
             }
         });
