@@ -28,6 +28,7 @@ use App\Models\Achat\BonCommande;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\LigneBonLivraisonFournisseur;
+use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\DetailInventaire;
 use App\Models\Catalogue\Inventaire;
@@ -68,10 +69,9 @@ Route::get("/debug", function () {
 
     // return $livraisonDeleteds;
 
-    $facture = FactureFournisseur::with("bonLivraison.lignes")
-        ->firstWhere("code", "FAC26069810");
+    $ligneFacture = LigneFactureFournisseur::find(1974);
 
-    return $facture;
+    return $ligneFacture;
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {
     //         $query->where(["article_id" => 1544, "depot_id" => 4]);
