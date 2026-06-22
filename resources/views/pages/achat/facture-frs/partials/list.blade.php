@@ -1,5 +1,6 @@
 <div class="row d-flex justify-content-center">
     <div class="col-md-6 border bg-light rounded p-3">
+
         <!-- FILTRAGE PAR DEPOT -->
         <form action="{{route('factures.index')}}" method="GET">
             @csrf
@@ -97,7 +98,7 @@
                         } else {
                             $factureStatutLivraison = 'PARTIELLEMENT_LIVRE';
                         }; ?>
-                        
+
                         <tr>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
@@ -172,7 +173,7 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
 
-                                    @if(!$facture->validated_at && !$facture->rejected_at)
+                                    @if(!$facture->validated_at)
                                     <button class="btn btn-sm btn-light-warning btn-icon ms-1"
                                         onclick="editFacture({{ $facture->id }})"
                                         data-bs-toggle="tooltip"
@@ -187,17 +188,20 @@
                                         <i class="fas fa-check"></i>
                                     </button>
 
-                                    <button class="btn btn-sm btn-light-success btn-icon ms-1"
-                                        onclick="initRejetFacture({{ $facture->id }})"
-                                        data-bs-toggle="tooltip" title="Rejeter">
-                                        <i class="fas fa-ban"></i>
-                                    </button>
-
                                     <button class="btn btn-sm btn-light-danger btn-icon ms-1"
                                         onclick="deleteFacture({{ $facture->id }})"
                                         data-bs-toggle="tooltip"
                                         title="Supprimer">
                                         <i class="fas fa-trash"></i>
+                                    </button>
+                                    @endif
+
+                                    <!-- annulation de on -->
+                                    @if(!$facture->rejected_at)
+                                    <button class="btn mx-1 btn-sm btn-light-success ms-1"
+                                        onclick="initRejetFacture({{ $facture }})"
+                                        data-bs-toggle="tooltip" title="Rejeter">
+                                        Annuler <i class="fas fa-ban"></i>
                                     </button>
                                     @endif
 
@@ -219,6 +223,7 @@
                                                     <i class="fas fa-file-excel me-2"></i>Exporter Excel
                                                 </a>
                                             </li>
+
                                         </ul>
                                     </div>
                                 </div>
@@ -339,7 +344,7 @@
             });
         }
 
-        /**DATATABLE */
+        /**Datatable */
         $("#example1").DataTable({
             "responsive": true,
             "lengthChange": false,

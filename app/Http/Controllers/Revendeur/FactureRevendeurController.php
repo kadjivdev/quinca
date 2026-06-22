@@ -66,6 +66,11 @@ class FactureRevendeurController extends Controller
                 Session::flash("day", $request->day);
             }
 
+            // Si un filtre de période est actif, l'appliquer aux stats aussi
+            if ($request->filled('debut') && $request->filled("fin")) {
+                $query->whereBetween("created_at", [$request->debut, $request->fin]);
+            }
+
             if (
                 auth()->user()->hasRole("Super Administrateur")
                 || auth()->user()->hasRole("CONTROLE INTERNE")

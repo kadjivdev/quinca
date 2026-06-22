@@ -1,4 +1,25 @@
 {{-- list-factures.blade.php --}}
+<div class="row d-flex justify-content-center">
+    <div class="col-md-6 border bg-light rounded p-3">
+        <form action="{{route('revendeur.speciales')}}" method="GET">
+            @csrf
+            <div class="row">
+                <div class="col-6">
+                    <label for="debut">Date de début</label>
+                    <input type="date" name="debut" class="form-control" id="debut">
+                </div>
+                <div class="col-6">
+                    <label for="debut">Date de fin</label>
+                    <input type="date" name="fin" class="form-control" id="fin">
+                </div>
+            </div>
+            <button class="w-100 btn btn-primary mt-2 px-4">
+                <i class="fas fa-save me-2"></i>Filtrer
+            </button>
+        </form>
+    </div>
+</div>
+
 <div class="row g-3">
     {{-- Table des factures --}}
     <div class="col-12">
@@ -13,7 +34,6 @@
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date facture</th>
                             <th class="border-bottom-0">Client</th>
-                            <!-- <th class="border-bottom-0">Etat</th> -->
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
                             <th class="border-bottom-0 text-end">Montant TVA</th>

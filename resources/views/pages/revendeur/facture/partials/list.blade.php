@@ -17,6 +17,16 @@
                     <input type="date" name="day" class="form-control" value="{{session('day')??null}}">
                 </div>
             </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="debut">Date de début</label>
+                    <input type="date" name="debut" class="form-control" id="debut">
+                </div>
+                <div class="col-6">
+                    <label for="fin">Date de fin</label>
+                    <input type="date" name="fin" class="form-control" id="fin">
+                </div>
+            </div>
             <button class="w-100 btn btn-primary mt-2 px-4">
                 <i class="fas fa-save me-2"></i>Filtrer
             </button>

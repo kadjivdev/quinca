@@ -85,7 +85,7 @@
                             <div class="card border border-light-subtle">
                                 <div class="card-header bg-light">
                                     <h6 class="card-title mb-0">
-                                        <i class="fas fa-box me-2"></i>gogo Articles
+                                        <i class="fas fa-box me-2"></i> Articles
                                     </h6>
                                 </div>
                                 <div class="card-body">

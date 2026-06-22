@@ -51,7 +51,7 @@ class SpecialController extends Controller
      * Affiche la liste des factures
      */
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             Log::info('Début du chargement de la liste des factures');
@@ -63,6 +63,11 @@ class SpecialController extends Controller
             $query = FactureRevendeur::with(['client'])
                 ->where('type_vente', 'speciale')
                 ->orderBy('date_facture', 'desc');
+
+            // Si un filtre de période est actif, l'appliquer aux stats aussi
+            if ($request->filled('debut') && $request->filled("fin")) {
+                $query->whereBetween("created_at", [$request->debut, $request->fin]);
+            }
 
             if (
                 auth()->user()->hasRole("Super Administrateur")

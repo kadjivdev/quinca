@@ -20,6 +20,37 @@
                 <div class="modal-body p-4">
                     <div class="row g-4">
 
+                        {{-- Section articles --}}
+                        <div id="articlesSectionShow" class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-box me-2"></i> Articles
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Référence</th>
+                                                    <th>Désignation</th>
+                                                    <th>Unité Base</th>
+                                                    <th class="text-end">Unité</th>
+                                                    <th class="text-end">Prix Unitaire</th>
+
+                                                    <th class="text-end">Montant HT</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="facture_articles">
+                                                <!-- Rempli dynamiquement -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {{-- Section commentaire --}}
                         <div class="col-12">
                             <div class="card border border-light-subtle">
@@ -51,77 +82,131 @@
 
 
 @push('scripts')
-    <script>
-        $(document).ready(function() {
-            // Soumission du formulaire
-            $('#rejetFactureForm').on('submit', function(e) {
-                e.preventDefault();
-                if (this.checkValidity()) {
-                    rejetFacture($(this), this.action);
+<script>
+    $(document).ready(function() {
+        // Soumission du formulaire
+        $('#rejetFactureForm').on('submit', function(e) {
+            e.preventDefault();
+            if (this.checkValidity()) {
+                rejetFacture($(this), this.action);
+            }
+            $(this).addClass('was-validated');
+        });
+    });
+
+    function rejetFacture($form, action) {
+        const formData = $form.serialize();
+
+        $.ajax({
+            url: action,
+            method: 'PUT',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    // Fermer le modal
+                    $('#rejetFactureModal').modal('hide');
+
+                    // Afficher le message de succès
+                    Toast.fire({
+                        icon: 'success',
+                        title: response.message
+                    });
+
+                    // Recharger la page après un court délai
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 }
-                $(this).addClass('was-validated');
-            });
+            },
+            error: function(xhr) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Erreur lors du rejet'
+                });
+            }
+        });
+    }
+
+
+    // Fonction pour afficher les articles
+    function loadArticles(lignes) {
+
+        const tbody = $('#facture_articles');
+        tbody.empty();
+
+        lignes.forEach(ligne => {
+            tbody.append(`
+                        <tr>
+                            <td>${ligne.article?.code_article}</td>
+                            <td>${ligne.article?.designation}</td>
+                            <td class="text-end">
+                                <input type="number" class="form-control form-control-sm text-end quantite"
+                                    name="articles[${ligne?.article.id}][quantite_base]"
+                                    value="${ligne?.quantite_base}"
+                                    readonly>
+                                    <span class="badge bg-light border text-dark">${ligne?.unite_mesure_base?.libelle_unite}</span>
+                            </td>
+                            <td class="text-end">
+                                <input type="number" class="form-control form-control-sm text-end quantite"
+                                    name="articles[${ligne.id}][quantite]"
+                                    value="${ligne.quantite}"
+                                    readonly>
+                                    <span class="badge bg-light border text-dark">${ligne?.unite_mesure}</span>
+                            </td>
+                            <td class="text-end">
+                                <input type="number" class="form-control form-control-sm text-end prix"
+                                    name="articles[${ligne?.id}][prix_unitaire]"
+                                    value="${ligne.prix_unitaire}"
+                                    readonly>
+                            </td>
+                            <td class="text-end">
+                                <span class="montant-ht">${(ligne.quantite * ligne.prix_unitaire).toFixed(2)}</span> FCFA
+                                <input type="hidden" name="articles[${ligne.id}][montant_ht]"
+                                    class="montant-ht-input"
+                                    value="${(ligne.quantite * ligne.prix_unitaire).toFixed(2)}">
+                                <input type="hidden" name="articles[${ligne.id}][unite_mesure_id]"
+                                    value="${ligne.unite_mesure_id}">
+                                <input type="hidden" name="articles[${ligne.id}][taux_tva]"
+                                    value="0">
+                                <input type="hidden" name="articles[${ligne.id}][taux_aib]"
+                                    value="0">
+                            </td>
+                        </tr>
+                `);
         });
 
-        function rejetFacture($form, action) {
-            const formData = $form.serialize();
+    }
 
-            $.ajax({
-                url: action,
-                method: 'PUT',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        // Fermer le modal
-                        $('#rejetFactureModal').modal('hide');
+    function initRejetFacture(facture) {
 
-                        // Afficher le message de succès
-                        Toast.fire({
-                            icon: 'success',
-                            title: response.message
-                        });
+        Swal.fire({
+            title: 'Confirmer le rejet',
+            text: 'Êtes-vous sûr de vouloir rejeter cette facture ? Cette action est irréversible.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, rejeter',
+            cancelButtonText: 'Annuler',
+            reverseButtons: true
+        }).then((result) => {
+            console.log('Réponse SweetAlert:', result); // Log de débogage
 
-                        // Recharger la page après un court délai
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    }
-                },
-                error: function(xhr) {
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Erreur lors du rejet'
-                    });
-                }
-            });
-        }
+            if (result.isConfirmed) {
+                const rejetModal = document.getElementById('rejetFactureModal');
+                const rejetForm = document.getElementById('rejetFactureForm');
 
-        function initRejetFacture(id) {
+                rejetForm.action = `/achat/factures/${facture?.id}/rejet`; // URL mise à jour
 
-            Swal.fire({
-                title: 'Confirmer le rejet',
-                text: 'Êtes-vous sûr de vouloir rejeter cette facture ? Cette action est irréversible.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Oui, rejeter',
-                cancelButtonText: 'Annuler',
-                reverseButtons: true
-            }).then((result) => {
-                console.log('Réponse SweetAlert:', result); // Log de débogage
+                // chargement des articles
+                console.log("Les lignes de la facture :",facture.lignes)
+                loadArticles(facture.lignes)
 
-                if (result.isConfirmed) {
-                    const rejetModal = document.getElementById('rejetFactureModal');
-                    const rejetForm = document.getElementById('rejetFactureForm');
-
-                    rejetForm.action = `/achat/factures/${id}/rejet`;  // URL mise à jour
-
-                    const modal = new bootstrap.Modal(rejetModal);
-                    modal.show();                
-                    Swal.close();
-                }
-            });
-        }
-    </script>
+                const modal = new bootstrap.Modal(rejetModal);
+                modal.show();
+                Swal.close();
+            }
+        });
+    }
+</script>
 @endpush

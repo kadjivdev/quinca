@@ -546,6 +546,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{facture}', [FactureFournisseurController::class, 'destroy'])->name('factures.destroy');
             Route::get('/{facture}/edit', [FactureFournisseurController::class, 'edit'])->name('factures.edit');
             Route::put('/{facture}/rejet', [FactureFournisseurController::class, 'rejectFacture'])->name('factures.reject');
+            Route::put('/{facture}/annuler', [FactureFournisseurController::class, 'annulerFacture'])->name('factures.annulerFacture');
 
             // Routes de validation et statuts
             Route::post('/{facture}/validate', [FactureFournisseurController::class, 'validated'])->name('factures.validate');

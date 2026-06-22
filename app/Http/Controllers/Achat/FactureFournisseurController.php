@@ -493,7 +493,34 @@ class FactureFournisseurController extends Controller
         }
     }
 
+    /**
+     * Rejeter la facture
+     */
     public function rejectFacture(Request $request, $id)
+    {
+        $facture = FactureFournisseur::findorFail($id);
+
+        $request->validate([
+            'motif_rejet' => 'required|string'
+        ]);
+
+        $facture->motif_rejet = $request->motif_rejet;
+        $facture->rejected_by = Auth::id();
+        $facture->rejected_at = now();
+
+        $facture->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Facture fournisseur rejetée avec succès',
+            'data' => $facture
+        ]);
+    }
+
+    /**
+     * Annuler la facture
+     */
+    public function annulerFacture(Request $request, $id)
     {
         $facture = FactureFournisseur::findorFail($id);
 
