@@ -68,7 +68,7 @@ Route::get("/debug", function () {
 
     // return $livraisonDeleteds;
 
-    $facture = FactureFournisseur::with("lignes")->firstWhere("code", "FAC26069810");
+    $facture = FactureFournisseur::with("lignes.quantite_livree","bonLivraison")->firstWhere("code", "FAC26069810");
 
     return $facture;
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
