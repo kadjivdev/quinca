@@ -1,7 +1,7 @@
 {{-- list-factures.blade.php --}}
 <div class="row d-flex justify-content-center">
     <div class="col-md-6 border bg-light rounded p-3">
-        <form action="{{route('revendeur.speciales')}}" method="GET">
+        <form action="{{route('revendeur.speciales.index')}}" method="GET">
             @csrf
             <div class="row">
                 <div class="col-6">
