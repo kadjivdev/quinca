@@ -96,12 +96,8 @@
                             $factureStatutLivraison = 'LIVRE';
                         } else {
                             $factureStatutLivraison = 'PARTIELLEMENT_LIVRE';
-                        }
-
-                            // if ($facture->code=='FAC25090427') {
-                            //     dd($qteTotalFacture,$totalLivres);
-                            // }
-                        ; ?>
+                        }; ?>
+                        
                         <tr>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
