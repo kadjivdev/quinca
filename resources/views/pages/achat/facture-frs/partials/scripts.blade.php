@@ -134,7 +134,7 @@
         $("[name='type_facture']").val(data.type_facture);
 
         // Vérification des articles
-        if (data.lignes && data.lignes.length > 0) {
+        if (data.all_lignes && data.all_lignes.length > 0) {
             let articlesHtml = `
             <div class="card border border-light-subtle">
                 <div class="card-header bg-light">
@@ -153,32 +153,39 @@
                                     <th class="text-end" style="width: 120px;">Unité</th>
                                     <th class="text-end" style="width: 150px;">Prix Unitaire</th>
                                     <th class="text-end" style="width: 150px;">Montant HT</th>
+                                    <th class="text-end" style="width: 150px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>`;
-
-            data.lignes.forEach((ligne, index) => {
+            data.all_lignes.forEach((ligne, index) => {
                 const article = ligne.article;
+                // console.log("Article :", article)
                 articlesHtml += `
-                <tr>
-                    <td>${article.code_article || ''}</td>
-                    <td>${article.designation || ''}</td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite_base]" value="${ligne.quantite_base}" readonly>
-                        <span class="badge bg-light border text-dark bordered">${ligne.unite_mesure_base?.libelle_unite || ""}</span>
-                    </td>
-                    <td class="text-end">
-                        <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite]" value="${ligne.quantite || 0}" readonly>
-                        <span class="badge bg-light border text-dark bordered">${ligne.unite_mesure.libelle_unite || ""}</span>
-                    </td>
-                    
-                    <td>
-                        <input type="number" value="${ligne.prix_unitaire || ''}"  readonly>
-                    </td>
-                    <td class="text-end">
-                        <span class="total-ligne-${index}">${ligne.montant_ht}</span> F CFA
-                    </td>
-                </tr>`;
+                                    <tr>
+                                        <td>${article.code_article || ''}</td>
+                                        <td>${article.designation || ''}</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite_base]" value="${ligne.quantite_base}" readonly>
+                                            <span class="badge bg-light border text-dark bordered">${ligne.unite_mesure_base?.libelle_unite || ""}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite]" value="${ligne.quantite || 0}" readonly>
+                                            <span class="badge bg-light border text-dark bordered">${ligne.unite_mesure.libelle_unite || ""}</span>
+                                        </td>
+                                        <td>
+                                            <input type="number" value="${ligne.prix_unitaire || ''}"  readonly>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="total-ligne-${index}">${ligne.montant_ht}</span> F CFA
+                                        </td>
+                                        <td class="text-center">
+                                            <input
+                                            class="text-danger"
+                                                type="checkbox"
+                                                readonly
+                                                ${ligne.rejected?'checked':''}>
+                                        </td>
+                                    </tr>`;
             });
 
             articlesHtml += `
@@ -188,7 +195,7 @@
                 </div>
             </div>`;
 
-            $('#articlesSectionShow').html(articlesHtml);
+            $('#achatFactureShowDetails').append(articlesHtml);
 
             $("#montantHTShow").html(data.montant_ht.toFixed(2))
             $("#montantTVAShow").html(data.montant_tva.toFixed(2))
@@ -197,12 +204,6 @@
 
             $("[name='commentaire']").val(data.commentaire)
 
-            // Calculer les totaux initiaux
-            // data.articles.forEach((article, index) => {
-            //     if (article.prix_unitaire) {
-            //         calculerMontantLigne(index);
-            //     }
-            // });
             calculerTotaux();
         } else {
             $('#articlesSection').html(`

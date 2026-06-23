@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Achat;
 
 use App\Http\Controllers\Controller;
 use App\Models\Achat\AccompteFournisseur;
+use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\Fournisseur;
 use App\Models\Achat\RequeteFournisseur;
 use App\Models\Catalogue\Article;
@@ -20,16 +21,18 @@ class RequeteFournisseurController extends Controller
      */
     public function index()
     {
-        $requetes = RequeteFournisseur::with('fournisseur')->with('articles')->get();
+        $requetes = RequeteFournisseur::with('fournisseur', 'factureFournisseur')->with('articles')->get();
         $fournisseurs = Fournisseur::get(["id", "code_fournisseur", "raison_sociale"]);
         $articles = Article::all();
+        $factures = FactureFournisseur::get(["id", "code"]);
 
         $requetesMax = RequeteFournisseur::withTrashed()->count() + 1;
         return view('pages.achat.requete.index', compact([
             'requetes',
             'fournisseurs',
             'articles',
-            'requetesMax'
+            'requetesMax',
+            "factures"
         ]));
     }
 
@@ -59,7 +62,8 @@ class RequeteFournisseurController extends Controller
                 'nature' => 'required|string',
                 'mention' => 'required|string',
                 'formulation' => 'required|string',
-                'fournisseur_id' => 'required|string',
+                'fournisseur_id' => 'required|integer',
+                'facture_id' => 'required|integer',
                 // 'motif' => 'nullable|string',
                 // 'articles' => 'required|array',
                 // 'articles.*' => 'exists:articles,id',
@@ -85,13 +89,13 @@ class RequeteFournisseurController extends Controller
                 'nature' => $request->nature,
                 'mention' => $request->mention,
                 'formulation' => $request->formulation,
-                'user_id' => auth()->user()->id,
+                'user_id' => auth()->user()?->id,
                 'fournisseur_id' => $request->fournisseur_id,
+                'facture_id' => $request->facture_id,
                 'motif' => $request->motif,
                 'motif_content' => $request->autre_motif,
                 'fichier' => $request->hasFile('fichier') ? $validated['fichier'] : null,
             ]);
-
 
             DB::commit();
             return response()->json([
@@ -138,7 +142,9 @@ class RequeteFournisseurController extends Controller
         $requete = RequeteFournisseur::findOrFail($requeteId);
         $fournisseurs = Fournisseur::get(["id", "code_fournisseur", "raison_sociale"]);
         $articles = Article::all();
-        return view('pages.achat.requete.edit', compact(['fournisseurs', 'articles', 'requete']));
+
+        $factures = FactureFournisseur::get(["id", "code"]);
+        return view('pages.achat.requete.edit', compact(['fournisseurs', 'articles', 'requete', 'factures']));
     }
 
     /**
@@ -149,7 +155,8 @@ class RequeteFournisseurController extends Controller
         try {
             DB::beginTransaction();
 
-            $requete = RequeteFournisseur::findOrFail($id);
+            $requete = RequeteFournisseur::with("factureFournisseur", "fournisseur")
+                ->findOrFail($id);
 
             $request->validate([
                 'num_demande' => 'required|integer',
@@ -158,6 +165,9 @@ class RequeteFournisseurController extends Controller
                 'mention' => 'required|string',
                 'formulation' => 'required|string',
                 'client_id' => 'required|string',
+                'fournisseur_id' => 'required|integer',
+                'facture_id' => 'required|integer',
+
                 // 'articles' => 'required|array',
                 'articles.*' => 'exists:articles,id',
             ]);

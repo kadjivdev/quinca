@@ -173,7 +173,6 @@ class FactureFournisseur extends Model
      * 
      * Recherche de factures
      */
-
     public function scopeSearch(Builder $query, string $term): Builder
     {
         return $query->where(function ($query) use ($term) {
@@ -218,6 +217,20 @@ class FactureFournisseur extends Model
      * Relation avec les lignes de facture
      */
     public function lignes()
+    {
+        return $this->hasMany(LigneFactureFournisseur::class, 'facture_id')
+            ->where("rejected", 0); // les lignes non rejetées;
+    }
+
+    /** Les lignes supprimées */
+    public function ligneCancelleds()
+    {
+        return $this->hasMany(LigneFactureFournisseur::class, 'facture_id')
+            ->where("rejected", 1); //les lignes rejetées;
+    }
+
+    /**Toutes les lignes */
+    public function allLignes()
     {
         return $this->hasMany(LigneFactureFournisseur::class, 'facture_id');
     }
@@ -275,10 +288,11 @@ class FactureFournisseur extends Model
      */
     public function updateMontants()
     {
-        $this->montant_ht = $this->lignes()->sum('montant_ht');
-        $this->montant_tva = $this->lignes()->sum('montant_tva');
-        $this->montant_aib = $this->lignes()->sum('montant_aib');
-        $this->montant_ttc = $this->lignes()->sum('montant_ttc');
+        //sauf les lignes non rejetées
+        $this->montant_ht = $this->lignes()->where("rejected", 0)->sum('montant_ht');
+        $this->montant_tva = $this->lignes()->where("rejected", 0)->sum('montant_tva');
+        $this->montant_aib = $this->lignes()->where("rejected", 0)->sum('montant_aib');
+        $this->montant_ttc = $this->lignes()->where("rejected", 0)->sum('montant_ttc');
         $this->save();
     }
 

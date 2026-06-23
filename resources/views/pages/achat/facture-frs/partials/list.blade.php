@@ -154,8 +154,17 @@
                                 </div>
                                 <small class="text-muted">
                                     (
-                                    @if ($facture->rejected_by)
-                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3"><i class="fas fa-minus-circle"></i> Rejetée</span>
+                                    @if($facture->rejected_by)
+                                        @php($rejected = $facture->allLignes()->where("rejected",1))
+                                        @if($rejected->count()>0 && $rejected->count()<$facture->allLignes()->count() )
+                                            <span class="badge bg-danger bg-opacity-10 text-danger px-3">
+                                                <i class="fas fa-minus-circle"></i> Partillement rejetée
+                                            </span>
+                                            @elseif($rejected->count()>0 && $rejected->count()==$facture->allLignes()->count())
+                                            <span class="badge bg-danger bg-opacity-10 text-danger px-3">
+                                                <i class="fas fa-minus-circle"></i> Totalement rejetée
+                                            </span>
+                                        @endif
                                     @elseif ($facture->validated_at)
                                     <span class="badge bg-success bg-opacity-10 text-success px-3"><i class="fas fa-check-circle"></i> Validée</span>
                                     @else

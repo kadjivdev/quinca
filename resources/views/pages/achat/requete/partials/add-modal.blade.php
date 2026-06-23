@@ -33,6 +33,18 @@
                 </div>
 
                 <div class="col-6 mb-3">
+                    <label for="client_id">Factures</label>
+                    <select required name="facture_id" id="facture_id" class="select2 form-select">
+                        <option value="">Choisir la facture </option>
+                        @foreach ($factures as $facture)
+                        <option value="{{ $facture->id }}" {{ old('facture_id') == $facture->id ? 'selected' : '' }}>
+                            {{ $facture->code }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-12 mb-3">
                     <label for="client_id">Fournisseurs</label>
                     <select required name="fournisseur_id" id="fournisseur_id" class="select2 form-select">
                         <option value="">Choisir le fournisseur </option>

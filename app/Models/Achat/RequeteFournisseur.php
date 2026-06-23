@@ -29,13 +29,20 @@ class RequeteFournisseur extends Model
         'motif_content',
 
         'deleted_by',
-        'deleted_at'
+        'deleted_at',
+        'facture_id',
     ];
 
     /** Many to many */
     public function articles()
     {
         return $this->belongsToMany(Article::class, 'articles_fournisseurrequetes', "requete_id", "article_id");
+    }
+
+    /**Facture fournisseur */
+    public function factureFournisseur()
+    {
+        return $this->belongsTo(FactureFournisseur::class, "facture_id");
     }
 
     /**Fournisseur */

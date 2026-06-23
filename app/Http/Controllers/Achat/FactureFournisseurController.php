@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class FactureFournisseurController extends Controller
 {
@@ -27,8 +28,10 @@ class FactureFournisseurController extends Controller
             'bonCommande',
             'pointVente',
             'fournisseur',
+            'allLignes',
             'lignes.article',
-            'lignes.uniteMesure'
+            'lignes.uniteMesure',
+            'lignes.uniteMesureBase',
         ]);
 
         if ($request->fournisseur_id) {
@@ -62,7 +65,9 @@ class FactureFournisseurController extends Controller
         }
 
         // Récupération des factures paginées
-        $factures = $query->latest('date_facture')->get();
+        $factures = $query->latest('date_facture')
+        ->get()
+        ;
 
         // Calcul des statistiques pour le header
 
@@ -238,35 +243,16 @@ class FactureFournisseurController extends Controller
             'pointVente',
             'fournisseur',
 
-            // 'lignes' => function ($query) {
-            //     /**on recupere seulement les lignes qui disposent encore de quantité */
-            //     $query->where(function ($q) {
-            //         if ($q->quantite_base) {
-            //             $q->whereNull('quantite_livree_simple')
-            //                 ->orWhere(function ($subQ) {
-            //                     $subQ->whereNotNull('quantite_livree_simple')
-            //                         ->where('quantite_base', '>', DB::raw('quantite_livree_simple'));
-            //                 });
-            //         } else {
-            //             $q->whereNull('quantite_livree_simple')
-            //                 ->orWhere(function ($subQ) {
-            //                     $subQ->whereNotNull('quantite_livree_simple')
-            //                         ->where('quantite', '>', DB::raw('quantite_livree_simple'));
-            //                 });
-            //         }
-            //     });
-            // },
-
             'lignes' => function ($query) {
                 $query->where(function ($q) {
                     /**quantite_base */
                     $q->where(function ($subQ) {
-                        $subQ->whereNotNull('quantite_base')
-                            ->where(function ($x) {
-                                $x->whereNull('quantite_livree_simple')
-                                    ->orWhereColumn('quantite_base', '>', 'quantite_livree_simple');
-                            });
-                    })
+                            $subQ->whereNotNull('quantite_base')
+                                ->where(function ($x) {
+                                    $x->whereNull('quantite_livree_simple')
+                                        ->orWhereColumn('quantite_base', '>', 'quantite_livree_simple');
+                                });
+                        })
                         /**quantite **/
                         ->orWhere(function ($subQ) {
                             $subQ->whereNull('quantite_base')
@@ -298,6 +284,11 @@ class FactureFournisseurController extends Controller
             'bonCommande',
             'pointVente',
             'fournisseur',
+
+            'allLignes.article',
+            'allLignes.uniteMesureBase',
+            'allLignes.uniteMesure',
+
             'lignes.uniteMesureBase',
             'lignes.article',
             'lignes.uniteMesure'
@@ -315,12 +306,6 @@ class FactureFournisseurController extends Controller
     public function update(Request $request, FactureFournisseur $facture)
     {
         try {
-            // if (!$facture->isModifiable()) {
-            //     throw new \Exception('Cette facture ne peut plus être modifiée');
-            // }
-
-            // dd($request->commentaireMod);
-
             DB::beginTransaction();
 
             // Validation similaire au store
@@ -498,46 +483,74 @@ class FactureFournisseurController extends Controller
      */
     public function rejectFacture(Request $request, $id)
     {
-        $facture = FactureFournisseur::findorFail($id);
+        try {
+            DB::beginTransaction();
 
-        $request->validate([
-            'motif_rejet' => 'required|string'
-        ]);
+            Log::debug("Les données de rejet :", ["id" => $id, "data" => $request->all()]);
+            $facture = FactureFournisseur::with("lignes")->findorFail($id);
 
-        $facture->motif_rejet = $request->motif_rejet;
-        $facture->rejected_by = Auth::id();
-        $facture->rejected_at = now();
+            Log::debug("La facture en question :", ["data" => $facture]);
 
-        $facture->save();
+            $request->validate([
+                'motif_rejet' => 'required|string',
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Facture fournisseur rejetée avec succès',
-            'data' => $facture
-        ]);
-    }
+                'articles' => 'required|array',
+                'articles.*.rejected' => 'nullable',
+            ]);
 
-    /**
-     * Annuler la facture
-     */
-    public function annulerFacture(Request $request, $id)
-    {
-        $facture = FactureFournisseur::findorFail($id);
+            $selectedIds = [];
+            foreach ($request->articles as $articleId => $value) {
+                if (isset($value["rejected"])) {
+                    $selectedIds[$articleId] = true;
+                }
+            }
+            Log::debug("Les ids rejetés :", ["data" => $selectedIds]);
 
-        $request->validate([
-            'motif_rejet' => 'required|string'
-        ]);
+            $facture->lignes()
+                ->whereIn("id", array_keys($selectedIds))
+                ->update(["rejected" => true]);
 
-        $facture->motif_rejet = $request->motif_rejet;
-        $facture->rejected_by = Auth::id();
-        $facture->rejected_at = now();
+            $facture->lignes()
+                ->whereNotIn("id", array_keys($selectedIds))
+                ->update(["rejected" => false]);
 
-        $facture->save();
+            $facture->update([
+                "motif_rejet" => $request->motif_rejet,
+                "rejected_by" => Auth::id(),
+                "rejected_at" => now()
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Facture fournisseur rejetée avec succès',
-            'data' => $facture
-        ]);
+            // 
+            $facture->updateMontants();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Facture fournisseur rejetée avec succès',
+                'data' => $facture
+            ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            Log::debug("Erreures lors de l'annulation de la facture ", ["errors" => $e->errors()]);
+
+            return response()
+                ->json([
+                    'success' => false,
+                    'message' => $e->errors()[0],
+                    // 'data' => $facture
+                ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            Log::debug("Erreures lors de l'annulation de la facture ", ["errors" => $th->getMessage()]);
+
+            return response()
+                ->json([
+                    'success' => false,
+                    'message' => $th->getMessage(),
+                    'data' => $facture
+                ]);
+        }
     }
 }

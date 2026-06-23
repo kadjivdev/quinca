@@ -8,8 +8,8 @@
                         <i class="fas fa-clipboard-list fs-4 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">Rejet de facture</h5>
-                        <p class="text-muted small mb-0">Remplissez les informations ci-dessous pour rejeter la facture</p>
+                        <h5 class="modal-title fw-bold mb-0">Annulation de la facture</h5>
+                        <p class="text-muted small mb-0">Choisissez les articles à rejeter</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -38,8 +38,8 @@
                                                     <th>Unité Base</th>
                                                     <th class="text-end">Unité</th>
                                                     <th class="text-end">Prix Unitaire</th>
-
                                                     <th class="text-end">Montant HT</th>
+                                                    <th class="text-end">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="facture_articles">
@@ -56,11 +56,11 @@
                             <div class="card border border-light-subtle">
                                 <div class="card-header bg-light">
                                     <h6 class="card-title mb-0">
-                                        <i class="fas fa-comment-alt me-2"></i>Motif du rejet
+                                        <i class="fas fa-comment-alt me-2"></i>Motif d'annulation
                                     </h6>
                                 </div>
                                 <div class="card-body">
-                                    <textarea class="form-control" name="motif_rejet" rows="3" placeholder="Commentaire éventuel" required></textarea>
+                                    <textarea class="form-control" id="motif_rejet" name="motif_rejet" rows="3" placeholder="Commentaire éventuel" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -94,6 +94,7 @@
         });
     });
 
+    // submission
     function rejetFacture($form, action) {
         const formData = $form.serialize();
 
@@ -119,14 +120,14 @@
                 }
             },
             error: function(xhr) {
+                console.log("erreure :", xhr.responseJSON?.message)
                 Toast.fire({
                     icon: 'error',
-                    title: 'Erreur lors du rejet'
+                    title: xhr.responseJSON?.message || 'Erreur lors du rejet'
                 });
             }
         });
     }
-
 
     // Fonction pour afficher les articles
     function loadArticles(lignes) {
@@ -135,6 +136,7 @@
         tbody.empty();
 
         lignes.forEach(ligne => {
+            const checked = ligne.rejected ? 'checked' : '';
             tbody.append(`
                         <tr>
                             <td>${ligne.article?.code_article}</td>
@@ -142,16 +144,16 @@
                             <td class="text-end">
                                 <input type="number" class="form-control form-control-sm text-end quantite"
                                     name="articles[${ligne?.article.id}][quantite_base]"
-                                    value="${ligne?.quantite_base}"
+                                    value="${ligne?.quantite}"
                                     readonly>
-                                    <span class="badge bg-light border text-dark">${ligne?.unite_mesure_base?.libelle_unite}</span>
+                                    <span class="badge bg-light border text-dark">${ligne?.unite_mesure?.libelle_unite}</span>
                             </td>
                             <td class="text-end">
                                 <input type="number" class="form-control form-control-sm text-end quantite"
                                     name="articles[${ligne.id}][quantite]"
                                     value="${ligne.quantite}"
                                     readonly>
-                                    <span class="badge bg-light border text-dark">${ligne?.unite_mesure}</span>
+                                    <span class="badge bg-light border text-dark">${ligne?.unite_mesure?.libelle_unite}</span>
                             </td>
                             <td class="text-end">
                                 <input type="number" class="form-control form-control-sm text-end prix"
@@ -170,6 +172,12 @@
                                     value="0">
                                 <input type="hidden" name="articles[${ligne.id}][taux_aib]"
                                     value="0">
+                            </td>
+                            <td class="text-end">
+                                <input
+                                    type="checkbox"
+                                    name="articles[${ligne.id}][rejected]"
+                                    ${checked}>
                             </td>
                         </tr>
                 `);
@@ -199,7 +207,9 @@
                 rejetForm.action = `/achat/factures/${facture?.id}/rejet`; // URL mise à jour
 
                 // chargement des articles
-                console.log("Les lignes de la facture :",facture.lignes)
+                document.getElementById("motif_rejet").value = facture.motif_rejet
+                
+                console.log("Les lignes de la facture :", facture.lignes)
                 loadArticles(facture.lignes)
 
                 const modal = new bootstrap.Modal(rejetModal);

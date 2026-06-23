@@ -42,7 +42,6 @@ class ProgrammationAchatController extends Controller
                 try {
                     $article->unites = $article->getUnites();
                 } catch (\Exception $e) {
-                    // Handle the exception, log it, or set a default value
                     $article->unites = null;
                 }
 

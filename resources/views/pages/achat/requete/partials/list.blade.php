@@ -9,6 +9,7 @@
                         <tr>
                             <th class="border-bottom-0">N° demande</th>
                             <th class="border-bottom-0">Fournisseur</th>
+                            <th class="border-bottom-0">Facture achat</th>
                             <th class="border-bottom-0">Date</th>
                             <th class="border-bottom-0">Mention</th>
                             <th class="border-bottom-0">Articles</th>
@@ -20,8 +21,9 @@
                     <tbody>
                         @foreach ($requetes as $requete)
                         <tr>
-                            <td>{{ $requete->num_demande }} </td>
+                            <td class="text-center">{{ $requete->num_demande }} </td>
                             <td>{{ $requete->fournisseur->raison_sociale }}</td>
+                            <td><span class="badge bg-light text-warning"> {{ $requete->factureFournisseur?->code ?? '---' }} </span></td>
                             <td>{{ $requete->date_demande }}</td>
                             <td>{{ $requete->mention }}</td>
 

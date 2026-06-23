@@ -114,12 +114,24 @@
                                                 <textarea rows="1" name="formulation" id="edit_formulation" class="form-control">{{$requete->formulation}}</textarea>
                                             </div>
 
+                                            <div class="col-6 mb-3">
+                                                <label for="client_id">Factures</label>
+                                                <select required name="facture_id" id="facture_id" class="select2 form-select">
+                                                    <option value="">Choisir la facture </option>
+                                                    @foreach ($factures as $facture)
+                                                    <option value="{{ $facture->id }}" {{ $requete->factureFournisseur?->id == $facture->id ? 'selected' : '' }}>
+                                                        {{ $facture->code }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
                                             {{-- Client (readonly) --}}
                                             <div class="col-md-6">
-                                                <label class="form-label fw-medium">Client</label>
-                                                <select name="client_id" id="edit_client_id" class="form-control form-select edit-select2">
+                                                <label class="form-label fw-medium">Fournisseur</label>
+                                                <select name="fournisseur_id" id="edit_client_id" class="form-control form-select edit-select2">
                                                     @foreach($fournisseurs as $fournisseur)
-                                                    <option @selected($fournisseur->id==$requete->fournisseur->id) value="{{$fournisseur->id}}">{{$fournisseur->raison_sociale}}</option>
+                                                    <option @selected($fournisseur->id==$requete->fournisseur?->id) value="{{$fournisseur->id}}">{{$fournisseur->raison_sociale}}</option>
                                                     @endforeach
                                                 </select>
                                             </div>

@@ -71,9 +71,10 @@ class LigneFactureFournisseur extends Model
         'created_by',
         'updated_by',
         'validated_by',
-
+        
         'unite_mesure_base_id',
-        'quantite_base'
+        'quantite_base',
+        'rejected',
     ];
 
     /**

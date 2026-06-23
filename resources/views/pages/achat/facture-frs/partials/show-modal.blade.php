@@ -16,8 +16,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             {{--
-            <form action="{{ route('factures.store') }}" method="POST" id="addFactureForm" class="needs-validation"
-            novalidate> --}}
+            <form action="#" method="POST" id="addFactureForm" class="needs-validation" novalidate> --}}
             <div class="modal-body p-4">
                 <div class="row g-4">
                     <div id="detailsContainer">
@@ -81,34 +80,8 @@
                         </div>
 
                         {{-- Section articles --}}
-                        <div id="articlesSectionShow" class="col-12">
-                            <div class="card border border-light-subtle">
-                                <div class="card-header bg-light">
-                                    <h6 class="card-title mb-0">
-                                        <i class="fas fa-box me-2"></i> Articles
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Référence</th>
-                                                    <th>Désignation</th>
-                                                    <th>Unité Base</th>
-                                                    <th class="text-end">Unité</th>
-                                                    <th class="text-end">Prix Unitaire</th>
-
-                                                    <th class="text-end">Montant HT</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="articlesTableBody">
-                                                <!-- Rempli dynamiquement -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+                        <div id="achatFactureShowDetails" class="col-12">
+                            <!--  -->
                         </div>
 
                         {{-- Section totaux --}}
@@ -192,21 +165,8 @@
             placeholder: 'Sélectionner un bon de commande'
         });
 
-        // Fonction pour charger les articles
-        function loadBonCommandeArticles(bonCommandeId) {
-            $.ajax({
-                url: `/achat/bon-commandes/${bonCommandeId}/articles`,
-                method: 'GET',
-                success: function(response) {
-                    if (response.success) {
-                        displayArticles(response.data);
-                    }
-                }
-            });
-        }
-
         // Fonction pour afficher les articles
-        function displayArticles(articles) {
+        function displayArticles(lignes) {
 
             const tbody = $('#articlesTableBody');
             tbody.empty();
@@ -248,6 +208,13 @@
                                 <input type="hidden" name="articles[${article.id}][taux_aib]"
                                     value="0">
                             </td>
+                            <td class="text-center">
+                                <input
+                                    type="checkbox"
+                                    readonly
+                                    name="articles[${ligne.id}][rejected]"
+                                    ${checked}>
+                            </td>
                         </tr>
                 `);
             });
@@ -268,7 +235,6 @@
                 calculateTotals();
             });
         }
-
 
         // Calculer les montants pour une ligne
         function calculateLineMontants(row) {
@@ -333,7 +299,6 @@
             }
             calculateTotals();
         });
-
     });
 </script>
 @endpush
