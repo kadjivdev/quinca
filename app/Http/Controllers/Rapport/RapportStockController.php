@@ -22,26 +22,6 @@ class RapportStockController extends Controller
     protected $serviceEntree;
     protected $serviceSortie;
 
-    public function mouvementReport(Request $request)
-    {
-        $depots = Depot::all();
-        $selectedDepot = $request->depot_id ?
-            Depot::findOrFail($request->depot_id) :
-            $depots->first();
-
-        $stats = $this->getStats($selectedDepot->id);
-        $mouvements = $this->getMouvements($request);
-        $stockDisponible = $this->getStockDisponible($selectedDepot->id);
-
-        return view('pages.rapports.stocks.mouvement', compact(
-            'stats',
-            'mouvements',
-            'depots',
-            'selectedDepot',
-            'stockDisponible'
-        ));
-    }
-
     public function __construct(
         ServiceStockEntree $serviceEntree,
         ServiceStockSortie $serviceSortie
@@ -61,7 +41,6 @@ class RapportStockController extends Controller
         $stockDisponible = $this->getStockDisponible($selectedDepot->id);
         $mouvements = $this->getMouvements($request);
         $alertes = $this->getAlertesStock($selectedDepot->id);
-
         return view('admin.rapports.stock.index', compact(
             'depots',
             'selectedDepot',
@@ -69,6 +48,26 @@ class RapportStockController extends Controller
             'stockDisponible',
             'mouvements',
             'alertes'
+        ));
+    }
+
+    public function mouvementReport(Request $request)
+    {
+        $depots = Depot::all();
+        $selectedDepot = $request->depot_id ?
+            Depot::findOrFail($request->depot_id) :
+            $depots->first();
+
+        $stats = $this->getStats($selectedDepot->id);
+        $mouvements = $this->getMouvements($request);
+        $stockDisponible = $this->getStockDisponible($selectedDepot->id);
+
+        return view('pages.rapports.stocks.mouvement', compact(
+            'stats',
+            'mouvements',
+            'depots',
+            'selectedDepot',
+            'stockDisponible'
         ));
     }
 
@@ -396,7 +395,7 @@ class RapportStockController extends Controller
     {
         $query = StockMouvement::with(['article', 'depot', 'uniteMesure', 'user'])
             ->whereNull("inventaire_id") //seuls les stocks nont inventoriés sont considéres
-            ->orderBy('date_mouvement', 'desc');
+            ->orderByDesc("id");
 
         if ($request->filled('depot_id')) {
             $query->where('depot_id', $request->depot_id);
