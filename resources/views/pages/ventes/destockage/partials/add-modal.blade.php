@@ -1,0 +1,255 @@
+<div class="modal fade" id="addDestockageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl bg-white">
+        <div class="modal-content border-0 ">
+            {{-- Header du modal avec un nouveau design --}}
+            <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                        <i class="fas fa-file-invoice fs-4 text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0">Nouveau destockage</h5>
+                        <p class="text-muted small mb-0">Remplissez les informations ci-dessous pour créer un nouveau destockage.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form action="{{route('destockages.store')}}" method="POST" id="addDestockageForm" class="needs-validation" novalidate>
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        {{-- Section informations générales --}}
+                        <div class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>Informations Générales
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-medium required">Date</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-clock text-primary"></i>
+                                                </span>
+                                                <input type="date" class="form-control" name="date_op"
+                                                    value="{{ date('Y-m-d') }}"
+                                                    required>
+                                            </div>
+                                            <div class="invalid-feedback">La date est requise</div>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-medium required">Dépôt</label>
+                                            <div class="input-group">
+                                                <select class="form-select select2" name="depot_id" required>
+                                                    <option value="">Sélectionner un dépôt</option>
+                                                    @foreach ($depots as $depot)
+                                                    <option value="{{ $depot->id }}">
+                                                        {{ $depot->raison_sociale }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="invalid-feedback">Le dépôt est requis</div>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-medium required">Client</label>
+                                            <div class="input-group">
+                                                <select class="form-select select2" name="client_id" required>
+                                                    <option value="">Sélectionner un client</option>
+                                                    @foreach ($clients as $client)
+                                                    <option value="{{ $client->id }}"
+                                                        data-taux-aib="{{ $client->taux_aib }}">
+                                                        {{ $client->raison_sociale }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="invalid-feedback">Le client est requis</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section articles --}}
+                        <div class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-box me-2"></i>Articles
+                                    </h6>
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnAddLigne">
+                                        <i class="fas fa-plus me-2"></i>Ajouter un article
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="exampleModal" class="table table-bordered table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Article</th>
+                                                    <th>Quantité</th>
+                                                    <th>Unité</th>
+                                                    <th>Prix unitaire</th>
+                                                    <th>Montant</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="addDestockageLignesContainer">
+                                                <!-- Les lignes seront ajoutées ici -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section règlement --}}
+                        <div class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-money-bill-wave me-2"></i> Règlement
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-medium required">Montant réglé</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-money-bill text-primary"></i>
+                                                </span>
+                                                <input type="number" class="form-control" name="montant_regle" id="montantRegle" required min="0" step="0.01">
+                                                <span class="input-group-text">FCFA</span>
+                                            </div>
+
+                                            <div id="champsBancaires" class="row g-3 mt-0" style="display: none;">
+                                                <div class="col-md-12">
+                                                    <label class="form-label fw-medium">Banque</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white">
+                                                            <i class="fas fa-university text-primary"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control" name="nom_banque" id="nomBanque">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label class="form-label fw-medium">Référence</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white">
+                                                            <i class="fas fa-hashtag text-primary"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control" name="reference_bancaire" id="referenceBancaire">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section observations --}}
+                        <div class="col-12">
+                            <div class="card border border-light-subtle">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-comment-alt me-2"></i>Observations
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <textarea class="form-control" name="observation" rows="3" placeholder="Observations éventuelles"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top-0 py-3">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Template pour une nouvelle ligne --}}
+<template id="ligneFactureTemplate">
+    <tr class="ligne-facture">
+        <td>
+            <select class="form-select select2-articles"
+                name="lignes[__INDEX__][article_id]"
+                required>
+                <option value="">Sélectionner un article</option>
+            </select>
+            <div class="invalid-feedback">L'article est requis</div>
+
+            <input type="hidden" name="lignes[__INDEX__][depot_id]">
+            <input type="hidden" name="lignes[__INDEX__][depot_stock]">
+
+            <input type="text"
+                readonly
+                name="lignes[__INDEX__][depot_libelle]"
+                class="form-control"
+                required>
+            <div class="invalid-feedback">Le dépôt est requis</div>
+        </td>
+        <td>
+            <div class="input-group">
+                <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
+                    placeholder="0.00" required min="0.01" step="0.01">
+                <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" hidden required>
+                    {{-- <option value="">Unité</option> --}}
+                </select>
+            </div>
+            <div class="invalid-feedback">La quantité est requise</div>
+        </td>
+        <td>
+            <input type="number"
+                class="form-control text-end select2-tarifs"
+                name="lignes[__INDEX__][tarification_id]"
+                placeholder="0.00"
+                required
+                min="0.01"
+                step="0.01">
+            <div class="invalid-feedback">Le prix est requis</div>
+        </td>
+        <td>
+            <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
+                placeholder="0.00" min="0" max="100" step="0.01">
+        </td>
+        <td>
+            <div class="input-group">
+                <span class="input-group-text">FCFA</span>
+                <input type="text" class="form-control text-end total-ligne" readonly value="0">
+            </div>
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn btn-outline-danger btn-sm remove-ligne">
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+@push("scripts")
+<script>
+    // gestion des selects
+    $(".select2").select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        dropdownParent: $('#addDestockageModal'),
+    })
+</script>
+@endpush

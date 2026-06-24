@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 use App\Models\Parametre\ConversionUnite;
 
-
 class UniteMesure extends Model
 {
     use SoftDeletes;

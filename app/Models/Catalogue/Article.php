@@ -317,7 +317,6 @@ class Article extends Model
 
     function facturesVenteAll($depotId = null)
     {
-
         $query = $this->hasMany(LigneFacture::class, "article_id")
             // ->where("depot", $depotId)
             ->whereHas("factureClient", function ($query) {
@@ -358,11 +357,7 @@ class Article extends Model
     function getQteReelleVendue($depotId = null)
     {
         $query = $this->hasMany(LigneFacture::class, "article_id")
-            // ->whereHas("ligneLivraisons", function ($query) {
-            //     $query->whereHas("livraisonClient", function ($q) {
-            //         $q->whereNotNull("validated_by"); //les ventes dont les livraisons sont validées
-            //     });
-            // })
+          
             ->whereHas("factureClient", function ($query) {
                 $query->whereNotNull("validated_by")
                     ->whereNull("inventaire_id")

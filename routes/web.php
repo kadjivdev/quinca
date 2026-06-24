@@ -13,6 +13,7 @@ use App\Http\Controllers\Parametre\ConversionUniteController;
 use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController, TarificationController};
 use App\Http\Controllers\Achat\{AccompteFournisseurController, AvanceController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
+use App\Http\Controllers\DestockageController;
 use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, ReversementController, TransportController, TransportMouvementController, VersementController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
@@ -71,7 +72,7 @@ Route::get("/debug", function () {
 
     $ligneFacture = LigneFactureFournisseur::find(1974);
 
-    $ligneFacture->quantite_livree=2025;
+    $ligneFacture->quantite_livree = 2025;
 
     $ligneFacture->save();
 
@@ -853,6 +854,11 @@ Route::middleware('auth')->group(function () {
                     ->name('vente.acomptes.stats');
             });
         });
+
+        // Routes pour les destockages
+        Route::resource("destockages", DestockageController::class);
+        Route::get('destockages/{destockage}/validate', [DestockageController::class, 'validate'])
+            ->name('destockage.validate');
 
         // Routes pour les versements cheque & momos
         Route::resource("versements", VersementController::class);
