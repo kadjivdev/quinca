@@ -166,12 +166,12 @@ class ReglementRevendeurController extends Controller
         $clients = $queryClient->get();
 
         // Récupérer les factures non soldées pour le modal d'ajout
-        $factures = FactureRevendeur::with(["reglements"])
-            ->where('statut', 'validee')
-            ->whereRaw('IFNULL(montant_regle, 0) < montant_ttc')
-            ->with('client')
-            ->latest()
-            ->get();
+        // $factures = FactureRevendeur::with(["reglements"])
+        //     ->where('statut', 'validee')
+        //     ->whereRaw('IFNULL(montant_regle, 0) < montant_ttc')
+        //     ->with('client')
+        //     ->latest()
+        //     ->get();
 
         // Types de règlement disponibles
         $typesReglement = ReglementRevendeur::getTypesReglement();
@@ -179,7 +179,7 @@ class ReglementRevendeurController extends Controller
         return view('pages.ventes.reglement-revendeurs.index', compact(
             'reglements',
             'clients',
-            'factures',
+            // 'factures',
             'typesReglement',
             'statsReglements',
             'date'
