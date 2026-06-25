@@ -21,34 +21,19 @@
             rows += `
             <tr class="ligne-facture">
                 <td>
-                    <select class="form-select select-modal">
-                        <option value="">${ligne.article?.designation??'---'}</option>
-                    </select>
+                    <span class="badge bg-light text-dark border rounded">${ligne.article?.designation??'---'}</span>
                 </td>
                 <td>
-                    <div class="input-group">
-                        <select class="form-select select-modal">
-                            <option value="">${ligne.unite_mesure?.libelle_unite}</option>
-                        </select>
-                    </div>
+                    <span class="badge bg-light text-dark border rounded">${ligne.unite_mesure?.libelle_unite}</span>
                 </td>
                 <td>
-                    <input type="number"
-                        class="form-control text-end"
-                        readonly
-                        value="${ligne.qte}">
+                    <span class="badge bg-light text-dark border rounded">${ligne.qte}</span>
                 </td>
                 <td>
-                    <input type="number"
-                        class="form-control text-end"
-                        readonly
-                        value="${ligne.pu}">
+                    <span class="badge bg-light text-dark border rounded">${ligne.pu}</span>
                 </td>
                 <td>
-                    <input type="number"
-                        class="form-control text-end"
-                        readonly
-                        value="${ligne.montant}">
+                    <span class="badge bg-light text-dark border rounded">${ligne.montant}</span>
                 </td>
             </tr>
             `
