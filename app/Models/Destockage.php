@@ -25,6 +25,7 @@ class Destockage extends Model
         "date_op",
         "observation",
         "created_by",
+        "validated_at",
         "validated_by"
     ];
 
@@ -72,13 +73,13 @@ class Destockage extends Model
         static::creating(function ($model) {
             if (Auth::user()) {
                 $model->created_by = Auth::id();
-            }
+                }
+                $model->code = "DES-" . time() . "-STOCK";
         });
 
-        // created
-        static::created(function ($model) {
-            $model->code = "DES-" . time() . "-STOCK";
-            $model->saveQuietly();
-        });
+        // // created
+        // static::created(function ($model) {
+        //     $model->saveQuietly();
+        // });
     }
 }

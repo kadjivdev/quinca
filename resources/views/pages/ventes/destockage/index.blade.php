@@ -47,16 +47,14 @@
         @include('pages.ventes.destockage.partials.list')
     </div>
 </div>
-
 @include('pages.ventes.destockage.partials.add-modal')
 @include('pages.ventes.destockage.partials.show-modal')
 @include('pages.ventes.destockage.partials.edit-modal')
-@include('pages.ventes.destockage.partials.import-modal')
 @endsection
 
 @push('scripts')
 @include('pages.ventes.destockage.partials.js-add-modal')
+@include('pages.ventes.destockage.partials.js-show-modal')
 @include('pages.ventes.destockage.partials.js-edit-modal')
 @include('pages.ventes.destockage.partials.js-delete-modal')
-@include('pages.ventes.destockage.partials.js-import-modal')
 @endpush

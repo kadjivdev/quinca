@@ -1,10 +1,20 @@
 <div class="row d-flex justify-content-center">
     <div class="col-md-6 border bg-light rounded p-3">
+        @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        <br>
+        @endif
         <form action="{{route('destockages.index')}}" method="GET">
             @csrf
             <div class="row">
                 <div class="col-6">
-                    <select class="form-select form-control _select2-form" name="depot_id">
+                    <select class="form-select form-control select2-form" name="depot_id">
                         <option value="">Sélectionner un dépôt</option>
                         @foreach($depots as $depot)
                         <option value="{{$depot->id}}">{{$depot->libelle_depot}}</option>
@@ -13,7 +23,7 @@
                 </div>
 
                 <div class="col-6">
-                    <select class="form-select form-control _select2-form" name="client_id">
+                    <select class="form-select form-control select2-form" name="client_id">
                         <option value="">Sélectionner un client</option>
                         @foreach($clients as $client)
                         <option value="{{$client->id}}" class="">{{$client->raison_sociale}}</option>
@@ -23,14 +33,13 @@
             </div>
             <br>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="input-group">
                         <select class="form-select _select2-form" name="article_id">
                             <option value="">Sélectionner un article</option>
                             @foreach ($articles as $article)
-                            <option value="{{ $article->id }}"
-                                data-taux-aib="{{ $article->id }}">
-                                {{ $article->code_article }}
+                            <option value="{{ $article->id }}">
+                                {{ $article->code_article }} - {{$article->designation}}
                             </option>
                             @endforeach
                         </select>
@@ -56,8 +65,8 @@
     </div>
 </div>
 
+{{-- Table des destockages --}}
 <div class="row g-3">
-    {{-- Table des factures --}}
     <div class="col-12">
         <div class="card border-0 p-3 shadow-sm">
             <div class="table-responsive">
@@ -72,15 +81,17 @@
                             <th class="border-bottom-0">Dépôt</th>
                             <th class="border-bottom-0">Client</th>
 
+                            <th class="border-bottom-0">Inseré par</th>
                             <th class="border-bottom-0">Validé par</th>
                             <th class="border-bottom-0">Validé le</th>
+                            <th class="border-bottom-0">Observation</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($destockages as $destockage)
                         <tr>
-                            <td class="text-center">{{$destockage->iteration}}</td>
+                            <td class="text-center">{{$loop->iteration}}</td>
                             <td class="text-nowrap py-3">
                                 <div class="d-flex align-items-center">
                                     <span class="numero-facture me-2">{{ $destockage->code }}</span>
@@ -91,9 +102,9 @@
                                     <span class="numero-facture me-2">{{ $destockage->reference }}</span>
                                 </div>
                             </td>
-                            <td>{{ Carbon\Carbon::parse($destockage->created_at)->format('D MMMM YYYY') }}</td>
-                            <td>{{ $destockage->date_op->format('D MMMM YYYY') }}</td>
-                            <td>{{ $destockage->depot?->nom??'---' }}</td>
+                            <td>{{ Carbon\Carbon::parse($destockage->created_at)->locale('fr')->isoFormat('D MMMM YYYY') }}</td>
+                            <td>{{ Carbon\Carbon::parse($destockage->date_op)->locale('fr')->isoFormat('D MMMM YYYY') }}</td>
+                            <td>{{ $destockage->depot?->libelle_depot??'---' }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-client me-2">
@@ -105,153 +116,76 @@
                                     </div>
                                 </div>
                             </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark rounded border">{{$destockage->createdBy?->name}}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark rounded border">{{$destockage->validatedBy?->name??'---'}}</span>
+                            </td>
                             <td>
-                                <span class="badge bg-light border rounded text-dark">{{ $facture->client?->agent?->nom?? '---' }}</span>
-                            </td>
-                            <td><span class="badge bg-light rounded border text-dark">{{$facture->client?->zone?->libelle??'---'}}</span></td>
-                            <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
-                            <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_ht, 0, ',', ' ') }}
-                            </td>
-                            <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_tva, 0, ',', ' ') }}
-                            </td>
-                            <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_aib, 0, ',', ' ') }}
-                            </td>
-                            <td class="text-end fw-medium">
-                                {{ number_format($facture->montant_ttc-$facture->montant_remise, 0, ',', ' ') }}
-                            </td>
-                            <td class="text-end">
-                                @if ($facture->reste_a_payer > 0)
-                                <span class="text-danger fw-medium">
-                                    {{ number_format($facture->reste_a_payer, 0, ',', ' ') }}
-                                </span>
-                                @else
-                                <span class="badge bg-success bg-opacity-10 text-success">Soldée</span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                <span class="badge bg-dark  px-3">{{$facture->type_facture}}</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge bg-primary  px-3">{{$facture->date_validation}}</span>
-                            </td>
-                            <td class="text-center">
-                                @switch($facture->statut_reel)
-                                @case('brouillon')
-                                <span class="badge bg-warning bg-opacity-10 text-warning px-3">Brouillon</span>
-                                @break
-                                @case('validee')
-                                <span class="badge bg-primary bg-opacity-10 text-primary px-3">Validée</span>
-                                @break
-                                @case('payee')
-                                <span class="badge bg-success bg-opacity-10 text-success px-3">Payée</span>
-                                @break
-                                @case('partiellement_payee')
-                                <span class="badge bg-info bg-opacity-10 text-info px-3">Partiellement payée</span>
-                                @break
-                                @default
-                                <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulée</span>
-                                @endswitch
+                                <span class="badge bg-light text-dark rounded border">{{$destockage->validated_at? Carbon\Carbon::parse($destockage->validated_at)->locale('fr')->isoFormat('D MMMM YYYY'):'---' }} </span>
                             </td>
 
-
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded border">{{$facture->recommandeur_credit??'---'}}</span>
-                            </td>
-                            <td class="text-center">
-                                @if($facture->preuve_credit)
-                                <a href="{{$facture->preuve_credit}}" target="_blank" rel="noopener noreferrer"><span class="badge bg-light text-dark rounded border"> <i class="fas fa-file text-primary"></i></span> </a>
-                                @else
-                                <span class="badge bg-light text-dark border rounded">---</span>
-                                @endif
+                            <td>
+                                <textarea name="" class="form-control">{{$destockage->Observation}}</textarea>
                             </td>
 
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded border">{{$facture->createdBy?->name}}</span>
-                            </td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    {{-- Voir détails --}}
-                                    @can("vente.facture.view")
+                                    @can("destockage.view")
                                     <button class="btn btn-sm btn-light-primary btn-icon"
-                                        onclick="showFacture({{ $facture->id }})"
+                                        onclick="showDestockage({{ $destockage }})"
                                         data-bs-toggle="tooltip" title="Voir les détails">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     @endcan
 
-                                    @if($facture->statut === 'brouillon')
-                                    @can("vente.facture.edit")
-                                    {{-- Modifier --}}
-                                    <!-- <button class="btn btn-sm btn-light-warning btn-icon ms-1"
-                                        onclick="editFactures({{ $facture->id }})"
+                                    <!-- @can("destockage.edit")
+                                    <button class="btn btn-sm btn-light-warning btn-icon"
+                                        onclick="editDestockage({{ $destockage }})"
                                         data-bs-toggle="tooltip" title="Modifier">
-                                        <i class="fas fa-edit"></i>
-                                    </button> -->
-                                    @endcan
+                                        <i class="fas fa-pencil"></i>
+                                    </button>
+                                    @endcan -->
 
-                                    {{-- Valider --}}
-                                    @can("vente.facture.validate")
-                                    @if(!$facture->validated_by)
-                                    <button class="btn btn-sm btn-light-success btn-icon ms-1"
-                                        onclick="validateFacture({{ $facture->id }})"
+                                    @if(!$destockage->validated_by)
+                                    @can("destockage.validate")
+                                    <a href="{{route('destockages.validate',$destockage->id)}}"
+                                        class="btn btn-sm btn-light-success btn-icon ms-1"
+                                        onclick="confirm('Voulez-vous vraiment valider ce destockage??')"
                                         data-bs-toggle="tooltip" title="Valider">
                                         <i class="fas fa-check"></i>
-                                    </button>
-                                    @endif
+                                    </a>
                                     @endcan
 
-                                    @can("vente.facture.delete")
-                                    {{-- Supprimer --}}
-                                    @if(!$facture->validated_by)
-                                    <button class="btn btn-sm btn-light-danger btn-icon ms-1"
-                                        onclick="deleteFacture({{ $facture->id }})"
-                                        data-bs-toggle="tooltip" title="Supprimer">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    @endif
-                                    @endcan
-                                    @endif
-
-                                    {{-- Imprimer --}}
-                                    <div class="btn-group ms-1">
-                                        <button class="btn btn-sm btn-light-secondary btn-icon"
-                                            data-bs-toggle="dropdown">
-                                            <i class="fas fa-print"></i>
+                                    @can("destockage.delete")
+                                    <form action="{{route('destockages.destroy',$destockage->id)}}" method="post">
+                                        @csrf
+                                        @method("DELETE")
+                                        <button type="submit" class="btn btn-sm btn-light-danger btn-icon ms-1"
+                                            onclick="confirm('Voulez-vous vraiment supprimer ce destockage??')"
+                                            data-bs-toggle="tooltip" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li>
-                                                <a class="dropdown-item generate-facture-btn" target="blank"
-                                                    data-type="proforma"
-                                                    data-facture="{{$facture->id}}">
-                                                    <i class="fas fa-file-alt me-2"></i>Proforma
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item generate-facture-btn" target="blank"
-                                                    data-type="bon-a-livrer"
-                                                    data-facture="{{$facture->id}}">
-                                                    <i class="fas fa-file-alt me-2"></i>Bon à livrer
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    </form>
+                                    @endcan
+                                    @else
+                                    ---
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center py-5">
+                            <td colspan="11" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
-                                    <h6 class="text-muted mb-1">Aucune facture trouvée</h6>
-                                    <p class="text-muted small mb-3">Les factures que vous créez apparaîtront ici</p>
+                                    <h6 class="text-muted mb-1">Aucun destockage trouvé</h6>
+                                    <p class="text-muted small mb-3">Le destockage que vous créez apparaîtront ici</p>
                                     <button class="btn btn-primary btn-sm"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#addFactureModal">
-                                        <i class="fas fa-plus me-2"></i>Créer une facture
+                                        data-bs-target="#addDestockageModal">
+                                        <i class="fas fa-plus me-2"></i>Créer un destockage
                                     </button>
                                 </div>
                             </td>
@@ -408,7 +342,7 @@
 @push("scripts")
 <script>
     $(document).ready(function() {
-        $(".select2-form").select2({
+        $("._select2-form").select2({
             theme: 'bootstrap-5',
             width: '100%',
         })

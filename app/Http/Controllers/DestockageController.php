@@ -6,11 +6,12 @@ use App\Models\Destockage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DestockageRequest;
 use App\Models\Catalogue\Article;
-use App\Models\Parametre\Agent;
 use App\Models\Parametre\Depot;
+use App\Models\Parametre\UniteMesure;
 use App\Models\Vente\Client;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -21,8 +22,15 @@ class DestockageController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Destockage::query()
-            ->with("depot", "client", "lignes.article", "lignes.uniteMesure");
+        $query = Destockage::with([
+            "depot",
+            "createdBy",
+            "validatedBy",
+            "client",
+            "lignes",
+            "lignes.article",
+            "lignes.uniteMesure"
+        ]);
 
         // dépôt
         if ($request->filled("depot_id")) {
@@ -43,12 +51,25 @@ class DestockageController extends Controller
             });
         }
 
-        $depots = Depot::get(["id", "nom"]);
-        $articles = Article::get(["id", "code_article"]);
+        $depots = Depot::get(["id", "libelle_depot"]);
+        $articles = Article::get(["id", "code_article", "designation"]);
         $clients = Client::get(["id", "raison_sociale"]);
+        $uniteMesures = UniteMesure::get(["id", "libelle_unite"]);
 
         $destockages = $query->get();
-        return view("vente.destockage.index", compact("destockages", "articles", "agents", "clients","depots"));
+        $stacks = [
+            "destockagesCount" => $destockages->count(),
+            "destockagesToday" => $destockages->where('date_op', now()->format('Y-m-d'))->count(),
+            "totalAmount" => $destockages->flatMap->lignes?->sum("montant") ?? 0,
+            "destockagesMonth" => $destockages->whereBetween('date_op', [now()->startOfMonth(), now()->endOfMonth()])
+                ->flatMap
+                ->lignes?->sum('montant') ?? 0,
+            "totalAmountToday" => $destockages->where('date_op', now()->format('Y-m-d'))
+                ->flatMap
+                ->lignes?->sum('montant') ?? 0,
+        ];
+
+        return view("pages.ventes.destockage.index", compact("destockages", "articles", "clients", "depots", "stacks", "uniteMesures"));
     }
 
     /**
@@ -68,28 +89,33 @@ class DestockageController extends Controller
         try {
             DB::beginTransaction();
 
-            Destockage::create($request->validated());
+            $destockage = Destockage::create($request->validated());
+
+            $destockage->lignes()
+                ->createMany($request->validated()["lignes"]);
 
             DB::commit();
 
             Log::info("Destockage crée avec succès!");
-            return response()
+            return redirect()
                 ->back()
                 ->with("message", "Destockage crée avec succès!");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure de validation lors de la creation du destockage");
 
-            return response()
+            return redirect()
                 ->back()
-                ->with("errors", $e->errors());
+                ->withErrors($e->errors());
         } catch (Exception $e) {
             DB::rollBack();
             Log::debug("Erreure de validation lors de la creation du destockage", ["error" => $e->getMessage()]);
 
-            return response()
+            return redirect()
                 ->back()
-                ->with("errors", $e->getMessage());
+                // ✅ Utiliser withErrors() à la place
+                ->withErrors(['error' => $e->getMessage()]);
+            // ->with("errors", $e->getMessage());
         }
     }
 
@@ -155,20 +181,25 @@ class DestockageController extends Controller
         try {
             DB::beginTransaction();
 
+            // suppression des lignes
+            $destockage->lignes()
+                ->delete();
+
+            // suppression du destockage
             $destockage->delete();
 
             DB::commit();
 
             Log::info("Destockage supprimé avec succès!");
 
-            return response()
+            return redirect()
                 ->back()
                 ->with("message", "Destockage supprimé avec succès!");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure de validation lors de la suppression du destockage");
 
-            return response()
+            return redirect()
                 ->back()
                 ->with("errors", $e->errors());
         } catch (Exception $e) {
@@ -176,6 +207,45 @@ class DestockageController extends Controller
             Log::debug("Erreure de validation lors de la suppression du destockage", ["error" => $e->getMessage()]);
 
             return response()
+                ->back()
+                ->with("errors", $e->getMessage());
+        }
+    }
+
+    /**
+     * Validate the specified resource from storage.
+     */
+    public function validateDestockage(Destockage $destockage)
+    {
+        Log::debug("Validation des données de destockage :", ["data" => $destockage]);
+
+        try {
+            DB::beginTransaction();
+
+            $destockage->update([
+                "validated_by" => Auth::id(),
+                "validated_at" => now(),
+            ]);
+
+            DB::commit();
+
+            Log::info("Destockage validé avec succès!");
+
+            return redirect()
+                ->back()
+                ->with("message", "Destockage supprimé avec succès!");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            Log::debug("Erreure de validation lors de la suppression du destockage");
+
+            return redirect()
+                ->back()
+                ->with("errors", $e->errors());
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::debug("Erreure de validation lors de la suppression du destockage", ["error" => $e->getMessage()]);
+
+            return redirect()
                 ->back()
                 ->with("errors", $e->getMessage());
         }

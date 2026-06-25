@@ -857,8 +857,8 @@ Route::middleware('auth')->group(function () {
 
         // Routes pour les destockages
         Route::resource("destockages", DestockageController::class);
-        Route::get('destockages/{destockage}/validate', [DestockageController::class, 'validate'])
-            ->name('destockage.validate');
+        Route::get('destockages/{destockage}/validate', [DestockageController::class, 'validateDestockage'])
+            ->name('destockages.validate');
 
         // Routes pour les versements cheque & momos
         Route::resource("versements", VersementController::class);

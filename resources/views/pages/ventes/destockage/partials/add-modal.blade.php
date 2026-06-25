@@ -15,8 +15,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="{{route('destockages.store')}}" method="POST" id="addDestockageForm" class="needs-validation" novalidate>
+            <form action="{{route('destockages.store')}}" method="POST" >
                 @csrf
+                @method("POST")
                 <div class="modal-body p-4">
                     <div class="row g-4">
                         {{-- Section informations générales --}}
@@ -43,13 +44,26 @@
                                         </div>
 
                                         <div class="col-md-3">
+                                            <label class="form-label fw-medium required">Reference</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-clock text-primary"></i>
+                                                </span>
+                                                <input type="text" class="form-control" name="reference"
+                                                    placeholder="XXXXXXXXXXX"
+                                                    required>
+                                            </div>
+                                            <div class="invalid-feedback">La reference est est requise</div>
+                                        </div>
+
+                                        <div class="col-md-3">
                                             <label class="form-label fw-medium required">Dépôt</label>
                                             <div class="input-group">
                                                 <select class="form-select select2" name="depot_id" required>
                                                     <option value="">Sélectionner un dépôt</option>
                                                     @foreach ($depots as $depot)
                                                     <option value="{{ $depot->id }}">
-                                                        {{ $depot->raison_sociale }}
+                                                        {{ $depot->libelle_depot }}
                                                     </option>
                                                     @endforeach
                                                 </select>
@@ -63,8 +77,7 @@
                                                 <select class="form-select select2" name="client_id" required>
                                                     <option value="">Sélectionner un client</option>
                                                     @foreach ($clients as $client)
-                                                    <option value="{{ $client->id }}"
-                                                        data-taux-aib="{{ $client->taux_aib }}">
+                                                    <option value="{{ $client->id }}">
                                                         {{ $client->raison_sociale }}
                                                     </option>
                                                     @endforeach
@@ -84,7 +97,8 @@
                                     <h6 class="card-title mb-0">
                                         <i class="fas fa-box me-2"></i>Articles
                                     </h6>
-                                    <button type="button" class="btn btn-primary btn-sm" id="btnAddLigne">
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="addLigne()">
                                         <i class="fas fa-plus me-2"></i>Ajouter un article
                                     </button>
                                 </div>
@@ -94,62 +108,17 @@
                                             <thead class="table-light">
                                                 <tr>
                                                     <th>Article</th>
-                                                    <th>Quantité</th>
                                                     <th>Unité</th>
+                                                    <th>Quantité</th>
                                                     <th>Prix unitaire</th>
                                                     <th>Montant</th>
+                                                    <th>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="addDestockageLignesContainer">
                                                 <!-- Les lignes seront ajoutées ici -->
                                             </tbody>
                                         </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Section règlement --}}
-                        <div class="col-12">
-                            <div class="card border border-light-subtle">
-                                <div class="card-header bg-light">
-                                    <h6 class="card-title mb-0">
-                                        <i class="fas fa-money-bill-wave me-2"></i> Règlement
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-medium required">Montant réglé</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white">
-                                                    <i class="fas fa-money-bill text-primary"></i>
-                                                </span>
-                                                <input type="number" class="form-control" name="montant_regle" id="montantRegle" required min="0" step="0.01">
-                                                <span class="input-group-text">FCFA</span>
-                                            </div>
-
-                                            <div id="champsBancaires" class="row g-3 mt-0" style="display: none;">
-                                                <div class="col-md-12">
-                                                    <label class="form-label fw-medium">Banque</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text bg-white">
-                                                            <i class="fas fa-university text-primary"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control" name="nom_banque" id="nomBanque">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <label class="form-label fw-medium">Référence</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text bg-white">
-                                                            <i class="fas fa-hashtag text-primary"></i>
-                                                        </span>
-                                                        <input type="text" class="form-control" name="reference_bancaire" id="referenceBancaire">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -185,55 +154,62 @@
 </div>
 
 {{-- Template pour une nouvelle ligne --}}
-<template id="ligneFactureTemplate">
+<template id="ligneDestockageTemplate">
     <tr class="ligne-facture">
         <td>
-            <select class="form-select select2-articles"
+            <select class="form-select select-modal"
                 name="lignes[__INDEX__][article_id]"
                 required>
                 <option value="">Sélectionner un article</option>
+                @foreach($articles as $article)
+                <option value="{{$article->id}}">{{$article->designation}}</option>
+                @endforeach
             </select>
             <div class="invalid-feedback">L'article est requis</div>
-
-            <input type="hidden" name="lignes[__INDEX__][depot_id]">
-            <input type="hidden" name="lignes[__INDEX__][depot_stock]">
-
-            <input type="text"
-                readonly
-                name="lignes[__INDEX__][depot_libelle]"
-                class="form-control"
-                required>
-            <div class="invalid-feedback">Le dépôt est requis</div>
         </td>
         <td>
             <div class="input-group">
-                <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
-                    placeholder="0.00" required min="0.01" step="0.01">
-                <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" hidden required>
-                    {{-- <option value="">Unité</option> --}}
+                <select class="form-select select-modal" name="lignes[__INDEX__][unite_mesure_id]" required>
+                    <option value="">Unité de mesure</option>
+                    @foreach($uniteMesures as $unite)
+                    <option value="{{$unite->id}}">{{$unite->libelle_unite}}</option>
+                    @endforeach
                 </select>
             </div>
+            <div class="invalid-feedback">L'unité de mesure est requise</div>
+        </td>
+        <td>
+            <input type="number"
+                class="form-control text-end"
+                name="lignes[__INDEX__][qte]"
+                placeholder="0.00"
+                required
+                min="0.01"
+                step="0.01"
+                onchange="updateMontant(lignes[__INDEX__][qte])">
             <div class="invalid-feedback">La quantité est requise</div>
         </td>
         <td>
             <input type="number"
-                class="form-control text-end select2-tarifs"
-                name="lignes[__INDEX__][tarification_id]"
-                placeholder="0.00"
+                class="form-control text-end"
+                name="lignes[__INDEX__][pu]"
                 required
-                min="0.01"
-                step="0.01">
-            <div class="invalid-feedback">Le prix est requis</div>
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                onchange="updateMontant(lignes[__INDEX__][qte])">
+            <div class="invalid-feedback">Le prix unitaire est requis</div>
         </td>
         <td>
-            <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
-                placeholder="0.00" min="0" max="100" step="0.01">
-        </td>
-        <td>
-            <div class="input-group">
-                <span class="input-group-text">FCFA</span>
-                <input type="text" class="form-control text-end total-ligne" readonly value="0">
-            </div>
+            <input type="number"
+                class="form-control text-end"
+                name="lignes[__INDEX__][montant]"
+                required
+                placeholder="0.00"
+                min="0"
+                max="100"
+                step="0.01"
+                readonly>
         </td>
         <td class="text-center">
             <button type="button" class="btn btn-outline-danger btn-sm remove-ligne">
@@ -245,11 +221,71 @@
 
 @push("scripts")
 <script>
-    // gestion des selects
-    $(".select2").select2({
-        theme: 'bootstrap-5',
-        width: '100%',
-        dropdownParent: $('#addDestockageModal'),
-    })
+    let ligneIndex = 0; // ✅ Variable globale, persiste entre les appels
+
+    // Initialiser select2 sur une ligne spécifique
+    function initSelect2OnLigne($ligne) {
+        $ligne.find(".select-modal").select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#addDestockageModal'),
+        });
+    }
+
+    // Ajouter une ligne
+    function addLigne() {
+        try {
+            const template = $("#ligneDestockageTemplate").html();
+            const newLine = template.replace(/__INDEX__/g, ligneIndex); // ✅ Remplace avec le bon index
+            const $newLine = $(newLine);
+
+            $newLine.hide();
+            $("#addDestockageLignesContainer").append($newLine); // ✅ Append $newLine, pas template
+            $newLine.fadeIn(300);
+
+            initSelect2OnLigne($newLine); // ✅ Init select2 sur la nouvelle ligne
+
+            // ✅ Brancher le bouton supprimer
+            $newLine.find(".remove-ligne").on("click", function() {
+                $(this).closest("tr").fadeOut(300, function() {
+                    $(this).remove();
+                    updateTotalGeneral();
+                });
+            });
+
+            // ✅ Brancher les inputs pour le calcul automatique
+            $newLine.find("input[name$='[qte]'], input[name$='[pu]']").on("input", function() {
+                updateMontant($newLine);
+            });
+
+            ligneIndex++; // ✅ Incrémenter après usage
+        } catch (error) {
+            console.error("Erreur lors de l'ajout de ligne:", error);
+        }
+    }
+
+    // ✅ Calcul du montant d'une ligne
+    function updateMontant($ligne) {
+        const qte = parseFloat($ligne.find("input[name$='[qte]']").val()) || 0;
+        const pu = parseFloat($ligne.find("input[name$='[pu]']").val()) || 0;
+        const montant = qte * pu;
+
+        $ligne.find("input[name$='[montant]']").val(montant.toFixed(2));
+        updateTotalGeneral();
+    }
+
+    // ✅ Calcul du total général (optionnel mais utile)
+    function updateTotalGeneral() {
+        let total = 0;
+        $("#addDestockageLignesContainer tr").each(function() {
+            const montant = parseFloat($(this).find("input[name$='[montant]']").val()) || 0;
+            total += montant;
+        });
+        // Affichez le total où vous voulez, ex:
+        // $("#totalGeneral").text(total.toFixed(2));
+        console.log("Total général :", total.toFixed(2));
+    }
+
+    // Initialisation — une ligne vide au démarrage
+    addLigne();
 </script>
 @endpush

@@ -214,7 +214,8 @@
                     data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
                     <span class="uil fs-8 me-2 uil-dollar-sign"></span>Ventes
                 </a>
-                <ul class="dropdown-menu navbar-dropdown-caret">
+                <ul class="dropdown-menu navbar-dropdown-caret" 
+                >
                     @can('vente.clients.view')
                     <li>
                         <a class="dropdown-item" href="{{ route('vente.clients.index') }}">
@@ -312,6 +313,23 @@
             </li>
             @endcanany
 
+            @canany(['destockage.view'])
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle lh-1" href="#" role="button" data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
+                    <span class="uil fs-8 me-2 uil-dollar-sign"></span>Destockage
+                </a>
+                <ul class="dropdown-menu navbar-dropdown-caret">
+                    @can("destockage.view")
+                    <li><a class="dropdown-item" href="{{ route('destockages.index') }}">
+                            <div class="dropdown-item-wrapper">Liste de destockages</div>
+                        </a></li>
+                    @endcan
+                </ul>
+            </li>
+            @endcanany
+
+
             <!-- REVENDEUR -->
             @canany(['revendeur.facture.view', 'revendeur.speciales.view', 'revendeur.normale.rapport.view', 'revendeur.speciale.rapport.view'])
             <li class="nav-item dropdown">
@@ -402,7 +420,7 @@
             @endcanany
 
             <!-- RAPPORTS VENTES -->
-            
+
             @canany(['rapports.ventes-articles.view', 'rapports.ventes-familles.view', 'rapports.ventes-clients.view',
             'rapports.vente-journaliere.view', 'rapports.creances.view', 'vente.sessions.rapport.view',
             'rapports.compte-client.view'])

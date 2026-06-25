@@ -11,7 +11,7 @@ class DestockageRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,18 @@ class DestockageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "reference" => "required|unique:destockages,reference",
+            "depot_id" => "required|integer|exists:depots,id",
+            "client_id" => "required|integer|exists:clients,id",
+            "date_op" => "required|date",
+            "observation" => "nullable",
+
+            "lignes" => "required|array",
+            "lignes.*.article_id" => "required|integer|exists:articles,id",
+            "lignes.*.unite_mesure_id" => "required|integer|exists:unite_mesures,id",
+            "lignes.*.qte" => "required|numeric",
+            "lignes.*.pu" => "required|numeric",
+            "lignes.*.montant" => "required|numeric",
         ];
     }
 }

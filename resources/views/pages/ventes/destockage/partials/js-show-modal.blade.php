@@ -1,70 +1,61 @@
 <script>
-    function showLivraison(id) {
-        // Afficher un loader dans le modal
-        $('#showLivraisonModal').modal('show');
-        
-        // Charger les données
-        $.ajax({
-            url: `${apiUrl}/vente/livraisons/${id}`,
-            method: 'GET',
-            success: function(response) {
-                if (response.success) {
-                    const data = response.data;
-                    
-                    // Remplir les informations de base
-                    $('#blNumero').text(`Bon de livraison N° ${data.livraison.numero}`);
-                    $('#factureNumero').text(data.livraison.facture.numero);
-                    $('#factureDate').text(data.livraison.facture.date);
-                    
-                    // Informations client
-                    $('#clientNom').text(data.livraison.facture.client.raison_sociale);
-                    $('#clientContact').text(data.livraison.facture.client.telephone);
-                    $('#clientAdresse').text(data.livraison.facture.client.adresse);
-                    
-                    // Lignes de livraison
-                    let lignesHtml = '';
-                    data.lignes.forEach(ligne => {
-                        lignesHtml += `
-                            <tr>
-                                <td>
-                                    <div class="fw-medium">${ligne.article.designation}</div>
-                                    <div class="small text-muted">${ligne.article.reference}</div>
-                                </td>
-                                <td class="text-center">
-                                    ${ligne.quantite} ${ligne.unite}
-                                </td>
-                                <td class="text-end">
-                                    ${formatMontant(ligne.prix_unitaire)}
-                                </td>
-                                <td class="text-end">
-                                    ${formatMontant(ligne.montant_total)}
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    $('#lignesLivraison').html(lignesHtml);
-                    
-                    // Notes et infos supplémentaires
-                    $('#livraisonNotes').text(data.livraison.notes || 'Aucune note');
-                    $('#createInfo').text(data.livraison.created_by || '-');
-                    $('#validateInfo').text(data.livraison.validated_by || '-');
-                }
-            },
-            error: function() {
-                Toast.fire({
-                    icon: 'error',
-                    title: 'Erreur lors du chargement des détails'
-                });
-                $('#showLivraisonModal').modal('hide');
-            }
+    function showDestockage(destockage) {
+
+        console.log("destockage detail:", destockage)
+
+        // Remplir les informations de base
+        $('#destockageClient').text(`Client : ${destockage.client?.raison_sociale}`);
+        $('#destockageCode').text(`Code : ${destockage.code}`);
+        $('#destockageReference').text(destockage.reference);
+        $("#observation").html(destockage.Observation)
+        $('#destockageDate').text(destockage.date_op);
+
+
+        $("#showDestockageLignesContainer").empty()
+        let rows = ''
+        if (destockage.lignes.length == 0) {
+            rows = "Aucun article"
+        }
+
+        destockage.lignes?.forEach(ligne => {
+            rows += `
+            <tr class="ligne-facture">
+                <td>
+                    <select class="form-select select-modal">
+                        <option value="">${ligne.article?.designation??'---'}</option>
+                    </select>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <select class="form-select select-modal">
+                            <option value="">${ligne.unite_mesure?.libelle_unite}</option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <input type="number"
+                        class="form-control text-end"
+                        readonly
+                        value="${ligne.qte}">
+                </td>
+                <td>
+                    <input type="number"
+                        class="form-control text-end"
+                        readonly
+                        value="${ligne.pu}">
+                </td>
+                <td>
+                    <input type="number"
+                        class="form-control text-end"
+                        readonly
+                        value="${ligne.montant}">
+                </td>
+            </tr>
+            `
         });
+
+        $("#showDestockageLignesContainer").append(rows)
+
+        $('#showDestockageModal').modal('show');
     }
-    
-    // Fonction utilitaire pour formater les montants
-    function formatMontant(montant) {
-        return new Intl.NumberFormat('fr-FR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(montant);
-    }
-    </script>
+</script>

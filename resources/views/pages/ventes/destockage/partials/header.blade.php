@@ -29,9 +29,9 @@
                 </a>
 
                 <button type="button"
-                        class="btn btn-primary px-3 d-inline-flex align-items-center"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addDestockageModal">
+                    class="btn btn-primary px-3 d-inline-flex align-items-center"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addDestockageModal">
                     <i class="fas fa-plus me-2"></i>
                     Nouveau destockage
                 </button>
@@ -56,10 +56,10 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-baseline">
-                            <h4 class="mb-0 me-2">{{ $destockages->count() }}</h4>
+                            <h4 class="mb-0 me-2">{{ $stacks["destockagesCount"] }}</h4>
                             <small class="text-success">
                                 <i class="fas fa-calendar-check me-1"></i>
-                                {{ $destockages->where('date_op', now()->format('Y-m-d'))->count() }} aujourd'hui
+                                {{ $stacks["destockagesToday"] }} aujourd'hui
                             </small>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-baseline">
-                            <h4 class="mb-0 me-2">{{ number_format($destockages->lignes()->sum('montant'), 0, ',', ' ') }}</h4>
+                            <h4 class="mb-0 me-2">{{ number_format($stacks["totalAmount"], 0, ',', ' ') }}</h4>
                             <small class="text-muted">FCFA</small>
                         </div>
                     </div>
@@ -106,7 +106,7 @@
                         </div>
                         <div class="d-flex align-items-baseline">
                             <h4 class="mb-0 me-2">
-                                {{ number_format($destockage->whereBetween('date_op', [now()->startOfMonth(), now()->endOfMonth()])->lignes()->sum('montant'), 0, ',', ' ') }}
+                                {{ number_format($stacks["destockagesMonth"], 0, ',', ' ') }}
                             </h4>
                             <small class="text-warning">FCFA</small>
                         </div>
@@ -131,7 +131,7 @@
                         </div>
                         <div class="d-flex align-items-baseline">
                             <h4 class="mb-0 me-2">
-                                {{ number_format($destockage->where('date_op', now()->format('Y-m-d'))->lignes()->sum('montant'), 0, ',', ' ') }}
+                                {{ number_format($stacks["totalAmountToday"], 0, ',', ' ') }}
                             </h4>
                             <small class="text-info">FCFA</small>
                         </div>
@@ -143,26 +143,30 @@
 </div>
 
 <style>
-/* On garde les mêmes styles que l'original mais on ajoute quelques spécificités pour les montants */
-:root {
-    --kadjiv-orange: #FFA500;
-    --kadjiv-orange-light: rgba(255, 165, 0, 0.1);
-}
+    /* On garde les mêmes styles que l'original mais on ajoute quelques spécificités pour les montants */
+    :root {
+        --kadjiv-orange: #FFA500;
+        --kadjiv-orange-light: rgba(255, 165, 0, 0.1);
+    }
 
-/* Style spécifique pour les montants */
-.card h4 {
-    font-family: 'Consolas', monospace;
-    font-size: 1.5rem;
-}
+    /* Style spécifique pour les montants */
+    .card h4 {
+        font-family: 'Consolas', monospace;
+        font-size: 1.5rem;
+    }
 
-/* Animation pour les changements de montants */
-@keyframes highlight {
-    0% { background-color: var(--kadjiv-orange-light); }
-    100% { background-color: transparent; }
-}
+    /* Animation pour les changements de montants */
+    @keyframes highlight {
+        0% {
+            background-color: var(--kadjiv-orange-light);
+        }
 
-.amount-change {
-    animation: highlight 1s ease-out;
-}
+        100% {
+            background-color: transparent;
+        }
+    }
+
+    .amount-change {
+        animation: highlight 1s ease-out;
+    }
 </style>
-

@@ -27,7 +27,7 @@ class AddPermissionSeeder extends Seeder
     {
         $permissions_groups = [
             'Destockages' => array_merge(
-                $this->createCrudValidatePermissions('destockages', 'destockages', 'Destockages'),
+                $this->createCrudValidatePermissions('destockages', 'destockage', 'Destockages'),
             )
         ];
 

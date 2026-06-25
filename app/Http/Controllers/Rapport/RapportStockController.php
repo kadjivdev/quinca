@@ -179,19 +179,6 @@ class RapportStockController extends Controller
                                 // $article->unite_mesure_id
                             ) : 00;
 
-                        $requeteQuery =
-                            // session()->get("date_ftr") ?
-                            //     RequeteStock::where("article_id", $stock->article_id)
-                            //     ->where("depot_id", $stock->depot_id)
-                            //     ->whereNotNull("validated_by")
-                            //     ->whereNotNull("validated_at")
-                            //     ->where("created_at", session()->get("date_ftr"))
-                            //     :
-                            RequeteStock::where("article_id", $stock->article_id)
-                            ->where("depot_id", $stock->depot_id)
-                            ->whereNull("inventaire_id")
-                            ->whereNotNull("validated_by")
-                            ->whereNotNull("validated_at");
 
                         /**Qte de requete */
                         // $stock->qantiteRequete = $requeteQuery

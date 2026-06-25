@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Models\Catalogue\Article;
 use App\Models\Parametre\UniteMesure;
-use App\Models\Vente\Client;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
