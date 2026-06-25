@@ -144,15 +144,26 @@ class ReglementRevendeurController extends Controller
             ];
         }
 
-        // dd($statsReglements["reglements_en_attente"]);
-
         // Données pour les filtres et le modal d'ajout
-        $clients = Client::orderBy('raison_sociale')
+        $queryClient = Client::orderBy('raison_sociale')
             ->with(["facturesRevendeur" => function ($query) {
                 /**on integre la somme des montant des reglements  dans les datas du facturesRevendeur*/
                 $query->withSum('reglements', 'montant');
             }])
-            ->get();
+            ->latest();
+
+        $user = auth()->user();
+        if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
+            $queryClient;
+        } elseif ($user->hasRole("AGENT")) {
+            $queryClient
+                ->where('agent_id', $user->agent_id);
+        } else {
+            $queryClient
+                ->where('point_de_vente_id', $user->point_de_vente_id);
+        }
+
+        $clients = $queryClient->get();
 
         // Récupérer les factures non soldées pour le modal d'ajout
         $factures = FactureRevendeur::with(["reglements"])

@@ -11,7 +11,8 @@
     </div>
     <div class="collapse navbar-collapse navbar-top-collapse order-1 order-lg-0 justify-content-center"
         id="navbarTopCollapse">
-        <ul class="navbar-nav navbar-nav-top" data-dropdown-on-hover="data-dropdown-on-hover">
+        <ul class="navbar-nav navbar-nav-top" data-dropdown-on-hover="data-dropdown-on-hover"
+            >
 
             <!-- ADMINISTRATION & gael-->
             @if(auth()->user()->hasRole("Super Administrateur") || in_array(auth()->user()->id,[14,21]))
@@ -214,8 +215,7 @@
                     data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
                     <span class="uil fs-8 me-2 uil-dollar-sign"></span>Ventes
                 </a>
-                <ul class="dropdown-menu navbar-dropdown-caret" 
-                >
+                <ul class="dropdown-menu navbar-dropdown-caret">
                     @can('vente.clients.view')
                     <li>
                         <a class="dropdown-item" href="{{ route('vente.clients.index') }}">

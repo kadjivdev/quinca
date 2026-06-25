@@ -57,7 +57,7 @@
                         @forelse($reglements as $reglement)
                         <tr>
                             <td class="text-nowrap py-3">
-                                <span class="numero-recu me-2">{{ $reglement->numero }}</span>
+                                <span class="numero-recu me-2">{{ $reglement->id }} | {{ $reglement->numero }}</span>
                             </td>
                             <td>{{ Carbon\Carbon::parse($reglement->created_at)->format('d/m/Y H:i:s') }}</td>
                             <td>{{ $reglement->date_reglement->format('d/m/Y') }}</td>
@@ -297,7 +297,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+            [0, 'desc']
         ],
         "pageLength": 15,
         language: {

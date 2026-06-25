@@ -36,7 +36,7 @@ class ClientRevendeurController extends Controller
 
         // Récupération des données avec pagination
         $user = auth()->user();
-        $query = $clients = Client::with([
+        $query = Client::with([
             'facturesRevendeur',
             'departement',
             'agent',
@@ -44,38 +44,38 @@ class ClientRevendeurController extends Controller
         ])->latest();
 
         if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
-            $clients = $query;
+            $query;
         } elseif ($user->hasRole("AGENT")) {
-            $clients = $query
+            $query
                 ->where('agent_id', Auth()->user()->agent_id);
         } else {
-            $clients = $query
+            $query
                 ->where('point_de_vente_id', Auth()->user()->point_de_vente_id);
         }
 
         // Application des filtres si présents dans la requête
         if ($request->filled('categorie')) {
-            $clients->where('categorie', $request->categorie);
+            $query->where('categorie', $request->categorie);
         }
 
         if ($request->filled('ville')) {
-            $clients->where('ville', $request->ville);
+            $query->where('ville', $request->ville);
         }
 
         if ($request->filled('statut')) {
-            $clients->where('statut', $request->statut);
+            $query->where('statut', $request->statut);
         }
 
         if ($request->filled('search')) {
-            $clients->search($request->search);
+            $query->search($request->search);
         }
 
         if ($request->has('avec_credit')) {
-            $clients->avecCredit();
+            $query->avecCredit();
         }
 
         // $clients = $clients->paginate(10);
-        $clients = $clients->get()
+        $clients = $query->get()
             ->transform(function ($client) {
                 /**LES FACTURES */
                 $client->facturesAmount = $client->facturesRevendeur
@@ -99,10 +99,10 @@ class ClientRevendeurController extends Controller
         // Statistiques pour le header
 
         $stats = [
-            'total_clients' => Client::count(),
-            'clients_actifs' => Client::where('statut', true)->count(),
-            'clients_professionnels' => Client::where('categorie', 'professionnel')->count(),
-            'clients_avec_credit' => Client::where('plafond_credit', '>', 0)->count(),
+            'total_clients' => $clients->count(),
+            'clients_actifs' => $clients->where('statut', true)->count(),
+            'clients_professionnels' => $clients->where('categorie', 'professionnel')->count(),
+            'clients_avec_credit' => $clients->where('plafond_credit', '>', 0)->count(),
             'total_reglements' => DB::table('facture_revendeurs')
                 ->join('reglement_revendeurs', 'facture_revendeurs.id', '=', 'reglement_revendeurs.facture_revendeur_id')
                 ->where('reglement_revendeurs.statut', ReglementRevendeur::STATUT_VALIDE)

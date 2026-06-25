@@ -42,7 +42,6 @@ class FactureRevendeurController extends Controller
     /**
      * Affiche la liste des factures
      */
-
     public function index(Request $request)
     {
         try {
@@ -125,8 +124,28 @@ class FactureRevendeurController extends Controller
             $pointsVentes = PointDeVente::all();
 
             // Charger la liste des clients pour le filtre
-            $clients =  Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)
-                ->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
+            // $clients =  Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)
+            //     ->orderBy('raison_sociale')->get(['id', 'raison_sociale', 'taux_aib']);
+
+            $queryClient = Client::with([
+                'facturesRevendeur',
+                'departement',
+                'agent',
+                'facturesRevendeur.reglements' // Chargement des règlements via les factures
+            ])->latest();
+
+            $user = auth()->user();
+            if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
+                $queryClient;
+            } elseif ($user->hasRole("AGENT")) {
+                $queryClient
+                    ->where('agent_id', $user->agent_id);
+            } else {
+                $queryClient
+                    ->where('point_de_vente_id', $user->point_de_vente_id);
+            }
+
+            $clients = $queryClient->get();
 
             return view('pages.revendeur.facture.index', compact(
                 'factures',
