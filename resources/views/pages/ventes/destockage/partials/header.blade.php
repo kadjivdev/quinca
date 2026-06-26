@@ -36,7 +36,7 @@
                     <i class="fas fa-plus me-2"></i>
                     Nouveau destockage
                 </button>
-                @andcan
+                @endcan
             </div>
         </div>
 
