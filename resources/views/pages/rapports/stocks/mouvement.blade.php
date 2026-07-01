@@ -100,6 +100,7 @@
                         <tr>
                             <th>Code</th>
                             <th>Inseré le</th>
+                            <th>Modifié le</th>
                             <th>Date</th>
                             <th>Inseré par:</th>
                             <th>Type</th>
@@ -118,6 +119,7 @@
                         <tr>
                             <td class="text-monospace">{{$mouvement->id}} | {{ $mouvement->code }}</td>
                             <td>{{ $mouvement->created_at->format('d/m/Y') }}</td>
+                            <td>{{ $mouvement->updated_at->format('d/m/Y') }}</td>
                             <td>{{ $mouvement->date_mouvement->format('d/m/Y') }}</td>
                             <td><span class="badge bg-light border rounded text-dark"> {{ $mouvement->user?->name }} </span></td>
                             <td>
