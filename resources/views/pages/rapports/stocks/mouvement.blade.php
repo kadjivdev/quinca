@@ -100,7 +100,7 @@
                         <tr>
                             <th>Code</th>
                             <th>Inseré le</th>
-                            <th>Modifié le</th>
+                            <th>Date de modification de l'article dans le stock</th>
                             <th>Date</th>
                             <th>Inseré par:</th>
                             <th>Type</th>
