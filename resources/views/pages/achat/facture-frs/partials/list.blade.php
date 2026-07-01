@@ -4,12 +4,27 @@
         <!-- FILTRAGE PAR DEPOT -->
         <form action="{{route('factures.index')}}" method="GET">
             @csrf
-            <select class="form-select form-control" name="fournisseur_id">
-                <option value="">Sélectionner un fournisseur</option>
-                @foreach($fournisseurs as $fournisseur)
-                <option value="{{$fournisseur->id}}" class="">{{$fournisseur->raison_sociale}}</option>
-                @endforeach
-            </select>
+            <div class="row">
+                <div class="col-12">
+                    <select class="form-select form-control" name="fournisseur_id">
+                        <option value="">Sélectionner un fournisseur</option>
+                        @foreach($fournisseurs as $fournisseur)
+                        <option value="{{$fournisseur->id}}" class="">{{$fournisseur->raison_sociale}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6">
+                    <label for="debut">Date de début</label>
+                    <input type="date" name="debut" class="form-control" id="debut">
+                </div>
+                <div class="col-6">
+                    <label for="debut">Date de fin</label>
+                    <input type="date" name="fin" class="form-control" id="fin">
+                </div>
+            </div>
             <button class="w-100 btn btn-warning mt-2 px-4">
                 <i class="fas fa-save me-2"></i>Filtrer
             </button>
@@ -155,22 +170,22 @@
                                 <small class="text-muted">
                                     (
                                     @if($facture->rejected_by)
-                                        @php($rejected = $facture->allLignes()->where("rejected",1))
-                                        @if($rejected->count()>0 && $rejected->count()<$facture->allLignes()->count() )
-                                            <span class="badge bg-danger bg-opacity-10 text-danger px-3">
-                                                <i class="fas fa-minus-circle"></i> Partillement rejetée
-                                            </span>
-                                            @elseif($rejected->count()>0 && $rejected->count()==$facture->allLignes()->count())
-                                            <span class="badge bg-danger bg-opacity-10 text-danger px-3">
-                                                <i class="fas fa-minus-circle"></i> Totalement rejetée
-                                            </span>
+                                    @php($rejected = $facture->allLignes()->where("rejected",1))
+                                    @if($rejected->count()>0 && $rejected->count()<$facture->allLignes()->count() )
+                                        <span class="badge bg-danger bg-opacity-10 text-danger px-3">
+                                            <i class="fas fa-minus-circle"></i> Partillement rejetée
+                                        </span>
+                                        @elseif($rejected->count()>0 && $rejected->count()==$facture->allLignes()->count())
+                                        <span class="badge bg-danger bg-opacity-10 text-danger px-3">
+                                            <i class="fas fa-minus-circle"></i> Totalement rejetée
+                                        </span>
                                         @endif
-                                    @elseif ($facture->validated_at)
-                                    <span class="badge bg-success bg-opacity-10 text-success px-3"><i class="fas fa-check-circle"></i> Validée</span>
-                                    @else
-                                    <span class="badge bg-warning bg-opacity-10 text-warning px-3"><i class="fas fa-hourglass-half"></i> En attente</span>
-                                    @endif
-                                    )
+                                        @elseif ($facture->validated_at)
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3"><i class="fas fa-check-circle"></i> Validée</span>
+                                        @else
+                                        <span class="badge bg-warning bg-opacity-10 text-warning px-3"><i class="fas fa-hourglass-half"></i> En attente</span>
+                                        @endif
+                                        )
                                 </small>
                             </td>
                             <td class="text-end">

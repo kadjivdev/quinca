@@ -32,7 +32,15 @@ class FactureFournisseurController extends Controller
             'lignes.article',
             'lignes.uniteMesure',
             'lignes.uniteMesureBase',
-        ]);
+        ])->orderByDesc('created_at');
+
+        // Construction de la requête de base
+        if ($request->debut && $request->fin) {
+            $query->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
+        } else {
+            $query->limit(200);
+        }
+
 
         if ($request->fournisseur_id) {
             $query->where("fournisseur_id", $request->fournisseur_id);
@@ -66,8 +74,7 @@ class FactureFournisseurController extends Controller
 
         // Récupération des factures paginées
         $factures = $query->latest('date_facture')
-        ->get()
-        ;
+            ->get();
 
         // Calcul des statistiques pour le header
 
@@ -247,12 +254,12 @@ class FactureFournisseurController extends Controller
                 $query->where(function ($q) {
                     /**quantite_base */
                     $q->where(function ($subQ) {
-                            $subQ->whereNotNull('quantite_base')
-                                ->where(function ($x) {
-                                    $x->whereNull('quantite_livree_simple')
-                                        ->orWhereColumn('quantite_base', '>', 'quantite_livree_simple');
-                                });
-                        })
+                        $subQ->whereNotNull('quantite_base')
+                            ->where(function ($x) {
+                                $x->whereNull('quantite_livree_simple')
+                                    ->orWhereColumn('quantite_base', '>', 'quantite_livree_simple');
+                            });
+                    })
                         /**quantite **/
                         ->orWhere(function ($subQ) {
                             $subQ->whereNull('quantite_base')
