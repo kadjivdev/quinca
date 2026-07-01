@@ -408,7 +408,14 @@ class RapportStockController extends Controller
             $query->whereDate('date_mouvement', '<=', $request->date_fin);
         }
 
-        return $query->get();
+        return $query
+            ->get()
+            ->transform((function ($mouvement) {
+                $mouvement->stock_depot_updated_at = StockDepot::where('article_id', $mouvement->article_id)
+                    ->where('depot_id', $mouvement->depot_id)
+                    ->value('updated_at');
+                return $mouvement;
+            }));
     }
 
     public function export(Request $request)

@@ -119,7 +119,7 @@
                         <tr>
                             <td class="text-monospace">{{$mouvement->id}} | {{ $mouvement->code }}</td>
                             <td>{{ $mouvement->created_at->format('d/m/Y') }}</td>
-                            <td>{{ $mouvement->updated_at->format('d/m/Y') }}</td>
+                            <td>{{ $mouvement->stock_depot_updated_at->format('d/m/Y') }}</td>
                             <td>{{ $mouvement->date_mouvement->format('d/m/Y') }}</td>
                             <td><span class="badge bg-light border rounded text-dark"> {{ $mouvement->user?->name }} </span></td>
                             <td>
