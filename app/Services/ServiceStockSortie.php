@@ -135,7 +135,7 @@ class ServiceStockSortie
                 'quantite_origine' => $donnees['quantite'],
                 'unite_mesure_id' => $unite_origine_id,
                 'unite_mesure_origine_id' => $unite_origine_id,
-                'prix_unitaire' => $donnees["prix_unitaire"], // $stock->prix_moyen,
+                'prix_unitaire' => $donnees["prix_moyen"]??null, // $stock->prix_moyen,
                 'reference_mouvement' => $donnees['reference_mouvement'],
                 'document_type' => $donnees['document_type'] ?? null,
                 'document_id' => $donnees['document_id'] ?? null,

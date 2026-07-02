@@ -58,7 +58,7 @@ use App\Models\Vente\LigneLivraisonClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $lignesFacture = LigneLivraisonClient::with("livraisonClient")
+    $lignesFacture = LigneLivraisonClient::with("livraisonClient","article", "uniteVente")
         ->whereHas("livraisonClient", function ($query) {
             $query->whereBetween("validated_at", [
                 // Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
