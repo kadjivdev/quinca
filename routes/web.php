@@ -58,17 +58,33 @@ use App\Models\Vente\LigneLivraisonClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    $lignesFacture = LigneLivraisonClient::with("livraisonClient","article", "uniteVente")
+    return FactureClient::where("created_at", Carbon::create(2026, 07, 2)->startOfDay())
+        ->where("client_id",290)
+        ->get();
+
+    // les livraisons clients du depot 3 validées entre le 13 mai 2026 et maintenant
+    $livraisonClientLignes = LigneLivraisonClient::where("depot_id", 3)
+        ->with("livraisonClient", "article", "uniteVente")
         ->whereHas("livraisonClient", function ($query) {
             $query->whereBetween("validated_at", [
-                // Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
                 Carbon::create(2026, 05, 13)->startOfDay(), // 13 Mai 
                 now(), // maintenant
             ]);
         })
         ->get();
 
-    return $lignesFacture;
+    // les livraisons fournisseurs du depot 3 validées entre le 13 mai 2026 et maintenant
+    $livraisonFournisseurLignes = LigneBonLivraisonFournisseur::where("depot_id", 3)
+        ->with("bonLivraison", "article", "uniteMesure")
+        ->whereHas("bonLivraison", function ($query) {
+            $query->whereBetween("validated_at", [
+                Carbon::create(2026, 05, 13)->startOfDay(), // 13 Mai
+                now(), // maintenant
+            ]);
+        })
+        ->get();
+
+    return $livraisonClientLignes;
 
     // return StockDepot::where(["article_id"=> 1927,"depot_id"=>3])
     //     ->get();
