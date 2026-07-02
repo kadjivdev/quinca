@@ -68,7 +68,7 @@
     <div class="row d-flex justify-content-center">
         <div class="col-6">
             <div class="border rounded shadow-sm p-2">
-                <p class="text-center">Ce panel est devenu fonctionnel à la date du <em class="text-danger"> 13/05/2026</em></p>
+                <p class="text-center">Ce panel est devenu fonctionnel à la date du <em class="text-danger"> 13/05/2026</em> | Les qte de sortie sont devenue juste à partir du 02/07/2026</p>
                 <form action="{{route('rapports.mouvement-stock')}}" method="get">
                     <select name="depot_id" value="{{old('depot_id')}}" class="form-control">
                         <option value="">Choisissez un dépôt ...</option>

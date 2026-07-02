@@ -55,14 +55,6 @@ class ServiceStockEntree
                 // 'unite_mesure_id' => $donnees["unite_mesure_id"],
             ]);
 
-            if (!$stockExiste) {
-                throw new Exception(sprintf(
-                    "L'article %s n'existe pas dans le dépôt %s",
-                    $article->code_article,
-                    $donnees['depot_id']
-                ));
-            }
-
             ## determination de l'unité de destination
             if (isset($donnees["appro"]) || isset($donnees["livraison"])) {
                 // quand le stock existe déjà, l'approvisionnement se fera en l'unité de mesure existante déjà
@@ -73,6 +65,18 @@ class ServiceStockEntree
                 }
             } else {
                 $unite_dest_id = $article->unite_mesure_id;
+            }
+
+            // 5. création du stock
+            if ($stockExiste) {
+                $stock = $stockExiste;
+            } else {
+                $stock = StockDepot::create([
+                    'depot_id' => $donnees['depot_id'],
+                    'article_id' => $article->id,
+                    'user_id' => Auth::id(),
+                    'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
+                ]);
             }
 
             $conversion = $this->rechercherConversion(
@@ -105,17 +109,6 @@ class ServiceStockEntree
                 'unite_base' => $uniteBase->id
             ]);
 
-            // 5. création du stock
-            if ($stockExiste) {
-                $stock = $stockExiste;
-            } else {
-                $stock = StockDepot::create([
-                    'depot_id' => $donnees['depot_id'],
-                    'article_id' => $article->id,
-                    'user_id' => Auth::id(),
-                    'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
-                ]);
-            }
 
             $ancien_stock = $stock->quantite_reelle ?? 0;
             $ancien_cump = $stock->prix_moyen ?? 0;

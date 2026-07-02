@@ -53,19 +53,23 @@ class ServiceStockSortie
                 // 'unite_mesure_id' => $donnees["unite_mesure_id"],
             ]);
 
-            if (!$stockExiste) {
-                throw new Exception(sprintf(
-                    "L'article %s n'existe pas dans le dépôt %s",
-                    $article->code_article,
-                    $donnees['depot_id']
-                ));
+            // 5. création du stock
+            if ($stockExiste) {
+                $stock = $stockExiste;
+            } else {
+                $stock = StockDepot::create([
+                    'depot_id' => $donnees['depot_id'],
+                    'article_id' => $article->id,
+                    'user_id' => Auth::id(),
+                ]);
             }
+
 
             ## determination de l'unité de destination
             if (isset($donnees["appro"]) || isset($donnees["livraison"])) {
                 // quand le stock existe déjà, l'approvisionnement se fera en l'unité de mesure existante déjà
-                if ($stockExiste) {
-                    $unite_dest_id = $stockExiste->unite_mesure_id;
+                if ($stock) {
+                    $unite_dest_id = $stock->unite_mesure_id;
                 } else {
                     $unite_dest_id = $article->unite_mesure_id;
                 }
@@ -103,21 +107,6 @@ class ServiceStockSortie
                 'unite_base' => $uniteBase->id
             ]);
 
-            // 5. création du stock
-            // if ($stockExiste) {
-            //     $stock = $stockExiste;
-            // } else {
-            //     $stock = StockDepot::create([
-            //         'depot_id' => $donnees['depot_id'],
-            //         'article_id' => $article->id,
-            //         'user_id' => Auth::id(),
-            //         'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
-            //     ]);
-            // }
-
-            // $ancien_stock = $stock->quantite_reelle ?? 0;
-            // $ancien_cump = $stock->prix_moyen ?? 0;
-
             // 7. Création du mouvement de stock
             $mouvement = StockMouvement::create([
                 'code' => $this->genererCodeMouvement(),
@@ -129,24 +118,13 @@ class ServiceStockSortie
                 'quantite_origine' => $donnees['quantite'],
                 'unite_mesure_id' => $unite_origine_id,
                 'unite_mesure_origine_id' => $unite_origine_id,
-                'prix_unitaire' => $donnees["prix_moyen"]??null, // $stock->prix_moyen,
+                'prix_unitaire' => $donnees["prix_moyen"] ?? null, // $stock->prix_moyen,
                 'reference_mouvement' => $donnees['reference_mouvement'],
                 'document_type' => $donnees['document_type'] ?? null,
                 'document_id' => $donnees['document_id'] ?? null,
                 'notes' => $donnees['notes'] ?? null,
                 'user_id' => $donnees['user_id']
             ]);
-
-            // 8. Mise à jour du stock
-            // $stock->fill([
-            //     'quantite_reelle' => $ancien_stock + $quantite_base, //old $quantite_base,
-            //     'prix_moyen' => 0.00,
-            //     'date_dernier_mouvement' => $donnees['date_mouvement'],
-            //     'user_id' => $donnees['user_id'],
-            //     // 'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
-            // ]);
-
-            // $stock->save();
 
             DB::commit();
 
@@ -160,7 +138,7 @@ class ServiceStockSortie
                     'unite_origine' => UniteMesure::find($unite_origine_id)->code_unite,
                     'quantite_base' => $quantite_base,
                     'unite_base' => $article->uniteMesure->code_unite,
-                    'nouveau_stock' => $stockExiste?->quantite_reelle
+                    'nouveau_stock' => $stock?->quantite_reelle
                 ]
             ];
         } catch (Exception $e) {
@@ -247,23 +225,62 @@ class ServiceStockSortie
         return $prefix . $date . $newNumber;
     }
 
-    private function rechercherConversion(int $unite_source_id, int $unite_base_id, int $article_id): ?ConversionUnite
+    // private function rechercherConversion(int $unite_source_id, int $unite_base_id, int $article_id): ?ConversionUnite
+    // {
+    //     return ConversionUnite::where(function ($query) use ($unite_source_id, $unite_base_id) {
+    //         $query->where([
+    //             'unite_source_id' => $unite_source_id,
+    //             'unite_dest_id' => $unite_base_id
+    //         ])->orWhere([
+    //             'unite_source_id' => $unite_base_id,
+    //             'unite_dest_id' => $unite_source_id
+    //         ]);
+    //     })
+    //         ->where(function ($query) use ($article_id) {
+    //             $query->where('article_id', $article_id)
+    //                 ->orWhereNull('article_id');
+    //         })
+    //         ->where('statut', true)
+    //         ->first();
+    // }
+
+    /**
+     * Recherche une conversion entre deux unités
+     * @param $current_unite_id unité entrante
+     * @param $unite_base_id unité de l'aricle(unité de base)
+     * @param $article_id l'id de l'article en question
+     */
+    private function rechercherConversion(int $current_unite_id, int $unite_base_id, int $article_id): ?ConversionUnite
     {
-        return ConversionUnite::where(function ($query) use ($unite_source_id, $unite_base_id) {
+        $baseUniteToCurrentUnite =  ConversionUnite::with(["uniteSource", "uniteDest", "article.uniteMesure"])->where(function ($query) use ($current_unite_id, $unite_base_id) {
+            /** quand l'unité entrante est l'unité de 
+             * destination dans la conversion 
+             * */
             $query->where([
-                'unite_source_id' => $unite_source_id,
-                'unite_dest_id' => $unite_base_id
-            ])->orWhere([
                 'unite_source_id' => $unite_base_id,
-                'unite_dest_id' => $unite_source_id
+                'unite_dest_id' =>  $current_unite_id
             ]);
         })
             ->where(function ($query) use ($article_id) {
-                $query->where('article_id', $article_id)
-                    ->orWhereNull('article_id');
-            })
-            ->where('statut', true)
-            ->first();
+                $query->where('article_id', $article_id);
+            })->where('statut', true)->first();
+
+        $currentUniteToBaseUnite =  ConversionUnite::with(["uniteSource", "uniteDest", "article.uniteMesure"])->where(function ($query) use ($current_unite_id, $unite_base_id) {
+            /** quand l'unité entrante est l'unité de 
+             * source dans la conversion 
+             * */
+            $query->where([
+                'unite_source_id' => $current_unite_id,
+                'unite_dest_id' =>  $unite_base_id
+            ]);
+        })
+            ->where(function ($query) use ($article_id) {
+                $query->where('article_id', $article_id);
+            })->where('statut', true)->first();
+
+        return $baseUniteToCurrentUnite ?
+            $baseUniteToCurrentUnite :
+            $currentUniteToBaseUnite;
     }
 
     // private function convertirQuantite(float $quantite, ConversionUnite $conversion, int $unite_source_id): float
@@ -273,7 +290,7 @@ class ServiceStockSortie
     //         : $conversion->convertirInverse($quantite);
     // }
 
-     /**
+    /**
      * Convertit une quantité selon le sens de la conversion
      * @param $current_unite_id l'unité actuelle (ou entrante)
      */
