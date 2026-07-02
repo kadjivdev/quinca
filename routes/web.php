@@ -45,6 +45,7 @@ use App\Models\Vente\LivraisonClient;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Securite\User;
+use App\Models\Vente\LigneLivraisonClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,9 +58,20 @@ use App\Models\Securite\User;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    return StockDepot::where(["article_id"=> 1927,"depot_id"=>3])
+    $lignesFacture = LigneLivraisonClient::with("livraisonClient")
+        ->whereHas("livraisonClient", function ($query) {
+            $query->whereBetween("validated_at", [
+                Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
+                now(), // maintenant
+            ]);
+        })
         ->get();
-        // ->load(["article","depot"]);
+
+    return $lignesFacture;
+
+    // return StockDepot::where(["article_id"=> 1927,"depot_id"=>3])
+    //     ->get();
+    // ->load(["article","depot"]);
     // return Article::firstWhere("code_article", "ART-0DPM2VUT");
     // FAC-20260611-0020
     // $livraisonDeleteds = LivraisonClient::onlyTrashed()
@@ -74,13 +86,13 @@ Route::get("/debug", function () {
 
     // return $livraisonDeleteds;
 
-    $ligneFacture = LigneFactureFournisseur::find(1974);
+    // $ligneFacture = LigneFactureFournisseur::find(1974);
 
-    $ligneFacture->quantite_livree = 2025;
+    // $ligneFacture->quantite_livree = 2025;
 
-    $ligneFacture->save();
+    // $ligneFacture->save();
 
-    return $ligneFacture;
+    // return $ligneFacture;
     // $BonLivraisonFournisseurs = BonLivraisonFournisseur::with("lignes", "lignes.uniteMesure", "lignes.article")
     //     ->whereHas("lignes", function ($query) {
     //         $query->where(["article_id" => 1544, "depot_id" => 4]);
