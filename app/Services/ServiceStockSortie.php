@@ -53,6 +53,14 @@ class ServiceStockSortie
                 // 'unite_mesure_id' => $donnees["unite_mesure_id"],
             ]);
 
+            if (!$stockExiste) {
+                throw new Exception(sprintf(
+                    "L'article %s n'existe pas dans le dépôt %s",
+                    $article->code_article,
+                    $donnees['depot_id']
+                ));
+            }
+
             ## determination de l'unité de destination
             if (isset($donnees["appro"]) || isset($donnees["livraison"])) {
                 // quand le stock existe déjà, l'approvisionnement se fera en l'unité de mesure existante déjà
@@ -102,19 +110,19 @@ class ServiceStockSortie
             ]);
 
             // 5. création du stock
-            if ($stockExiste) {
-                $stock = $stockExiste;
-            } else {
-                $stock = StockDepot::create([
-                    'depot_id' => $donnees['depot_id'],
-                    'article_id' => $article->id,
-                    'user_id' => Auth::id(),
-                    'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
-                ]);
-            }
+            // if ($stockExiste) {
+            //     $stock = $stockExiste;
+            // } else {
+            //     $stock = StockDepot::create([
+            //         'depot_id' => $donnees['depot_id'],
+            //         'article_id' => $article->id,
+            //         'user_id' => Auth::id(),
+            //         'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
+            //     ]);
+            // }
 
-            $ancien_stock = $stock->quantite_reelle ?? 0;
-            $ancien_cump = $stock->prix_moyen ?? 0;
+            // $ancien_stock = $stock->quantite_reelle ?? 0;
+            // $ancien_cump = $stock->prix_moyen ?? 0;
 
             // 7. Création du mouvement de stock
             $mouvement = StockMouvement::create([
@@ -127,7 +135,7 @@ class ServiceStockSortie
                 'quantite_origine' => $donnees['quantite'],
                 'unite_mesure_id' => $article->unite_mesure_id,
                 'unite_mesure_origine_id' => $unite_origine_id,
-                'prix_unitaire' => $stock->prix_moyen,
+                'prix_unitaire' => $donnees["prix_moyen"], // $stock->prix_moyen,
                 'reference_mouvement' => $donnees['reference_mouvement'],
                 'document_type' => $donnees['document_type'] ?? null,
                 'document_id' => $donnees['document_id'] ?? null,
@@ -136,21 +144,21 @@ class ServiceStockSortie
             ]);
 
             // 8. Mise à jour du stock
-            $stock->fill([
-                'quantite_reelle' => $ancien_stock + $quantite_base, //old $quantite_base,
-                'prix_moyen' => 0.00,
-                'date_dernier_mouvement' => $donnees['date_mouvement'],
-                'user_id' => $donnees['user_id'],
-                // 'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
-            ]);
+            // $stock->fill([
+            //     'quantite_reelle' => $ancien_stock + $quantite_base, //old $quantite_base,
+            //     'prix_moyen' => 0.00,
+            //     'date_dernier_mouvement' => $donnees['date_mouvement'],
+            //     'user_id' => $donnees['user_id'],
+            //     // 'livraison' => isset($donnees["livraison"]) ? $donnees["livraison"] : null,
+            // ]);
 
-            $stock->save();
+            // $stock->save();
 
             DB::commit();
 
             Log::debug("Sortie de stock réussie", [
                 'mouvement_id' => $mouvement->id,
-                'nouveau_stock' => $stock->quantite_reelle
+                'nouveau_stock' => $stockExiste?->quantite_reelle
             ]);
 
             return [
@@ -163,7 +171,7 @@ class ServiceStockSortie
                     'unite_origine' => UniteMesure::find($unite_origine_id)->code_unite,
                     'quantite_base' => $quantite_base,
                     'unite_base' => $article->uniteMesure->code_unite,
-                    'nouveau_stock' => $stock->quantite_reelle
+                    'nouveau_stock' => $stockExiste?->quantite_reelle
                 ]
             ];
         } catch (Exception $e) {
@@ -176,7 +184,7 @@ class ServiceStockSortie
 
             return [
                 'succes' => false,
-                'message' => 'Erreur lors de la sortie de stock: ' . $e->getMessage()
+                'message' => 'Erreure lors de la sortie de stock: ' . $e->getMessage()
             ];
         }
     }

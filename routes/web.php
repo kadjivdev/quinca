@@ -58,8 +58,8 @@ use App\Models\Securite\User;
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
     return StockDepot::where(["article_id"=> 1927,"depot_id"=>3])
-        ->get()
-        ->load(["article","depot"]);
+        ->get();
+        // ->load(["article","depot"]);
     // return Article::firstWhere("code_article", "ART-0DPM2VUT");
     // FAC-20260611-0020
     // $livraisonDeleteds = LivraisonClient::onlyTrashed()
