@@ -156,11 +156,6 @@ class ServiceStockSortie
 
             DB::commit();
 
-            Log::debug("Sortie de stock réussie", [
-                'mouvement_id' => $mouvement->id,
-                'nouveau_stock' => $stockExiste?->quantite_reelle
-            ]);
-
             return [
                 'succes' => true,
                 'message' => 'Sortie de stock effectuée avec succès',
