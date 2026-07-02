@@ -58,9 +58,12 @@ use App\Models\Vente\LigneLivraisonClient;
 
 // DEBUGGING ROUTES
 Route::get("/debug", function () {
-    return FactureClient::where("created_at", Carbon::create(2026, 07, 2)->startOfDay())
-        ->where("client_id",290)
-        ->get();
+    return FactureClient::withTrashed()
+        ->with("client")
+        ->where("created_at", Carbon::create(2026, 07, 2)->startOfDay())
+        ->where("client_id", 290)
+        ->get()
+        ->pluck("client.raison_sociale");
 
     // les livraisons clients du depot 3 validées entre le 13 mai 2026 et maintenant
     $livraisonClientLignes = LigneLivraisonClient::where("depot_id", 3)
