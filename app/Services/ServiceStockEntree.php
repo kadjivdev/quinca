@@ -55,6 +55,14 @@ class ServiceStockEntree
                 // 'unite_mesure_id' => $donnees["unite_mesure_id"],
             ]);
 
+            if (!$stockExiste) {
+                throw new Exception(sprintf(
+                    "L'article %s n'existe pas dans le dépôt %s",
+                    $article->code_article,
+                    $donnees['depot_id']
+                ));
+            }
+
             ## determination de l'unité de destination
             if (isset($donnees["appro"]) || isset($donnees["livraison"])) {
                 // quand le stock existe déjà, l'approvisionnement se fera en l'unité de mesure existante déjà
@@ -90,7 +98,7 @@ class ServiceStockEntree
                 $unite_origine_id
             );
 
-            Log::debug("Conversion effectuée", [
+            Log::debug("Conversion effectuée à l'entrée", [
                 'quantite_origine' => $donnees['quantite'],
                 'unite_origine' => $uniteSource->id,
                 'quantite_base' => $quantite_base,

@@ -60,7 +60,7 @@
                                         <!-- seul JEANNE & GAEL peuvent choisir un magasin de destination
                                          
                                         integré le 13/06/2026-->
-                                        @if(auth()->user()->id==29 || auth()->user()->id==14)
+                                        @if(auth()->user()->id==29 || auth()->user()->id==14 || auth()->user()->id==1)
                                         <div class="col-md-12">
                                             <label class="form-label fw-medium">Magasin Destination Interne (pour une livraison sur un autre point de vente)</label>
                                             <select class="form-select" name="depot_dest_id">

@@ -143,7 +143,7 @@
                             <td>{{ $mouvement->article?->designation }} | {{$mouvement->article?->code_article}}</td>
                             <td>{{ $mouvement->depot?->libelle_depot }}</td>
                             <td>{{ $mouvement->article?->uniteMesure?->libelle_unite }}</td>
-                            <td class="text-end">{{ number_format($mouvement->quantite, 2, ',', ' ') }}</td>
+                            <td class="text-end"> {{ number_format($mouvement->quantite, 2, ',', ' ') }}</td>
                             <td class="text-end">{{ number_format($mouvement->prix_unitaire, 0, ',', ' ') }} FCFA
                             <td>{{ $mouvement->document_type }} {{ $mouvement->document_id }}</td>
                             <td>

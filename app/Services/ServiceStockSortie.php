@@ -79,12 +79,6 @@ class ServiceStockSortie
                 $article->id
             );
 
-            $quantite_base = $this->convertirQuantite(
-                $donnees['quantite'],
-                $conversion,
-                $unite_origine_id
-            );
-
             Log::debug('Convertion retrouvée:', ["data" => $conversion]);
 
             if (!$conversion) {
@@ -102,7 +96,7 @@ class ServiceStockSortie
                 $unite_origine_id
             );
 
-            Log::debug("Conversion effectuée", [
+            Log::debug("Conversion effectuée à la sortie", [
                 'quantite_origine' => $donnees['quantite'],
                 'unite_origine' => $uniteSource->id,
                 'quantite_base' => $quantite_base,
@@ -272,11 +266,24 @@ class ServiceStockSortie
             ->first();
     }
 
-    private function convertirQuantite(float $quantite, ConversionUnite $conversion, int $unite_source_id): float
+    // private function convertirQuantite(float $quantite, ConversionUnite $conversion, int $unite_source_id): float
+    // {
+    //     return $conversion->unite_source_id === $unite_source_id
+    //         ? $conversion->convertir($quantite)
+    //         : $conversion->convertirInverse($quantite);
+    // }
+
+     /**
+     * Convertit une quantité selon le sens de la conversion
+     * @param $current_unite_id l'unité actuelle (ou entrante)
+     */
+    private function convertirQuantite(float $quantite, ConversionUnite $conversion, int $current_unite_id): float
     {
-        return $conversion->unite_source_id === $unite_source_id
-            ? $conversion->convertir($quantite)
-            : $conversion->convertirInverse($quantite);
+        // return $conversion->convertToBase($quantite);
+
+        return $conversion->unite_dest_id === $current_unite_id //$conversion->unite_source_id === $current_unite_id
+            ? $conversion->convertirInverse($quantite)
+            : $conversion->convertir($quantite);
     }
 
     private function validerDonneesSortie(array $donnees): void

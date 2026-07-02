@@ -14,8 +14,14 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->timestamp('date_mouvement');
             $table->enum('type_mouvement', ['ENTREE', 'SORTIE', 'TRANSFERT', 'AJUSTEMENT', 'RETOUR']);
-            $table->foreignId('depot_id')->constrained('depots');
-            $table->foreignId('article_id')->constrained('articles');
+            $table->foreignId('depot_id')
+                ->nullable()
+                ->constrained('depots')
+                ->onDelete('set null');
+            $table->foreignId('article_id')
+                ->nullable()
+                ->constrained('articles')
+                ->onDelete('set null');
             $table->foreignId('unite_mesure_id')->constrained('unite_mesures');
             $table->decimal('quantite', 15, 3);
             $table->decimal('prix_unitaire', 15, 2);
