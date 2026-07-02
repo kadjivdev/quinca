@@ -61,7 +61,8 @@ Route::get("/debug", function () {
     $lignesFacture = LigneLivraisonClient::with("livraisonClient")
         ->whereHas("livraisonClient", function ($query) {
             $query->whereBetween("validated_at", [
-                Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
+                // Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars 
+                Carbon::create(2026, 05, 13)->startOfDay(), // 13 Mai 
                 now(), // maintenant
             ]);
         })
