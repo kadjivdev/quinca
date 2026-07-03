@@ -48,6 +48,7 @@ use App\Models\Securite\User;
 use App\Models\Vente\LigneLivraisonClient;
 
 use App\Services\ServiceStockEntree;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,7 +67,7 @@ Route::get("/debug", function () {
         ->get()
         ->each(function ($stock) {
             $livraisonFournisseurLignes = LigneBonLivraisonFournisseur::query()
-                ->with("bonLivraison", "article", "uniteMesure")
+                // ->with("bonLivraison", "article", "uniteMesure")
                 ->where("article_id", $stock->article_id)
                 ->whereHas("bonLivraison", function ($query) use ($stock) {
                     $query
@@ -126,14 +127,26 @@ Route::get("/debug", function () {
 
             // qteDepart
             $stock->qte_base_total = $stock->qteDepart + $livraisonFournisseurLignes->sum();
+
             return $stock;
         })
         ->groupBy('code_article')
         ->map(function ($group) {
+            Log::debug("Group: ", ["stock" => $group]);
+
+            $stock = StockDepot::findOrFail($group->first()->id);
+            // mise à jour de la qte reelle du stock
+            $stock->quantite_reelle = $group->sum('qte_base_total');
+            $stock->save();
+
             return $group->sum('qte_base_total');
         });
 
     return $magasin1Articles;
+    // $magasin1Articles
+    // ->each(function ($qte_base_total, $code_article) {
+    //     echo "Article: {$code_article} - Quantité totale en base: {$qte_base_total}<br>";
+    // });
 
     // return StockDepot::where(["article_id"=> 1927,"depot_id"=>3])
     //     ->get();
