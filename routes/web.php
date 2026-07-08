@@ -61,7 +61,7 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    // Capitulation des qte entrée dans le Magasin 1 Cotonou depuis le 23 Mars 2026 jusqu'à maintenant
+    // Capitulation des qte entrée dans le Magasin 2 Cotonou depuis le 28 Mars 2026 jusqu'à maintenant
     StockDepot::query()
         ->where("depot_id", 4)
         ->get()
@@ -73,7 +73,7 @@ Route::get("/debug", function () {
                     $query
                         ->where("depot_id", $stock->depot_id)
                         ->whereBetween("validated_at", [
-                            Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars
+                            Carbon::create(2026, 02, 28)->startOfDay(), // 23 Mars
                             now(), // maintenant
                         ]);
                 })
@@ -150,7 +150,7 @@ Route::get("/debug", function () {
             $query->where("depot_id", 4)
                 ->whereNotNull("validated_by")
                 ->whereBetween("created_at", [
-                    Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars
+                    Carbon::create(2026, 02, 28)->startOfDay(), // 23 Mars
                     now(), // maintenant
                 ]);
         })
@@ -294,7 +294,7 @@ Route::get("/debug", function () {
                 ->whereIn("numero", ["BL-260421-95b"]) /// les bons concernés
                 ->whereNotNull("validated_by")
                 ->whereBetween("created_at", [
-                    Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars
+                    Carbon::create(2026, 02, 28)->startOfDay(), // 23 Mars
                     now(), // maintenant
                 ])
             ;
