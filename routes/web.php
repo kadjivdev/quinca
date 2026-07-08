@@ -143,14 +143,14 @@ Route::get("/debug", function () {
         });
 
 
-    // retour des marchandises à ajouter aux stocks
+    // // retour des marchandises à ajouter aux stocks
     LigneMarchandise::with("marchandBack", "marchandBack.depot", "article")
         ->where("quantite", ">", 0)
         ->whereHas("marchandBack", function ($query) {
             $query->where("depot_id", 4)
                 ->whereNotNull("validated_by")
                 ->whereBetween("created_at", [
-                    Carbon::create(2026, 02, 28)->startOfDay(), // 23 Mars
+                    Carbon::create(2026, 02, 28)->startOfDay(), // 28 Mars
                     now(), // maintenant
                 ]);
         })
@@ -211,7 +211,6 @@ Route::get("/debug", function () {
                 "total_qte_base" => $lignes->sum("qte_base"),
             ];
         });
-
 
     // // livraison client | qte à ajouter aux  stocks
     // LigneLivraisonClient::with("livraison", "livraison.depot", "article")
