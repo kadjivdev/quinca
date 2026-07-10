@@ -55,6 +55,18 @@ class FactureRevendeurController extends Controller
                 ->where('type_vente', 'normale')
                 ->orderBy('date_facture', 'desc');
 
+            // Construction de la requête de base
+            if ($request->filled('debut') && $request->filled("fin")) {
+                $query
+                    ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
+            } elseif ($request->filled('day')) {
+                $query
+                    ->whereBetween('created_at', [Carbon::parse($request->day)->startOfDay(), Carbon::parse($request->day)->endOfDay()]);
+            } else {
+                $query
+                    ->whereBetween('created_at', [Carbon::parse(now())->startOfMonth(), Carbon::parse(now())->endOfMonth()]);
+            }
+
             if ($request->point_vente_id) {
                 $query->where("point_de_vente_id", $request->point_vente_id);
                 Session::flash("pointDeVente", $request->point_vente_id);
@@ -65,10 +77,6 @@ class FactureRevendeurController extends Controller
                 Session::flash("day", $request->day);
             }
 
-            // Si un filtre de période est actif, l'appliquer aux stats aussi
-            if ($request->filled('debut') && $request->filled("fin")) {
-                $query->whereBetween("created_at", [$request->debut, $request->fin]);
-            }
 
             if (
                 auth()->user()->hasRole("Super Administrateur")

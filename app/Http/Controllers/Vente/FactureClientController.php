@@ -56,7 +56,7 @@ class FactureClientController extends Controller
             } else {
                 $query = FactureClient::with(['client', 'createdBy'])
                     ->orderBy('created_at', 'desc')
-                    ->limit(200);
+                    ->whereBetween('created_at', [Carbon::parse(now())->startOfMonth(), Carbon::parse(now())->endOfMonth()]);
             }
 
             // Chargement des factures avec les relations nécessaires

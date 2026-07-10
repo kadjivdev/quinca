@@ -4,7 +4,9 @@
         <form action="{{route('revendeur.facture.index')}}" method="GET">
             @csrf
             <div class="row">
+                @if(!auth()->user()->hasRole('GERANT DEPOT'))
                 <div class="col-6">
+                    <label for="debut">Choisir un point de vente</label>
                     <select class="form-select form-control select2-form" name="point_vente_id">
                         <option value="">Sélectionner un point de vente -- {{session('pointDeVente')}} </option>
                         @foreach($pointsVentes as $pointVente)
@@ -13,8 +15,10 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-6">
-                    <input type="date" name="day" class="form-control" value="{{session('day')??null}}">
+                @endif
+                <div class="{{!auth()->user()->hasRole('GERANT DEPOT')? 'col-md-6': 'col-md-12'}}">
+                    <label for="day">Choisir un jour particulier</label>
+                    <input type="date" id="day" name="day" class="form-control" value="{{session('day')??null}}">
                 </div>
             </div>
             <div class="row">
