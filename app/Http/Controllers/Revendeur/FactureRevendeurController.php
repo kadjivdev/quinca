@@ -51,21 +51,17 @@ class FactureRevendeurController extends Controller
             $tauxTva = $configuration ? $configuration->taux_tva : 18;
 
             // Chargement des factures avec les relations nécessaires
-            $query = FactureRevendeur::with(['client'])
+            $query = FactureRevendeur::with([
+                'client',
+                'destockage.depot',
+                'destockage.client',
+                'destockage.lignes',
+                'destockage.lignes.article',
+                'destockage.lignes.uniteMesure',
+                'lignes'
+            ])
                 ->where('type_vente', 'normale')
                 ->orderBy('date_facture', 'desc');
-
-            // Construction de la requête de base
-            if ($request->filled('debut') && $request->filled("fin")) {
-                $query
-                    ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
-            } elseif ($request->filled('day')) {
-                $query
-                    ->whereBetween('created_at', [Carbon::parse($request->day)->startOfDay(), Carbon::parse($request->day)->endOfDay()]);
-            } else {
-                $query
-                    ->whereBetween('created_at', [Carbon::parse(now())->startOfMonth(), Carbon::parse(now())->endOfMonth()]);
-            }
 
             if ($request->point_vente_id) {
                 $query->where("point_de_vente_id", $request->point_vente_id);
@@ -77,6 +73,10 @@ class FactureRevendeurController extends Controller
                 Session::flash("day", $request->day);
             }
 
+            // Si un filtre de période est actif, l'appliquer aux stats aussi
+            if ($request->filled('debut') && $request->filled("fin")) {
+                $query->whereBetween("created_at", [$request->debut, $request->fin]);
+            }
 
             if (
                 auth()->user()->hasRole("Super Administrateur")
@@ -184,8 +184,8 @@ class FactureRevendeurController extends Controller
         try {
             Log::info('Début création facture Revendeur', ['request' => $request->all()]);
 
-            $client = Client::findOrFail($request->client_id);
-            $configuration = Societe::firstOrFail();
+            // $client = Client::findOrFail($request->client_id);
+            // $configuration = Societe::firstOrFail();
 
             // Validation
             $validator = Validator::make($request->all(), [
@@ -239,8 +239,10 @@ class FactureRevendeurController extends Controller
             // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
             foreach ($request->lignes as $ligne) {
                 $depot = Depot::find($ligne["depot_id"]);
+
                 // 
-                $stock = StockDepot::where('depot_id', $ligne["depot_id"])
+                $stock = StockDepot::query()
+                    ->where('depot_id', $ligne["depot_id"])
                     ->where('article_id', $ligne['article_id'])
                     ->first();
 
@@ -248,7 +250,6 @@ class FactureRevendeurController extends Controller
                  * Recherche de la conversion
                  */
                 $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
-                // $stockUnite = UniteMesure::findOrFail($stock->unite_mesure_id);
                 $article = Article::findOrFail($ligne['article_id']);
 
                 $conversion = $this->serviceStockEntree
@@ -265,19 +266,31 @@ class FactureRevendeurController extends Controller
                     ], 500);
                 }
 
+                /**Qte de Base */
+                $qantiteBase = $stock->quantite_reelle;
+
+                /**Qte de requete */
+                $stock->qantiteRequete = $stock->quantite_requete;
+
+                /**Qte Vendue */
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+
+                /**Qte Reste */
+                $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
+
+                Log::debug("article :", ["data" => $article->code_article]);
+                Log::debug("qantiteBase :", ["data" => $qantiteBase]);
+                Log::debug("qantiteRequete :", ["data", $stock->qantiteRequete]);
+                Log::debug("qteTotalVendu :", ["data", $qteTotalVendu]);
+                Log::debug("resteStock :", ["data", $resteStock]);
+
                 /**
                  * Obtention de la quantité convertie
                  */
 
-                // stock existant en unité de base d el'article
-                $resteStock = isset($ligne["depot_stock"]) ? $ligne["depot_stock"] : 0;
-
                 // unite de vente vers unite de base de l'article
                 $QteConvertie = $this->serviceStockEntree
                     ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
-
-                // $QteStockConvertie = $this->serviceStockEntree
-                //     ->convertirQuantite($resteStock, $conversion, $ligne['unite_vente_id']);
 
                 // on verifie la quantité restante de l'article dans le depot est suffisante
                 if ($resteStock < $QteConvertie) {
@@ -590,6 +603,13 @@ class FactureRevendeurController extends Controller
 
             $facture = FactureRevendeur::with([
                 'client',
+                'destockage.depot',
+                'destockage.client',
+                'destockage.lignes',
+                'destockage.lignes.article',
+                'destockage.lignes.uniteMesure',
+                'lignes',
+
                 'lignes.article',
                 'lignes.uniteVente',
                 'lignes.facturedepot',

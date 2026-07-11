@@ -901,4 +901,98 @@ $(document).ready(() => {
         window.factureManager = new FactureManager();
         window.factureManager.init();
     }
+
+    $(".destockage-form-select").select2({
+    theme: 'bootstrap-5',
+    width: '100%',
+    dropdownParent: $('#addFactureModal'),
+    placeholder: 'Sélectionner un destockage',
+    allowClear: true
+}).on('change', function (e) {
+    const selectedOption = $(this).find('option:selected')
+    const destockageId = e.target.value
+
+    if (!destockageId) {
+        console.log("Aucun destockage sélectionné")
+        return
+    }
+
+    const destockage = selectedOption.data('destockage')
+
+    $("#lignesContainer").empty()
+        let rows = ''
+        destockage?.lignes.forEach(ligne => {
+            rows += `
+                <tr class="ligne-facture">
+                    <td>
+                        <input type="text" class="form-control" 
+                            value="${ligne.article_id}" 
+                            name="lignes[${ligne.id}][article_id]"
+                            hidden
+                            >
+                        <span class="badge bg-light border rounded text-dark">${ligne.article?.code_article} - ${ligne.article?.designation}</span>
+                        <div class="invalid-feedback">L'article est requis</div>
+                    </td>
+                    <td>
+                        <input type="hidden" 
+                            name="lignes[${ligne.id}][depot_id]"
+                            required
+                            value="${destockage.depot?.id}">
+
+                        <input type="text"
+                            readonly
+                            value="${destockage.depot?.libelle_depot}"
+                            class="form-control">
+                        <div class="invalid-feedback">Le dépôt est requis</div>
+                    </td>
+                    <td>
+                        <div class="">
+                            <input type="number" class="form-control text-end quantite-input" 
+                                name="lignes[${ligne.id}][quantite]"
+                                required 
+                                readonly
+                                value="${ligne.qte}">
+                            <select 
+                                class="form-select unite-select" 
+                                name="lignes[${ligne.id}][unite_vente_id]"  
+                                required>
+                            <option value="${ligne.unite_mesure?.id}">${ligne.unite_mesure?.libelle_unite}</option>
+                            </select>
+                        </div>
+                        <div class="invalid-feedback">La quantité est requise</div>
+                    </td>
+                    <td>
+                        <input type="number"
+                            class="form-control text-end select2-tarifs"
+                            name="lignes[${ligne.id}][tarification_id]"
+                            readonly
+                            value="${ligne.pu}"
+                        >
+                        <div class="invalid-feedback">Le prix est requis</div>
+                    </td>
+                    <td>
+                        <input type="number" 
+                            class="form-control text-end remise-input" 
+                            name="lignes[${ligne.id}][taux_remise]"
+                            placeholder="0.00" min="0" max="100" step="0.01">
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" 
+                                    class="form-control text-end total-ligne" 
+                                    readonly 
+                                    value="${ligne.montant}">
+                        </div>
+                    </td>
+                    <td class="text-center">
+                    ---
+                    </td>
+                </tr>
+        `})
+
+        $("#lignesContainer").append(rows)
+
+        // Recalcule les totaux avec les lignes fraîchement injectées
+        window.factureManager.updateTotaux()
+    })
 });

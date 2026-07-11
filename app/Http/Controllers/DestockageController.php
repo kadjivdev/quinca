@@ -8,12 +8,14 @@ use App\Http\Requests\DestockageRequest;
 use App\Models\Catalogue\Article;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
+use App\Models\Stock\StockDepot;
 use App\Models\Vente\Client;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\ServiceStockEntree;
 
 class DestockageController extends Controller
 {
@@ -91,6 +93,71 @@ class DestockageController extends Controller
 
             $destockage = Destockage::create($request->validated());
 
+            $serviceStockEntree =  new ServiceStockEntree();
+            $depot = Depot::findOrFail($request->depot_id);
+
+            // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
+            foreach ($request->lignes as $ligne) {
+
+                // 
+                $stock = StockDepot::query()
+                    ->where('depot_id', $depot->id)
+                    ->where('article_id', $ligne['article_id'])
+                    ->first();
+
+                /**
+                 * Recherche de la conversion
+                 */
+                $venteUnite = UniteMesure::findOrFail($ligne['unite_mesure_id']);
+                $article = Article::findOrFail($ligne['article_id']);
+
+                $conversion = $serviceStockEntree
+                    ->rechercherConversion(
+                        $ligne['unite_mesure_id'],
+                        $article->unite_mesure_id, // $stock->unite_mesure_id,
+                        $stock->article_id
+                    );
+
+                if (!$conversion) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ({{$article->uniteMesure?->libelle_unite}}) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
+                    ], 500);
+                }
+
+                /**Qte de Base */
+                $qantiteBase = $stock->quantite_reelle;
+
+                /**Qte de requete */
+                $stock->qantiteRequete = $stock->quantite_requete;
+
+                /**Qte Vendue */
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+
+                /**Qte Reste */
+                $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
+
+                Log::debug("article :", ["data" => $article->code_article]);
+                Log::debug("qantiteBase :", ["data" => $qantiteBase]);
+                Log::debug("qantiteRequete :", ["data", $stock->qantiteRequete]);
+                Log::debug("qteTotalVendu :", ["data", $qteTotalVendu]);
+                Log::debug("resteStock :", ["data", $resteStock]);
+
+                /**
+                 * Obtention de la quantité convertie
+                 */
+
+                // unite de vente vers unite de base de l'article
+                $QteConvertie = $serviceStockEntree
+                    ->convertirQuantite($ligne['qte'], $conversion, $ligne['unite_mesure_id']);
+
+                // on verifie la quantité restante de l'article dans le depot est suffisante
+                if ($resteStock < $QteConvertie) {
+                    throw new Exception("Le reste du stock de l'article ($article->designation) est de $resteStock {{$article->uniteMesure?->libelle_unite}} dans le depôt ({$stock->depot?->libelle_depot})! Vous avez saisi $QteConvertie {{$article->uniteMesure?->libelle_unite}}!  Stock insuiffisant par rapport à la quantité saisie");
+                }
+            }
+
+
             $destockage->lignes()
                 ->createMany($request->validated()["lignes"]);
 
@@ -114,8 +181,7 @@ class DestockageController extends Controller
             return redirect()
                 ->back()
                 // ✅ Utiliser withErrors() à la place
-                ->withErrors(['error' => $e->getMessage()]);
-            // ->with("errors", $e->getMessage());
+                ->withErrors($e->getMessage());
         }
     }
 
@@ -233,7 +299,7 @@ class DestockageController extends Controller
 
             return redirect()
                 ->back()
-                ->with("message", "Destockage supprimé avec succès!");
+                ->with("message", "Destockage validé avec succès!");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure de validation lors de la suppression du destockage");

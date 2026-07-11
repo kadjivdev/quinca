@@ -599,7 +599,7 @@
                     const facture = data.data.facture;
 
                     // Remplir le formulaire
-                    $('#updateFactureForm').attr('action', `${apiUrl}/revendeurs/factures/${facture.id}/update`);
+                    $('#updateFactureForm').attr('action', `${apiUrl}/revendeurs/ventes-speciales/${facture.id}/update`);
                     $('#factureNumber').text(facture.numero);
                     $('[name="date_facture"]').val(facture.date_facture.split('T')[0]);
                     $('[name="date_echeance"]').val(facture.date_echeance.split('T')[0]);
@@ -610,17 +610,27 @@
 
                     // Vider et remplir les lignes
                     $('#updateLinesContainer').empty();
-                    if (facture.lignes && facture.lignes.length > 0) {
-                        facture.lignes.forEach(ligne => updateManager.addLigne(ligne));
-                    } else {
-                        updateManager.addLigne();
+
+                    // Sélectionner le destockage dans le select2 et générer les lignes
+
+                    console.log("facture selectionnée:", facture)
+                    $('.edit-destockage-form-select')
+                        .val(facture.destockage_id)
+                        .trigger('change.select2');
+
+                    if (facture.destockage?.lignes && facture.destockage?.lignes.length > 0) {
+                        renderUpdateDestockageLines(facture.destockage);
                     }
+                    // else {
+                    //     updateManager.addLigne();
+                    // }
 
                     // Afficher le modal
                     $('#updateFactureModal').modal('show');
                 }
             })
             .catch(error => {
+                alert("errorororo")
                 error.response.json().then(errData => {
                     console.error('Erreur détaillée:', errData);
                 });
@@ -631,4 +641,72 @@
                 });
             });
     }
+
+    function renderUpdateDestockageLines(destockage) {
+        $('#updateLinesContainer').empty();
+
+        if (!destockage?.lignes?.length) {
+            updateManager.addLigne();
+            return;
+        }
+
+        let rows = '';
+        destockage.lignes.forEach((ligne, index) => {
+            rows += `
+                <tr class="ligne-facture">
+                    <td>
+                        <input type="hidden" name="lignes[${index}][article_id]" value="${ligne.article_id}">
+                        <span class="badge bg-light border rounded text-dark">${ligne.article?.code_article || ''} - ${ligne.article?.designation || ''}</span>
+                        <div class="invalid-feedback">L'article est requis</div>
+                    </td>
+                    <td>
+                        <input type="hidden" name="lignes[${index}][depot_id]" value="${destockage.depot?.id || ''}">
+                        <input type="number" class="form-control text-end quantite-input" name="lignes[${index}][quantite]" required readonly value="${ligne.qte}">
+                        <select class="form-select unite-select" name="lignes[${index}][unite_vente_id]" required>
+                            <option value="${ligne.unite_mesure?.id}">${ligne.unite_mesure?.libelle_unite || ''}</option>
+                        </select>
+                        <div class="invalid-feedback">La quantité est requise</div>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control text-end select2-tarifs" name="lignes[${index}][tarification_id]" readonly value="${ligne.pu}">
+                        <div class="invalid-feedback">Le prix est requis</div>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control text-end remise-input" name="lignes[${index}][taux_remise]" placeholder="0.00" min="0" max="100" step="0.01" value="${ligne.taux_remise || 0}">
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control text-end total-ligne" readonly value="${ligne.montant}">
+                        </div>
+                    </td>
+                    <td class="text-center">---</td>
+                </tr>
+            `;
+        });
+
+        $('#updateLinesContainer').append(rows);
+        updateManager.updateTotaux();
+    }
+
+    $(document).ready(() => {
+        $(".edit-destockage-form-select").select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('#updateFactureModal'),
+            placeholder: 'Sélectionner un destockage',
+            allowClear: true
+        }).on('change', function(e) {
+            const selectedOption = $(this).find('option:selected')
+            const destockageId = e.target.value
+
+            if (!destockageId) {
+                console.log("Aucun destockage sélectionné")
+                return
+            }
+
+            const destockage = selectedOption.data('destockage')
+
+            renderUpdateDestockageLines(destockage)
+        })
+    })
 </script>

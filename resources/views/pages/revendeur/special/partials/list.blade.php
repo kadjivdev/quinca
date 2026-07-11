@@ -29,6 +29,8 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">N° Facture</th>
+                            <th class="border-bottom-0">Destockage</th>
+                            <th class="border-bottom-0">Décharge</th>
                             <th class="border-bottom-0">Point de Vente</th>
                             <th class="border-bottom-0">Dépôt</th>
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
@@ -60,7 +62,22 @@
                                 <span class="text-dark">Inventorié: {{ $facture->inventaire?->id }}</span>
                                 @endif
                             </td>
-                            <td>
+                            <td class="text-nowrap py-3">
+                                <div class="d-flex align-items-center">
+                                    <span class="numero-facture me-2">{{ $facture->destockage?->code??'---' }}</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                @if($facture->decharge)
+                                <a href="{{$facture->decharge}}" target="_blank" class="btn btn-sm btn-light-primary btn-icon"
+                                    data-bs-toggle="tooltip" title="Voir la décharge">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                @else
+                                ---
+                                @endif
+                            </td>
+                            <td class="text-center">
                                 <span class="badge bg-dark text-white">{{$facture->createdBy->pointDeVente->nom_pv}}</span>
                             </td>
                             <td class="border p-0">
@@ -92,19 +109,6 @@
                             $qte = $facture->lignes()->sum("quantite");
                             $qteLivre = $facture->lignes()->sum("quantite_livree")
                             @endphp
-                            <!-- <td>
-                                @if($qte==$qteLivre)
-                                <span class="badge bg-primary"> Livrée </span>
-                                @else
-
-                                @if($qteLivre < 0 || $qteLivre==0)
-                                    <span class="badge bg-danger">Non Livrée </span>
-                                    @else
-                                    <span class="badge bg-info bg-opacity-10 text-info">Livré partiellement({{$qteLivre}})</span>
-                                    @endif
-
-                                    @endif
-                            </td> -->
                             <td>{{ $facture->date_echeance->format('d/m/Y') }}</td>
                             <td class="text-end fw-medium">
                                 {{ number_format($facture->montant_ht, 0, ',', ' ') }} F

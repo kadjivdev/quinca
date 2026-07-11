@@ -42,21 +42,19 @@
                                         </div>
 
                                         <div class="col-md-3">
-                                            <label class="form-label fw-medium required">Client</label>
+                                            <label class="form-label fw-medium required">Destockage</label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white">
-                                                    <i class="fas fa-user text-primary"></i>
-                                                </span>
-                                                <select class="form-select " name="client_id" required>
-                                                    <option value="">Sélectionner un client</option>
-                                                    @foreach ($clients as $client)
-                                                    <option value="{{ $client->id }}"
-                                                        data-taux-aib="{{ $client->taux_aib }}">
-                                                        {{ $client->raison_sociale }}
+                                                <select class="form-select edit-destockage-form-select" name="destockage_id" required>
+                                                    <option value="">Sélectionner un destockage</option>
+                                                    @foreach ($destockages as $destockage)
+                                                    @continue($destockage->factureRevendeur?->validated_by)
+                                                    <option value="{{ $destockage->id }}" data-destockage="{{ json_encode($destockage) }}">
+                                                        {{ $destockage->code }} - {{ $destockage->client?->raison_sociale }}
                                                     </option>
                                                     @endforeach
                                                 </select>
                                             </div>
+                                            <div class="invalid-feedback">Le destockage est requis</div>
                                         </div>
 
                                         <div class="col-md-3">
@@ -83,6 +81,20 @@
                                                     <option value="normaliser">Normalisée</option>
                                                 </select>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- decharge -->
+                                    <div class="row my-3">
+                                        <div class="col-md-12">
+                                            <label for="decharge">Uploader la décharge de la vente</label>
+                                            <input
+                                                type="file"
+                                                class="form-control"
+                                                id="decharge"
+                                                name="decharge"
+                                                required>
+                                            <div class="invalid-feedback">La date d'échéance est requise</div>
                                         </div>
                                     </div>
                                 </div>
@@ -252,7 +264,7 @@
 </div>
 
 {{-- Template pour ligne de mise à jour --}}
-<template id="updateLineTemplate">
+<!-- <template id="updateLineTemplate">
     <tr class="ligne-facture">
         <td>
             <select class="form-select select2-articles" name="lignes[__INDEX__][article_id]" required>
@@ -293,4 +305,4 @@
             </button>
         </td>
     </tr>
-</template>
+</template> -->

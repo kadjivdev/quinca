@@ -70,8 +70,8 @@
                                 <td class="text-nowrap py-3">
                                     <span class="code-client">{{$compte->id}} -  {{ $loop->iteration }}</span>
                                 </td>
-                                <td>{{ Carbon\Carbon::parse($compte->created_at)->format('d/m/Y H:i:s') }}</td>
-                                <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y H:i:s') }}</td>
+                                <td>{{ Carbon\Carbon::parse($compte->created_at)->format('d/m/Y') }}</td>
+                                <td>{{ Carbon\Carbon::parse($compte->date_op)->format('d/m/Y') }}</td>
 
                                 <td>
                                     @if($compte->type_op=="FAC_CLT")

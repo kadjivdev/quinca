@@ -43,25 +43,19 @@
                                         </div>
 
                                         <div class="col-md-3">
-                                            <label class="form-label fw-medium required">Client</label>
+                                            <label class="form-label fw-medium required">Destockage</label>
                                             <div class="input-group">
-                                                <!-- <span class="input-group-text bg-white">
-                                                    <i class="fas fa-user text-primary"></i>
-                                                </span> -->
-                                                <div class="">
-                                                    <input type="search" class="form-control" id="input-search">
-                                                    <select class="form-select _client-select2" id="content-block" name="client_id" required>
-                                                        <option class="first" value="">Selectionnez un client</option>
-                                                        @foreach ($clients as $client)
-                                                        <option class="items" value="{{ $client->id }}"
-                                                            data-taux-aib="{{ $client->taux_aib }}">
-                                                            {{ $client->raison_sociale }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
+                                                <select class="form-select destockage-form-select" name="destockage_id" required>
+                                                    <option value="">Sélectionner un destockage</option>
+                                                    @foreach ($destockages as $destockage)
+                                                    @continue($destockage->factureRevendeur)
+                                                    <option value="{{ $destockage->id }}" data-destockage="{{ json_encode($destockage) }}">
+                                                        {{ $destockage->code }} - {{ $destockage->client?->raison_sociale }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
-                                            <div class="invalid-feedback">Le client est requis</div>
+                                            <div class="invalid-feedback">Le destockage est requis</div>
                                         </div>
 
                                         <div class="col-md-3">
@@ -92,6 +86,20 @@
                                             <div class="invalid-feedback">Le type de facture est requis</div>
                                         </div>
                                     </div>
+
+                                    <!-- decharge -->
+                                    <div class="row my-3">
+                                        <div class="col-md-12">
+                                            <label for="decharge">Uploader la décharge de la vente</label>
+                                            <input
+                                                type="file"
+                                                class="form-control"
+                                                id="decharge"
+                                                name="decharge"
+                                                required>
+                                            <div class="invalid-feedback">La date d'échéance est requise</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -103,22 +111,22 @@
                                     <h6 class="card-title mb-0">
                                         <i class="fas fa-box me-2"></i>Articles
                                     </h6>
-                                    <button type="button" class="btn btn-primary btn-sm" id="btnAddLigne">
+                                    <!-- <button type="button" class="btn btn-primary btn-sm" id="btnAddLigne">
                                         <i class="fas fa-plus me-2"></i>Ajouter un article
-                                    </button>
+                                    </button> -->
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-hover">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th style="width: 30%">Article</th>
-                                                    <th style="width: 15%">Dépôt</th>
-                                                    <th style="width: 15%">Quantité</th>
-                                                    <th style="width: 20%">Prix</th>
-                                                    <th style="width: 10%">Remise (%)</th>
-                                                    <th style="width: 25%">Total TTC</th>
-                                                    <th style="width: 5%"></th>
+                                                    <th>Article</th>
+                                                    <th>Dépôt</th>
+                                                    <th>Quantité</th>
+                                                    <th>Prix</th>
+                                                    <th>Remise (%)</th>
+                                                    <th>Total TTC</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody id="lignesContainer">
@@ -164,15 +172,7 @@
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <!-- <label class="form-label fw-medium required">Montant réglé</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white">
-                                                    <i class="fas fa-money-bill text-primary"></i>
-                                                </span>
-                                                <input type="number" class="form-control" name="montant_regle"
-                                                    id="montantRegle" required min="0" step="0.01">
-                                                <span class="input-group-text">FCFA</span>
-                                            </div> -->
+
 
                                             <div id="champsBancaires" class="row g-3 mt-0" style="display: none;">
                                                 <div class="col-md-12">
@@ -231,10 +231,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
-
-
-
                                     </div>
                                 </div>
                             </div>
@@ -270,7 +266,7 @@
 </div>
 
 {{-- Template pour une nouvelle ligne --}}
-<template id="ligneFactureTemplate">
+<!-- <template id="ligneFactureTemplate">
     <tr class="ligne-facture">
         <td>
             <select class="form-select select2-articles" name="lignes[__INDEX__][article_id]" required>
@@ -289,12 +285,6 @@
                 required>
             <div class="invalid-feedback">Le dépôt est requis</div>
         </td>
-        <!-- <td>
-            <input type="number" hidden name="lignes[__INDEX__][depot_id]" class="form-control">
-            <input type="number" _hidden name="lignes[__INDEX__][depot_stock]" class="form-control">
-            <input type="text" disabled name="lignes[__INDEX__][depot_libelle]" class="form-control">
-            <div class="invalid-feedback">Le depôt est requis</div>
-        </td> -->
         <td>
             <div class="input-group">
                 <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
@@ -321,7 +311,6 @@
         </td>
         <td>
             <div class="input-group">
-                <!-- <span class="input-group-text">FCFA</span> -->
                 <input type="text" class="form-control text-end total-ligne" readonly value="0">
             </div>
         </td>
@@ -331,7 +320,7 @@
             </button>
         </td>
     </tr>
-</template>
+</template> -->
 
 @push("scripts")
 <script>

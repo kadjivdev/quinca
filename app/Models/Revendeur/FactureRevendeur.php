@@ -3,6 +3,7 @@
 namespace App\Models\Revendeur;
 
 use App\Models\Catalogue\Inventaire;
+use App\Models\Destockage;
 use App\Models\Parametre\PointDeVente;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,8 +30,10 @@ class FactureRevendeur extends Model
         'numero',
         'date_facture',
         'date_echeance',
+        'decharge',
         'date_validation',
         'client_id',
+        "destockage_id",
         'statut',
         'montant_ht',
         'montant_remise',
@@ -75,7 +78,7 @@ class FactureRevendeur extends Model
      * où XXXX est un numéro séquentiel
      * @throws \Exception si impossible de générer un numéro unique après plusieurs tentatives
      */
-    
+
     public static function generateNumero()
     {
         $maxAttempts = 5;
@@ -163,7 +166,13 @@ class FactureRevendeur extends Model
         });
     }
 
-    function compteClient(): HasMany
+    // destockage
+    public function destockage(): BelongsTo
+    {
+        return $this->belongsTo(Destockage::class, 'destockage_id');
+    }
+
+    public function compteClient(): HasMany
     {
         return $this->hasMany(CompteClient::class, "facture_revendeur_id");
     }

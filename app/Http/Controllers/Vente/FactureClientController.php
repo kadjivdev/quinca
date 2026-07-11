@@ -23,7 +23,6 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Facades\Auth;
-use Psy\Readline\Hoa\Console;
 
 class FactureClientController extends Controller
 {

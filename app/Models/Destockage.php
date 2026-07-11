@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Models\Parametre\Depot;
+use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Securite\User;
 use App\Models\Vente\Client;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
@@ -58,6 +60,12 @@ class Destockage extends Model
         return $this->belongsTo(User::class, "validated_by");
     }
 
+    // facture
+    function factureRevendeur(): HasOne
+    {
+        return $this->hasOne(FactureRevendeur::class, "destockage_id");
+    }
+
     // lignes
     public function lignes(): HasMany
     {
@@ -73,8 +81,8 @@ class Destockage extends Model
         static::creating(function ($model) {
             if (Auth::user()) {
                 $model->created_by = Auth::id();
-                }
-                $model->code = "DES-" . time() . "-STOCK";
+            }
+            $model->code = "DES-" . time() . "-STOCK";
         });
 
         // // created

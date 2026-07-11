@@ -56,7 +56,7 @@
 
 @push('scripts')
     @include('pages.revendeur.special.partials.js-validate')
-    @include('pages.revendeur.facture.partials.update-js')
+    @include('pages.revendeur.special.partials.update-js')
 
     <script type="text/javascript">
         // Attendre que jQuery soit chargé
