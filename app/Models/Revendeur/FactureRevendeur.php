@@ -10,10 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 use App\Models\Securite\User;
-use App\Models\Vente\{Client, CompteClient, ReglementClient, ReglementRevendeur};
+use App\Models\Vente\{Client, CompteClient, ReglementRevendeur};
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class FactureRevendeur extends Model

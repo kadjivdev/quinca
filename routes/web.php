@@ -14,7 +14,7 @@ use App\Http\Controllers\Catalogues\{FamilleArticleController, ArticleController
 use App\Http\Controllers\Achat\{AccompteFournisseurController, AvanceController, FournisseurApprovisionnementController, FournisseurController, ProgrammationAchatController, LigneProgrammationAchatController, RequeteFournisseurController};
 use App\Http\Controllers\Achat\{BonCommandeController, LigneBonCommandeController, FactureFournisseurController, LigneFactureFournisseurController, ReglementFournisseurController,  BonLivraisonFournisseurController, LigneBonLivraisonFournisseurController};
 use App\Http\Controllers\DestockageController;
-use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, ReversementController, TransportController, TransportMouvementController, VersementController};
+use App\Http\Controllers\Vente\{AcompteClientController, ClientController, ClientRevendeurController, SessionCaisseController, FactureClientController, ReglementClientController, LivraisonClientController, LivraisonPvClientController, LigneLivraisonClientController, LivraisonDestockageController, ProformaController, RecouvrementController, ReglementRevendeurController, RequeteController, ReversementController, TransportController, TransportMouvementController, VersementController};
 use App\Http\Controllers\Parametre\ChauffeurController;
 use App\Http\Controllers\Parametre\VehiculeController;
 use App\Http\Controllers\Revendeur\FactureRevendeurController;
@@ -35,6 +35,7 @@ use App\Models\Catalogue\DetailInventaire;
 use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\Agent;
 use App\Models\RequeteStock;
+use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Stock\StockDepot;
 use App\Models\Stock\StockMouvement;
@@ -46,7 +47,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Securite\User;
 use App\Models\Vente\LigneLivraisonClient;
-
+use App\Models\Vente\LigneLivraisonDestockage;
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Facades\Log;
 
@@ -61,8 +62,7 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    // return Article::firstWhere("code_article", "ART-393");
-    // return StockDepot::where(["article_id"=>394,"depot_id"=>5])->get();
+    return FactureRevendeur::with("lignes")->firstWhere("numero", 'FAC-20260710-f3567007');
     // // Capitulation des qte entrée dans le Magasin 2 Cotonou depuis le 28 Mars 2026 jusqu'à maintenant
     // StockDepot::query()
     //     ->where("depot_id", 4)
@@ -1395,6 +1395,10 @@ Route::middleware('auth')->group(function () {
             // Voir les détails d'une facture
             Route::get('/{id}', [FactureRevendeurController::class, 'show'])->name('revendeur.facture.show');
 
+            // voir les factures d'un depot
+            Route::get('/factures-depot/{depotId}', [FactureRevendeurController::class, 'getDepotFactureRevendeur'])->name('vente.getDepotFactureRevendeur');
+
+
             // Routes pour la recherche d'articles et récupération des données
             Route::prefix('api')->group(function () {
                 Route::get('/articles/search', [FactureRevendeurController::class, 'searchArticles']);
@@ -1415,7 +1419,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/{facture}/print', [FactureRevendeurController::class, 'print'])->name('revendeur.facture.print');
             Route::put('/{facture}/update', [FactureRevendeurController::class, 'update'])->name('revendeur.facture.update');
         });
-
         Route::get('/validation', [FactureRevendeurController::class, 'dailyRapport'])->name('revendeur.normale.rapport');
         Route::put('/make-validation', [FactureRevendeurController::class, 'MakevalidationDaily'])->name('revendeur.normale.makevalidation');
 
@@ -1426,7 +1429,7 @@ Route::middleware('auth')->group(function () {
             // Créer une nouvelle facture
             Route::post('/store', [SpecialController::class, 'store'])->name('revendeur.speciales.store');
             Route::put('/{id}/update', [SpecialController::class, 'update'])->name('revendeur.speciales.update');
-            
+
             // Voir les détails d'une facture
             Route::get('/{id}', [SpecialController::class, 'show'])->name('revendeur.speciales.show');
 
@@ -1451,6 +1454,90 @@ Route::middleware('auth')->group(function () {
             Route::post('/{facture}/print', [SpecialController::class, 'print'])->name('vente-speciale.facture.print');
             Route::post('/{facture}/bon-a-livrer', [SpecialController::class, 'bonALivrer'])->name('vente-speciale.bonALivrer');
             Route::post('/{facture}/bordereau-livraison', [SpecialController::class, 'bordereauLivraison'])->name('vente-speciale.bordereauLivraison');
+        });
+
+        // livraions destockages
+        Route::prefix('livraisons')->group(function () {
+            Route::get('/verifier-stock', [LivraisonDestockageController::class, 'verifierStock'])
+                ->name('vente.livraison-destockages.verifier-stock');
+
+            // Liste des livraisons
+            Route::get('/', [LivraisonDestockageController::class, 'index'])
+                ->name('vente.livraison-destockages.index');
+
+            // Créer une nouvelle livraison
+            Route::post('/', [LivraisonDestockageController::class, 'store'])->name('vente.livraison-destockages.store');
+
+            // IMPRESSION EN PDF
+            Route::post('/{livraison}/bordereau-livraison', [LivraisonDestockageController::class, 'bordereauLivraison'])->name('vente.bordereauLivraisonDestockage');
+
+
+            // Voir les détails d'une livraison
+            Route::get('/{livraisonDestockage}', [LivraisonDestockageController::class, 'show'])
+                ->name('vente.livraison-destockages.show');
+
+            // Modifier une livraison
+            Route::get('/{livraisonDestockage}/edit', [LivraisonDestockageController::class, 'edit'])
+                ->name('vente.livraison-destockages.edit');
+
+            Route::patch('/{livraisonDestockage}/update', [LivraisonDestockageController::class, 'update'])
+                ->name('vente.livraison-destockages.update');
+
+            // Supprimer une livraison
+            Route::delete('/{livraisonDestockage}', [LivraisonDestockageController::class, 'destroy'])->name('vente.livraison-destockages.destroy');
+
+            // Valider une livraison
+            Route::post('{livraisonDestockage}/validate', [LivraisonDestockageController::class, 'validateLivraison'])->name('vente.livraison-destockages.validate');
+
+            Route::post('/{livraisonDestockage}/validate', [LivraisonDestockageController::class, 'validateLivraison'])
+                ->name('vente.livraison-destockages.validate');
+
+            // Annuler une livraison
+            Route::post('/{livraisonDestockage}/annuler', [LivraisonDestockageController::class, 'annuler'])
+                ->name('vente.livraison-destockages.annuler');
+
+            // Imprimer une livraison
+            Route::get('/{livraisonDestockage}/print', [LivraisonDestockageController::class, 'print'])
+                ->name('vente.livraison-destockages.print');
+
+            // Gestion des lignes de livraison
+            Route::post('/{livraisonDestockage}/lignes', [LigneLivraisonDestockage::class, 'store'])
+                ->name('vente.livraison-destockages.lignes.store');
+
+            Route::put('/{livraisonDestockage}/lignes/{ligneLivraison}', [LigneLivraisonDestockage::class, 'update'])
+                ->name('vente.livraison-destockages.lignes.update');
+
+            Route::delete('/{livraisonDestockage}/lignes/{ligneLivraison}', [LigneLivraisonDestockage::class, 'destroy'])
+                ->name('vente.livraison-destockages.lignes.destroy');
+
+            // Récupérer les lignes de facture disponibles pour livraison
+            Route::get('/facture/{factureRevendeur}/lignes-disponibles', [LivraisonDestockageController::class, 'getLignesFactureDisponibles'])
+                ->name('vente.livraison-destockages.lignes-facture-disponibles');
+
+            // Export des livraisons
+            Route::get('/export', [LigneLivraisonDestockage::class, 'export'])
+                ->name('vente.livraisons.export');
+
+            Route::get('/{livraisonDestockage}/export', [LigneLivraisonDestockage::class, 'exportOne'])
+                ->name('vente.livraison-destockages.export-one');
+
+            // Stats et tableaux de bord
+            Route::get('/stats', [LigneLivraisonDestockage::class, 'getStats'])
+                ->name('vente.livraison-destockages.stats');
+
+            // Routes pour les mouvements de stock liés
+            Route::get('/{livraisonDestockage}/mouvements', [LigneLivraisonDestockage::class, 'getMouvements'])
+                ->name('vente.livraison-destockages.mouvements');
+
+            // Routes pour la traçabilité
+            Route::get('/{livraisonDestockage}/historique', [LigneLivraisonDestockage::class, 'getHistorique'])
+                ->name('vente.livraisons.historique');
+
+            Route::get('/pdf/a4/bon-livrasion/{facture}', [LigneLivraisonDestockage::class, 'generateBonA4'])
+                ->name('vente.livraison-destockages.pdf.bon-livraison');
+
+            Route::get('/pdf/a5/bon-livrasion/{facture}', [LigneLivraisonDestockage::class, 'generateBonA5'])
+                ->name('vente.livraison-destockages.pdf.bon-livraison');
         });
 
         //Routes des règlements

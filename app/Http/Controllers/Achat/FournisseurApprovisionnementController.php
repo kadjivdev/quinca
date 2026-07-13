@@ -15,7 +15,7 @@ class FournisseurApprovisionnementController extends Controller
      */
     public function index()
     {
-        $approvisionnements = FournisseurApprovisionnement::with(["fournisseur", "actor"])->orderBy("id", "desc")->get();
+        $approvisionnements = FournisseurApprovisionnement::with(["fournisseur", "actor"])->orderBy("date", "desc")->get();
         $fournisseurs = Fournisseur::all();
         return view("pages.achat.approvisionnement.index", compact("approvisionnements", "fournisseurs"));
     }

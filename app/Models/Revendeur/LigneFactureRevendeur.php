@@ -10,7 +10,7 @@ use App\Models\Catalogue\Tarification;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
-use App\Models\Vente\{FactureClient, LigneLivraisonClient};
+use App\Models\Vente\{FactureClient, LigneLivraisonClient, LigneLivraisonDestockage};
 use Exception;
 use Illuminate\Support\Facades\Log;
 
@@ -202,28 +202,13 @@ class LigneFactureRevendeur extends Model
             // $ligneFacture->calculerMontants();
         });
     }
-    // protected static function boot()
-    // {
-    //     parent::boot();
-
-    //     static::saving(function ($ligneFacure) {
-    //         // Définir le prix depuis la tarification
-    //         $ligneFacure->prix_unitaire_ht = $ligneFacure->tarification_id;
-
-    //         // Convertir la quantité en unité de base
-    //         $ligneFacure->quantite_base = $ligneFacure->convertirEnUniteBase($ligneFacure->quantite);
-
-    //         // Recalculer les montants
-    //         $ligneFacure->calculerMontants();
-    //     });
-    // }
-
+  
     /**
      * Relation avec les lignes de livraison
      */
     public function lignesLivraison()
     {
-        return $this->hasMany(LigneLivraisonClient::class, 'ligne_facture_id');
+        return $this->hasMany(LigneLivraisonDestockage::class, 'ligne_facture_id');
     }
 
     /**
@@ -231,7 +216,7 @@ class LigneFactureRevendeur extends Model
      */
     public function facture()
     {
-        return $this->belongsTo(FactureClient::class, 'facture_client_id');
+        return $this->belongsTo(FactureRevendeur::class, 'facture_revendeur_id');
     }
 
     /**

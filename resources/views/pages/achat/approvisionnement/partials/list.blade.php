@@ -32,7 +32,9 @@
                             <td> <span class="badge bg-dark">{{$appro->fournisseur?->raison_sociale }} </span> </td>
                             <td><span class="fw-bold">{{ number_format($appro->montant, 2) }} F
                                     CFA</span></td>
-                            <td>{{ Carbon\Carbon::parse($appro->date)->format('d/m/Y H:i:s') }}</td>
+                            <td data-order="{{ $appro->date ? \Carbon\Carbon::parse($appro->date)->format('Y-m-d H:i:s') : '' }}">
+                                {{ \Carbon\Carbon::parse($appro->date)->format('d/m/Y H:i:s') }}
+                            </td>
                             <td>{{ $appro->actor->name }}</td>
                             <td>{{ $appro->source }}</td>
                             <td>
@@ -348,7 +350,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'desc']
+            [5, 'desc']
         ],
         "pageLength": 15,
         language: {

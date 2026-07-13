@@ -11,8 +11,7 @@
     </div>
     <div class="collapse navbar-collapse navbar-top-collapse order-1 order-lg-0 justify-content-center"
         id="navbarTopCollapse">
-        <ul class="navbar-nav navbar-nav-top" data-dropdown-on-hover="data-dropdown-on-hover"
-            >
+        <ul class="navbar-nav navbar-nav-top" data-dropdown-on-hover="data-dropdown-on-hover">
 
             <!-- ADMINISTRATION & gael-->
             @if(auth()->user()->hasRole("Super Administrateur") || in_array(auth()->user()->id,[14,21]))
@@ -323,6 +322,12 @@
                     @can("destockage.view")
                     <li><a class="dropdown-item" href="{{ route('destockages.index') }}">
                             <div class="dropdown-item-wrapper">Liste de destockages</div>
+                        </a></li>
+                    @endcan
+
+                    @can('vente.livraisons.view')
+                    <li><a class="dropdown-item" href="{{ route('vente.livraison-destockages.index') }}">
+                            <div class="dropdown-item-wrapper">Bordereau de livraison</div>
                         </a></li>
                     @endcan
                 </ul>

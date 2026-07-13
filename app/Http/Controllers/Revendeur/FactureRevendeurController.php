@@ -236,6 +236,8 @@ class FactureRevendeurController extends Controller
                 }
             }
 
+            $selectedArticles = [];
+
             // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
             foreach ($request->lignes as $ligne) {
                 $depot = Depot::find($ligne["depot_id"]);
@@ -245,6 +247,19 @@ class FactureRevendeurController extends Controller
                     ->where('depot_id', $ligne["depot_id"])
                     ->where('article_id', $ligne['article_id'])
                     ->first();
+
+
+                /**
+                 * on verifie si l'article a été choisi deux fois
+                 */
+                if (isset($selectedArticles[$ligne['article_id']])) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "L'article ({$article->designation}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
+                    ], 422);
+                }
+                $selectedArticles[$ligne['article_id']] = true;//on conpte cet article comme déjà selectionné
+
 
                 /**
                  * Recherche de la conversion
@@ -407,6 +422,34 @@ class FactureRevendeurController extends Controller
                 'message' => 'Erreur création facture: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    // get depot's factures
+    public static function getDepotFactureRevendeur($depotId)
+    {
+        Log::debug("Depot selectionné :", ["depot" => Depot::find($depotId)]);
+
+        $factures = FactureRevendeur::query()
+            ->where('type_vente', 'speciale') //facture speciale
+            ->whereNotNull("validated_by") //validée
+            ->whereHas("destockage") //venant d'un destockage
+            ->whereHas('lignes', function ($ligne) use ($depotId) {
+                $ligne->where('depot', $depotId)
+                    /**on recupere seulement les lignes qui disposent encore de quantité */
+                    ->where(function ($q) {
+                        $q->whereNull('quantite_livree_simple')
+                            ->orWhere(function ($subQ) {
+                                $subQ->whereNotNull('quantite_livree_simple')
+                                    ->where('quantite', '>', DB::raw('quantite_livree_simple'));
+                            });
+                    });
+            })->get(["id", "numero"]);
+
+        Log::debug("Les factures recupérées :", ["data" => $factures]);
+
+        return response()->json([
+            'data' => $factures
+        ]);
     }
 
     public function searchArticles(Request $request)
