@@ -417,7 +417,7 @@ class FactureClientController extends Controller
                         'message' => "L'article ({$article->designation}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
                     ], 422);
                 }
-                $selectedArticles[$ligne['article_id']] = true;//on conpte cet article comme déjà selectionné
+                $selectedArticles[$ligne['article_id']] = true; //on conpte cet article comme déjà selectionné
 
 
                 //On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
@@ -847,6 +847,31 @@ class FactureClientController extends Controller
                 'status' => 'error',
                 'message' => 'Erreur mise à jour facture: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function updateReference(Request $request, FactureClient $facture)
+    {
+        Log::debug("Début d emodification de la reference :", ["data" => $request->all()]);
+
+        try {
+            DB::beginTransaction();
+
+            // Mise à jour de la facture
+            $facture->update([
+                'reference_recu' => $request->reference_recu,
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->back()
+                ->with("message", "Reference mise à jour avec succès");
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->back()
+                ->with("error", $e->getMessage());
         }
     }
 

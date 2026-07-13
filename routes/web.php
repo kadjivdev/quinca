@@ -1180,6 +1180,9 @@ Route::middleware('auth')->group(function () {
 
             Route::put('/update/{id}', [FactureClientController::class, 'update'])->name('vente.facture.update');
 
+            // update reference
+            Route::post('/update/{facture}/update-reference', [FactureClientController::class, 'updateReference'])->name('vente.facture.updateReference');
+
             // Voir les détails d'une facture
             Route::get('/{id}', [FactureClientController::class, 'show'])->name('vente.facture.show');
 

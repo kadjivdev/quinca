@@ -1,4 +1,15 @@
 {{-- list-factures.blade.php --}}
+<div class="row d-flex justify-content-center">
+    <div class="col-md-6">
+        @if(session()->has("message"))
+        <div class="alert alert-success"> {{session()->get("message")}} </div>
+        @endif
+
+        @if(session()->has("error"))
+        <div class="alert alert-danger"> {{session()->get("error")}} </div>
+        @endif
+    </div>
+</div>
 
 <div class="row d-flex justify-content-center">
     <div class="col-md-6 border bg-light rounded p-3">
@@ -76,15 +87,15 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">N° Facture</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Reference</th>
+                            <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0 text-nowrap py-3">Session</th>
                             <th class="border-bottom-0">Point de Vente</th>
                             <th class="border-bottom-0">Dépôt</th>
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date facture</th>
-                            <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0">Agent</th>
                             <th class="border-bottom-0">Zone</th>
-                            <!-- <th class="border-bottom-0">Etat</th> -->
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
                             <th class="border-bottom-0 text-end">Montant TVA</th>
@@ -114,6 +125,31 @@
                                 <span class="text-dark">Inventorié: {{ $facture->inventaire_id }}</span>
                                 @endif
                             </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border">{{$facture->reference_recu??'---'}}</span> <br>
+                                @if(Auth::id()==26 || Auth::id()==1)
+                                <form action="{{route('vente.facture.updateReference',$facture->id)}}" method="POST">
+                                    @csrf
+                                    <input type="text"
+                                        class="form-control my-2"
+                                        required
+                                        name="reference_recu"
+                                        placeholder="Ex: KAD10977">
+                                    <button type="submit" class="btn btn-sm btn-dark text-white ">Modifier reference</button>
+                                </form>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-client me-2">
+                                        {{ substr($facture->client?->raison_sociale, 0, 2) }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">{{ $facture->client?->raison_sociale }}</div>
+                                        <div class="text-muted small">{{ $facture->client?->telephone }}</div>
+                                    </div>
+                                </div>
+                            </td>
                             <td><span class="badge bg-light text-dark border">#{{$facture->sessionCaisse?->id}}</span></td>
                             <td>
                                 <span class="badge bg-dark text-white">{{$facture->createdBy->pointDeVente->nom_pv}}</span>
@@ -132,17 +168,7 @@
                             </td>
                             <td>{{ Carbon\Carbon::parse($facture->created_at)->format('d/m/Y H:i:s') }}</td>
                             <td>{{ $facture->date_facture->format('d/m/Y') }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-client me-2">
-                                        {{ substr($facture->client?->raison_sociale, 0, 2) }}
-                                    </div>
-                                    <div>
-                                        <div class="fw-medium">{{ $facture->client?->raison_sociale }}</div>
-                                        <div class="text-muted small">{{ $facture->client?->telephone }}</div>
-                                    </div>
-                                </div>
-                            </td>
+
                             <td>
                                 <span class="badge bg-light border rounded text-dark">{{ $facture->client?->agent?->nom?? '---' }}</span>
                             </td>
@@ -193,7 +219,6 @@
                                 <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulée</span>
                                 @endswitch
                             </td>
-
 
                             <td class="text-center">
                                 <span class="badge bg-light text-dark rounded border">{{$facture->recommandeur_credit??'---'}}</span>
@@ -281,7 +306,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center py-5">
+                            <td colspan="11" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucune facture trouvée</h6>

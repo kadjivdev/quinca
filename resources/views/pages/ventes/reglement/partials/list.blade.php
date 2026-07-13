@@ -48,6 +48,7 @@
                             <td class="text-nowrap py-3">
                                 <span class="numero-recu me-2">{{ $reglement->numero }}</span>
                             </td>
+                            
                             <td>{{ Carbon\Carbon::parse($reglement->created_at)->format('d/m/Y H:i:s') }}</td>
                             <td>{{ $reglement->date_reglement->format('d/m/Y') }}</td>
                             <td>
