@@ -777,13 +777,13 @@ class ClientController extends Controller
             $client->taux_aib = $request->taux_aibMob;
 
             // Si le plafond de crédit a changé, vérifier le dépassement
-            if ($client->isDirty('plafond_credit') && $client->solde_courant > $validated['plafond_credit']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Le nouveau plafond de crédit est inférieur au solde courant du client',
-                    'type' => 'warning'
-                ], 422);
-            }
+            // if ($client->isDirty('plafond_credit') && $client->solde_courant > $validated['plafond_credit']) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Le nouveau plafond de crédit est inférieur au solde courant du client',
+            //         'type' => 'warning'
+            //     ], 422);
+            // }
 
             $client->update();
 
