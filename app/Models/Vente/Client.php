@@ -107,7 +107,6 @@ class Client extends Model
             ->sum("montant");
 
         //sum des règlements de chaque factures
-
         $reglementsAmount = $this->facturesClient
             ->whereNotNull('validated_by')
             ->pluck("reglements")
@@ -124,7 +123,6 @@ class Client extends Model
             return $clientAccomptesAmount;
         }
 
-        // return ($reglementsAmount + $clientAccomptesAmount) - ($facturesAmount + $clientTransportAmount);
         return ($reglementsAmount + $clientAccomptesAmount) - ($facturesAmount);
     }
 
@@ -330,7 +328,7 @@ class Client extends Model
                 $id ? [] : ['unique:clients,raison_sociale']
             ),
             'ifu' => 'nullable|string',
-            'rccm' => 'nullable|string' ,
+            'rccm' => 'nullable|string',
             'telephone' => ['nullable', 'string', 'max:20'],
             'email' => 'nullable|email',
             'adresse' => 'nullable|string',

@@ -569,6 +569,14 @@ class FactureClientController extends Controller
                     $facture->reglements()->save($reglement);
                 }
 
+                // verification du depassement du plafond de crédit
+                $montant = -$facture->client->solde() + $facture->montant_ttc;
+                $plafondCredit = $facture->client?->plafond_credit;
+
+                if ($montant> $plafondCredit) {
+                    throw new Exception("Le montant $ {$facture->montant_ttc} de la vente, ajouté au solde $ -{$facture->client->solde()} dépasse son plafond de crédit $ {$plafondCredit}");
+                };
+
                 $sessionCaisse->mettreAJourTotaux();
                 DB::commit();
 
@@ -756,6 +764,15 @@ class FactureClientController extends Controller
                     ]);
                     $facture->reglements()->save($reglement);
                 }
+
+                // verification du depassement du plafond de crédit
+                $montant = -$facture->client->solde() + $facture->montant_ttc;
+                $plafondCredit = $facture->client?->plafond_credit;
+                
+                if ($montant> $plafondCredit) {
+                    throw new Exception("Le montant $ {$facture->montant_ttc} de la vente, ajouté au solde $ -{$facture->client->solde()} dépasse son plafond de crédit $ {$plafondCredit}");
+                };
+
 
                 Log::info("Total de ligne après suppression des anciennes", ["count" => count($request->lignes)]);
 
