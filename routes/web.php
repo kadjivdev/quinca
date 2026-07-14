@@ -63,7 +63,9 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    return AcompteClient::with("compteClient")->firstWhere("reference", "ACP20267520");
+    AcompteClient::with("compteClient")
+        ->firstWhere("reference", "ACP20267520")
+        ->update(["versement_reference" => "E521618"]);
     return "regularisation éffectuée avec succès | totale regularisation des stocks du magasin 2!";
 });
 
