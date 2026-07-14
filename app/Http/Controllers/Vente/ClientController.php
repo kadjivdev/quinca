@@ -785,6 +785,7 @@ class ClientController extends Controller
             //     ], 422);
             // }
 
+            $client->zone_id = $request->zone_id ?? $client->zone_id;
             $client->update();
 
             DB::commit();
