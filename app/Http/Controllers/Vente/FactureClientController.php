@@ -573,8 +573,8 @@ class FactureClientController extends Controller
                 $montant = -$facture->client->solde() + $facture->montant_ttc;
                 $plafondCredit = $facture->client?->plafond_credit;
 
-                if ($montant> $plafondCredit) {
-                    throw new Exception("Le montant $ {$facture->montant_ttc} de la vente, ajouté au solde $ -{$facture->client->solde()} dépasse son plafond de crédit $ {$plafondCredit}");
+                if ($plafondCredit > 0 && $montant > $plafondCredit) {
+                    throw new Exception("Le montant $ {$facture->montant_ttc} de la vente, ajouté au solde $ {$facture->client->solde()} dépasse son plafond de crédit $ {$plafondCredit}");
                 };
 
                 $sessionCaisse->mettreAJourTotaux();
@@ -768,8 +768,8 @@ class FactureClientController extends Controller
                 // verification du depassement du plafond de crédit
                 $montant = -$facture->client->solde() + $facture->montant_ttc;
                 $plafondCredit = $facture->client?->plafond_credit;
-                
-                if ($montant> $plafondCredit) {
+
+                if ($plafondCredit>0 && $montant > $plafondCredit) {
                     throw new Exception("Le montant $ {$facture->montant_ttc} de la vente, ajouté au solde $ -{$facture->client->solde()} dépasse son plafond de crédit $ {$plafondCredit}");
                 };
 
