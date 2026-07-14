@@ -81,7 +81,7 @@
 
                                         <div class="col-md-12">
                                             <label class="form-label fw-medium required">Zone</label>
-                                            <select class="form-select" name="zone_id" id="zone_id" required>
+                                            <select class="form-select" name="zone_id" id="zone_id" >
                                                 <option value="">Choisissez une zone</option>
                                                 @foreach($zones as $zone)
                                                 <option value="{{$zone->id}}">{{$zone->libelle}}</option>

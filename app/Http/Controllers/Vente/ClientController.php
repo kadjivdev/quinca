@@ -842,10 +842,6 @@ class ClientController extends Controller
      */
     public function destroy(Request $request, Client $client)
     {
-        // return response()->json([
-        //     'success' => false,
-        //     'message' => 'Cette Opération est bloquée temporairement! Contactez l\'administrateur du système'
-        // ], 422);
 
         if (!$request->ajax()) {
             return response()->json(['error' => 'Requête non autorisée'], 403);
@@ -1034,31 +1030,6 @@ class ClientController extends Controller
             ], 500);
         }
     }
-    /**
-     * Générer et télécharger le template d'import
-     */
-    //     public function downloadTemplate()
-    // {
-    //     // Chemin vers le fichier template
-    //     $filePath = public_path('templates/modele_import_clients.xlsx');
-
-    //     // Si le fichier n'existe pas, on utilise storage_path
-    //     if (!file_exists($filePath)) {
-    //         $filePath = storage_path('app/templates/modele_import_clients.xlsx');
-    //     }
-
-    //     // Vérifier si le fichier existe
-    //     if (!file_exists($filePath)) {
-    //         return response()->json([
-    //             'message' => 'Le fichier template n\'existe pas'
-    //         ], 404);
-    //     }
-
-    //     return response()->download($filePath, 'modele_import_clients.xlsx', [
-    //         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    //     ]);
-    // }
-
 
     public function downloadTemplate()
     {

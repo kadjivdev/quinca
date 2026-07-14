@@ -343,7 +343,7 @@ class Client extends Model
             'notes' => 'nullable|string',
             'taux_aib' => 'nullable|numeric|min:0|max:100',
             'agent_id' => 'required|integer',
-            'zone_id' => 'required|integer',
+            'zone_id' => 'nullable|integer',
         ];
     }
 }

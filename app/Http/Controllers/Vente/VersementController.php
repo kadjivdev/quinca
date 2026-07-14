@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class VersementController extends Controller
@@ -129,6 +130,7 @@ class VersementController extends Controller
                 'observation' => $versement->comment,
                 'point_de_vente_id' => $sessionCaisse?->point_de_vente_id,
                 'session_caisse_id' => $sessionCaisse?->id,
+                'created_by' => Auth::id(),// integré le 14/07/2026
             ]);
 
             DB::commit();

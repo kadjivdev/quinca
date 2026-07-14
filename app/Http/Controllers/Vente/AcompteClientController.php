@@ -49,7 +49,6 @@ class AcompteClientController extends Controller
             $acomptes->search($request->search);
         }
 
-        // $acomptes = $acomptes->paginate(10);
         $acomptes = $acomptes->get();
 
         // Statistiques
