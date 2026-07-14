@@ -770,7 +770,7 @@ class FactureClientController extends Controller
                 $plafondCredit = $facture->client?->plafond_credit;
 
                 if ($plafondCredit>0 && $montant > $plafondCredit) {
-                    throw new Exception("Le montant $ {$facture->montant_ttc} de la vente, ajouté au solde $ -{$facture->client->solde()} dépasse son plafond de crédit $ {$plafondCredit}");
+                    throw new Exception("Le montant $ {$facture->montant_ttc} de la vente, ajouté au solde $ {$facture->client->solde()} dépasse son plafond de crédit $ {$plafondCredit}");
                 };
 
 

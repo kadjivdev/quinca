@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DestockageRequest extends FormRequest
 {
@@ -22,7 +23,11 @@ class DestockageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "reference" => "required|unique:destockages,reference",
+            "reference" => [
+                "required",
+                Rule::unique('destockages', 'reference')
+                    ->whereNull('deleted_at'),
+            ],
             "depot_id" => "required|integer|exists:depots,id",
             "client_id" => "required|integer|exists:clients,id",
             "date_op" => "required|date",
