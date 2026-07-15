@@ -247,6 +247,11 @@ class DestockageController extends Controller
         try {
             DB::beginTransaction();
 
+            // update of the reference
+            $destockage->update([
+                "reference" => "__$destockage->reference"
+            ]);
+
             // suppression des lignes
             $destockage->lignes()
                 ->delete();

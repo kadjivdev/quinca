@@ -33,6 +33,7 @@ use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\DetailInventaire;
 use App\Models\Catalogue\Inventaire;
+use App\Models\Destockage;
 use App\Models\Parametre\Agent;
 use App\Models\RequeteStock;
 use App\Models\Revendeur\FactureRevendeur;
@@ -63,9 +64,11 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    AcompteClient::with("compteClient")
-        ->firstWhere("reference", "ACP20267520")
-        ->update(["versement_reference" => "E521618"]);
+    Destockage::onlyTrashed()
+        ->get()
+        ->each(function ($des) {
+            $des->update(["reference" => "__$des->reference"]);
+        });
     return "regularisation éffectuée avec succès | totale regularisation des stocks du magasin 2!";
 });
 

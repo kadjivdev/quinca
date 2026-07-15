@@ -162,7 +162,7 @@
                 required>
                 <option value="">Sélectionner un article</option>
                 @foreach($articles as $article)
-                <option value="{{$article->id}}">{{$article->designation}}</option>
+                <option value="{{$article->id}}">{{$article->code_article}} - {{$article->designation}}</option>
                 @endforeach
             </select>
             <div class="invalid-feedback">L'article est requis</div>

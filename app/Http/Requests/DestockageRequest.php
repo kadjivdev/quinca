@@ -25,8 +25,7 @@ class DestockageRequest extends FormRequest
         return [
             "reference" => [
                 "required",
-                Rule::unique('destockages', 'reference')
-                    ->whereNull('deleted_at'),
+                "unique:destockages,reference",
             ],
             "depot_id" => "required|integer|exists:depots,id",
             "client_id" => "required|integer|exists:clients,id",
