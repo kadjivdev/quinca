@@ -9,7 +9,7 @@
                         <i class="fas fa-file-invoice fs-4 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">Modifier gogo update la facture <span id="factureNumber"></span></h5>
+                        <h5 class="modal-title fw-bold mb-0">Modifier update la facture <span id="factureNumber"></span></h5>
                         <p class="text-muted small mb-0">Modifiez les informations de la facture</p>
                     </div>
                 </div>

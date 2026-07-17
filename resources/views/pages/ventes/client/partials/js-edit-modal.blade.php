@@ -41,12 +41,12 @@
 
                     const zones = @json($zones);
 
-                    $("#zone_id").val(String('')).trigger("change");
+                    $("#edit_zone_id").val(String('')).trigger("change");
                     zones.forEach(zone => {
                         console.log("Zone concernée ", zone)
                         if (client.zone?.id == zone.id) {
                             console.log("Zone id ", client.zone?.id)
-                            $("#zone_id").val(String(client.zone?.id)).trigger("change");
+                            $("#edit_zone_id").val(String(client.zone?.id)).trigger("change");
                         }
                     });
 

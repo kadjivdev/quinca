@@ -25,10 +25,10 @@ const FactureConfig = {
         totalLigne: 'total-ligne'
     },
     routes: {
-        articlesSearch: 'ventes-speciales/factures/api/articles/search',
-        getTarifs: (id) => `ventes-speciales/factures/articles/${id}/tarifs`,
-        getUnites: (id) => `ventes-speciales/factures/articles/${id}/unites`,
-        store: 'ventes-speciales/factures/store'
+        articlesSearch: 'ventes-speciales/api/articles/search',
+        getTarifs: (id) => `ventes-speciales/articles/${id}/tarifs`,
+        getUnites: (id) => `ventes-speciales/articles/${id}/unites`,
+        store: 'ventes-speciales/store'
     },
     select2Options: {
         theme: 'bootstrap-5',

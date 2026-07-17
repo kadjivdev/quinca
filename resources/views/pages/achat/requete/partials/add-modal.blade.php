@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="col-6 mb-3">
-                    <label for="client_id">Factures</label>
+                    <label for="facture_id">Factures</label>
                     <select required name="facture_id" id="facture_id" class="select2 form-select">
                         <option value="">Choisir la facture </option>
                         @foreach ($factures as $facture)
@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="col-12 mb-3">
-                    <label for="client_id">Fournisseurs</label>
+                    <label for="fournisseur_id">Fournisseurs</label>
                     <select required name="fournisseur_id" id="fournisseur_id" class="select2 form-select">
                         <option value="">Choisir le fournisseur </option>
                         @foreach ($fournisseurs as $fournisseur)
