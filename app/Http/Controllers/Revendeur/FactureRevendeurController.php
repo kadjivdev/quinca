@@ -244,10 +244,10 @@ class FactureRevendeurController extends Controller
 
                 // 
                 $stock = StockDepot::query()
+                    ->with("uniteMesure")
                     ->where('depot_id', $ligne["depot_id"])
                     ->where('article_id', $ligne['article_id'])
                     ->first();
-
 
                 /**
                  * on verifie si l'article a été choisi deux fois
@@ -269,7 +269,7 @@ class FactureRevendeurController extends Controller
 
                 $conversion = $this->serviceStockEntree
                     ->rechercherConversion(
-                        $ligne['unite_vente_id'],
+                        $stock->unite_mesure_id, //$ligne['unite_vente_id'],
                         $article->unite_mesure_id, // $stock->unite_mesure_id,
                         $stock->article_id
                     );
@@ -282,7 +282,12 @@ class FactureRevendeurController extends Controller
                 }
 
                 /**Qte de Base */
-                $qantiteBase = $stock->quantite_reelle;
+                $qantiteBase = $this->serviceStockEntree
+                    ->convertirQuantite(
+                        $stock->quantite_reelle,
+                        $conversion,
+                        $stock->unite_mesure_id, //$article->unite_mesure_id, // $ligne['unite_vente_id']
+                    );
 
                 /**Qte de requete */
                 $stock->qantiteRequete = $stock->quantite_requete;
@@ -293,19 +298,21 @@ class FactureRevendeurController extends Controller
                 /**Qte Reste */
                 $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
 
+                /**
+                 * Obtention de la quantité convertie
+                 */
+                $QteConvertie = $this->serviceStockEntree
+                    ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
+
                 Log::debug("article :", ["data" => $article->code_article]);
+                Log::debug("quantite :", ["data" => $ligne['quantite']]);
+                Log::debug("stock :", ["data" => $stock]);
+                Log::debug("conversion :", ["data" => $conversion]);
+                Log::debug("quantiteConvertie :", ["data" => $QteConvertie]);
                 Log::debug("qantiteBase :", ["data" => $qantiteBase]);
                 Log::debug("qantiteRequete :", ["data", $stock->qantiteRequete]);
                 Log::debug("qteTotalVendu :", ["data", $qteTotalVendu]);
                 Log::debug("resteStock :", ["data", $resteStock]);
-
-                /**
-                 * Obtention de la quantité convertie
-                 */
-
-                // unite de vente vers unite de base de l'article
-                $QteConvertie = $this->serviceStockEntree
-                    ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
 
                 // on verifie la quantité restante de l'article dans le depot est suffisante
                 if ($resteStock < $QteConvertie) {

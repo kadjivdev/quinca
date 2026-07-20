@@ -64,11 +64,7 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    Destockage::onlyTrashed()
-        ->get()
-        ->each(function ($des) {
-            $des->update(["reference" => "__$des->reference"]);
-        });
+    return Article::with("uniteMesure")->firstWhere("code_article", "ART-1755");
     return "regularisation éffectuée avec succès | totale regularisation des stocks du magasin 2!";
 });
 
