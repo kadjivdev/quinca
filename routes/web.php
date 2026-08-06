@@ -64,7 +64,11 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    return Article::with("uniteMesure")->firstWhere("code_article", "ART-1755");
+    $factures = FactureClient::with("factures")
+        ->where("reference_recu", "KAD10656")
+        ->get();
+
+    return $factures;
     return "regularisation éffectuée avec succès | totale regularisation des stocks du magasin 2!";
 });
 
