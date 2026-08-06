@@ -264,8 +264,7 @@
             <div class="invalid-feedback">L'article est requis</div>
 
             <input type="hidden" name="lignes[__INDEX__][depot_id]" class="form-control depot-input">
-            <input type="hidden" name="lignes[__INDEX__][depot_stock]" classe="depot_stock">
-
+            
             <input type="text"
                 readonly
                 name="lignes[__INDEX__][depot_libelle]"

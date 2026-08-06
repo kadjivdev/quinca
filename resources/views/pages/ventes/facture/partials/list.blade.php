@@ -248,11 +248,11 @@
                                     @if($facture->statut === 'brouillon')
                                     @can("vente.facture.edit")
                                     {{-- Modifier --}}
-                                    <!-- <button class="btn btn-sm btn-light-warning btn-icon ms-1"
+                                    <button class="btn btn-sm btn-light-warning btn-icon ms-1"
                                         onclick="editFactures({{ $facture->id }})"
                                         data-bs-toggle="tooltip" title="Modifier">
                                         <i class="fas fa-edit"></i>
-                                    </button> -->
+                                    </button>
                                     @endcan
 
                                     {{-- Valider --}}

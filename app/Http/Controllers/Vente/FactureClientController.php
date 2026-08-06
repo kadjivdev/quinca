@@ -344,27 +344,70 @@ class FactureClientController extends Controller
                 ], 422);
             }
 
-            // Validation
             $validator = Validator::make($request->all(), [
                 'date_facture' => 'required|date',
                 'client_id' => 'required|exists:clients,id',
                 'date_echeance' => 'date',
                 'montant_regle' => 'required|numeric|min:0',
-                'moyen_reglement' => 'required|string',
 
                 'recommandeur_credit' => 'nullable|string',
-                // 'preuve_credit' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
 
                 'lignes' => 'required|array|min:1',
-                'lignes*article_id' => 'required|exists,articles',
-                'lignes*depot_id' => 'required|exits,depots',
-                'lignes*quantite' => 'required',
-                'lignes*tarification_id' => 'required',
+                'lignes.*.article_id' => 'required|exists:articles,id',
+                'lignes.*.depot_id' => 'required|exists:depots,id',
+                'lignes.*.quantite' => 'required|numeric|min:0.01',
+                'lignes.*.tarification_id' => 'required',
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
-                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir",
+                'moyen_reglement' => 'required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir',
+            ], [
+                'date_facture.required' => 'La date de facture est obligatoire.',
+                'date_facture.date' => 'La date de facture doit être une date valide.',
+
+                'client_id.required' => 'Le client est obligatoire.',
+                'client_id.exists' => "Le client sélectionné n'existe pas.",
+
+                'date_echeance.date' => "La date d'échéance doit être une date valide.",
+
+                'montant_regle.required' => 'Le montant réglé est obligatoire.',
+                'montant_regle.numeric' => 'Le montant réglé doit être un nombre.',
+                'montant_regle.min' => 'Le montant réglé ne peut pas être négatif.',
+
+                'recommandeur_credit.string' => 'Le recommandeur crédit doit être une chaîne de caractères.',
+
+                'lignes.required' => 'Au moins une ligne de facture est requise.',
+                'lignes.array' => 'Les lignes doivent être un tableau.',
+                'lignes.min' => 'Au moins une ligne de facture est requise.',
+
+                'lignes.*.article_id.required' => 'L\'article est obligatoire pour chaque ligne.',
+                'lignes.*.article_id.exists' => "L'article sélectionné n'existe pas.",
+
+                'lignes.*.depot_id.required' => 'Le dépôt est obligatoire pour chaque ligne.',
+                'lignes.*.depot_id.exists' => "Le dépôt sélectionné n'existe pas.",
+
+                'lignes.*.quantite.required' => 'La quantité est obligatoire pour chaque ligne.',
+                'lignes.*.quantite.numeric' => 'La quantité doit être un nombre.',
+                'lignes.*.quantite.min' => 'La quantité doit être supérieure à 0.',
+
+                'lignes.*.tarification_id.required' => 'La tarification est obligatoire pour chaque ligne.',
+
+                'type_facture.required' => 'Le type de facture est obligatoire.',
+                'type_facture.in' => 'Le type de facture doit être "simple" ou "normaliser".',
+
+                'observations.string' => 'Les observations doivent être une chaîne de caractères.',
+
+                'moyen_reglement.required' => 'Le moyen de règlement est obligatoire.',
+                'moyen_reglement.in' => 'Le moyen de règlement sélectionné est invalide.',
             ]);
+
+            if ($validator->fails()) {
+                Log::debug("Erreure lors de l'enregistrement de la facture ", ["error" => $validator->errors()]);
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
 
             // Credit file handling
             $preuve_credit = null;
@@ -376,18 +419,11 @@ class FactureClientController extends Controller
                 $preuve_credit = asset("/preuve_credit/" . $fileName);
             }
 
-            if ($validator->fails()) {
-                Log::debug("Erreure lors de l'enregistrement de la facture ", ["error" => $validator->errors()]);
-                return response()->json([
-                    'status' => 'error',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-
-            /** */
+            /** 
+             * Verification de l'unicité des articles dans les données envoyées
+             * && verification des quantités disponibles dans la base de données
+             */
             $selectedArticles = [];
-
             foreach ($request->lignes as $ligne) {
                 $depot = Depot::find($ligne["depot_id"]);
                 $article = Article::find($ligne['article_id']);
@@ -630,23 +666,61 @@ class FactureClientController extends Controller
 
             $facture = FactureClient::findOrFail($id);
 
-            // Validation
             $validator = Validator::make($request->all(), [
                 'date_facture' => 'required|date',
                 'client_id' => 'required|exists:clients,id',
                 'date_echeance' => 'date',
                 'montant_regle' => 'required|numeric|min:0',
-                'moyen_reglement' => 'required|string',
+
+                'recommandeur_credit' => 'nullable|string',
 
                 'lignes' => 'required|array|min:1',
-                'lignes*article_id' => 'required|exists,articles',
-                'lignes*depot_id' => 'required|exits,depots',
-                'lignes*quantite' => 'required',
-                'lignes*tarification_id' => 'required',
+                'lignes.*.article_id' => 'required|exists:articles,id',
+                'lignes.*.depot_id' => 'required|exists:depots,id',
+                'lignes.*.quantite' => 'required|numeric|min:0.01',
+                'lignes.*.tarification_id' => 'required',
 
                 'type_facture' => 'required|in:simple,normaliser',
                 'observations' => 'nullable|string',
-                'moyen_reglement' => "required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir]",
+                'moyen_reglement' => 'required|in:espece,cheque,virement,carte_bancaire,MoMo,Flooz,Celtis_Pay,Effet,Avoir',
+            ], [
+                'date_facture.required' => 'La date de facture est obligatoire.',
+                'date_facture.date' => 'La date de facture doit être une date valide.',
+
+                'client_id.required' => 'Le client est obligatoire.',
+                'client_id.exists' => "Le client sélectionné n'existe pas.",
+
+                'date_echeance.date' => "La date d'échéance doit être une date valide.",
+
+                'montant_regle.required' => 'Le montant réglé est obligatoire.',
+                'montant_regle.numeric' => 'Le montant réglé doit être un nombre.',
+                'montant_regle.min' => 'Le montant réglé ne peut pas être négatif.',
+
+                'recommandeur_credit.string' => 'Le recommandeur crédit doit être une chaîne de caractères.',
+
+                'lignes.required' => 'Au moins une ligne de facture est requise.',
+                'lignes.array' => 'Les lignes doivent être un tableau.',
+                'lignes.min' => 'Au moins une ligne de facture est requise.',
+
+                'lignes.*.article_id.required' => 'L\'article est obligatoire pour chaque ligne.',
+                'lignes.*.article_id.exists' => "L'article sélectionné n'existe pas.",
+
+                'lignes.*.depot_id.required' => 'Le dépôt est obligatoire pour chaque ligne.',
+                'lignes.*.depot_id.exists' => "Le dépôt sélectionné n'existe pas.",
+
+                'lignes.*.quantite.required' => 'La quantité est obligatoire pour chaque ligne.',
+                'lignes.*.quantite.numeric' => 'La quantité doit être un nombre.',
+                'lignes.*.quantite.min' => 'La quantité doit être supérieure à 0.',
+
+                'lignes.*.tarification_id.required' => 'La tarification est obligatoire pour chaque ligne.',
+
+                'type_facture.required' => 'Le type de facture est obligatoire.',
+                'type_facture.in' => 'Le type de facture doit être "simple" ou "normaliser".',
+
+                'observations.string' => 'Les observations doivent être une chaîne de caractères.',
+
+                'moyen_reglement.required' => 'Le moyen de règlement est obligatoire.',
+                'moyen_reglement.in' => 'Le moyen de règlement sélectionné est invalide.',
             ]);
 
             if ($validator->fails()) {
@@ -656,66 +730,122 @@ class FactureClientController extends Controller
                 ], 422);
             }
 
-            DB::beginTransaction();
+            // Credit file handling
+            $preuve_credit = null;
+            if ($request->hasFile("preuve_credit")) {
+                $fileName = time() . '_' . $request->file('preuve_credit')->getClientOriginalName();
 
-            try {
-                // On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
+                $request->file('preuve_credit')->move("preuve_credit", $fileName);
 
-                foreach ($request->lignes as $ligne) {
-                    $depot = Depot::find($ligne["depot_id"]);
-                    // 
-                    $stock = StockDepot::where('depot_id', $ligne["depot_id"])
-                        ->where('article_id', $ligne['article_id'])
-                        ->first();
+                $preuve_credit = asset("/preuve_credit/" . $fileName);
+            }
 
-                    /**
-                     * Recherche de la conversion
-                     */
-                    $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
-                    $article = Article::findOrFail($ligne['article_id']);
+            /** 
+             * Verification de l'unicité des articles dans les données envoyées
+             * && vérification des quantités disponibles dans la base de données
+             */
+            $selectedArticles = [];
+            foreach ($request->lignes as $ligne) {
+                $depot = Depot::find($ligne["depot_id"]);
+                $article = Article::find($ligne['article_id']);
 
-                    $conversion = $this->serviceStockEntree
-                        ->rechercherConversion(
-                            $ligne['unite_vente_id'],
-                            $article->unite_mesure_id, // $stock->unite_mesure_id,
-                            $stock->article_id
-                        );
+                /**
+                 * on verifie si les articles selectionnés
+                 * sont tous dans son depôts pour les non admins
+                 */
+                if (!auth()->user()->hasRole('Super Administrateur')) {
+                    $userPv = auth()->user()->pointDeVente;
+                    $userPv_depotIds = $userPv->depot->pluck("id")->toArray(); //les depots du users
 
-                    if (!$conversion) {
+                    if (!in_array($ligne["depot_id"], $userPv_depotIds)) {
                         return response()->json([
                             'status' => false,
-                            'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ({{$article->uniteMesure?->libelle_unite}}) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
-                        ], 500);
-                    }
-
-                    /**
-                     * Obtention de la quantité convertie
-                     */
-
-                    // stock existant en unité de base de l'article
-                    $resteStock = isset($ligne["depot_stock"]) ? $ligne["depot_stock"] : 0;
-
-                    // unite de vente vers unite de base de l'article
-                    $QteConvertie = $this->serviceStockEntree
-                        ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
-
-                    Log::debug("Quantité convertie", [
-                        "depot_stock" => $ligne["depot_stock"],
-                        "quantite_saisie" => $ligne['quantite'],
-                        "quantite_convertie" => $QteConvertie,
-                        "unite_vente" => $venteUnite->libelle_unite,
-                        "unite_article" => $article->uniteMesure?->libelle_unite,
-                    ]);
-
-                    // on verifie la quantité restante de l'article dans le depot est suffisante
-                    if ($resteStock < $QteConvertie) {
-                        return response()->json([
-                            'status' => false,
-                            'message' => "Le reste du stock de l'article ($article->designation) est de $resteStock {{$article->uniteMesure?->libelle_unite}} dans le depôt ({$stock->depot?->libelle_depot})! Vous avez saisi $QteConvertie {{$article->uniteMesure?->libelle_unite}}!  Stock insuiffisant par rapport à la quantité saisie"
+                            'message' => "Le dépôt ($depot->libelle_depot) ne vous appartient pas! Vous ne pouvez pas y passer une ecriture "
                         ], 500);
                     }
                 }
 
+                /**
+                 * on verifie si l'article a été choisi deux fois
+                 */
+                if (isset($selectedArticles[$ligne['article_id']])) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "L'article ({$article->code_article}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
+                    ], 422);
+                }
+                $selectedArticles[$ligne['article_id']] = true; //on conpte cet article comme déjà selectionné
+
+
+                //On verifie si les quantités saisies au niveau des articles ne depasse pas le reste de quantité sur l'article
+                $stock = StockDepot::where('depot_id', $ligne["depot_id"])
+                    ->where('article_id', $ligne['article_id'])
+                    ->first();
+
+                /**
+                 * Recherche de la conversion
+                 */
+                $venteUnite = UniteMesure::findOrFail($ligne['unite_vente_id']);
+                $article = Article::findOrFail($ligne['article_id']);
+
+                $conversion = $this->serviceStockEntree
+                    ->rechercherConversion(
+                        $ligne['unite_vente_id'],
+                        $article->unite_mesure_id, // $stock->unite_mesure_id,
+                        $stock->article_id
+                    );
+
+                if (!$conversion) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Il n'y a pas de conversion de l'unité ($venteUnite->libelle_unite) vers ({{$article->uniteMesure?->libelle_unite}}) pour l'article ($article->code_article), ni l'inverse! Veuillez créer cette conversion afin de continuer l'opération"
+                    ], 500);
+                }
+
+                /**Qte de Base */
+                $qantiteBase = $stock->quantite_reelle;
+
+                /**Qte de requete */
+                $stock->qantiteRequete = $stock->quantite_requete;
+
+                /**Qte Vendue */
+                /**
+                 * on precise true pour préciser que c'est toutes les ventes(validée ou pas) qui sont considerées
+                 * */
+                $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
+
+                /**Qte Reste */
+                $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
+
+                Log::debug("La conversion :", ["conversion" => $conversion]);
+                Log::debug("La quantite_reelle :", ["quantite_reelle" => $stock->quantite_reelle]);
+                Log::debug("La qantiteBase :", ["qantiteBase" => $qantiteBase]);
+                Log::debug("La qteTotalVendu :", ["qteTotalVendu" => $qteTotalVendu]);
+                Log::debug("La quantite reste :", ["qteReste" => $resteStock]);
+
+                // unite de vente vers unite de base de l'article
+                $QteConvertie = $this->serviceStockEntree
+                    ->convertirQuantite($ligne['quantite'], $conversion, $ligne['unite_vente_id']);
+
+                Log::debug("Quantité convertie", [
+                    "quantite_saisie" => $ligne['quantite'],
+                    "quantite_convertie" => $QteConvertie,
+                    "unite_vente" => $venteUnite->libelle_unite,
+                    "unite_article" => $article->uniteMesure?->libelle_unite,
+                ]);
+
+                // on verifie la quantité restante de l'article dans le depot est suffisante
+                if ($resteStock < $QteConvertie) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Le reste du stock de l'article ($article->code_article) est de $resteStock {{$article->uniteMesure?->libelle_unite}} dans le depôt ({$stock->depot?->libelle_depot})! Vous avez saisi $QteConvertie {{$article->uniteMesure?->libelle_unite}}!  Stock insuiffisant par rapport à la quantité saisie"
+                    ], 500);
+                }
+            }
+
+            DB::beginTransaction();
+
+            try {
                 // Mise à jour de la facture
                 $facture->update([
                     'date_facture' => Carbon::parse($request->date_facture)->startOfDay(),
@@ -740,7 +870,11 @@ class FactureClientController extends Controller
                     'montant_aib' => 0,
                     'montant_ttc' => 0,
                     'montant_regle' => 0,
-                    'montant_regle' => $request->montant_regle
+                    'montant_regle' => $request->montant_regle,
+
+                    // credit
+                    "preuve_credit" => $preuve_credit,
+                    "recommandeur_credit" => $request->recommandeur_credit,
                 ]);
 
                 Log::info("Total de ligne avant suppression des anciennes ", ["count" => count($request->lignes)]);
@@ -836,7 +970,7 @@ class FactureClientController extends Controller
                         ]);
                 }
 
-                // $sessionCaisse->mettreAJourTotaux();
+                $sessionCaisse->mettreAJourTotaux();
                 DB::commit();
 
                 return response()->json([

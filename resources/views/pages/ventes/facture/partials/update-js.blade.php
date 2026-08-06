@@ -79,7 +79,6 @@
                 const data = e.params.data;
                 $line.find('.depot-input').val(data.depot.id);
                 $line.find('.depot-libelle').val(`${data.depot.libelle_depot} | Stock ${data.stock} (${data.unite_mesure.libelle_unite}) `);
-                $line.find('.depot_stock').val(data.stock);
                 $line.find('.quantite-input').attr("max", data.stock)
 
                 // Mettre à jour les prix
@@ -150,6 +149,8 @@
             // Charger les unités avant de définir les autres valeurs
             await this.loadUnites(data.article_id, $line, data.unite_vente_id);
 
+            // this.handleArticleSelect(e, $line)
+            
             // Autres champs
             $line.find('.quantite-input').val(data.quantite);
             $line.find('.select2-tarifs').val(data.prix_unitaire_ht);
@@ -177,6 +178,7 @@
             articleSelect.select2({
                 theme: 'bootstrap-5',
                 dropdownParent: this.modal,
+                allowClear: true,
                 width: '100%',
                 ajax: {
                     url: `${apiUrl}/vente/factures/api/articles/search`,
@@ -187,6 +189,11 @@
                         page: params.page || 1
                     }),
                     processResults: function(data, params) {
+                        console.log('Type de data:', typeof data);
+                        console.log('Data complète:', data);
+                        console.log('Data.results existe?', !!data.results);
+                        console.log('Data.results:', data.results);
+
                         // Vérification basique de la structure
                         if (!data.results) {
                             // console.error('Pas de résultats dans la réponse');
@@ -200,11 +207,11 @@
 
                         // Convertir l'objet en tableau
                         const resultsArray = Object.values(data.results);
-                        // console.log('Résultats convertis en tableau:', resultsArray);
+                        console.log('Résultats convertis en tableau:', resultsArray);
 
                         // Formatage simple des résultats
                         const formattedResults = resultsArray.map(item => {
-                            // console.log('Item brut:', item);
+                            console.log('Item brut:', item);
                             return {
                                 id: item.id,
                                 text: item.text || item.libelle || item.nom || item.designation || 'Sans nom',
@@ -215,7 +222,7 @@
                             };
                         });
 
-                        // console.log('Résultats formatés:', formattedResults);
+                        console.log('Résultats formatés:', formattedResults);
 
                         return {
                             results: formattedResults,
