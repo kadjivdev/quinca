@@ -769,7 +769,7 @@ class FactureClientController extends Controller
                 $montant = -$facture->client->solde() + $facture->montant_ttc;
                 $plafondCredit = $facture->client?->plafond_credit;
 
-                if ($plafondCredit>0 && $montant > $plafondCredit) {
+                if ($plafondCredit > 0 && $montant > $plafondCredit) {
                     throw new Exception("Le montant $ {$facture->montant_ttc} de la vente, ajouté au solde $ {$facture->client->solde()} dépasse son plafond de crédit $ {$plafondCredit}");
                 };
 
@@ -869,10 +869,19 @@ class FactureClientController extends Controller
 
     public function updateReference(Request $request, FactureClient $facture)
     {
-        Log::debug("Début d emodification de la reference :", ["data" => $request->all()]);
+        Log::debug("Début de modification de la reference :", ["data" => $request->all()]);
 
         try {
             DB::beginTransaction();
+
+            $isReferenceExiste = FactureClient::query()
+                ->where("id", "!=", $facture->id)
+                ->where("reference_recu", $request->reference_recu)
+                ->first();
+
+            if ($isReferenceExiste) {
+                throw new Exception("Cette reference existe déjà");
+            }
 
             // Mise à jour de la facture
             $facture->update([

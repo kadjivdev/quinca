@@ -64,7 +64,7 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $factures = FactureClient::with("factures")
+    $factures = FactureClient::query()
         ->where("reference_recu", "KAD10656")
         ->get();
 
