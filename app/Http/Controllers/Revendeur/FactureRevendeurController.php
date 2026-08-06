@@ -76,6 +76,8 @@ class FactureRevendeurController extends Controller
             // Si un filtre de période est actif, l'appliquer aux stats aussi
             if ($request->filled('debut') && $request->filled("fin")) {
                 $query->whereBetween("created_at", [$request->debut, $request->fin]);
+            } else {
+                $query->whereBetween("created_at", [Carbon::parse(now())->startOfMonth(), Carbon::parse(now()->endOfMonth())]);
             }
 
             if (
