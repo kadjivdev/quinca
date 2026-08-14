@@ -1,3 +1,24 @@
+<div class="row d-flex justify-content-center">
+    <div class="col-md-6 border bg-light rounded p-3">
+        <form action="{{route('bon-commandes.index')}}" method="GET">
+            @csrf
+            <div class="row">
+                <div class="col-6">
+                    <label for="debut">Date de début</label>
+                    <input type="date" name="debut" class="form-control" id="debut">
+                </div>
+                <div class="col-6">
+                    <label for="debut">Date de fin</label>
+                    <input type="date" name="fin" class="form-control" id="fin">
+                </div>
+            </div>
+            <button class="w-100 btn btn-primary mt-2 px-4">
+                <i class="fas fa-save me-2"></i>Filtrer
+            </button>
+        </form>
+    </div>
+</div>
+
 <div class="row g-3">
     {{-- Table des bons de commande --}}
     <div class="col-12">

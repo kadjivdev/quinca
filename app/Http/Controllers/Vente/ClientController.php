@@ -49,7 +49,7 @@ class ClientController extends Controller
             'facturesClient.reglements' // Chargement des règlements via les factures
         ])->latest();
 
-        if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT")) {
+        if ($user->hasRole("CONTROLE INTERNE") || $user->hasRole("Super Administrateur") || $user->hasRole("CONTROLE GENERAL, INSPECTION ET AUDIT") || $user->hasRole("RECOUVREMENT NORD ET DEPOTS")) {
             $clients = $query;
         } elseif ($user->hasRole("AGENT")) {
             $clients = $query
@@ -59,8 +59,8 @@ class ClientController extends Controller
                 ->where('point_de_vente_id', Auth()->user()->point_de_vente_id);
         }
 
-        // SANDRINE,HIPPOLYTE,ASSOGBA AUBIN
-        if (in_array(Auth::id(), [6, 22, 28])) {
+        // HIPPOLYTE,ASSOGBA AUBIN
+        if (in_array(Auth::id(), [22, 28])) {
             $clients = $clients->where("zone_id", Auth::user()->zone_id);
         }
 

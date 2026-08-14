@@ -20,9 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use App\Services\ServiceStockEntree;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\ErrorHandler\Debug;
 
 class BonCommandeController extends Controller
 {
@@ -38,8 +36,8 @@ class BonCommandeController extends Controller
     /**
      * Affiche la liste des bons de commande
      */
-    
-    public function index()
+
+    public function index(Request $request)
     {
         // Récupérer l'utilisateur connecté et son point de vente
         $user = auth()->user();
@@ -50,8 +48,7 @@ class BonCommandeController extends Controller
         // Date au format français
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
-        // Requête principale avec filtrage par point de vente
-        $bonCommandes = BonCommande::with([
+        $query = BonCommande::with([
             'pointVente',
             'fournisseur',
             'programmation',
@@ -60,8 +57,19 @@ class BonCommandeController extends Controller
             'creator',
             'updater'
         ])
-            ->where('point_de_vente_id', $user->point_de_vente_id)
-            ->get();
+            ->where('point_de_vente_id', $user->point_de_vente_id);
+
+        // Construction de la requête de base
+        if ($request->debut && $request->fin) {
+            $query
+                ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
+        } else {
+            $query
+                ->whereBetween('created_at', [Carbon::parse(now())->startOfMonth(), Carbon::parse(now())->endOfMonth()]);
+        }
+
+        // Requête principale avec filtrage par point de vente
+        $bonCommandes = $query->get();
 
         // Programmations validées du point de vente de l'utilisateur
         $programmationsValidees = ProgrammationAchat::whereNotNull('validated_at')
@@ -226,7 +234,7 @@ class BonCommandeController extends Controller
                         'message' => "L'article ({$article->designation}) a été sélectionné plusieurs fois. Veuillez regrouper les quantités dans une seule ligne."
                     ], 422);
                 }
-                $selectedArticles[$ligne['article_id']] = true;//on compte cet article comme déjà selectionné
+                $selectedArticles[$ligne['article_id']] = true; //on compte cet article comme déjà selectionné
 
 
                 // Trouver la ligne de programmation correspondante pour obtenir l'unite_mesure_id
