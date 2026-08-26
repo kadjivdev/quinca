@@ -35,7 +35,7 @@
                         <div class="row">
                             {{-- LES DEPOTS --}}
                             <div class="col-12">
-                                <select class="form-select select2" name="depot_id" id="depot_id" required>
+                                <select class="form-select select2" name="point_vente_id" id="point_vente_id" required>
                                     <!-- gere avec su js -->
                                 </select>
                                 <div class="invalid-feedback">

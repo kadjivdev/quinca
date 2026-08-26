@@ -7,6 +7,7 @@ use App\Models\Catalogue\Tarification;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\FamilleArticle;
 use App\Models\Parametre\Depot;
+use App\Models\Parametre\PointDeVente;
 use App\Models\Parametre\TypeTarif;
 use App\Models\Parametre\UniteMesure;
 use Illuminate\Http\Request;
@@ -16,9 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
+// use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
 
 class TarificationController extends Controller
 {
@@ -27,12 +26,13 @@ class TarificationController extends Controller
      */
     public function index()
     {
+        Log::info("Début de recuperation des tarifications");
         try {
             $tarifications = Tarification::with(['article', 'typeTarif'])->get();
             $articles = Article::where('statut', 'actif')->get();
             $typesTarifs = TypeTarif::where('statut', true)->get();
             $familles = FamilleArticle::where('statut', true)->get();
-            $depots = Depot::get();
+            $pointVentes = PointDeVente::get();
             $uniteMesures = UniteMesure::get();
 
             // Statistiques
@@ -48,7 +48,7 @@ class TarificationController extends Controller
             return view('pages.catalogues.tarification.index', compact(
                 'tarifications',
                 'articles',
-                'depots',
+                'pointVentes',
                 'typesTarifs',
                 'familles',
                 'stats',
@@ -74,7 +74,8 @@ class TarificationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'article_id' => 'required|exists:articles,id',
-            'depot_id' => 'required|exists:depots,id',
+            'depot_id' => 'nullable|exists:depots,id',
+            'point_vente_id' => 'required|exists:point_de_ventes,id',
             'unite_mesure_id' => 'required|exists:unite_mesures,id',
             'type_tarif_id' => [
                 'required',
@@ -84,7 +85,7 @@ class TarificationController extends Controller
                     $exists = Tarification::where([
                         'article_id' => $request->article_id,
                         'type_tarif_id' => $value,
-                        'unite_mesure_id'=>$request->unite_mesure_id,
+                        'unite_mesure_id' => $request->unite_mesure_id,
                         ['id', '!=', $request->id ?? 0]
                     ])->exists();
 
@@ -388,7 +389,9 @@ class TarificationController extends Controller
                 'data' => [
                     "tarification" => $tarification,
                     'unites' => $tarification->article?->getUnites(), //ulites de l'article
-                    'depots' => $tarification->article?->depots, //depots de l'article
+                    // 'depots' => $tarification->article?->depots, //depots de l'article
+                    "pointVentes" => PointDeVente::whereIn("id", $tarification->article?->depots?->pluck("point_de_vente_id")->toArray())
+                        ->get()
                 ],
             ]);
         } catch (\Exception $e) {
@@ -416,7 +419,8 @@ class TarificationController extends Controller
         $validator = Validator::make($request->all(), [
             'prix' => 'required|numeric|min:0',
             'statut' => 'boolean',
-            'depot_id' => 'required|integer',
+            'depot_id' => 'nullable|integer',
+            'point_vente_id' => 'required|exists:point_de_ventes,id',
             'unite_mesure_id' => 'required|integer',
         ]);
 

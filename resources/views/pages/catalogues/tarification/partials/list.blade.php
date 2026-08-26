@@ -7,7 +7,7 @@
                     {{-- Filtre Article --}}
                     <div class="col-md-4">
                         <label class="form-label fw-semibold small mb-1">Article</label>
-                        <select class="form-select form-select-sm" id="articleFilter" onchange="filterTarifications()">
+                        <select class="form-control form-select-sm filterSelect2" id="articleFilter" onchange="filterTarifications()">
                             <option value="">Tous les articles</option>
                             @foreach($articles as $article)
                             <option value="{{ $article->id }}">{{ $article->code_article }} - {{ $article->libelle_article }}</option>
@@ -18,7 +18,7 @@
                     {{-- Filtre Famille --}}
                     <div class="col-md-4">
                         <label class="form-label fw-semibold small mb-1">Famille d'Articles</label>
-                        <select class="form-select form-select-sm" id="familleFilter" onchange="filterTarifications()">
+                        <select class="form-control form-select-sm filterSelect2" id="familleFilter" onchange="filterTarifications()">
                             <option value="">Toutes les familles</option>
                             @foreach($familles as $famille)
                             <option value="{{ $famille->id }}">{{ $famille->libelle_famille }}</option>
@@ -78,23 +78,23 @@
                                     @foreach($tarifications as $tarification)
                                     <!-- un commercial n'a pas le droit de voir les prix Special & Hyper Grossiste -->
                                     @continue(auth()->user()->hasRole('COMMERCIAL') && ($tarification->type_tarif_id==1 || $tarification->type_tarif_id==2))
-                                    <div class="tarif-value d-flex align-items-center justify-content-between">
-                                        <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA ({{$tarification->uniteMesure?->libelle_unite}}) | {{$tarification->depotTarif?->libelle_depot}}</span>
-                                        <div class="btn-group btn-group-sm ms-3 action-buttons">
-                                            @can("tarification.edit")
-                                            <button class="btn btn-link p-0 text-warning btn-animated"
-                                                onclick="editTarification({{ $tarification->id }})"
-                                                title="Modifier ce tarif">
-                                                <i class="far fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-link p-0 text-danger ms-2 btn-animated"
-                                                onclick="toggleTarificationStatus({{ $tarification->id }})"
-                                                title="{{ $tarification->statut ? 'Désactiver' : 'Activer' }} ce tarif">
-                                                <i class="fas {{ $tarification->statut ? 'fa-ban' : 'fa-check' }}"></i>
-                                            </button>
-                                            @endcan
+                                        <div class="tarif-value d-flex align-items-center justify-content-between">
+                                            <span class="fw-medium">{{ number_format($tarification->prix, 2, ',', ' ') }} FCFA ({{$tarification->uniteMesure?->libelle_unite}}) | {{$tarification->depotTarif?->libelle_depot}}</span>
+                                            <div class="btn-group btn-group-sm ms-3 action-buttons">
+                                                @can("tarification.edit")
+                                                <button class="btn btn-link p-0 text-warning btn-animated"
+                                                    onclick="editTarification({{ $tarification->id }})"
+                                                    title="Modifier ce tarif">
+                                                    <i class="far fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-link p-0 text-danger ms-2 btn-animated"
+                                                    onclick="toggleTarificationStatus({{ $tarification->id }})"
+                                                    title="{{ $tarification->statut ? 'Désactiver' : 'Activer' }} ce tarif">
+                                                    <i class="fas {{ $tarification->statut ? 'fa-ban' : 'fa-check' }}"></i>
+                                                </button>
+                                                @endcan
+                                            </div>
                                         </div>
-                                    </div>
                                     @endforeach
                                     @endif
                                     <!-- else -->
@@ -276,14 +276,13 @@
 <!-- DATATABLES -->
 @push('scripts')
 <script>
-    $(".example1").DataTable({
+    $(".filterSelect2").select2()
+
+    $("#tarificationsTable").DataTable({
         "responsive": true,
         "lengthChange": false,
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
-        // "order": [
-        //     [7, 'asc']
-        // ],
         "pageLength": 15,
         language: {
             "emptyTable": "Aucune donnée disponible dans le tableau",
@@ -486,6 +485,8 @@
                 }
             }
         },
-    }).buttons().container().appendTo('.example1_wrapper .col-md-6:eq(0)');
+    })
+    .buttons().container().appendTo('#tarificationsTable_wrapper .col-md-6:eq(0)');
+    // .buttons().container().appendTo('.example1_wrapper .col-md-6:eq(0)');
 </script>
 @endpush

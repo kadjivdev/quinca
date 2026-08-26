@@ -4,6 +4,7 @@ namespace App\Models\Catalogue;
 
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
+use App\Models\Parametre\PointDeVente;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,6 +21,7 @@ class Tarification extends Model
     protected $fillable = [
         'article_id',
         'depot_id',
+        'point_vente_id',
         'type_tarif_id',
         'prix',
         'statut',
@@ -33,6 +35,7 @@ class Tarification extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'depot_id' => 'integer',
+        'point_vente_id' => 'integer',
         'unite_mesure_id' => 'integer',
     ];
 
@@ -48,7 +51,12 @@ class Tarification extends Model
 
     public function depotTarif()
     {
-        return $this->belongsTo(Depot::class,"depot_id");
+        return $this->belongsTo(Depot::class, "depot_id");
+    }
+
+    public function pointVenteTarif()
+    {
+        return $this->belongsTo(PointDeVente::class, "point_vente_id");
     }
 
     public function typeTarif()
@@ -58,7 +66,7 @@ class Tarification extends Model
 
     function uniteMesure(): BelongsTo
     {
-        return $this->belongsTo(UniteMesure::class,"unite_mesure_id");
+        return $this->belongsTo(UniteMesure::class, "unite_mesure_id");
     }
 
     // Scopes

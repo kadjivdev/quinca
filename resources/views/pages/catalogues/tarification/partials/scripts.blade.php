@@ -153,13 +153,11 @@
 
                 const result = await response.json();
 
-                // console.log(result)
-
                 if (result.success) {
                     const data = result.data
                     const tarification = data.tarification
                     const unite_mesures = data.unites
-                    const depots = data.depots
+                    const pointVentes = data.pointVentes
 
                     // Mise à jour du formulaire
                     const editForm = document.getElementById('editTarificationForm');
@@ -169,12 +167,12 @@
                     document.getElementById('editCodeArticle').textContent = tarification.article?.code_article;
                     document.getElementById('editTypeTarif').textContent = tarification.type_tarif?.libelle_type_tarif;
 
-                    let depotsHtml = `<option value="">Sélectionner un dépôt</option>`
+                    let depotsHtml = `<option value="">Sélectionner un point de vente</option>`
                     let uniteMesureHtml = `<option value="">Sélectionner une unité de mesure</option>`
 
-                    if (depots.length > 0) {
-                        depots.forEach(depot => {
-                            depotsHtml += `<option value="${depot.id}" ${tarification.depot_id==depot.id? 'selected':null}>${depot.libelle_depot}</option>`
+                    if (pointVentes.length > 0) {
+                        pointVentes.forEach(pv => {
+                            depotsHtml += `<option value="${pv.id}" ${tarification.point_vente_id==pv.id? 'selected':null}>${pv.nom_pv}</option>`
                         });
                     }
 
@@ -187,7 +185,7 @@
                     console.log("Depots ", depotsHtml)
                     console.log("Unite de mesure ", uniteMesureHtml)
 
-                    document.getElementById('depot_id').innerHTML = depotsHtml
+                    document.getElementById('point_vente_id').innerHTML = depotsHtml
                     document.getElementById('unite_mesure_id').innerHTML = uniteMesureHtml
 
                     // Mise à jour des champs du formulaire
@@ -375,16 +373,18 @@
                 Swal.close();
             }
 
-            console.log("Tarif ",typeTarif)
+            console.log("Tarif ", typeTarif)
 
             const result = await response.json();
             if (!result.success) {
                 Swal.close()
                 throw new Error("Echec de récupération des données at success");
             }
+            console.log("result :", result)
             const article = result.data
             const uniteMesures = result.utils.unites
             const depots = result.utils.depots
+            const pointVentes = result.utils.pointVentes            
 
             document.getElementById('add_article_id').innerHTML = `<option value="${article.id}" >
                                     ${article.code_article } - ${article.designation}
@@ -394,12 +394,12 @@
                                     ${typeTarif.code_type_tarif } - ${typeTarif.libelle_type_tarif}
                                 </option>`;
 
-            let depotsHtml = `<option value="">Sélectionner un dépôt</option>`
+            let depotsHtml = `<option value="">Sélectionner un point de vente</option>`
             let uniteMesureHtml = `<option value="">Sélectionner une unité de mesure</option>`
 
-            if (depots.length > 0) {
-                depots.forEach(depot => {
-                    depotsHtml += `<option value="${depot.id}" >${depot.libelle_depot}</option>`
+            if (pointVentes.length > 0) {
+                pointVentes.forEach(pv => {
+                    depotsHtml += `<option value="${pv.id}" >${pv.nom_pv}</option>`
                 });
             }
 
@@ -409,10 +409,10 @@
                 });
             }
 
-            console.log("Depots ", depotsHtml)
+            console.log("Points ventes ", depotsHtml)
             console.log("Unite de mesure ", uniteMesureHtml)
 
-            document.getElementById('add_depot_id').innerHTML = depotsHtml
+            document.getElementById('add_point_vente_id').innerHTML = depotsHtml
             document.getElementById('add_unite_mesure_id').innerHTML = uniteMesureHtml
 
             // Ouvrir le modal
@@ -425,7 +425,7 @@
             Swal.close();
             Swal.fire({
                 icon: 'error',
-                title: 'Erreure lors du chargement des données at error'
+                title: 'Erreure lors du chargement des données'
             })
         }
     }

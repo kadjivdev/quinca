@@ -151,10 +151,7 @@ class FactureClient extends Model
 
     public function lignes(): HasMany
     {
-        return $this->hasMany(LigneFacture::class)
-        
-        // ->with("article")
-        ;
+        return $this->hasMany(LigneFacture::class);
     }
 
     public function livraisons(): HasMany

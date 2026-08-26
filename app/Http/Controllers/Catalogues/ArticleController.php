@@ -9,6 +9,7 @@ use App\Models\Catalogue\FamilleArticle;
 use App\Models\Catalogue\Inventaire;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
+use App\Models\Parametre\PointDeVente;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
@@ -510,6 +511,7 @@ class ArticleController extends Controller
             'utils' => [
                 "unites" => $article->getUnites(),
                 "depots" => $article->depots->unique('id')->values(),
+                "pointVentes" => PointDeVente::whereIn("id", $article->depots?->pluck("point_de_vente_id")->toArray())->get(),
                 // "type_tarifs" => TypeTarif::get(["id", "code_type_tarif", "libelle_type_tarif"])
             ]
         ]);

@@ -25,33 +25,10 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
-use App\Models\Achat\BonCommande;
-use App\Models\Achat\BonLivraisonFournisseur;
-use App\Models\Achat\FactureFournisseur;
-use App\Models\Achat\LigneBonLivraisonFournisseur;
-use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Catalogue\Article;
-use App\Models\Catalogue\DetailInventaire;
-use App\Models\Catalogue\Inventaire;
-use App\Models\Destockage;
-use App\Models\Parametre\Agent;
-use App\Models\RequeteStock;
-use App\Models\Revendeur\FactureRevendeur;
-use App\Models\Revendeur\LigneFactureRevendeur;
 use App\Models\Stock\StockDepot;
-use App\Models\Stock\StockMouvement;
 use App\Models\Vente\FactureClient;
-use App\Models\Vente\LigneFacture;
-use App\Models\Vente\LigneMarchandise;
-use App\Models\Vente\LivraisonClient;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Securite\User;
-use App\Models\Vente\AcompteClient;
-use App\Models\Vente\LigneLivraisonClient;
 use App\Models\Vente\LigneLivraisonDestockage;
-use App\Services\ServiceStockEntree;
-use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,12 +41,9 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $factures = FactureClient::query()
-        ->where("reference_recu", "KAD10656")
-        ->get();
-
-    return $factures;
-    return "regularisation éffectuée avec succès | totale regularisation des stocks du magasin 2!";
+    $stock = StockDepot::where(["article_id" => 806, "depot_id" => 4]);
+    $stock->update(["unite_mesure_id" => 19]);
+    return $stock->get();
 });
 
 /**DETELE A STOCK */

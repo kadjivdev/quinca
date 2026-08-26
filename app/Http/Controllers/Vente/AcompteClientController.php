@@ -25,7 +25,7 @@ class AcompteClientController extends Controller
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
         // Récupération des données avec pagination
-        $acomptes = AcompteClient::with(['client', 'createdBy'])
+        $acomptes = AcompteClient::with(['client.agent', 'createdBy'])
             ->where('point_de_vente_id', Auth()->user()->point_de_vente_id)
             ->latest();
 

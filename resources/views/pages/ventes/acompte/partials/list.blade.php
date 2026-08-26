@@ -79,6 +79,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Session</th>
                             <th class="border-bottom-0">Date</th>
                             <th class="border-bottom-0">Client</th>
+                            <th class="border-bottom-0 bg-dark text-white rounded text-center">Agent</th>
                             <th class="border-bottom-0 text-center">Type</th>
                             <th class="border-bottom-0 text-end">Montant</th>
                             <th class="border-bottom-0 text-end">Preuve</th>
@@ -113,6 +114,13 @@
                                     <div>
                                         <div class="fw-medium">{{ $acompte->client?->raison_sociale }}</div>
                                         <div class="text-muted small">{{ $acompte->client?->code_client }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-client me-2">
+                                        {{ $acompte->client?->agent?->nom }}
                                     </div>
                                 </div>
                             </td>

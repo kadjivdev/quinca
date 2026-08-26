@@ -34,17 +34,17 @@
 
                         {{-- LES DEPOTS --}}
                         <div class="col-12">
-                            <label class="form-label fw-medium required">Dépôts</label>
-                            <select class="form-select select2" name="depot_id" id="add_depot_id" required>
-                                <option value="">Sélectionner un dépôt</option>
-                                @foreach($depots as $depot)
-                                <option value="{{ $depot->id }}">
-                                    {{ $depot->libelle_depot }}
+                            <label class="form-label fw-medium required">Point de vente</label>
+                            <select class="form-select select2" name="point_vente_id" id="add_point_vente_id" required>
+                                <option value="">Sélectionner un point</option>
+                                @foreach($pointVentes as $point)
+                                <option value="{{ $point->id }}">
+                                    {{ $point->nom_pv }}
                                 </option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback">
-                                Veuillez sélectionner un dépôt
+                                Veuillez sélectionner un point de vente
                             </div>
                         </div>
 

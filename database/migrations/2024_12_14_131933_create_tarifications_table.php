@@ -40,6 +40,13 @@ return new class extends Migration
             // Index
             $table->index('statut');
 
+            $table->foreignId('point_vente_id')
+                ->nullable()
+                ->constrained('point_de_ventes')
+                ->onDelete('CASCADE')
+                ->onUpdate('CASCADE')
+                ->comment('ID du point de vente');
+
             // Contrainte d'unicité
             $table->unique(['article_id', 'type_tarif_id'], 'unique_article_type_tarif');
         });
