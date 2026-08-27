@@ -68,11 +68,11 @@
                             </td>
 
                             @foreach($typesTarifs as $typeTarif)
-                            @php
-                            $tarifications = $article->tarifications
-                            ->where('type_tarif_id', $typeTarif->id)
-                            ->where('statut', true);
-                            @endphp
+                                @php
+                                $tarifications = $article->tarifications
+                                ->where('type_tarif_id', $typeTarif->id)
+                                ->where('statut', true);
+                                @endphp
 
                             <td class="text-end">
                                 <div class="d-flex align-items-center justify-content-end gap-2">

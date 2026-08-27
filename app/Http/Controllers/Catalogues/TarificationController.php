@@ -32,18 +32,18 @@ class TarificationController extends Controller
             $familles = FamilleArticle::where('statut', true)->get();
             $pointVentes = PointDeVente::get();
             $uniteMesures = UniteMesure::get();
-            
-            $tarificationQuery = Tarification::with(['article', 'typeTarif']);
-            $articleQuery = Article::where('statut', 'actif');
+
+            $articleQuery = Article::with(["tarifications" => function ($query) use ($request) {
+                if ($request->filled("pv_id")) {
+                    $query->where("point_vente_id", $request->pv_id);
+                }
+            }])->where('statut', 'actif');
 
             if ($request->filled("article_id")) {
-                $articleQuery->where("article_id",$request->article_id);
+                $articleQuery->where("id", $request->article_id);
             }
 
-            if ($request->filled("pv_id")) {
-                $tarificationQuery->where("point_vente_id",$request->pv_id);
-            }
-
+            $tarificationQuery = Tarification::with(['article', 'typeTarif']);
             $tarifications = $tarificationQuery->get();
             $articles = $articleQuery->get();
 

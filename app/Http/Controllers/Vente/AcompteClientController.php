@@ -141,7 +141,6 @@ class AcompteClientController extends Controller
      */
     public function store(Request $request)
     {
-        
         try {
             Log::debug("Début du stockage de l'acompte", ["data" => $request->all()]);
 

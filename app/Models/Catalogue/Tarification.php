@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Models\Parametre\TypeTarif;
 use App\Models\Parametre\UniteMesure;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
 
 class Tarification extends Model
 {
