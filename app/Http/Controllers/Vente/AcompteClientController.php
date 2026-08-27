@@ -217,7 +217,7 @@ class AcompteClientController extends Controller
                     'acompte' => $acompte->load(['client', 'createdBy'])
                 ]
             ]);
-        } catch (ExceptionValidationException $e) {
+        } catch (ValidationException $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
