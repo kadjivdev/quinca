@@ -111,7 +111,7 @@
                             });
                         }
                     } else {
-
+                        console.log("xhr.responseJSON :", xhr.responseJSON)
                         Toast.fire({
                             icon: 'error',
                             title: 'Une erreur est survenue lors de l\'enregistrement de l\'acompte',
