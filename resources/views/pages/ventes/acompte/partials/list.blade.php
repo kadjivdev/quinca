@@ -17,9 +17,8 @@
                                     @endforeach
                                 </select>
                             </div>
-
                             {{-- Filtre Type de Paiement --}}
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label class="form-label small">Type de paiement</label>
                                 <select class="form-select form-select-sm" id="typePaiementFilter" name="type_paiement">
                                     <option value="">Tous les types</option>
@@ -30,7 +29,7 @@
                             </div>
 
                             {{-- Filtre Période --}}
-                            <div class="col-md-5">
+                            <div class="col-md-3">
                                 <label class="form-label small">Période</label>
                                 <div class="input-group input-group-sm">
                                     <input type="date" class="form-control" id="dateDebut" name="date_debut">
@@ -40,7 +39,7 @@
                             </div>
 
                             {{-- Recherche --}}
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label class="form-label small">Recherche</label>
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-light border-end-0">
@@ -51,7 +50,6 @@
                                         placeholder="Référence...">
                                 </div>
                             </div>
-
                         </div>
                         <div class="d-flex justify-content-center">
                             {{-- Bouton réinitialiser --}}

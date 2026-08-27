@@ -24,16 +24,28 @@ class TarificationController extends Controller
     /**
      * Afficher la liste des tarifications
      */
-    public function index()
+    public function index(Request $request)
     {
         Log::info("Début de recuperation des tarifications");
         try {
-            $tarifications = Tarification::with(['article', 'typeTarif'])->get();
-            $articles = Article::where('statut', 'actif')->get();
             $typesTarifs = TypeTarif::where('statut', true)->get();
             $familles = FamilleArticle::where('statut', true)->get();
             $pointVentes = PointDeVente::get();
             $uniteMesures = UniteMesure::get();
+            
+            $tarificationQuery = Tarification::with(['article', 'typeTarif']);
+            $articleQuery = Article::where('statut', 'actif');
+
+            if ($request->filled("article_id")) {
+                $articleQuery->where("article_id",$request->article_id);
+            }
+
+            if ($request->filled("pv_id")) {
+                $tarificationQuery->where("point_vente_id",$request->pv_id);
+            }
+
+            $tarifications = $tarificationQuery->get();
+            $articles = $articleQuery->get();
 
             // Statistiques
             $stats = [

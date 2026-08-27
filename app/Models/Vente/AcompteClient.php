@@ -191,7 +191,7 @@ class AcompteClient extends Model
                 self::STATUT_REJETE
             ]),
             'montant' => 'required|numeric',
-            'preuve' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'preuve' => 'nullable|file|mimes:jpg,jpeg,png,pdf',
         ];
     }
 
