@@ -25,6 +25,8 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
+use App\Models\Achat\BonLivraisonFournisseur;
+use App\Models\Achat\FactureFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
@@ -41,9 +43,8 @@ use App\Models\Vente\LigneLivraisonDestockage;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $stock = StockDepot::where(["article_id" => 806, "depot_id" => 4]);
-    $stock->update(["unite_mesure_id" => 19]);
-    return $stock->get();
+    $facture = FactureFournisseur::with("lignes.article")->firstWhere("code","FAC26082596");
+    return $facture;
 });
 
 /**DETELE A STOCK */

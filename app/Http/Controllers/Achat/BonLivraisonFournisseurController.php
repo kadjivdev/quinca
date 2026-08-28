@@ -502,6 +502,7 @@ class BonLivraisonFournisseurController extends Controller
      */
     public function validate_bon(BonLivraisonFournisseur $bonLivraison)
     {
+        Log::debug("Début de validation du bon",["data"=>$bonLivraison]);
         if ($bonLivraison->validated_at || $bonLivraison->rejected_at) {
             return response()->json([
                 'success' => false,
@@ -611,7 +612,7 @@ class BonLivraisonFournisseurController extends Controller
                 Log::debug("Vraie qtelivrée :", ["data" => $vraiQteLivree]);
 
                 if (($vraiQteLivree) > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
-                    throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée.");
+                    throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée {$ligneFact->quantite_base}.");
                 }
 
                 $entrees[] = [
@@ -668,6 +669,7 @@ class BonLivraisonFournisseurController extends Controller
                 ]
             ]);
         } catch (Exception $e) {
+            Log::debug("Erreure lors de la validation du bon de livraison :",["error"=>$e->getMessage()]);
             DB::rollBack();
             Log::error('Erreur validation bon livraison:', [
                 'bon_livraison_id' => $bonLivraison->id,
