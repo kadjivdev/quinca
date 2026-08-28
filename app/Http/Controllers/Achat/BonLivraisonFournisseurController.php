@@ -612,7 +612,7 @@ class BonLivraisonFournisseurController extends Controller
                 Log::debug("Vraie qtelivrée :", ["data" => $vraiQteLivree]);
 
                 if (($vraiQteLivree) > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
-                    throw new \Exception("La quantité livrée pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée {$ligneFact->quantite_base}.");
+                    throw new \Exception("La quantité livrée {$vraiQteLivree} pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée {$ligneFact->quantite_base}.");
                 }
 
                 $entrees[] = [
