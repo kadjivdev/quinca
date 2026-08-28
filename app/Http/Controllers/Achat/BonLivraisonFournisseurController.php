@@ -581,7 +581,7 @@ class BonLivraisonFournisseurController extends Controller
                 ]);
 
                 $ligneFact->update([
-                    'quantite_livree' => round($ligneFact->quantite_livree  + $stockToAdd, 2),
+                    'quantite_livree' => round($ligneFact->quantite_livree  + $ligneFact->quantite_livree_simple, 2),
                 ]);
 
                 Log::info("QTe ajouté", ["data" => $stockToAdd]);
@@ -785,7 +785,7 @@ class BonLivraisonFournisseurController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur suppression bon livraison:', [
+            Log::error('Erreur suppression bon livraison:', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
