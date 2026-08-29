@@ -25,12 +25,19 @@ use App\Http\Controllers\Revendeur\DepenseRevendeurController;
 use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
+use App\Models\Achat\AccompteFournisseur;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
+use App\Models\Achat\FournisseurApprovisionnement;
+use App\Models\Achat\LigneBonLivraisonFournisseur;
+use App\Models\Achat\RequeteFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneLivraisonDestockage;
+use App\Services\ServiceStockEntree;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,8 +50,97 @@ use App\Models\Vente\LigneLivraisonDestockage;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $facture = FactureFournisseur::with("lignes.article")->firstWhere("code","FAC26082596");
-    return $facture;
+    // Capitulation des qte entrée dans le Magasin 2 Cotonou depuis le 28 Mars 2026 jusqu'à maintenant
+    StockDepot::query()
+        ->where("depot_id", 6)
+        ->get()
+        ->each(function ($stock) {
+            $livraisonFournisseurLignes = LigneBonLivraisonFournisseur::query()
+                // ->with("bonLivraison", "article", "uniteMesure")
+                ->where("article_id", $stock->article_id)
+                ->whereHas("bonLivraison", function ($query) use ($stock) {
+                    $query
+                        ->where("depot_id", $stock->depot_id)
+                        ->whereBetween("validated_at", [
+                            Carbon::create(2026, 02, 28)->startOfDay(), // 23 Mars
+                            now(), // maintenant
+                        ]);
+                })
+                ->get()
+                ->transform(function ($ligne) {
+                    // 
+                    $serviceStockEntree = new ServiceStockEntree();
+                    $conversion = $serviceStockEntree->rechercherConversion(
+                        $ligne->unite_mesure_id,
+                        $ligne->article->unite_mesure_id,
+                        $ligne->article->id
+                    );
+
+                    if (!$conversion) {
+                        throw new Exception(sprintf(
+                            "Aucune conversion trouvée de l'unité (%s) vers (%s) pour l'article %s ni l'inverse! Veuillez créer la conversion avant de continuer",
+                            $ligne->uniteMesure?->libelle_unite ?? '---',
+                            $ligne->article->uniteMesure?->libelle_unite ?? '---',
+                            $ligne->article->code_article ?? '---'
+                        ));
+                    }
+                    // qte de base
+                    $quantite_base = $serviceStockEntree->convertirQuantite(
+                        $ligne->quantite,
+                        $conversion,
+                        $ligne->unite_mesure_id
+                    );
+
+                    return [
+                        // "id" => $ligne->id,
+                        "bordereau" => $ligne->bonLivraison->code ?? '---',
+                        "code_article" => $ligne->article->code_article ?? '---',
+                        "depot" => $ligne->bonLivraison->depot?->libelle_depot ?? '---',
+                        "quantite" => $ligne->quantite,
+                        "qte_base" => $quantite_base,
+                        "unite_mesure" => $ligne->uniteMesure?->libelle_unite ?? '---',
+                        "unite_mesure_base" => $ligne->article->uniteMesure?->libelle_unite ?? '---',
+                        "validated_at" => $ligne->bonLivraison->validated_at ?? '---',
+                    ];
+                })
+
+                ->groupBy('code_article')
+                ->map(function ($group) {
+                    return $group->sum('qte_base');
+                });
+
+            $lastInventaire = $stock->article->lastInventaireDetail($stock->depot_id);
+
+            $stock->qteDepart = $lastInventaire?->qte_reel ?? 0;
+            $stock->code_article = $stock->article?->code_article ?? '---';
+
+            // qteDepart
+            $stock->qte_base_total = $stock->qteDepart + $livraisonFournisseurLignes->sum();
+
+            return $stock;
+        })
+        ->groupBy('code_article')
+        ->map(function ($group) {
+            // if ($group[0]?->code_article=="ART-0DPM2VUT") {
+            Log::debug("Group: ", ["stock" => $group[0]]);
+            // }
+
+            $stock = StockDepot::findOrFail($group->first()->id);
+            // mise à jour de la qte reelle du stock
+            $stock->quantite_reelle = $group->sum('qte_base_total');
+            $stock->save();
+
+            return $group->sum('qte_base_total');
+        });
+
+    // regularisation de solde ancien
+    $accompteFrs = AccompteFournisseur::firstWhere("reference", "ACP20250015");
+    $accompteFrs->update(["montant" => -12542643]);
+
+    // Regularisation du reglement N°737
+    $appro = FournisseurApprovisionnement::with("fournisseur")->find(737);
+    $appro->update(["fournisseur_id" => 107]);
+    return $appro;
 });
 
 /**DETELE A STOCK */
