@@ -82,6 +82,14 @@
                         {{session()->get("success")}}
                     </div>
                     @endif
+
+                    <!--  -->
+                    @if(session()->has("error"))
+                    <div class="alert alert-danger">
+                        <button type="button" class="btn btn-sm text-white float-right" data-bs-dismiss="alert"><i class="bi bi-x-circle"></i></button>
+                        {{session()->get("error")}}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

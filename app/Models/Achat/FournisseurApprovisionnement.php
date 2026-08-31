@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class FournisseurApprovisionnement extends Model
 {
@@ -27,15 +28,23 @@ class FournisseurApprovisionnement extends Model
         "reference"
     ];
 
-    static function rules()
+    static public function rules($id = null)
     {
+        // Récupère l'ID de l'approvisionnement concerné par la requête
+        // $id = $this->route('approvisionnement'); // ou $this->approvisionnement si c'est un attribut/paramètre de route
+
         return [
             "fournisseur_id" => "required|integer",
             "montant" => "required|min:1",
             "source" => "required|in:DIRECTION,AGENT",
-            "document" => "required",
+            "document" => $id ? "nullable" : "required",
             "date" => "required|date",
-            "reference" => "nullable|unique:fournisseur_approvisionnements,reference",
+            "reference" => [
+                "nullable",
+                $id ?
+                    Rule::unique('fournisseur_approvisionnements', 'reference')->ignore($id) :
+                    Rule::unique('fournisseur_approvisionnements', 'reference'),
+            ],
         ];
     }
 

@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Achat\Fournisseur;
 use App\Models\Achat\FournisseurApprovisionnement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class FournisseurApprovisionnementController extends Controller
 {
@@ -67,9 +70,28 @@ class FournisseurApprovisionnementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, FournisseurApprovisionnement $approvisionnement)
     {
-        //
+        Log::info("Début de recuperation de l'approvisionnement ", ["approvisionnement" => $approvisionnement]);
+        try {
+            if ($request->ajax()) {
+                return response()
+                    ->json(
+                        [
+                            "sussess" => true,
+                            "data" => $approvisionnement
+                        ]
+                    );
+            }
+
+            return response()
+                ->json([
+                    "sussess" => true,
+                    "data" => $approvisionnement
+                ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 
     /**
@@ -83,9 +105,39 @@ class FournisseurApprovisionnementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, FournisseurApprovisionnement $approvisionnement)
     {
-        //
+        Log::info("Début de modification d'un approvisionnement :", ["approvisionnement" => $approvisionnement]);
+        Log::info("Data :", ["data" => $request->all()]);
+        try {
+            DB::beginTransaction();
+            $validated = $request->validate(FournisseurApprovisionnement::rules($approvisionnement->id), FournisseurApprovisionnement::messages());
+
+            $data = $validated;
+            if ($request->hasFile("document")) {
+                $document = $request->file("document");
+                $name = $document->getClientOriginalName();
+                $document->move("files", $name);
+                $document_url = asset("files/" . $name);
+                $data = array_merge($validated, ["document" => $document_url]);
+            }
+
+            $approvisionnement->update($data);
+
+            Log::info("Approvisionnement éffectué avec succès!");
+            DB::commit();
+            return redirect()->back()->with("success", "Approvisionnement éffectué avec succès!");
+        } catch (\Throwable $th) {
+            Log::debug("Erreure de modification de l'approvisionnement", ["error" => $th->getMessage()]);
+            DB::rollBack();
+
+            return back()->with(["error" => $th->getMessage()]);
+        } catch (ValidationException $e) {
+            Log::debug("Erreure de validation de l'approvisionnement", ["errors" => $e->errors()]);
+            DB::rollBack();
+
+            return back()->withErrors($e->errors());
+        }
     }
 
     /**

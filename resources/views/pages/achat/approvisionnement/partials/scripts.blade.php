@@ -14,10 +14,16 @@
 
         // Initialisation de Select2 avec gestion d'erreur
         try {
-            $('.select2').select2({
+            $('#addApprovisionnementModal .select2').select2({
                 theme: 'bootstrap-5',
                 width: '100%',
                 dropdownParent: $('#addApprovisionnementModal')
+            });
+
+            $('#editApprovisionnementModal .select2').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownParent: $('#editApprovisionnementModal')
             });
         } catch (e) {
             console.error('Erreur initialisation Select2:', e);
@@ -32,14 +38,14 @@
             $(this).addClass('was-validated');
         });
 
-        // Soumission du formulaire
-        $('#editApprovisionnementForm').on('submit', function(e) {
-            e.preventDefault();
-            if (this.checkValidity()) {
-                updateBonCommande($(this));
-            }
-            $(this).addClass('was-validated');
-        });
+        // // Soumission du formulaire
+        // $('#editApprovisionnementForm').on('submit', function(e) {
+        //     e.preventDefault();
+        //     if (this.checkValidity()) {
+        //         updateBonCommande($(this));
+        //     }
+        //     $(this).addClass('was-validated');
+        // });
     });
 
 
@@ -162,9 +168,7 @@
         });
     }
 
-
-
-    async function editBonCommande(id) {
+    async function editApprovisionnement(id) {
         try {
             Swal.fire({
                 title: 'Chargement...',
@@ -178,7 +182,7 @@
                 }
             });
 
-            const response = await fetch(`${apiUrl}/achat/bon-commandes/${id}`, { // URL mise à jour
+            const response = await fetch(`${apiUrl}/achat/approvisionnements/${id}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -191,135 +195,47 @@
             }
 
             const result = await response.json();
-            console.log(result.data);
+            console.log(result);
 
-            if (result.success) {
-                const editModal = document.getElementById('editBonCommandeModal');
-                const editForm = document.getElementById('editBonCommandeForm');
+            // Correction : la réponse est l'objet directement, pas { success, data }
+            const data = result?.data;
 
-                const data = result.data;
+            console.log("data :", data)
 
-                editForm.action = `${apiUrl}/achat/bon-commandes/${id}`; // URL mise à jour
+            const editModal = document.getElementById('editApprovisionnementModal');
+            const editForm = document.getElementById('editApprovisionnementForm');
 
-                const responseProg = await fetch(`${apiUrl}/achat/programmations/validees`, { // URL mise à jour
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                });
+            editForm.action = `${apiUrl}/achat/approvisionnements/${id}`;
 
-                const resultProg = await responseProg.json();
+            // Vider le contenu actuel du select
+            const selecteFournisseur = $("#fournisseur_id").empty();
 
-                const selectProgrammations = $('#programmationSelectMod');
+            // Ajouter une option par défaut
+            selecteFournisseur.append('<option value="">Sélectionner un fournisseur</option>');
 
-                // Vider le contenu actuel du select
-                selectProgrammations.empty();
+            const fournisseurs = @json($fournisseurs);
 
-                // Ajouter une option par défaut
-                selectProgrammations.append('<option value="">Sélectionner une programmation</option>');
+            console.log("fournisseurs: ", fournisseurs)
 
-                // Ajouter les programmations validées
-                resultProg.data.forEach(prog => {
-                    selectProgrammations.append(
-                        `<option 
-                        value="${prog.id}"
-                        data-code="${prog.code || ''}"
-                        data-point-vente="${prog.point_vente.nom_pv || ''}"
-                        data-point-vente-id="${prog.point_de_vente_id || ''}"
-                        data-fournisseur="${prog.fournisseur.raison_sociale || ''}"
-                        data-fournisseur-id="${prog.fournisseur_id || ''}"
-                        data-validation="${prog.validated_at ? new Date(prog.validated_at).toLocaleDateString('fr-FR') : ''}">
-                        ${prog.code || 'N/A'} - (Validée le ${prog.validated_at ? new Date(prog.validated_at).toLocaleDateString('fr-FR') : 'N/A'})
-                    </option>`
-                    );
-                });
+            // Ajouter les fournisseurs
+            fournisseurs.forEach(fr => {
+                selecteFournisseur.append(
+                    `<option value="${fr.id}">${fr.raison_sociale}</option>`
+                );
+            });
 
-                // Marquer la programmation sélectionnée
-                const option = selectProgrammations.find(`option[value="${data.programmation_id}"]`);
-                if (option) {
-                    option.prop('selected', true);
-                }
+            selecteFournisseur.val(data.fournisseur_id);
 
-                $("#bonIdMod").html(data.programmation.code);
+            $("#codeAppro").val(data.reference);
+            $("#montant").val(data.montant);
+            $("#date").val(data.date?.split("T")?.[0]);
+            $("#reference").val(data.reference);
+            $("#source").val(data.source);
 
-                $("#programmationCodeMod").html(data.programmation.code);
-                $("#pointVenteMod").html(data.point_vente.nom_pv);
-                $("[name='point_vente_id']").val(data.point_vente.id);
-                $("#fournisseurMod").html(data.fournisseur.raison_sociale);
-                $("[name='fournisseur_id']").val(data.fournisseur_id);
-                $("#dateValidationMod").html(data.programmation.validated_at.split('T')[0]);
+            const modal = new bootstrap.Modal(editModal);
+            modal.show();
+            Swal.close();
 
-                $("[name='code']").val(data.code);
-                $("[name='date_commandeMod']").val(data.date_commande.split('T')[0]);
-
-                const lignes = data.lignes || [];
-                let articlesHtml = `
-                <div class="card border border-light-subtle">
-                    <div class="card-header bg-light">
-                        <h6 class="card-title mb-0">
-                            <i class="fas fa-box me-2"></i>Articles
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Référence</th>
-                                        <th>Désignation</th>
-                                        <th>Unité</th>
-                                        <th class="text-end">Quantité</th>
-                                        <th class="text-end">Prix Unitaire</th>
-                                        <th class="text-end">Total HT</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-                if (lignes.length > 0) {
-
-                    lignes.forEach((ligne, index) => {
-                        articlesHtml += `
-                        <tr>
-                            <td>${ligne.article.code_article || ""}</td>
-                            <td>${ligne.article.designation || ""}</td>
-                            <td>${ligne.unite_mesure.libelle_unite || ""}</td>
-                            <td class="text-end">
-                                <input type="hidden" name="articles[${index}][article_id]" value="${ligne.article.id}">
-                                <input type="number" class="form-control form-control-sm text-end"  name="articles[${index}][quantite]" value="${ligne.quantite || 0}" readonly>
-                            </td>
-                            <td>
-                                <input type="number" class="form-control form-control-sm text-end prix-unitaire" name="articles[${index}][prix_unitaire]" step="0.01" min="0" value="${ligne.prix_unitaire || ""}" data-index="${index}" required>
-                                <div class="invalid-feedback">Le prix unitaire est requis</div>
-                            </td>
-                            <td class="text-end">
-                                <span class="total-ligne-${index}">0.00</span> F CFA
-                            </td>
-                        </tr>`;
-                    });
-
-                    articlesHtml += `
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>`;
-
-                    $("#articlesSectionMod").html(articlesHtml);
-                    calculerTotaux('update');
-                }
-
-                editForm.querySelector('[name="cout_transport_mod"]').value = data.cout_transport;
-                editForm.querySelector('[name="cout_chargement_mod"]').value = data.cout_chargement;
-                editForm.querySelector('[name="autre_cout_mod"]').value = data.autre_cout;
-
-                editForm.querySelector('[name="commentaireMod"]').value = data.commentaire;
-
-                const modal = new bootstrap.Modal(editModal);
-                modal.show();
-                Swal.close();
-            } else {
-                throw new Error(result.message || 'Erreur lors du chargement des données');
-            }
         } catch (error) {
             console.error('Erreur:', error);
             Toast.fire({

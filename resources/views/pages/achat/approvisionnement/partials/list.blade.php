@@ -57,14 +57,16 @@
                             <td class="text-end">
                                 <div class="btn-group">
 
-                                    @if(!$appro->validated_at)
-                                    <!-- <button class="btn btn-sm btn-light-warning btn-icon ms-1"
-                                        onclick="editApprovisionnement({{ $appro->id }})" data-bs-toggle="tooltip"
-                                        title="Modifier">
-                                        <i class="fas fa-edit"></i>
-                                    </button> -->
-                                    @if(!$appro->rejected_by)
-
+                                    @can('approvisionnements.edit')
+                                        @if(!$appro->validated_at)
+                                        <button class="btn btn-sm btn-light-warning btn-icon ms-1"
+                                            onclick="editApprovisionnement({{ $appro->id }})" data-bs-toggle="tooltip"
+                                            title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        @if(!$appro->rejected_by)
+                                    @endif
+                                    
                                     @can('approvisionnements.validate')
                                     <a href="{{route('approvisionnements.valider',$appro->id)}}" class="btn btn-sm btn-light-success btn-icon ms-1"
                                         data-bs-toggle="tooltip" title="Valider">
@@ -334,12 +336,12 @@
     }
 
     // Initialisation des tooltips
-    $(document).ready(function() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    });
+    // $(document).ready(function() {
+    //     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    //     tooltipTriggerList.map(function(tooltipTriggerEl) {
+    //         return new bootstrap.Tooltip(tooltipTriggerEl);
+    //     });
+    // });
 </script>
 
 @push('scripts')
