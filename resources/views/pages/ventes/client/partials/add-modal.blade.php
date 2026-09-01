@@ -98,8 +98,8 @@
                                     </h6>
                                     <div class="row g-3">
                                         <div class="col-md-12">
-                                            <label class="form-label fw-medium">Téléphone</label>
-                                            <input type="tel" class="form-control" name="telephone"
+                                            <label class="form-label fw-medium">Téléphone <span class="text-danger">*</span> </label>
+                                            <input type="tel" class="form-control" required name="telephone"
                                                 placeholder="Numéro de téléphone">
                                         </div>
 

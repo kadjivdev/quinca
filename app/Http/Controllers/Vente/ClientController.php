@@ -20,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
+use PhpOffice\PhpSpreadsheet\Style\{Fill, Border};
 use Symfony\Component\ErrorHandler\Debug;
 
 class ClientController extends Controller
