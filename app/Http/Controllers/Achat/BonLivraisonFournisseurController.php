@@ -581,7 +581,7 @@ class BonLivraisonFournisseurController extends Controller
                 ]);
 
                 $ligneFact->update([
-                    'quantite_livree' => round($ligneFact->quantite_livree  + $ligneFact->quantite_livree_simple, 2),
+                    'quantite_livree' => round($ligneFact->quantite_livree  + $stockToAdd, 2),
                 ]);
 
                 Log::info("QTe ajouté", ["data" => $stockToAdd]);
@@ -606,9 +606,9 @@ class BonLivraisonFournisseurController extends Controller
                 $vraiQteLivree = $ligneFact->quantite_livree - $QteBaseSupplementaire;
                 Log::debug("Vraie qtelivrée :", ["data" => $vraiQteLivree]);
 
-                // if (($vraiQteLivree) > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
-                //     throw new \Exception("La quantité livrée {$vraiQteLivree} pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée {$ligneFact->quantite_base}.");
-                // }
+                if (($vraiQteLivree) > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
+                    throw new \Exception("La quantité livrée {$vraiQteLivree} pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée {$ligneFact->quantite_base}.");
+                }
 
                 $entrees[] = [
                     'depot_id' => $bonLivraison->depot_id,

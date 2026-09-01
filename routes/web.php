@@ -50,22 +50,10 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    // $reqteFrs = RequeteFournisseur::with('accompteFournisseurs')
-    //     ->whereIn("num_demande", [41, 47])
-    //     ->get();
+    $bon = FactureFournisseur::with("lignes.article")
+        ->firstWhere("code", "FAC26085801");
 
-    // foreach ($reqteFrs as $requete) {
-    //     Log::info("Requête ID: {$requete->id}, Accompte ID: {$requete->id}, Montant: {$requete->montant}");
-    //     $amount = -$requete->montant;
-    //     $requete->update(["montant" => $amount]);
-
-    //     $requete->accompteFournisseurs
-    //         ->each(function ($accompte) use ($amount) {
-    //             $accompte->update(["montant" => $amount]);
-    //         });
-    // }
-    // return $reqteFrs;
-    // $bon = Facture FAC26085801
+    return $bon;
 });
 
 /**DETELE A STOCK */
