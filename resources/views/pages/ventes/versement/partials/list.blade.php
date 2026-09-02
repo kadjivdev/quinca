@@ -81,7 +81,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Référence</th>
                             <th class="border-bottom-0 text-nowrap py-3">Référence d'opération</th>
                             <th class="border-bottom-0 text-nowrap py-3">Accompte Client</th>
-                            <th class="border-bottom-0">Date opération</th>
+                            <th class="border-bottom-0">Date d'insertion</th>
                             <th class="border-bottom-0">Date valeur</th>
                             <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0">Banque</th>
@@ -102,7 +102,7 @@
                                 <span class="code-reference">{{ $versement->reference }}</span>
                             </td>
                             <td class="text-nowrap py-3">
-                                <span class="code-reference">{{ $versement->reference_op }}</span>
+                                <span class="code-reference">{{ $versement->created_at }}</span>
                             </td>
                             <td class="text-nowrap py-3">
                                 <span class="badge bg-light text-dark bold">{{$versement->accompteClient?->reference??'--'}}</span>

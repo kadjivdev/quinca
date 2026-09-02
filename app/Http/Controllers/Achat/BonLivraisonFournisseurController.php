@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Services\ServiceStockEntree;
 use Exception;
+use Faker\Provider\Lorem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -583,7 +584,7 @@ class BonLivraisonFournisseurController extends Controller
                 $ligneFact->update([
                     'quantite_livree' => round($ligneFact->quantite_livree  + $stockToAdd, 2),
                 ]);
-
+                
                 Log::info("QTe ajouté", ["data" => $stockToAdd]);
                 Log::info("QTe Total", ["data" => $ligneFact->quantite_livree]);
                 Log::info("Ligne facture après update", ["data" => $ligneFact]);

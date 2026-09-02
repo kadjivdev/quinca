@@ -18,6 +18,7 @@
                             <th class="border-bottom-0">Action</th>
                         </tr>
                     </thead>
+                    
                     <tbody>
                         @foreach ($requetes as $requete)
                         <tr>
