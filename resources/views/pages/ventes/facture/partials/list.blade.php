@@ -105,6 +105,7 @@
                             <th class="border-bottom-0 text-center">Type</th>
                             <th class="border-bottom-0">Date validation</th>
                             <th class="border-bottom-0 text-center">Statut</th>
+                            <th class="border-bottom-0 text-center">Etat</th>
                             <th class="border-bottom-0 text-center">Recommandeur Crédit</th>
                             <th class="border-bottom-0 text-center">Preuve crédit</th>
                             <th class="border-bottom-0 text-center">Inséré par</th>
@@ -215,8 +216,49 @@
                                 @case('partiellement_payee')
                                 <span class="badge bg-info bg-opacity-10 text-info px-3">Partiellement payée</span>
                                 @break
+                                @case('non_livree')
+                                <span class="badge bg-danger bg-opacity-10 text-danger px-3">Non livrée</span>
+                                @break
+                                @case('partiellement_livree')
+                                <span class="badge bg-warning bg-opacity-10 text-warning px-3">Livrée partiellement</span>
+                                @break
+                                @case('livree')
+                                <span class="badge bg-success bg-opacity-10 text-success px-3">Livrée</span>
+                                @break
                                 @default
                                 <span class="badge bg-danger bg-opacity-10 text-danger px-3">Annulée</span>
+                                @endswitch
+                            </td>
+
+                            <td class="text-center">
+                                <!-- payement_state -->
+                                @switch($facture->payement_state)
+                                @case('non_payee')
+                                <span class="badge bg-danger bg-opacity-10 text-white px-3">Non payée</span>
+                                @break
+                                @case('partiellement_payee')
+                                <span class="badge bg-warning bg-opacity-10 text-white px-3">Partiellement payée</span>
+                                @break
+                                @case('payee')
+                                <span class="badge bg-success bg-opacity-10 text-white px-3">Payée</span>
+                                @break
+                                @default
+                                ---
+                                @endswitch
+
+                                <!-- state -->
+                                @switch($facture->state)
+                                @case('non_livree')
+                                <span class="badge bg-danger bg-opacity-10 text-white px-3">Non livrée</span>
+                                @break
+                                @case('livree')
+                                <span class="badge bg-success bg-opacity-10 text-white px-3">Livrée</span>
+                                @break
+                                @case('partiellement_livree')
+                                <span class="badge bg-warning bg-opacity-10 text-white px-3">Partiellement livrée</span>
+                                @break
+                                @default
+                                ---
                                 @endswitch
                             </td>
 

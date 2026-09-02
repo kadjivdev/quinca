@@ -49,11 +49,11 @@ class FactureClientController extends Controller
 
             // Construction de la requête de base
             if ($request->debut && $request->fin) {
-                $query = FactureClient::with(['client', 'createdBy'])
+                $query = FactureClient::with(['client', 'createdBy','lignes'])
                     ->orderBy('created_at', 'desc')
                     ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
             } else {
-                $query = FactureClient::with(['client', 'createdBy'])
+                $query = FactureClient::with(['client', 'createdBy','lignes'])
                     ->orderBy('created_at', 'desc')
                     ->whereBetween('created_at', [Carbon::parse(now())->startOfMonth(), Carbon::parse(now())->endOfMonth()]);
             }
@@ -114,6 +114,44 @@ class FactureClientController extends Controller
                         $facture->statut_reel = 'payee';
                     }
                 }
+
+                /**
+                 * Détermination de l'état de la facture basé sur la livraison et le paiement
+                 */
+                $facture->state = "";
+                $facture->payement_state = "";
+                if ($facture->montant_regle==0) {
+                    $facture->payement_state = "non_payee";
+                }
+
+                if ($facture->montant_regle>0 && $facture->montant_regle<$facture->montant_ttc) {
+                    $facture->payement_state = "partiellement_payee";
+                }
+
+                if ($facture->montant_regle>0 && $facture->montant_regle>=$facture->montant_ttc) {
+                    $facture->payement_state = "payee";
+                }
+
+                $lignes = $facture->lignes;
+                $quantitesLivrees = $lignes->map(function ($ligne) {
+                    return (float) ($ligne->quantite_livree ?? 0);
+                });
+                $quantitesFacturees = $lignes->map(function ($ligne) {
+                    return (float) $ligne->quantite;
+                });
+
+                if ($quantitesFacturees->isNotEmpty() && $quantitesLivrees->every(function ($quantiteLivree, $index) use ($quantitesFacturees) {
+                    return $quantiteLivree >= $quantitesFacturees[$index];
+                })) {
+                    $facture->state = "livree";
+                } elseif ($quantitesLivrees->contains(function ($quantiteLivree) {
+                    return $quantiteLivree > 0;
+                })) {
+                    $facture->state = "partiellement_livree";
+                } else {
+                    $facture->state = "non_livree";
+                }
+                /** Fin de la determonation d'état des factures */
 
                 // Vérifier si la facture est en retard
                 $facture->is_overdue = $facture->statut !== 'payee'
