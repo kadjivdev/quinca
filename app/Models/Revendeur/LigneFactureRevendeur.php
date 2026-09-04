@@ -10,7 +10,7 @@ use App\Models\Catalogue\Tarification;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
-use App\Models\Vente\{FactureClient, LigneLivraisonClient, LigneLivraisonDestockage};
+use App\Models\Vente\{LigneLivraisonDestockage};
 use Exception;
 use Illuminate\Support\Facades\Log;
 

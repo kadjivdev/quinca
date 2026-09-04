@@ -32,6 +32,9 @@ use App\Models\Achat\FournisseurApprovisionnement;
 use App\Models\Achat\LigneBonLivraisonFournisseur;
 use App\Models\Achat\RequeteFournisseur;
 use App\Models\Catalogue\Article;
+use App\Models\Parametre\Depot;
+use App\Models\Parametre\UniteMesure;
+use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneLivraisonDestockage;
@@ -51,87 +54,52 @@ use Illuminate\Support\Facades\Log;
 // DEBUGING ROUTES
 Route::get("/debug", function () {
     // Capitulation des qte entrée dans le Magasin 2 Cotonou depuis le 28 Mars 2026 jusqu'à maintenant
-    StockDepot::query()
-        ->where("depot_id", 6)
+    // return Article::firstWhere("code_article","ART-459");// id: 460
+
+    $facturesRevendeurs = FactureRevendeur::with(["lignes" => function ($query) {
+        $query
+            ->with("article")
+            ->where("article_id", 460)
+            ->where("depot", 1) //depot parakou
+        ;
+    }])
+        ->where("created_at", ">=", Carbon::create(2026, 3, 23))
+        ->where("created_at", "<=", Carbon::create(2026, 9, 03))
         ->get()
-        ->each(function ($stock) {
-            $livraisonFournisseurLignes = LigneBonLivraisonFournisseur::query()
-                // ->with("bonLivraison", "article", "uniteMesure")
-                ->where("article_id", $stock->article_id)
-                ->whereHas("bonLivraison", function ($query) use ($stock) {
-                    $query
-                        ->where("depot_id", $stock->depot_id)
-                        ->whereBetween("validated_at", [
-                            Carbon::create(2026, 03, 23)->startOfDay(), // 23 Mars
-                            now(), // maintenant
-                        ]);
-                })
-                ->get()
-                ->transform(function ($ligne) {
-                    // 
-                    $serviceStockEntree = new ServiceStockEntree();
-                    $conversion = $serviceStockEntree->rechercherConversion(
-                        $ligne->unite_mesure_id,
-                        $ligne->article->unite_mesure_id,
-                        $ligne->article->id
-                    );
-
-                    if (!$conversion) {
-                        throw new Exception(sprintf(
-                            "Aucune conversion trouvée de l'unité (%s) vers (%s) pour l'article %s ni l'inverse! Veuillez créer la conversion avant de continuer",
-                            $ligne->uniteMesure?->libelle_unite ?? '---',
-                            $ligne->article->uniteMesure?->libelle_unite ?? '---',
-                            $ligne->article->code_article ?? '---'
-                        ));
-                    }
-                    // qte de base
-                    $quantite_base = $serviceStockEntree->convertirQuantite(
-                        $ligne->quantite,
-                        $conversion,
-                        $ligne->unite_mesure_id
-                    );
-
-                    return [
-                        // "id" => $ligne->id,
-                        "bordereau" => $ligne->bonLivraison->code ?? '---',
-                        "code_article" => $ligne->article->code_article ?? '---',
-                        "depot" => $ligne->bonLivraison->depot?->libelle_depot ?? '---',
-                        "quantite" => $ligne->quantite,
-                        "qte_base" => $quantite_base,
-                        "unite_mesure" => $ligne->uniteMesure?->libelle_unite ?? '---',
-                        "unite_mesure_base" => $ligne->article->uniteMesure?->libelle_unite ?? '---',
-                        "validated_at" => $ligne->bonLivraison->validated_at ?? '---',
-                    ];
-                })
-
-                ->groupBy('code_article')
-                ->map(function ($group) {
-                    return $group->sum('qte_base');
-                });
-
-            $lastInventaire = $stock->article->lastInventaireDetail($stock->depot_id);
-
-            $stock->qteDepart = $lastInventaire?->qte_reel ?? 0;
-            $stock->code_article = $stock->article?->code_article ?? '---';
-
-            // qteDepart
-            $stock->qte_base_total = $stock->qteDepart + $livraisonFournisseurLignes->sum();
-
-            return $stock;
+        ->filter(function ($facture) {
+            return $facture->lignes->isNotEmpty();
         })
-        ->groupBy('code_article')
-        ->map(function ($group) {
-            Log::debug("Group: ", ["stock" => $group]);
+        ->values()
+        ->map(function ($facture) {
+            $facture->setRelation("lignes", $facture->lignes->map(function ($ligne) {
+                return [
+                    "depot"=>$ligne->depot,
+                    "article_id" => $ligne->article_id,
+                    "quantite" => $ligne->quantite,
+                    "unite_vente_id"=>$ligne->unite_vente_id
+                ];
+            })->values());
 
-            $stock = StockDepot::findOrFail($group->first()->id);
-            // mise à jour de la qte reelle du stock
-            $stock->quantite_reelle = $group->sum('qte_base_total');
-            $stock->save();
-
-            return $group->sum('qte_base_total');
+            return $facture;
         });
-
-    return "Opération éffectuée avec succès, dans le magasin usine client!!";
+    return $facturesRevendeurs
+        ->map(function ($facture) {
+            return [
+                // "id" => $facture->id,
+                "facture" => $facture->numero,
+                "crée le" => Carbon::create($facture->created_at)->format("d-m-Y"),
+                "détails facture" => $facture->lignes->map(function ($ligne) {
+                    Log::info("Ligne: " . json_encode($ligne));
+                    return [
+                        "depot" => Depot::firstWhere("id", $ligne["depot"])?->libelle_depot,
+                        "article" => Article::firstWhere("id", $ligne["article_id"])?->designation,
+                        "quantite" => $ligne["quantite"],
+                        "unité de vente" =>UniteMesure::firstWhere("id", $ligne["unite_vente_id"])?->libelle_unite,
+                    ];
+                })->values(),
+            ];
+        });
+    // return "Opération éffectuée avec succès, dans le magasin usine client!!";
 });
 
 /**DETELE A STOCK */
