@@ -38,6 +38,7 @@ use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneLivraisonDestockage;
+use App\Models\Vente\Versement;
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -54,52 +55,16 @@ use Illuminate\Support\Facades\Log;
 // DEBUGING ROUTES
 Route::get("/debug", function () {
     // Capitulation des qte entrée dans le Magasin 2 Cotonou depuis le 28 Mars 2026 jusqu'à maintenant
-    // return Article::firstWhere("code_article","ART-459");// id: 460
+    $factureUsineClients = FactureClient::whereHas("lignes", function ($query) {
+        $query->where("depot", 6); //usine client
+    })->where("created_at", "<", Carbon::parse("2026-08-31"));
 
-    $facturesRevendeurs = FactureRevendeur::with(["lignes" => function ($query) {
-        $query
-            ->with("article")
-            ->where("article_id", 460)
-            ->where("depot", 1) //depot parakou
-        ;
-    }])
-        ->where("created_at", ">=", Carbon::create(2026, 3, 23))
-        ->where("created_at", "<=", Carbon::create(2026, 9, 03))
-        ->get()
-        ->filter(function ($facture) {
-            return $facture->lignes->isNotEmpty();
-        })
-        ->values()
-        ->map(function ($facture) {
-            $facture->setRelation("lignes", $facture->lignes->map(function ($ligne) {
-                return [
-                    "depot"=>$ligne->depot,
-                    "article_id" => $ligne->article_id,
-                    "quantite" => $ligne->quantite,
-                    "unite_vente_id"=>$ligne->unite_vente_id
-                ];
-            })->values());
+    $factureDirections = FactureClient::whereHas("lignes", function ($query) {
+        $query->whereIn("depot", [3, 4]); //usine client
+    })->where("created_at", "<", Carbon::parse("2026-03-31"));
 
-            return $facture;
-        });
-    return $facturesRevendeurs
-        ->map(function ($facture) {
-            return [
-                // "id" => $facture->id,
-                "facture" => $facture->numero,
-                "crée le" => Carbon::create($facture->created_at)->format("d-m-Y"),
-                "détails facture" => $facture->lignes->map(function ($ligne) {
-                    Log::info("Ligne: " . json_encode($ligne));
-                    return [
-                        "depot" => Depot::firstWhere("id", $ligne["depot"])?->libelle_depot,
-                        "article" => Article::firstWhere("id", $ligne["article_id"])?->designation,
-                        "quantite" => $ligne["quantite"],
-                        "unité de vente" =>UniteMesure::firstWhere("id", $ligne["unite_vente_id"])?->libelle_unite,
-                    ];
-                })->values(),
-            ];
-        });
-    // return "Opération éffectuée avec succès, dans le magasin usine client!!";
+    // $factureUsineClients->delete();
+    // $factureDirections->delete();
 });
 
 /**DETELE A STOCK */

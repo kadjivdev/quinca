@@ -79,7 +79,7 @@
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">ID</th>
                             <th class="border-bottom-0 text-nowrap py-3">Référence</th>
-                            <th class="border-bottom-0 text-nowrap py-3">Référence d'opération</th>
+                            <!-- <th class="border-bottom-0 text-nowrap py-3">Référence d'opération</th> -->
                             <th class="border-bottom-0 text-nowrap py-3">Accompte Client</th>
                             <th class="border-bottom-0">Date d'insertion</th>
                             <th class="border-bottom-0">Date valeur</th>
@@ -97,18 +97,18 @@
                     <tbody>
                         @forelse($versements as $versement)
                         <tr>
-                            <td>{{$loop->iteration}}</td>
+                            <td>{{$versement->id}}</td>
                             <td class="text-nowrap py-3">
                                 <span class="code-reference">{{ $versement->reference }}</span>
                             </td>
-                            <td class="text-nowrap py-3">
-                                <span class="code-reference">{{ $versement->created_at }}</span>
-                            </td>
+                            <!-- <td class="text-nowrap py-3">
+                                <span class="">{{ $versement->created_at }}</span>
+                            </td> -->
                             <td class="text-nowrap py-3">
                                 <span class="badge bg-light text-dark bold">{{$versement->accompteClient?->reference??'--'}}</span>
                             </td>
                             <td class="text-nowrap">
-                                {{ $versement->date_op->format('d/m/Y') }}
+                                {{ $versement->created_at->format('d/m/Y') }}
                             </td>
                             <td class="text-nowrap">
                                 {{ $versement->date_valeur->format('d/m/Y') }}
@@ -680,7 +680,7 @@
         "autoWidth": false,
         "buttons": ["pdf", "print", "csv", "excel"],
         "order": [
-            [0, 'asc']
+           [0, 'desc']
         ],
         "pageLength": 15,
         language: {

@@ -23,8 +23,7 @@ class VersementController extends Controller
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
 
         // Récupération des données avec 
-        $versementsQuery = Versement::with(['client', 'createdBy', "accompteClient", "validatedBy", "extournedBy"])
-            ->latest();
+        $versementsQuery = Versement::with(['client', 'createdBy', "accompteClient", "validatedBy", "extournedBy"]);
 
         // Application des filtres
         if ($request->filled('client_id')) {
@@ -65,6 +64,7 @@ class VersementController extends Controller
             }
         }
 
+        $versementsQuery->orderByDesc('id');
         $versements = $versementsQuery->get();
         $versementsMois = $versementsQuery
             ->whereMonth('date_op', now()->year)
