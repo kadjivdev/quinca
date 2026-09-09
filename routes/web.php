@@ -38,6 +38,7 @@ use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneLivraisonDestockage;
+use App\Models\Vente\LivraisonClient;
 use App\Models\Vente\Versement;
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Carbon;
@@ -55,16 +56,23 @@ use Illuminate\Support\Facades\Log;
 // DEBUGING ROUTES
 Route::get("/debug", function () {
     // Capitulation des qte entrée dans le Magasin 2 Cotonou depuis le 28 Mars 2026 jusqu'à maintenant
-    $factureUsineClients = FactureClient::whereHas("lignes", function ($query) {
-        $query->where("depot", 6); //usine client
-    })->where("created_at", "<", Carbon::parse("2026-08-31"));
+    $livraisonUsineClients = LivraisonClient::query()
+        ->whereNull("validated_at")
+        ->where("depot_id", 6) //usine client
+        ->where("created_at", "<", Carbon::parse("2026-08-31"))
+        ->with("depot");
 
-    $factureDirections = FactureClient::whereHas("lignes", function ($query) {
-        $query->whereIn("depot", [3, 4]); //usine client
-    })->where("created_at", "<", Carbon::parse("2026-03-31"));
+    $livraisonDirections = LivraisonClient::query()
+        ->whereNull("validated_at")
+        ->whereIn("depot_id", [3, 4]) //depot cotonou 1 et 2
+        ->where("created_at", "<", Carbon::parse("2026-03-31"))
+        ->with("depot");
 
-    // $factureUsineClients->delete();
-    // $factureDirections->delete();
+    // return $livraisonDirections->get()->pluck("validated_at");
+    $livraisonUsineClients->delete();
+    $livraisonDirections->delete();
+
+    return "Regularisation éffectué";
 });
 
 /**DETELE A STOCK */

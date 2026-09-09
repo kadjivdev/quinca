@@ -243,7 +243,6 @@ class LivraisonClientController extends Controller
     /**
      * Valide une livraison
      */
-
     public function validateLivraison(Request $request, LivraisonClient $livraisonClient)
     {
         if (!$request->ajax()) {
