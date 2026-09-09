@@ -900,7 +900,7 @@
     function calculerTotalMontant() {
         let total = 0;
 
-        table.column(9, {
+        table.column(8, {
             search: 'applied'
         }).nodes().each(function(node) {
             // .text() récupère le texte du <span class="montant">...</span>
