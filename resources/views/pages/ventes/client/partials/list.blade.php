@@ -41,7 +41,7 @@
     <div class="col-12">
         <div class="card border-0 p-3 shadow-sm">
             <div class="table-responsive">
-                <h5 class="">Montant Total: <span class="badge bg-success" >{{ number_format($clients->sum('solde'), 0, '.', ' ') }} FCFA</span></h5>
+                <h5 class="">Montant Total: <span id="montantTotal" class="badge bg-success">{{ number_format($clients->sum('solde'), 2, ',', ' ') }} FCFA</span></h5>
 
                 <table id="example1" class="table table-hover align-middle mb-0" id="clientsTable">
                     <thead class="bg-light">
@@ -114,8 +114,8 @@
                             <td>
                                 <span class="badge bg-success bg-opacity-10 text-white">{{number_format($client->soldeRevendeur,2,',',' ')}}</span>
                             </td>
-                            <td>
-                                {{number_format($client->solde,2,',',' ')}}
+                            <td class="solde-total" data-solde="{{ $client->solde }}">
+                                {{ number_format($client->solde, 2, ',', ' ') }}
                             </td>
 
                             <td class="text-end">
@@ -678,25 +678,32 @@
 
     // Fonction pour calculer le total
     function calculateTotal() {
-        let table = $('#example1').DataTable();
+        const table = $('#example1').DataTable();
         let total = 0;
 
-        // Parcourir toutes les lignes visibles et additionner les montants
-        table.column(10, {
-            search: 'applied'
-        }).data().each(function(value) {
-            // Nettoyer la valeur (enlever "FCFA" et les espaces, puis convertir en nombre)
-            let montant = parseInt(value.replace(/[^0-9-]/g, ''));
-            total += montant;
+        // Additionner les valeurs numériques des lignes correspondant à la recherche.
+        table.rows({ search: 'applied' }).nodes().each(function(row) {
+            const montant = Number($(row).find('.solde-total').data('solde'));
+
+            if (Number.isFinite(montant)) {
+                total += montant;
+            }
         });
 
         // Afficher le total formaté
-        $("#montantTotal").html(total.toLocaleString() + " FCFA");
+        $("#montantTotal").text(
+            total.toLocaleString('fr-FR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + " FCFA"
+        );
     }
 
     // Recalculer lors de la recherche
-    $('#example1').on('search.dt', calculateTotal);
+    $('#example1').on('search.dt draw.dt', calculateTotal);
 
+    // initialisation
+    // calculateTotal()
     //
     $("#example1").DataTable({
         "responsive": true,
@@ -909,5 +916,7 @@
             }
         },
     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+    calculateTotal();
 </script>
 @endpush
