@@ -144,7 +144,15 @@ class Article extends Model
      * Obtient les tarifications de l'article
      * en fonction de l'unité Id
      */
-    public function tarifViaUnite($uniteId)
+    public function tarifViaTarifId($typeTarifId)
+    {
+        return Tarification::firstWhere(["type_tarif_id" => $typeTarifId]);
+    }
+
+     /**
+     * Obtient la tarification de type hyper grossiste de l'article
+     */
+    public function tarifViaType($typeId)
     {
         return Tarification::firstWhere(["unite_mesure_id" => $uniteId]);
     }

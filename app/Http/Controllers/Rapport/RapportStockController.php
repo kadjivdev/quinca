@@ -11,9 +11,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MouvementsStockExport;
-use App\Models\Achat\LigneBonLivraisonFournisseur;
-use App\Models\Catalogue\Article;
-use App\Models\RequeteStock;
 use Illuminate\Support\Facades\Log;
 use PDF;
 
@@ -187,17 +184,6 @@ class RapportStockController extends Controller
 
                         $stock->qantiteRequete = $stock->quantite_requete;
 
-                        // $conversion ? $this->serviceEntree
-                        //     ->convertirQuantite(
-                        //         $requeteQuery
-                        //             ->get()
-                        //             ->sum("quantite"),
-                        //         $conversion,
-                        //         $stock->unite_mesure_id,
-                        //         // $article->unite_mesure_id,
-                        //     ) : 00;
-                        // $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
-
                         /**Qte Vendue */
                         // $stock->qteTotalVendu = session()->get("date_ftr") ?
                         //     $article->qteVenduAtDate($stock->depot_id, session()->get("date_ftr")) : $article->qteVendu($stock->depot_id);
@@ -205,7 +191,6 @@ class RapportStockController extends Controller
                         $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
 
                         /**Reste en stock */
-                        // $stock->resteStock = $stock->quantite_reelle - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
                         $stock->resteStock = ($stock->quantite_reelle + $stock->qantiteRequete) - $stock->qteTotalVendu; //$article->reste($stock->depot_id);
                     });
 
@@ -229,23 +214,6 @@ class RapportStockController extends Controller
                 // inventaire date
                 $article->inventaire_date = $lastInventaire?->inventaire?->created_at;
 
-                // // entree via livraison
-                // $ligneQuery = LigneBonLivraisonFournisseur::where("article_id", $article->id)
-                //     ->with("article", "bonLivraison", "uniteMesure")
-                //     ->whereHas("bonLivraison", function ($query) use ($depot) {
-                //         $query->where("depot_id", $depot->id)
-                //             ->whereNull("inventaire_id")
-                //             ->whereNotNull("validated_at");
-                //     });
-
-                // $lignesBonLivraison = $lastInventaire?->inventaire && $article->inventaire_date ?
-                //     $ligneQuery->whereBetween('created_at', [
-                //         Carbon::parse($article->inventaire_date)->startOfDay(),
-                //         now(),
-                //     ]) : $ligneQuery;
-
-                // $article->qteEntreeLivraison = $lignesBonLivraison->sum("quantite");
-
                 // qte approvisionnement
                 $article->qteAppro = ($article->stocks()?->firstWhere("depot_id", $depot->id)?->quantite_reelle ?? 0) - $article->qteDepart; // $articleStocks->sum("quantite_reelle") - $article->qteDepart;
 
@@ -254,11 +222,17 @@ class RapportStockController extends Controller
                 // unité du stock
                 $article->unite_mesure = $articleStocks->first()?->uniteMesure?->libelle_unite;
 
+                // montant de l'article
+                $article->montant = $article->stockDisponible
+                    * $article->tarifViaTarifId(2)?->prix ?? 0; //le price unitaire hypergrossiste de l'article
+
                 return $article;
             });
 
             $depots = Depot::all();
-            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr"));
+            $montantTotal = array_sum($articles->pluck("montant")->toArray());
+
+            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr","montantTotal"));
         } catch (\Exception $e) {
             Log::debug("Une erreure est survenue lors du chargement du stock", ["error" => $e->getMessage()]);
             return back()->with("error", "Une erreure est survenue lors du chargement du stock :" . $e->getMessage());

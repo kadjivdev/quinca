@@ -25,7 +25,7 @@
         </div>
 
         <br>
-        <h4 class="">Historique du stock du dépôt : <span class="badge bg-light rounded borded text-success">{{$depot->libelle_depot}} @if($date_ftr) - Date filtrée : {{\Carbon\Carbon::parse($date_ftr)->format('d/m/Y')}} @endif </span> </h4>
+        <h4 class="">Historique du stock du dépôt : <span class="badge bg-light rounded borded text-success">{{$depot->libelle_depot}} | Montant total: {{number_format($montantTotal,2,','," ")}} FCFA @if($date_ftr) - Date filtrée : {{\Carbon\Carbon::parse($date_ftr)->format('d/m/Y')}} @endif </span> </h4>
 
         <div class="table-responsive">
             <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
@@ -44,6 +44,7 @@
                         <th class="border-bottom-0">Unité de vente</th>
                         <th class="border-bottom-0">Stock final</th>
                         <th class="border-bottom-0">Unité</th>
+                        <th class="border-bottom-0">Montant</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,6 +63,7 @@
                         <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">({{$article->uniteMesure?->libelle_unite}})</span></td>
+                        <td><span class="badge bg-light text-dark">{{number_format($article->montant,2,"."," ")}}</span></td>
                     </tr>
                     @endforeach
                 </tbody>
