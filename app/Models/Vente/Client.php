@@ -124,7 +124,7 @@ class Client extends Model
         }
 
         return ($reglementsAmount + $clientAccomptesAmount)
-            - $this->id != 242 ? ($facturesAmount) : 0;//pour le client depot COTONOU, les factures ne doivente pas être prises en compte dans le solde
+            - $this->id != 242 ? ($facturesAmount) : 0; //pour le client depot COTONOU, les factures ne doivente pas être prises en compte dans le solde
     }
 
     /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */
@@ -146,7 +146,10 @@ class Client extends Model
             ->whereNotNull('validated_by')
             ->sum("montant");
 
-        return $reglementsAmount - $facturesRevendeurAmount;
+        return $reglementsAmount
+            - $this->id != 242 ? ($facturesRevendeurAmount) : 0; //pour le client depot COTONOU, les factures ne doivente pas être prises en compte dans le solde
+
+        // return $reglementsAmount - $facturesRevendeurAmount;
     }
 
     // Reglements
