@@ -30,6 +30,7 @@ class ServiceStockSortie
 
             // 2. Récupération de l'article avec son unité de base
             $article = Article::with('uniteMesure')->findOrFail($donnees['article_id']);
+            Log::debug("L'article en question :", ["article" => $article]);
 
             if (!$article->unite_mesure_id) {
                 throw new Exception(sprintf(
@@ -61,9 +62,9 @@ class ServiceStockSortie
                     'depot_id' => $donnees['depot_id'],
                     'article_id' => $article->id,
                     'user_id' => Auth::id(),
+                    'unite_mesure_id' => $unite_origine_id
                 ]);
             }
-
 
             ## determination de l'unité de destination
             if (isset($donnees["appro"]) || isset($donnees["livraison"])) {

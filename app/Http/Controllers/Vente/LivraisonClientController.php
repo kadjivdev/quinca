@@ -245,6 +245,7 @@ class LivraisonClientController extends Controller
      */
     public function validateLivraison(Request $request, LivraisonClient $livraisonClient)
     {
+        Log::info("Début de validation de la livraison client");
         if (!$request->ajax()) {
             return response()->json(['error' => 'Requête non autorisée'], 403);
         }
@@ -264,6 +265,8 @@ class LivraisonClientController extends Controller
 
             /** */
             foreach ($livraisonClient->lignes as $livraisonLigne) {
+                Log::debug("La ligne en cours :", ["data" => $livraisonLigne]);
+
                 /**Ligne Facture client associée */
                 $ligneFactureClient = $livraisonLigne
                     ->ligneFactureClient;
@@ -292,9 +295,11 @@ class LivraisonClientController extends Controller
                     'notes' => "Livraison client #{$livraisonClient->numero}"
                 ]);
 
+                Log::debug("Mouvement sortie :", ["data" => $mouvementSortie]);
                 if (!$mouvementSortie['succes']) {
                     throw new Exception($mouvementSortie['message']);
                 }
+
 
                 // Associer le mouvement à la ligne
                 $livraisonLigne->mouvement_stock_id = $mouvementSortie['donnees']['mouvement_id'];

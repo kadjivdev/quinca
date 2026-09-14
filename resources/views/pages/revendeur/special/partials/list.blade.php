@@ -36,6 +36,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">Date Insertion</th>
                             <th class="border-bottom-0">Date facture</th>
                             <th class="border-bottom-0">Client</th>
+                            <th class="border-bottom-0">Agent</th>
                             <th class="border-bottom-0">Échéance</th>
                             <th class="border-bottom-0 text-end">Montant HT</th>
                             <th class="border-bottom-0 text-end">Montant TVA</th>
@@ -105,6 +106,9 @@
                                     </div>
                                 </div>
                             </td>
+                            <td>
+                                <span class="badge bg-light border rounded text-dark">{{ $facture->client?->agent?->nom?? '---' }}</span>
+                            </td>
                             @php
                             $qte = $facture->lignes()->sum("quantite");
                             $qteLivre = $facture->lignes()->sum("quantite_livree")
@@ -167,7 +171,6 @@
                                     @endcanany
 
                                     @if($facture->statut === 'brouillon')
-
 
                                     {{-- Modifier --}}
                                     @canany(["revendeur.speciales.edit","vente.facture.edit"])

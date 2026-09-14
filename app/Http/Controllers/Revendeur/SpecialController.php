@@ -62,7 +62,7 @@ class SpecialController extends Controller
 
             // Chargement des factures avec les relations nécessaires
             $query = FactureRevendeur::with([
-                'client',
+                'client.agent',
                 'destockage.depot',
                 'destockage.client',
                 'destockage.lignes',
