@@ -109,9 +109,9 @@ class ClientController extends Controller
                     ->sum("montant");
 
                 /**Transports amount */
-                $transportAmount = $client->transports
-                    ->whereNotNull("validate_at")
-                    ->sum("montant");
+                // $transportAmount = $client->transports
+                //     ->whereNotNull("validate_at")
+                //     ->sum("montant");
 
                 /** SOLDE = SOLDE CLIENT + SOLDE REVENDEUR*/
                 // $client->soldeClient = $client->solde();
