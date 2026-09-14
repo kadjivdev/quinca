@@ -123,7 +123,8 @@ class Client extends Model
             return $clientAccomptesAmount;
         }
 
-        return ($reglementsAmount + $clientAccomptesAmount) - ($facturesAmount);
+        return ($reglementsAmount + $clientAccomptesAmount)
+            - $this->id != 242 ? ($facturesAmount) : 0;//pour le client depot COTONOU, les factures ne doivente pas être prises en compte dans le solde
     }
 
     /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */

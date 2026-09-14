@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
 use Illuminate\Support\Facades\Auth;
 // use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -21,7 +20,6 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\{Fill, Border};
-use Symfony\Component\ErrorHandler\Debug;
 
 class ClientController extends Controller
 {
@@ -1032,6 +1030,9 @@ class ClientController extends Controller
         }
     }
 
+    /**
+     * 
+     */
     public function downloadTemplate()
     {
         try {
