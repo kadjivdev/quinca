@@ -13,8 +13,8 @@ use App\Models\Securite\User;
 use App\Models\Vente\SoldeInitialClient;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class Client extends Model
 {
@@ -95,11 +95,19 @@ class Client extends Model
     public function solde()
     {
         // Factures clients
-        $facturesAmount = $this->facturesClient()
-            ->whereNotNull('validated_by')
-            ->sum("montant_ttc") - $this->facturesClient()
-            ->whereNotNull('validated_by')
-            ->sum("montant_remise");
+        $factureQuery = $this->facturesClient()
+            ->whereNotNull('validated_by');
+
+        if ($this->id == 242) { //depot cotonou
+            $facturesAmount = $factureQuery
+                ->where("created_at", "<", Carbon::createFromFormat('d/m/Y', '08/09/2026'))
+                ->sum("montant_ttc") - $factureQuery
+                ->sum("montant_remise");
+        } else {
+            $facturesAmount = $factureQuery
+                ->sum("montant_ttc") - $factureQuery
+                ->sum("montant_remise");
+        }
 
         /** Les transports */
         $clientTransportAmount = $this->transports
@@ -124,14 +132,14 @@ class Client extends Model
         }
 
         //pour le client depot COTONOU, les factures ne doivente pas être prises en compte dans le solde
-        if ($this->id == 242) {
-            return ($reglementsAmount + $clientAccomptesAmount);
-        }
+        // if ($this->id == 242) {
+        //     return ($reglementsAmount + $clientAccomptesAmount);
+        // }
 
         return ($reglementsAmount + $clientAccomptesAmount) - $facturesAmount;
     }
 
-    /** SOLDE DU CLIENT DAN SLE PANEL DES REVENDEURS */
+    /** SOLDE DU CLIENT DANS SLE PANEL DES REVENDEURS */
     public function soldeRevendeur()
     {
         // Factures Revendeurs
@@ -142,7 +150,6 @@ class Client extends Model
             ->sum("montant_remise");
 
         //sum des règlements de chaque factures
-
         $reglementsAmount = $this->facturesRevendeur
             ->whereNotNull('validated_by')
             ->pluck("reglements")
