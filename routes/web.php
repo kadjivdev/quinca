@@ -26,6 +26,7 @@ use App\Http\Controllers\Vente\MarchandBackController;
 use App\Http\Controllers\Revendeur\SpecialController;
 use App\Http\Controllers\TransportationController;
 use App\Models\Achat\AccompteFournisseur;
+use App\Models\Achat\BonCommande;
 use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\FournisseurApprovisionnement;
@@ -55,25 +56,15 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    // Capitulation des qte entrée dans le Magasin 2 Cotonou depuis le 28 Mars 2026 jusqu'à maintenant
-    // $livraisonUsineClients = LivraisonClient::withTrashed()
-    //     ->whereNull("validated_at")
-    //     ->where("depot_id", 6) //usine client
-    //     ->where("created_at", "<", Carbon::parse("2026-08-31"));
+    $bon_BC2609215650 = BonCommande::fistWhere("code", "BC2609215650");
 
-    // $livraisonDirections = LivraisonClient::withTrashed()
-    //     ->whereNull("validated_at")
-    //     ->whereIn("depot_id", [3, 4]) //depot cotonou 1 et 2
-    //     ->where("created_at", "<", Carbon::parse("2026-03-31"));
-
-    // $livraisonUsineClients->delete();
-    // $livraisonDirections->delete();
-
-    $factureFAC_20251010_0018 = FactureClient::with("lignes.article")
-        ->firstWhere("numero", "FAC-20251010-0018");
-
-    return $factureFAC_20251010_0018;
-
+    if ($bon_BC2609215650) {
+        $bon_BC2609215650->update([
+            "validated_at" => null,
+            "validated_by" => null
+        ]);
+        return "Bon BC2609215650 restauré avec succès!";
+    }
     return "Regularisation éffectué";
 });
 
