@@ -56,7 +56,7 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $bon_BC2609215650 = BonCommande::fistWhere("code", "BC2609215650");
+    $bon_BC2609215650 = BonCommande::firstWhere("code", "BC2609215650");
 
     if ($bon_BC2609215650) {
         $bon_BC2609215650->update([
