@@ -64,6 +64,19 @@
         </div>
     </div>
 
+    <!-- alert -->
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-6">
+            @if(session()->has("message"))
+            <div class="alert alert-success"> {{session()->get("message")}} </div>
+            @endif
+
+            @if(session()->has("error"))
+            <div class="alert alert-danger"> {{session()->get("error")}} </div>
+            @endif
+        </div>
+    </div>
+
     {{-- Table des acomptes --}}
     <div class="col-12">
         <div class="card border-0 shadow-sm p-3">
@@ -96,6 +109,19 @@
                                 <span class="code-reference">{{ $acompte->reference }}</span><br>
                                 @if($acompte->versement_id)
                                 / Reference versement :<span class="code-reference">{{ $acompte->versement_reference }}</span>
+                                @endif
+
+                                <!-- Aimé, Christian,Emmannuel -->
+                                @if(Auth::id()==26 || Auth::id()==1 || Auth::id()==30)
+                                <form action="{{route('vente.acomptes.reference.edit',$acompte->id)}}" method="POST">
+                                    @csrf
+                                    <input type="text"
+                                        class="form-control my-2"
+                                        required
+                                        name="reference"
+                                        placeholder="Ex: Nouvelle reference">
+                                    <button type="submit" class="btn btn-sm btn-dark text-white ">Modifier reference</button>
+                                </form>
                                 @endif
                             </td>
                             <td class="text-nowrap py-3">

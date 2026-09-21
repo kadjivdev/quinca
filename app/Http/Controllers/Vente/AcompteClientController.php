@@ -156,7 +156,7 @@ class AcompteClientController extends Controller
                     'message' => 'Session de caisse requise.'
                 ], 422);
             }
-            
+
             Log::info("Les entrées", $request->all());
 
             // Validation des données
@@ -378,6 +378,48 @@ class AcompteClientController extends Controller
     }
 
     /**
+     * Update de reference
+     */
+    public function updateReference(Request $request, AcompteClient $acompte)
+    {
+        Log::debug("Début de modification de la reference :", ["data" => $request->all()]);
+
+        try {
+            DB::beginTransaction();
+
+            $isAcompteExiste = AcompteClient::query()
+                ->where("id", "!=", $acompte->id)
+                ->where("versement_reference", $request->reference)
+                ->first();
+
+            if ($isAcompteExiste) {
+                throw new Exception("Cette reference existe déjà");
+            }
+
+            // quand un versement est attaché
+            if ($acompte->versement_id) {
+                $acompte->versement()->update(["reference_op" => $request->reference]);
+            }
+
+            // Mise à jour de la facture
+            $acompte->update([
+                'versement_reference' => $request->reference,
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->back()
+                ->with("message", "Reference mise à jour avec succès");
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->back()
+                ->with("error", $e->getMessage());
+        }
+    }
+
+    /**
      * Valider un acompte
      */
     public function validate_acompte(Request $request, AcompteClient $acompte)
@@ -401,7 +443,7 @@ class AcompteClientController extends Controller
 
             // Valider l'acompte
             $acompte->update([
-                'versement_reference'=>$request->versement_reference,
+                'versement_reference' => $request->versement_reference,
                 'statut' => AcompteClient::STATUT_VALIDE,
                 'validated_at' => now(),
                 'validated_by' => auth()->id()

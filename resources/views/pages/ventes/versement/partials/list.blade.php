@@ -78,8 +78,8 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="border-bottom-0 text-nowrap py-3">ID</th>
-                            <th class="border-bottom-0 text-nowrap py-3">Référence</th>
-                            <!-- <th class="border-bottom-0 text-nowrap py-3">Référence d'opération</th> -->
+                            <th class="border-bottom-0 text-nowrap py-3">Code</th>
+                            <th class="border-bottom-0 text-nowrap py-3">Référence d'opération</th>
                             <th class="border-bottom-0 text-nowrap py-3">Accompte Client</th>
                             <th class="border-bottom-0">Date d'insertion</th>
                             <th class="border-bottom-0">Date valeur</th>
@@ -101,9 +101,9 @@
                             <td class="text-nowrap py-3">
                                 <span class="code-reference">{{ $versement->reference }}</span>
                             </td>
-                            <!-- <td class="text-nowrap py-3">
-                                <span class="">{{ $versement->created_at }}</span>
-                            </td> -->
+                            <td class="text-nowrap py-3">
+                                <span class="">{{ $versement->reference_op }}</span>
+                            </td>
                             <td class="text-nowrap py-3">
                                 <span class="badge bg-light text-dark bold">{{$versement->accompteClient?->reference??'--'}}</span>
                             </td>

@@ -693,6 +693,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/', [AcompteClientController::class, 'store'])
                 ->name('vente.acomptes.store');
 
+            // update de la reference d'un acompte
+            Route::post('/update-reference/{acompte}', [AcompteClientController::class, 'updateReference'])
+                ->name('vente.acomptes.reference.edit');
+
             // Rafraîchissement de la liste des acomptes (pour AJAX)
             Route::get('/refresh-list', [AcompteClientController::class, 'refreshList'])
                 ->name('vente.acomptes.refresh-list');
