@@ -41,7 +41,6 @@ class FactureFournisseurController extends Controller
             $query->limit(200);
         }
 
-
         if ($request->fournisseur_id) {
             $query->where("fournisseur_id", $request->fournisseur_id);
         }

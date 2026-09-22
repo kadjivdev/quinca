@@ -31,6 +31,7 @@ use App\Models\Achat\BonLivraisonFournisseur;
 use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\FournisseurApprovisionnement;
 use App\Models\Achat\LigneBonLivraisonFournisseur;
+use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Achat\RequeteFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Parametre\Depot;
@@ -56,17 +57,13 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $bon_BC2609215650 = BonCommande::firstWhere("code", "BC2609215650");
+    $FAC26098808 = FactureFournisseur::with("lignes")
+    ->firstWhere("code", "FAC26098808");
 
-    if ($bon_BC2609215650) {
-        $bon_BC2609215650->update([
-            "validated_at" => null,
-            "validated_by" => null
-        ]);
-        return "Bon BC2609215650 restauré avec succès!";
-    }
-    return "Regularisation éffectué";
+    return LigneFactureFournisseur::where(["facture_id"=>874])->get(["id","quantite_base","quantite_livree","quantite_livree_simple"]);
+    return $FAC26098808;
 });
+
 
 /**DETELE A STOCK */
 Route::get("/stock/{id}/delete", function ($id) {

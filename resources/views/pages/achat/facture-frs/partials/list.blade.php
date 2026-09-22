@@ -106,13 +106,20 @@
                         });
 
                         $totalLivres = $facture->lignes()->sum('quantite_livree');
-                        if ($totalLivres == 0) {
+
+                        $qteTotalFacture = (float) $qteTotalFacture;
+                        $totalLivres = (float) $totalLivres;
+
+                        $comparaison = bccomp((string) $totalLivres, (string) $qteTotalFacture, 2);
+
+                        if ($totalLivres <= 0) {
                             $factureStatutLivraison = 'NON_LIVRE';
-                        } elseif ($totalLivres >= $qteTotalFacture) {
+                        } elseif ($comparaison >= 0) {
                             $factureStatutLivraison = 'LIVRE';
                         } else {
                             $factureStatutLivraison = 'PARTIELLEMENT_LIVRE';
-                        }; ?>
+                        }
+                        ?>
 
                         <tr>
                             <td class="text-nowrap py-3">
