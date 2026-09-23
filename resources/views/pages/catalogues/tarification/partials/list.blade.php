@@ -15,7 +15,7 @@
                                 @endforeach
                             </select>
                         </div>
-    
+
                         {{-- Filtre point de vente --}}
                         <div class="col-md-3">
                             <label class="form-label small">Point de vente</label>
@@ -26,7 +26,7 @@
                                 @endforeach
                             </select>
                         </div>
-    
+
                         {{-- Bouton Reset --}}
                         <div class="col-md-4">
                             <label class="form-label d-none d-md-block small mb-1">&nbsp;</label>
@@ -68,11 +68,11 @@
                             </td>
 
                             @foreach($typesTarifs as $typeTarif)
-                                @php
-                                $tarifications = $article->tarifications
-                                ->where('type_tarif_id', $typeTarif->id)
-                                ->where('statut', true);
-                                @endphp
+                            @php
+                            $tarifications = $article->tarifications
+                            ->where('type_tarif_id', $typeTarif->id)
+                            ->where('statut', true);
+                            @endphp
 
                             <td class="text-end">
                                 <div class="d-flex align-items-center justify-content-end gap-2">
@@ -102,7 +102,7 @@
                                     <!-- else -->
                                     @can("tarification.create")
                                     <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
-                                        onclick="showAddTarificationModal({{ $article->id }}, {{ $typeTarif }})"
+                                        onclick='showAddTarificationModal({{ $article->id }}, @json($typeTarif))'
                                         title="Ajouter un tarif">
                                         <i class="fas fa-plus"></i>
                                     </button>
@@ -279,6 +279,10 @@
 @push('scripts')
 <script>
     $(".filterSelect2").select2()
+    $("#add_article_id").select2({
+        width: '100%',
+        dropdownParent: $("#addTarificationModal")
+    })
 
     $("#tarificationsTable").DataTable({
             "responsive": true,
