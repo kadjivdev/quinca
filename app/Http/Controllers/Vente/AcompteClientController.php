@@ -390,6 +390,7 @@ class AcompteClientController extends Controller
             $isAcompteExiste = AcompteClient::query()
                 ->where("id", "!=", $acompte->id)
                 ->where("versement_reference", $request->reference)
+                ->orWhere("reference", $request->reference)
                 ->first();
 
             if ($isAcompteExiste) {
@@ -403,6 +404,7 @@ class AcompteClientController extends Controller
 
             // Mise à jour de la facture
             $acompte->update([
+                'reference' => $request->reference,
                 'versement_reference' => $request->reference,
             ]);
 
