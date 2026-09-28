@@ -57,11 +57,11 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $FAC26098808 = FactureFournisseur::with("lignes")
-    ->firstWhere("code", "FAC26098808");
+    // $BC2609287246 = BonCommande::withTrashed()
+    // ->where("code", "BC2609287246");
 
-    return LigneFactureFournisseur::where(["facture_id"=>874])->get(["id","quantite_base","quantite_livree","quantite_livree_simple"]);
-    return $FAC26098808;
+    $BC2609287246 = BonCommande::find(1313);
+    return $BC2609287246;
 });
 
 

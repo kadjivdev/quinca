@@ -688,7 +688,8 @@ class BonCommandeController extends Controller
 
     public function generatePDF(Request $request, $id, $bon_object, $entete = false)
     {
-        $bcde = BonCommande::with(['fournisseur', 'lignes.uniteMesure', 'lignes.article'])->where('id', $id)->first();
+        $bcde = BonCommande::with(['fournisseur', 'lignes.uniteMesure', 'lignes.article'])
+            ->where('id', $id)->first();
 
         $pdf = new PDF_MC_Table();
         $pdf->AliasNbPages();  // To use the total number of pages
