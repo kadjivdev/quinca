@@ -749,7 +749,8 @@ class BonCommandeController extends Controller
         $pdf->Row(array('TOTAL', number_format($tot_ht, 2, ',', ' ')));
 
         $lettre = new ChiffreEnLettre;
-        $prix_lettre = $lettre->Conversion($tot_ht);
+        // $prix_lettre = $lettre->Conversion($tot_ht);
+        $prix_lettre = $lettre->Conversion((string) intval(round($tot_ht)));
 
         // dd($prix_lettre);
 
