@@ -57,7 +57,8 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-   
+
+    return route("articles.edit",2);
     $BC2609287246 = BonCommande::find(1313);
     return $BC2609287246;
 });

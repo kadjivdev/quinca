@@ -145,11 +145,11 @@
                     }
                 });
 
-                
+
                 if (!response.ok) {
                     throw new Error('Erreur lors du chargement des données');
                 }
-                
+
                 const result = await response.json();
                 console.log("response :", result)
 
@@ -321,8 +321,19 @@
                 window.location.reload();
             }, 500);
         };
-    });
 
+        // 
+        document.getElementById('addTarificationForm').addEventListener('submit', function(e) {
+            const hasPrix = [...this.querySelectorAll('.prix-input')]
+                .some(input => input.value !== '' && parseFloat(input.value) >= 0);
+
+            document.getElementById('prixError').classList.toggle('d-none', hasPrix);
+            if (!hasPrix) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    });
 
     // Filtrage des tarifications
     function filterTarifications() {
@@ -663,4 +674,83 @@
                 });
             });
     }
+
+    // 
+    (function() {
+        const articleSelect = document.getElementById('add_article_id');
+        const uniteSelect = document.getElementById('add_unite_mesure_id');
+        const modalEl = document.getElementById('addTarificationModal');
+        const baseUrl = "{{ url('/catalogue/articles') }}";
+
+        let requestId = 0; // évite qu'une ancienne réponse écrase une plus récente
+
+        function resetUnites(message = "Sélectionner d'abord un article") {
+            uniteSelect.innerHTML = `<option value="">${message}</option>`;
+            uniteSelect.disabled = true;
+        }
+
+        $('#add_article_id').on('change', async function() {
+            const articleId = this.value;
+
+            if (!articleId) {
+                resetUnites();
+                return;
+            }
+
+            const currentRequest = ++requestId;
+            resetUnites('Chargement...');
+
+            try {
+                const response = await fetch(`${baseUrl}/${articleId}/edit`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+
+                const result = await response.json();
+                if (currentRequest !== requestId) return; // réponse obsolète
+
+                const unites = Array.from(result.utils?.unites ?? []);
+                console.log('Unités reçues:', unites); // à retirer une fois validé
+
+                if (unites.length === 0) {
+                    resetUnites('Aucune unité pour cet article');
+                    return;
+                }
+
+                uniteSelect.innerHTML = '<option value="">Sélectionner une unité de mesure</option>';
+
+                unites.forEach(u => {
+                    const option = document.createElement('option');
+                    option.value = u.id;
+                    option.textContent = u.text ?? u.libelle ?? u.nom ?? ('Unité #' + u.id);
+                    uniteSelect.appendChild(option);
+                });
+
+                uniteSelect.disabled = false;
+
+                // Présélectionner l'unité principale de l'article si elle existe dans la liste
+                const defaut = result.data?.unite_mesure_id;
+                if (defaut && unites.some(u => String(u.id) === String(defaut))) {
+                    uniteSelect.value = defaut;
+                } else if (unites.length === 1) {
+                    uniteSelect.value = unites[0].id;
+                }
+            } catch (error) {
+                console.error('Erreur chargement unités:', error);
+                if (currentRequest === requestId) {
+                    resetUnites('Erreur de chargement');
+                }
+            }
+        });
+
+        // Réinitialiser à la fermeture du modal
+        modalEl.addEventListener('hidden.bs.modal', function() {
+            requestId++;
+            resetUnites();
+        });
+    })();
 </script>

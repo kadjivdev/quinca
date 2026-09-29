@@ -213,7 +213,7 @@ class Article extends Model
                 'unites' => $unites->toArray()
             ]);
 
-            return $unites->values()->all();
+            return $unites->unique("id")->values()->all();
         } catch (\Exception $e) {
             Log::error('Erreur lors de la récupération des unités', [
                 'article_id' => $this->id,

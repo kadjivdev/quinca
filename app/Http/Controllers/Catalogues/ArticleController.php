@@ -512,7 +512,6 @@ class ArticleController extends Controller
                 "unites" => $article->getUnites(),
                 "depots" => $article->depots->unique('id')->values(),
                 "pointVentes" => PointDeVente::whereIn("id", $article->depots?->pluck("point_de_vente_id")->toArray())->get(),
-                // "type_tarifs" => TypeTarif::get(["id", "code_type_tarif", "libelle_type_tarif"])
             ]
         ]);
     }

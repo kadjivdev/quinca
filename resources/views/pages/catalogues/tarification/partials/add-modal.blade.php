@@ -50,6 +50,17 @@
                             </div>
                         </div>
 
+                        {{-- Unite de mesure --}}
+                        <div class="col-12">
+                            <label class="form-label fw-medium required">Unité de mesure</label>
+                            <select class="form-select" name="unite_mesure_id" id="add_unite_mesure_id" required disabled>
+                                <option value="">Sélectionner d'abord un article</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner une unité de mesure
+                            </div>
+                        </div>
+
                         {{-- Prix par type de tarif --}}
                         <div class="col-12">
                             <label class="form-label fw-medium required">Prix par type de tarif</label>
@@ -86,20 +97,6 @@
                                 Renseignez au moins un prix.
                             </div>
                             <small class="text-muted">Laissez vide les types de tarif que vous ne souhaitez pas créer.</small>
-                        </div>
-
-                        {{-- Unite de mesure --}}
-                        <div class="col-12">
-                            <label class="form-label fw-medium required">Unité de mesure</label>
-                            <select class="form-select" name="unite_mesure_id" id="add_unite_mesure_id" required>
-                                <option value="">Sélectionner une unité de mesure</option>
-                                @foreach($uniteMesures as $uniteMesure)
-                                <option value="{{ $uniteMesure->id }}">{{ $uniteMesure->libelle_unite }}</option>
-                                @endforeach
-                            </select>
-                            <div class="invalid-feedback">
-                                Veuillez sélectionner une unité de mesure
-                            </div>
                         </div>
 
                         {{-- Statut --}}
