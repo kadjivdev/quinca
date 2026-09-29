@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Catalogue\Tarification;
 use App\Models\Catalogue\Article;
 use App\Models\Catalogue\FamilleArticle;
-use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
 use App\Models\Parametre\TypeTarif;
 use App\Models\Parametre\UniteMesure;
@@ -17,7 +16,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
-// use PhpOffice\PhpSpreadsheet\Style\{Fill, Border, Alignment};
+
+use Illuminate\Support\Collection;
+
 
 class TarificationController extends Controller
 {
@@ -78,71 +79,105 @@ class TarificationController extends Controller
     }
 
     /**
-     * Créer une nouvelle tarification
+     * Ne garde que les types de tarif pour lesquels un prix a été saisi
+     */
+    private function prixRenseignes(array $prix): Collection
+    {
+        return collect($prix)->filter(fn($p) => $p !== null && $p !== '');
+    }
+
+    /**
+     * Créer les tarifications (une par type de tarif renseigné)
      */
     public function store(Request $request)
     {
         Log::info('Données reçues:', $request->all());
 
         $validator = Validator::make($request->all(), [
-            'article_id' => 'required|exists:articles,id',
-            'depot_id' => 'nullable|exists:depots,id',
-            'point_vente_id' => 'required|exists:point_de_ventes,id',
+            'article_id'      => 'required|exists:articles,id',
+            // 'depot_id'        => 'nullable|exists:depots,id',
+            'point_vente_id'  => 'required|exists:point_de_ventes,id',
             'unite_mesure_id' => 'required|exists:unite_mesures,id',
-            'type_tarif_id' => [
-                'required',
-                'exists:type_tarifs,id',
-                function ($attribute, $value, $fail) use ($request) {
-                    // Vérifier si une tarification existe déjà pour cet article et ce type
-                    $exists = Tarification::where([
-                        'article_id' => $request->article_id,
-                        'type_tarif_id' => $value,
-                        'unite_mesure_id' => $request->unite_mesure_id,
-                        ['id', '!=', $request->id ?? 0]
-                    ])->exists();
-
-                    if ($exists) {
-                        $fail('Une tarification existe déjà pour cet article avec ce type de tarif & cette unité de mesure.');
-                    }
-                }
-            ],
-            'prix' => 'required|numeric|min:0',
-            'statut' => 'boolean'
+            'prix'            => 'required|array',
+            'prix.*'          => 'nullable|numeric|min:0',
+            'statut'          => 'boolean',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $prix = $this->prixRenseignes($request->input('prix', []));
+
+            if ($prix->isEmpty()) {
+                $validator->errors()->add('prix', 'Renseignez au moins un prix.');
+                return;
+            }
+
+            // Les clés doivent être des type_tarif_id valides
+            $typesValides = TypeTarif::whereIn('id', $prix->keys())->count();
+            if ($typesValides !== $prix->count()) {
+                $validator->errors()->add('prix', 'Un ou plusieurs types de tarif sont invalides.');
+                return;
+            }
+
+            // Doublons : même article + point de vente + unité + type de tarif
+            $existants = Tarification::where([
+                'article_id'      => $request->article_id,
+                'point_vente_id'  => $request->point_vente_id,
+                'unite_mesure_id' => $request->unite_mesure_id,
+            ])
+                ->whereIn('type_tarif_id', $prix->keys())
+                ->pluck('type_tarif_id');
+
+            foreach ($existants as $typeId) {
+                $validator->errors()->add(
+                    "prix.$typeId",
+                    'Une tarification existe déjà pour cet article avec ce type de tarif, ce point de vente & cette unité de mesure.'
+                );
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors'  => $validator->errors()
             ], 422);
         }
 
         try {
             DB::beginTransaction();
 
-            $data = $request->all();
-            $data['statut'] = $request->boolean('statut');
+            $prix = $this->prixRenseignes($request->input('prix'));
+            $tarifications = collect();
 
-            $tarification = Tarification::create($data);
+            foreach ($prix as $typeTarifId => $montant) {
+                $tarifications->push(Tarification::create([
+                    'article_id'      => $request->article_id,
+                    // 'depot_id'        => $request->depot_id,
+                    'point_vente_id'  => $request->point_vente_id,
+                    'unite_mesure_id' => $request->unite_mesure_id,
+                    'type_tarif_id'   => $typeTarifId,
+                    'prix'            => $montant,
+                    'statut'          => $request->boolean('statut'),
+                ]));
+            }
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tarification créée avec succès',
-                'data' => $tarification
+                'message' => $tarifications->count() . ' tarification(s) créée(s) avec succès',
+                'data'    => $tarifications
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur création tarification:', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString()
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création de la tarification',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
@@ -415,10 +450,11 @@ class TarificationController extends Controller
     }
 
     /**
-     * Mettre à jour une tarification
+     * Mettre à jour les tarifications d'un article (groupe article + point de vente + unité)
      */
     public function update(Request $request, $id)
     {
+        Log::info("Données de modificaion du arification ", ["data" => $request->all()]);
         $tarification = Tarification::find($id);
 
         if (!$tarification) {
@@ -596,6 +632,7 @@ class TarificationController extends Controller
             ], 500);
         }
     }
+
     /**
      * Récupérer le prix d'un article pour un type de tarif
      */

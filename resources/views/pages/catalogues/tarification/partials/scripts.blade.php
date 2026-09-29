@@ -133,7 +133,7 @@
                 // Afficher un indicateur de chargement
                 Toast.fire({
                     icon: 'info',
-                    title: 'Chargement...',
+                    title: 'Chargement du tarification ...',
                     timer: 1000,
                     showConfirmButton: false
                 });
@@ -145,13 +145,13 @@
                     }
                 });
 
-                console.log(response)
-
+                
                 if (!response.ok) {
                     throw new Error('Erreur lors du chargement des données');
                 }
-
+                
                 const result = await response.json();
+                console.log("response :", result)
 
                 if (result.success) {
                     const data = result.data
@@ -166,6 +166,7 @@
                     // Mise à jour des informations de l'article
                     document.getElementById('editCodeArticle').textContent = tarification.article?.code_article;
                     document.getElementById('editTypeTarif').textContent = tarification.type_tarif?.libelle_type_tarif;
+                    document.getElementById("edit_price").value = tarification.prix
 
                     let depotsHtml = `<option value="">Sélectionner un point de vente</option>`
                     let uniteMesureHtml = `<option value="">Sélectionner une unité de mesure</option>`
@@ -384,7 +385,7 @@
             const article = result.data
             const uniteMesures = result.utils.unites
             const depots = result.utils.depots
-            const pointVentes = result.utils.pointVentes            
+            const pointVentes = result.utils.pointVentes
 
             document.getElementById('add_article_id').innerHTML = `<option value="${article.id}" >
                                     ${article.code_article } - ${article.designation}

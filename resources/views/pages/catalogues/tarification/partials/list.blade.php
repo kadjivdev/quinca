@@ -100,13 +100,13 @@
                                     @endforeach
                                     @endif
                                     <!-- else -->
-                                    @can("tarification.create")
+                                    <!-- @can("tarification.create")
                                     <button class="btn btn-link btn-sm p-0 text-primary btn-animated"
                                         onclick='showAddTarificationModal({{ $article->id }}, @json($typeTarif))'
                                         title="Ajouter un tarif">
                                         <i class="fas fa-plus"></i>
                                     </button>
-                                    @endcan
+                                    @endcan -->
                                 </div>
                             </td>
                             @endforeach

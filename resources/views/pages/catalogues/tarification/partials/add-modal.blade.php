@@ -22,7 +22,7 @@
                             <select class="form-select" name="article_id" id="add_article_id" required>
                                 <option value="">Sélectionner un article</option>
                                 @foreach($articles as $article)
-                                <option value="{{ $article->id }}" >
+                                <option value="{{ $article->id }}">
                                     {{ $article->code_article }} - {{ $article->designation }}
                                 </option>
                                 @endforeach
@@ -35,7 +35,9 @@
                         {{-- LES DEPOTS --}}
                         <div class="col-12">
                             <label class="form-label fw-medium required">Point de vente</label>
-                            <select class="form-select select2" name="point_vente_id" id="add_point_vente_id" required>
+                            <select class="form-select select2"
+                                name="point_vente_id"
+                                id="add_point_vente_id" required>
                                 <option value="">Sélectionner un point</option>
                                 @foreach($pointVentes as $point)
                                 <option value="{{ $point->id }}">
@@ -48,36 +50,42 @@
                             </div>
                         </div>
 
-                        {{-- Type de Tarif --}}
+                        {{-- Prix par type de tarif --}}
                         <div class="col-12">
-                            <label class="form-label fw-medium required">Type de Tarif</label>
-                            <select class="form-select" name="type_tarif_id" id="add_type_tarif_id" required>
-                                <option value="">Sélectionner un type</option>
-                                @foreach($typesTarifs as $type)
-                                <option value="{{ $type->id }}">{{ $type->libelle_type_tarif }}</option>
-                                @endforeach
-                            </select>
-                            <div class="invalid-feedback">
-                                Veuillez sélectionner un type de tarif
+                            <label class="form-label fw-medium required">Prix par type de tarif</label>
+                            <div class="table-responsive border rounded">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 50%">Type de tarif</th>
+                                            <th>Prix</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($typesTarifs as $type)
+                                        <tr>
+                                            <td class="fw-medium">{{ $type->libelle_type_tarif }}</td>
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number"
+                                                        class="form-control prix-input"
+                                                        name="prix[{{ $type->id }}]"
+                                                        step="0.01"
+                                                        min="0"
+                                                        placeholder="0.00"
+                                                        value="{{ old('prix.' . $type->id) }}">
+                                                    <span class="input-group-text">FCFA</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-
-                        {{-- Prix --}}
-                        <div class="col-12">
-                            <label class="form-label fw-medium required">Prix</label>
-                            <div class="input-group">
-                                <input type="number"
-                                    class="form-control"
-                                    name="prix"
-                                    step="0.01"
-                                    min="0"
-                                    required
-                                    placeholder="0.00">
-                                <span class="input-group-text">FCFA</span>
-                                <div class="invalid-feedback">
-                                    Le prix est requis et doit être supérieur à 0
-                                </div>
+                            <div class="text-danger small mt-1 d-none" id="prixError">
+                                Renseignez au moins un prix.
                             </div>
+                            <small class="text-muted">Laissez vide les types de tarif que vous ne souhaitez pas créer.</small>
                         </div>
 
                         {{-- Unite de mesure --}}

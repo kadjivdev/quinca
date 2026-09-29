@@ -68,7 +68,9 @@
                                     step="0.01"
                                     min="0"
                                     required
-                                    placeholder="0.00">
+                                    placeholder="0.00"
+                                    id="edit_price"
+                                    >
                                 <span class="input-group-text">FCFA</span>
                                 <div class="invalid-feedback">
                                     Le prix est requis et doit être supérieur à 0
@@ -83,7 +85,8 @@
                                     class="form-check-input"
                                     name="statut"
                                     id="editStatutTarif"
-                                    value="1">
+                                    value="1"
+                                    checked>
                                 <label class="form-check-label" for="editStatutTarif">
                                     Tarification active
                                 </label>
