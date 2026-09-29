@@ -58,7 +58,6 @@
                                         </div>
 
                                         <!-- seul JEANNE & GAEL peuvent choisir un magasin de destination
-                                         
                                         integré le 13/06/2026-->
                                         @if(auth()->user()->id==29 || auth()->user()->id==14 || auth()->user()->id==1)
                                         <div class="col-md-12">
