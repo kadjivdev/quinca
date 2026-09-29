@@ -27,6 +27,7 @@ class TarificationController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
         Log::info("Début de recuperation des tarifications");
         try {
             $typesTarifs = TypeTarif::where('statut', true)->get();
@@ -34,9 +35,14 @@ class TarificationController extends Controller
             $pointVentes = PointDeVente::get();
             $uniteMesures = UniteMesure::get();
 
-            $articleQuery = Article::with(["tarifications" => function ($query) use ($request) {
+            $articleQuery = Article::with(["tarifications" => function ($query) use ($request, $user) {
                 if ($request->filled("pv_id")) {
                     $query->where("point_vente_id", $request->pv_id);
+                }
+
+                if ($user->hasRole("GERANT DEPOT")) {
+                    $query
+                        ->where("point_vente_id", $user->point_de_vente_id);
                 }
             }])->where('statut', 'actif');
 

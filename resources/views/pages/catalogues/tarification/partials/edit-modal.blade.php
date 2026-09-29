@@ -1,5 +1,3 @@
-<!-- resources/views/parametrage/tarification/partials/edit-modal.blade.php -->
-
 <div class="modal fade" id="editTarificationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content border-0 shadow">
