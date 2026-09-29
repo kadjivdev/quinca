@@ -57,9 +57,7 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    // $BC2609287246 = BonCommande::withTrashed()
-    // ->where("code", "BC2609287246");
-
+   
     $BC2609287246 = BonCommande::find(1313);
     return $BC2609287246;
 });
