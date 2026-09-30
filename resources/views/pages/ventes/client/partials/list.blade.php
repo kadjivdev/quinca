@@ -53,6 +53,8 @@
                             <th class="border-bottom-0">Département</th>
                             <th class="border-bottom-0">Agent</th>
                             <th class="border-bottom-0">Contact</th>
+                            <th class="border-bottom-0">Plafond crédit</th>
+                            <th class="border-bottom-0">Délai paiement</th>
                             <th class="border-bottom-0">Factures</th>
                             <th class="border-bottom-0">Reglements</th>
                             <th class="border-bottom-0">Accounts</th>
@@ -101,6 +103,12 @@
                                     </div>
                                     @endif
                                 </div>
+                            </td>
+                             <td>
+                                <span class="badge bg-light text-dark">{{number_format($client->plafond_credit,2,',',' ')}}</span>
+                            </td>
+                             <td>
+                                <span class="badge bg-light text-dark">{{$client->facturesAmount}} jours</span>
                             </td>
                             <td>
                                 <span class="badge bg-light text-dark">{{number_format($client->facturesAmount,2,',',' ')}}</span>
@@ -171,7 +179,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center py-5">
+                            <td colspan="12" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-1">Aucun client trouvé</h6>
