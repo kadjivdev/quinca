@@ -58,6 +58,23 @@ use Illuminate\Support\Facades\Log;
 // DEBUGING ROUTES
 Route::get("/debug", function () {
     $FAC26082596 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC26082596");
+
+    $$FAC26082596->lignes
+        ->each(function ($ligne) {
+            switch ($ligne->article_id) {
+                case 1019: //"ART-1018"
+                    $ligne->update(["quantite_livree_simple" => 100]);
+                    break;
+
+                case 1418: //"ART-1417"
+                    $ligne->update(["quantite_livree_simple" => 0]);
+                    break;
+
+                default:
+                    # code...
+                    break;
+            }
+        });
     return $FAC26082596;
 });
 
