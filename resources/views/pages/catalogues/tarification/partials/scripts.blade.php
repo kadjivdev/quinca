@@ -499,6 +499,7 @@
                                 <tr>
                                     <th>Type de Tarif</th>
                                     <th class="text-end">Prix</th>
+                                    <th>Unité de mesure</th>
                                     <th class="text-center">Statut</th>
                                 </tr>
                             </thead>
@@ -513,6 +514,7 @@
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
                             }).format(tarif.prix)} FCFA</td>
+                            <td class="text-end">${tarif.unite_mesure?.libelle_unite}</td>
                             <td class="text-center">
                                 <span class="badge ${tarif.statut ? 'bg-success' : 'bg-danger'}">
                                     ${tarif.statut ? 'Actif' : 'Inactif'}
