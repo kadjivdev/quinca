@@ -59,7 +59,7 @@ use Illuminate\Support\Facades\Log;
 Route::get("/debug", function () {
     $FAC26082596 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC26082596");
 
-    $$FAC26082596->lignes
+    $FAC26082596->lignes
         ->each(function ($ligne) {
             switch ($ligne->article_id) {
                 case 1019: //"ART-1018"
