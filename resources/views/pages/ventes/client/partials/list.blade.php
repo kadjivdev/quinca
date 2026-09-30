@@ -108,7 +108,7 @@
                                 <span class="badge bg-light text-dark">{{number_format($client->plafond_credit,2,',',' ')}}</span>
                             </td>
                              <td>
-                                <span class="badge bg-light text-dark">{{$client->facturesAmount}} jours</span>
+                                <span class="badge bg-light text-dark">{{$client->delai_paiement}} jours</span>
                             </td>
                             <td>
                                 <span class="badge bg-light text-dark">{{number_format($client->facturesAmount,2,',',' ')}}</span>
