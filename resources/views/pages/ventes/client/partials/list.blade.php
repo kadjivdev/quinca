@@ -58,7 +58,6 @@
                             <th class="border-bottom-0">Factures</th>
                             <th class="border-bottom-0">Reglements</th>
                             <th class="border-bottom-0">Accounts</th>
-                            <!-- <th class="border-bottom-0">Solde Direction</th> -->
                             <th class="border-bottom-0">Solde Revendeur</th>
                             <th class="border-bottom-0">Solde Total</th>
                             <th class="border-bottom-0 text-end" style="min-width: 150px;">Actions</th>

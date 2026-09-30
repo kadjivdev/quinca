@@ -57,12 +57,9 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-
-    return route("articles.edit",2);
-    $BC2609287246 = BonCommande::find(1313);
-    return $BC2609287246;
+    $FAC26082596 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC26082596");
+    return $FAC26082596;
 });
-
 
 /**DETELE A STOCK */
 Route::get("/stock/{id}/delete", function ($id) {
