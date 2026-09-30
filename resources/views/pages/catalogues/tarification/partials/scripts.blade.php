@@ -580,6 +580,7 @@
                                     <tr>
                                         <th>Type de Tarif</th>
                                         <th>Prix actuel</th>
+                                        <th>Unité de mesure</th>
                                         <th>Nouveau prix</th>
                                     </tr>
                                 </thead>
@@ -594,6 +595,7 @@
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
                             }).format(tarif.prix)} FCFA</td>
+                            <td class="text-end">${tarif.unite_mesure?.libelle_unite}</td>
                             <td>
                                 <div class="input-group">
                                     <input type="number"

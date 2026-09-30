@@ -38,6 +38,7 @@ use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
+use App\Models\Tarification;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneLivraisonDestockage;
 use App\Models\Vente\LivraisonClient;
@@ -57,25 +58,31 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $FAC26082596 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC26082596");
+    // return Article::firstWhere("code_article","ART-325");
+    // $FAC26082596 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC26082596");
 
-    $FAC26082596->lignes
-        ->each(function ($ligne) {
-            switch ($ligne->article_id) {
-                case 1019: //"ART-1018"
-                    $ligne->update(["quantite_livree_simple" => 100]);
-                    break;
+    // $FAC26082596->lignes
+    //     ->each(function ($ligne) {
+    //         switch ($ligne->article_id) {
+    //             case 1019: //"ART-1018"
+    //                 $ligne->update(["quantite_livree_simple" => 100]);
+    //                 break;
 
-                case 1418: //"ART-1417"
-                    $ligne->update(["quantite_livree_simple" => 0]);
-                    break;
+    //             case 1418: //"ART-1417"
+    //                 $ligne->update(["quantite_livree_simple" => 0]);
+    //                 break;
 
-                default:
-                    # code...
-                    break;
-            }
-        });
-    return $FAC26082596;
+    //             default:
+    //                 # code...
+    //                 break;
+    //         }
+    //     });
+    // return $FAC26082596;
+
+    $tarification = Tarification::where("article_id", 326);
+
+    $tarification->update(["statut" => true]);
+    return $tarification->get();
 });
 
 /**DETELE A STOCK */

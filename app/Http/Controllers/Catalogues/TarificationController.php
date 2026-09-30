@@ -615,6 +615,8 @@ class TarificationController extends Controller
                             'id' => $tarif->typeTarif->id,
                             'libelle_type_tarif' => $tarif->typeTarif->libelle_type_tarif
                         ],
+                        'unite_mesure' => $tarif->uniteMesure,
+
                         'depot_tarif' => [
                             'id' => $tarif->depotTarif?->id,
                             'libelle_depot_tarif' => $tarif->depotTarif?->libelle_depot
