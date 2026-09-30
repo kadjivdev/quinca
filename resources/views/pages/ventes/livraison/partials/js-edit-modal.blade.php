@@ -24,7 +24,8 @@
                         $('#editNotes').val(response.livraison.notes);
 
                         // Remplir le select des dépôts
-                        // $("#currentDepot").html()
+                        console.log("response.livraison :", response.livraison)
+
                         const depotSelect = $('#depot_id');
                         depotSelect.empty();
                         depotSelect.append('<option value="">Sélectionner un magasin</option>');
@@ -33,6 +34,20 @@
                                 depotSelect.append(`
                                 <option value="${depot.id}"
                                     ${depot.id == response.livraison.depot_id ? 'selected' : ''}>
+                                    ${depot.libelle_depot}
+                                </option>
+                            `);
+                            });
+                        }
+
+                        const depotDestinationSelect = $('#depot_dest_id');
+                        depotDestinationSelect.empty();
+                        depotDestinationSelect.append('<option value="">Sélectionner un magasin de destination</option>');
+                        if (Array.isArray(response.depots)) {
+                            response.depots.forEach(depot => {
+                                depotDestinationSelect.append(`
+                                <option value="${depot.id}"
+                                    ${depot.id == response.livraison.depot_dest_id ? 'selected' : ''}>
                                     ${depot.libelle_depot}
                                 </option>
                             `);
@@ -178,6 +193,9 @@
             }
 
             const depotId = $('#depot_id').val();
+            const depotDestId = $('#depot_dest_id').val();
+
+            console.log("depotDestId :", depotDestId)
             if (!depotId) {
                 Toast.fire({
                     icon: 'warning',
@@ -223,6 +241,7 @@
                 _token: $('meta[name="csrf-token"]').attr('content'),
                 _method: 'PUT',
                 depot_id: depotId,
+                depot_dest_id: depotDestId,
                 notes: $('#editNotes').val(),
                 lignes: lignes
             };

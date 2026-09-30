@@ -629,6 +629,7 @@ class LivraisonClientController extends Controller
                     'numero' => $livraisonClient->numero,
                     'date_livraison' => $livraisonClient->date_livraison->format('d/m/Y'),
                     'depot_id' => $livraisonClient->depot_id,
+                    'depot_dest_id' => $livraisonClient->depot_dest_id,
                     'notes' => $livraisonClient->notes,
                     'facture' => [
                         'id' => $livraisonClient->facture->id,
@@ -659,6 +660,7 @@ class LivraisonClientController extends Controller
 
     public function update(Request $request, LivraisonClient $livraisonClient)
     {
+        Log::debug("Les données antrantes pour la modification", ["data" => $request->all()]);
         try {
             if ($livraisonClient->statut !== 'brouillon') {
                 return response()->json([
@@ -669,6 +671,7 @@ class LivraisonClientController extends Controller
 
             $validated = $request->validate([
                 'depot_id' => 'required|exists:depots,id',
+                'depot_dest_id' => 'nullable|exists:depots,id',
                 'lignes' => 'required|array',
                 // 'lignes.*.unite_vente_id' => 'required|exists:unite_mesures,id',
                 'lignes.*.prix_unitaire' => 'required',
@@ -683,6 +686,7 @@ class LivraisonClientController extends Controller
             // Mettre à jour la livraison
             $livraisonClient->update([
                 'depot_id' => $validated['depot_id'],
+                'depot_dest_id' => $validated['depot_dest_id'],
                 'notes' => $validated['notes']
             ]);
 

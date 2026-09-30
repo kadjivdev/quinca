@@ -63,6 +63,21 @@
                                             
                                             <!-- <span class="badge bg-info">Dépôt actuel: <strong id="currentDepot"></strong> </span> -->
                                         </div>
+                                        <!-- seul JEANNE & GAEL peuvent choisir un magasin de destination
+                                        integré le 13/06/2026-->
+                                        @if(auth()->user()->id==29 || auth()->user()->id==14 || auth()->user()->id==1)
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-medium">Magasin Destination Interne (pour une livraison sur un autre point de vente)</label>
+                                            <select class="form-select" name="depot_dest_id" id="depot_dest_id">
+                                                <option value="">Sélectionner un magasin de destination</option>
+                                                @foreach ($depots as $depot)
+                                                <option value="{{ $depot->id }}">{{ $depot->libelle_depot }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">Veuillez sélectionner un magasin de destination interne</div>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
