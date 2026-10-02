@@ -572,6 +572,7 @@ class BonLivraisonFournisseurController extends Controller
 
                 // Log des données de conversion
                 Log::debug("Données de ligne avant update:", [
+                    "ligneFact"=>$ligneFact,
                     'ligne' => $ligne,
                     // 'unite_mesure_id' => $ligne->unite_mesure_id,
                     // 'unite_base_id' => $ligne->article?->unite_mesure_id,
