@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Services\ServiceStockEntree;
 use Exception;
-use Faker\Provider\Lorem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -503,7 +502,7 @@ class BonLivraisonFournisseurController extends Controller
      */
     public function validate_bon(BonLivraisonFournisseur $bonLivraison)
     {
-        Log::debug("Début de validation du bon",["data"=>$bonLivraison]);
+        Log::debug("Début de validation du bon fournisseur", ["data" => $bonLivraison]);
         if ($bonLivraison->validated_at || $bonLivraison->rejected_at) {
             return response()->json([
                 'success' => false,
@@ -522,16 +521,14 @@ class BonLivraisonFournisseurController extends Controller
             ]);
 
             // Log pour vérifier les données chargées
-            Log::debug('Données du bon de livraison:', [
-                'bon_livraison' => $bonLivraison->toArray(),
-                'lignes' => $bonLivraison->lignes->toArray()
-            ]);
+            // Log::debug('Données du bon de livraison:', [
+            //     'bon_livraison' => $bonLivraison->toArray(),
+            //     'lignes' => $bonLivraison->lignes->toArray()
+            // ]);
 
             // Récupérer les prix unitaires de la facture
             $prixUnitaires = [];
             foreach ($bonLivraison->lignes as $ligne) {
-                Log::info("Ligne bon de livraison avant update", ["data" => $bonLivraison->lignes]);
-
                 $ligneFact = $bonLivraison->facture->lignes()
                     ->firstWhere("article_id", $ligne->article_id);
 
@@ -546,7 +543,7 @@ class BonLivraisonFournisseurController extends Controller
                     ->lignes()
                     ->firstWhere("article_id", $ligne->article_id);
 
-                Log::debug("Ligne facture concernée livraison", ["data" => $ligneFact]);
+                // Log::debug("Ligne facture concernée livraison fournisseur avant validation", ["data" => $ligneFact]);
                 if (!$ligneFact) {
                     throw new Exception("La ligne {$ligne->id} n'existe pas dans les lignes de la facture concernée!");
                 }
@@ -574,17 +571,17 @@ class BonLivraisonFournisseurController extends Controller
                 $stockToAdd = number_format($stockToAdd, 2, '.', '');
 
                 // Log des données de conversion
-                Log::debug("Données de ligne:", [
-                    'article_id' => $ligne->article_id,
-                    'unite_mesure_id' => $ligne->unite_mesure_id,
-                    'unite_base_id' => $ligne->article?->unite_mesure_id,
+                Log::debug("Données de ligne avant update:", [
+                    'ligne' => $ligne,
+                    // 'unite_mesure_id' => $ligne->unite_mesure_id,
+                    // 'unite_base_id' => $ligne->article?->unite_mesure_id,
                     'quantite' => $stockToAdd, //$ligneFact->quantite_livree_simple, // $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                 ]);
 
                 $ligneFact->update([
                     'quantite_livree' => round($ligneFact->quantite_livree  + $stockToAdd, 2),
                 ]);
-                
+
                 Log::info("QTe ajouté", ["data" => $stockToAdd]);
                 Log::info("QTe Total", ["data" => $ligneFact->quantite_livree]);
                 Log::info("Ligne facture après update", ["data" => $ligneFact]);
@@ -665,7 +662,7 @@ class BonLivraisonFournisseurController extends Controller
                 ]
             ]);
         } catch (Exception $e) {
-            Log::debug("Erreure lors de la validation du bon de livraison :",["error"=>$e->getMessage()]);
+            Log::debug("Erreure lors de la validation du bon de livraison :", ["error" => $e->getMessage()]);
             DB::rollBack();
             Log::error('Erreur validation bon livraison:', [
                 'bon_livraison_id' => $bonLivraison->id,
