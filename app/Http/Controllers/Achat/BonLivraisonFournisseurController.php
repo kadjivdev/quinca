@@ -562,30 +562,11 @@ class BonLivraisonFournisseurController extends Controller
                     throw new Exception("Prix unitaire non trouvé pour l'article : " . $ligne->article?->code_article);
                 }
 
-                $diff = $ligneFact->quantite_livree_simple - $ligneFact->quantite_livree;
-
-                $stockToAdd = $ligneFact->quantite_livree ?
-                    ($diff < 0 ? -$diff : $diff) :
-                    $ligneFact->quantite_livree_simple;
-
-                $stockToAdd = number_format($stockToAdd, 2, '.', '');
-
-                // Log des données de conversion
-                Log::debug("Données de ligne avant update:", [
-                    "ligneFact"=>$ligneFact,
-                    'ligne' => $ligne,
-                    // 'unite_mesure_id' => $ligne->unite_mesure_id,
-                    // 'unite_base_id' => $ligne->article?->unite_mesure_id,
-                    'quantite' => $stockToAdd, //$ligneFact->quantite_livree_simple, // $ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
-                ]);
-
-                $ligneFact->update([
-                    'quantite_livree' => round($ligneFact->quantite_livree  + $stockToAdd, 2),
-                ]);
-
-                Log::info("QTe ajouté", ["data" => $stockToAdd]);
-                Log::info("QTe Total", ["data" => $ligneFact->quantite_livree]);
-                Log::info("Ligne facture après update", ["data" => $ligneFact]);
+                $ligneFact
+                    ->update([
+                        "quantite_livree" => $ligneFact
+                            ->quantite_livree + $ligne->quantite
+                    ]);
 
                 /**
                  * Quantité supplementaire convertie en 
