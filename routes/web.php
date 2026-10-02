@@ -59,7 +59,7 @@ use Illuminate\Support\Facades\Log;
 // DEBUGING ROUTES
 Route::get("/debug", function () {
     // return Article::firstWhere("code_article","ART-325");
-    // $FAC26082596 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC26082596");
+    $FAC26082596 = FactureFournisseur::with("lignes.article")->firstWhere("code", "FAC26082596");
 
     // $FAC26082596->lignes
     //     ->each(function ($ligne) {
@@ -77,12 +77,13 @@ Route::get("/debug", function () {
     //                 break;
     //         }
     //     });
-    // return $FAC26082596;
 
-    $tarification = Tarification::where("article_id", 326);
+    return $FAC26082596;
 
-    $tarification->update(["statut" => true]);
-    return $tarification->get();
+    // $tarification = Tarification::where("article_id", 326);
+
+    // $tarification->update(["statut" => true]);
+    // return $tarification->get();
 });
 
 /**DETELE A STOCK */
