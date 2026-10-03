@@ -520,12 +520,6 @@ class BonLivraisonFournisseurController extends Controller
                 'fournisseur'
             ]);
 
-            // Log pour vérifier les données chargées
-            // Log::debug('Données du bon de livraison:', [
-            //     'bon_livraison' => $bonLivraison->toArray(),
-            //     'lignes' => $bonLivraison->lignes->toArray()
-            // ]);
-
             // Récupérer les prix unitaires de la facture
             $prixUnitaires = [];
             foreach ($bonLivraison->lignes as $ligne) {
@@ -543,7 +537,6 @@ class BonLivraisonFournisseurController extends Controller
                     ->lignes()
                     ->firstWhere("article_id", $ligne->article_id);
 
-                // Log::debug("Ligne facture concernée livraison fournisseur avant validation", ["data" => $ligneFact]);
                 if (!$ligneFact) {
                     throw new Exception("La ligne {$ligne->id} n'existe pas dans les lignes de la facture concernée!");
                 }
@@ -594,7 +587,7 @@ class BonLivraisonFournisseurController extends Controller
                     'depot_id' => $bonLivraison->depot_id,
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
-                    'quantite' => $stockToAdd, // $ligneFact->quantite_livree_simple, //$ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
+                    'quantite' => $vraiQteLivree, // $ligneFact->quantite_livree_simple, //$ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                     'prix_unitaire' => $prixUnitaires[$ligne->article_id],
                     'date_mouvement' => $bonLivraison->date_livraison,
                     'reference_mouvement' => $bonLivraison->code,
