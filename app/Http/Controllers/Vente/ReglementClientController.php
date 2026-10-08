@@ -54,6 +54,17 @@ class ReglementClientController extends Controller
             $reglements->whereDate('date_reglement', '<=', $request->date_fin);
         }
 
+        if ($request->filled('date_debut') && $request->filled('date_fin')) {
+            $reglements->whereBetween('date_reglement', [
+                Carbon::parse($request->date_debut)->startOfDay(),
+                Carbon::parse($request->date_fin)->endOfDay()
+            ]);
+        } else {
+            // on affiche les acomptes du mois en cours par défaut si aucune date n'est fournie
+            $reglements
+                ->whereBetween('date_reglement', [Carbon::parse(now())->startOfMonth(), Carbon::parse(now())->endOfMonth()]);
+        }
+
         // Données pour les filtres et le modal d'ajout
         $clients = Client::orderBy('raison_sociale')
             ->with(["facturesClient" => function ($query) {

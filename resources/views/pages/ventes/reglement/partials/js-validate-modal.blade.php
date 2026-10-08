@@ -46,7 +46,7 @@
                         });
 
                         // Rafraîchir la liste des règlements
-                        window.location.href = `${apiUrl}/vente/reglement/`
+                        window.location.reload()// = `${apiUrl}/vente/reglement/`
                         // refreshList();
                     } else {
                         Toast.fire({

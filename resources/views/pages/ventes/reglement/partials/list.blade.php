@@ -3,12 +3,21 @@
         <!-- FILTRAGE PAR DEPOT -->
         <form action="{{route('vente.reglement.index')}}" method="GET">
             @csrf
+
             <select class="form-select form-control select-form" name="client_id">
                 <option value="">Sélectionner un client</option>
                 @foreach($clients as $client)
                 <option value="{{$client->id}}" class="">{{$client->raison_sociale}}</option>
                 @endforeach
             </select>
+
+            <!--  -->
+            {{-- Filtre Période --}}
+            <div class="input-group input-group-sm mt-2">
+                <input type="date" class="form-control" id="dateDebut" name="date_debut">
+                <span class="input-group-text">au</span>
+                <input type="date" class="form-control" id="dateFin" name="date_fin">
+            </div>
             <button class="w-100 btn btn-warning mt-2 px-4">
                 <i class="fas fa-save me-2"></i>Filtrer
             </button>
@@ -48,7 +57,7 @@
                             <td class="text-nowrap py-3">
                                 <span class="numero-recu me-2">{{ $reglement->numero }}</span>
                             </td>
-                            
+
                             <td>{{ Carbon\Carbon::parse($reglement->created_at)->format('d/m/Y H:i:s') }}</td>
                             <td>{{ $reglement->date_reglement->format('d/m/Y') }}</td>
                             <td>
@@ -213,10 +222,10 @@
 @push("scripts")
 
 <script type="text/javascript">
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         $(".select-form").select2()
-        
+
         function getDateString(d) {
             const date = new Date(d);
             const options = {
@@ -225,25 +234,25 @@
                 day: "numeric"
             };
             const formattedDate = date.toLocaleDateString("fr", options);
-    
+
             return formattedDate;
         }
-    
+
         function showFactures(reglement) {
             console.log(reglement)
-    
+
             $(".reglement-title").html(reglement.numero)
             $(".date_facture").val(getDateString(reglement.facture.date_facture))
             $(".facture-client").val(reglement.facture.client.raison_sociale)
             $(".date-echeance").val(getDateString(reglement.facture.date_echeance))
             $(".type-facture").val(reglement.facture.type_facture)
             $(".facture-number").val(reglement.facture.numero)
-    
+
             // alert(reglement.facture.client.raison_sociale)
             // gestion des articles
             $(".factures-articles").empty()
             let content = ''
-    
+
             if (reglement.facture.lignes.length > 0) {
                 let rows = ''
                 reglement.facture.lignes.forEach(ligne => {
@@ -255,14 +264,14 @@
                                     <li><span class="badge bg-warning text-dark">${depot.libelle_depot}- stock : ${depot.pivot.quantite_reelle} </span></li>
                                 `
                         });
-    
+
                         depot_content = `<ul>
                                             ${depot_rows}
                                         </ul>`
                     } else {
                         depot_content = `Aucun stock`
                     }
-    
+
                     content += `
                     <tr>
                         <td><span class="badge bg-warning text-dark"> ${ligne.article.designation} (${ligne.article.code_article})</span></td>
@@ -280,9 +289,9 @@
                 content = 'Aucun détail'
             }
             $(".factures-articles").append(content)
-    
+
         }
-    
+
         // 
         $("#example1").DataTable({
             "responsive": true,
