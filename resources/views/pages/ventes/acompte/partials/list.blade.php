@@ -88,6 +88,7 @@
                             <th class="border-bottom-0 text-nowrap py-3">ID</th>
                             <th class="border-bottom-0 text-nowrap py-3">Référence</th>
                             <th class="border-bottom-0 text-nowrap py-3">Session</th>
+                            <th class="border-bottom-0">Inseré le</th>
                             <th class="border-bottom-0">Date</th>
                             <th class="border-bottom-0">Client</th>
                             <th class="border-bottom-0 bg-dark text-white rounded text-center">Agent</th>
@@ -126,6 +127,9 @@
                             </td>
                             <td class="text-nowrap py-3">
                                 <span class="code-reference">{{$acompte->sessionCaisse? "##". $acompte->sessionCaisse?->id :'--'}}</span>
+                            </td>
+                            <td class="text-nowrap">
+                                {{ $acompte->created_at->format('d/m/Y') }}
                             </td>
                             <td class="text-nowrap">
                                 {{ $acompte->date->format('d/m/Y') }}

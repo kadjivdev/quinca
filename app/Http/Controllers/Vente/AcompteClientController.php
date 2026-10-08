@@ -39,7 +39,7 @@ class AcompteClientController extends Controller
         }
 
         if ($request->filled('date_debut') && $request->filled('date_fin')) {
-            $acomptes->whereBetween('date', [
+            $acomptes->whereBetween('created_at', [
                 Carbon::parse($request->date_debut)->startOfDay(),
                 Carbon::parse($request->date_fin)->endOfDay()
             ]);
