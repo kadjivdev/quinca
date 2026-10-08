@@ -43,6 +43,10 @@ class AcompteClientController extends Controller
                 Carbon::parse($request->date_debut)->startOfDay(),
                 Carbon::parse($request->date_fin)->endOfDay()
             ]);
+        }else{
+            // on affiche les acomptes du mois en cours par défaut si aucune date n'est fournie
+                $acomptes
+                    ->whereBetween('created_at', [Carbon::parse(now())->startOfMonth(), Carbon::parse(now())->endOfMonth()]);
         }
 
         if ($request->filled('search')) {

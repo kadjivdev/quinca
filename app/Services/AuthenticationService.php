@@ -25,6 +25,7 @@ class AuthenticationService
      */
     public function login(string $email, string $password, bool $remember = false): array
     {
+        Log::info("Attempting to log in user with email: {$email}");
         $user = User::where('email', $email)->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
@@ -42,6 +43,8 @@ class AuthenticationService
         $token = $user->createToken('auth_token')->plainTextToken;
 
         Auth::login($user, $remember);
+
+        Log::info("User {$user->email} logged in successfully.");
 
         return [
             'user' => $user,
