@@ -144,17 +144,22 @@ class Article extends Model
      * Obtient les tarifications de l'article
      * en fonction de l'unité Id
      */
-    public function tarifViaTarifId($typeTarifId)
+    public function tarifViaTypeIdPvId($typeTarifId, $pvId)
     {
-        return Tarification::firstWhere(["type_tarif_id" => $typeTarifId]);
+        return Tarification::firstWhere([
+            "article_id" => $this->id,
+            "type_tarif_id" => $typeTarifId,
+            "statut" => true,
+            "point_vente_id" => $pvId
+        ]);
     }
 
-     /**
+    /**
      * Obtient la tarification de type hyper grossiste de l'article
      */
     public function tarifViaType($typeId)
     {
-        return Tarification::firstWhere(["unite_mesure_id" => $uniteId]);
+        return Tarification::firstWhere(["unite_mesure_id" => $typeId]);
     }
 
     public function getUnites()
@@ -294,7 +299,7 @@ class Article extends Model
                     ->whereNull("inventaire_id"); //les ventes qui n'appartiennent à aucun inventaire
             });
 
-             // Appliquer le filtre seulement si $depotId existe
+        // Appliquer le filtre seulement si $depotId existe
         if (!is_null($depotId)) {
             $query->where("depot", $depotId);
         }
@@ -365,7 +370,7 @@ class Article extends Model
     function getQteReelleVendue($depotId = null)
     {
         $query = $this->hasMany(LigneFacture::class, "article_id")
-          
+
             ->whereHas("factureClient", function ($query) {
                 $query->whereNotNull("validated_by")
                     ->whereNull("inventaire_id")

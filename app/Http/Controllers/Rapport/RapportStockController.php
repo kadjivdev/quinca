@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Rapport;
 
 use App\Http\Controllers\Controller;
 use App\Models\Stock\{StockMouvement, StockDepot};
-use App\Models\Parametre\{Depot, UniteMesure};
+use App\Models\Parametre\{Depot, TypeTarif};
 use App\Services\{ServiceStockEntree, ServiceStockSortie};
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -38,6 +38,7 @@ class RapportStockController extends Controller
         $stockDisponible = $this->getStockDisponible($selectedDepot->id);
         $mouvements = $this->getMouvements($request);
         $alertes = $this->getAlertesStock($selectedDepot->id);
+
         return view('admin.rapports.stock.index', compact(
             'depots',
             'selectedDepot',
@@ -219,12 +220,21 @@ class RapportStockController extends Controller
 
                 //stock disponible
                 $article->stockDisponible = $article->qteAppro > 0 ? $article->qteAppro + $article->qteDepart : $article->qteDepart;
+
                 // unité du stock
                 $article->unite_mesure = $articleStocks->first()?->uniteMesure?->libelle_unite;
 
+                // Type tarif & prix unitaire
+                $typeTarifId = 2; //tarif Hyper Grossiste
+                $type_tarif = TypeTarif::firstWhere("id", $typeTarifId);
+
+                $article->type_tarif = $type_tarif->libelle_type_tarif;
+                $article->type_tarif_price = $article
+                    ->tarifViaTypeIdPvId($typeTarifId, $depot->point_de_vente_id)?->prix ?? 0; //le price unitaire hypergrossiste de l'article
+
                 // montant de l'article
-                $article->montant = $article->stockDisponible
-                    * $article->tarifViaTarifId(2)?->prix ?? 0; //le price unitaire hypergrossiste de l'article
+                $article->montant = $article->resteStock
+                    * $article->type_tarif_price;
 
                 return $article;
             });
@@ -232,7 +242,7 @@ class RapportStockController extends Controller
             $depots = Depot::all();
             $montantTotal = array_sum($articles->pluck("montant")->toArray());
 
-            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr","montantTotal"));
+            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr", "montantTotal"));
         } catch (\Exception $e) {
             Log::debug("Une erreure est survenue lors du chargement du stock", ["error" => $e->getMessage()]);
             return back()->with("error", "Une erreure est survenue lors du chargement du stock :" . $e->getMessage());

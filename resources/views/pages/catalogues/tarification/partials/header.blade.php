@@ -26,13 +26,13 @@
             {{-- Section droite avec les boutons d'action --}}
             <div class="col-auto d-flex gap-2">
                 {{-- Bouton de synchronisation --}}
-                <button
+                <a
                     type="button"
                     class="btn btn-light-secondary btn-sm d-flex align-items-center"
-                    onclick="refreshPage()">
+                    href="{{route('tarification.index')}}">
                     <i class="fas fa-sync-alt me-2 refresh-icon"></i>
                     <span class="refresh-text">Actualiser</span>
-                </button>
+                </a>
 
                 <!-- Importation -->
                 <button type="button"

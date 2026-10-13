@@ -36,12 +36,11 @@ class RequeteStockController extends Controller
         // requetes
         $requetes = $requetesQuery->get();
 
-        $articles = Article::with(["depots", "uniteMesure"])
-            ->whereHas("depots")
+        $articles = Article::with(["stocks","uniteMesure"])
             ->whereHas("uniteMesure")
             ->get(['id', 'code_article', 'designation', 'unite_mesure_id'])
             ->map(function ($article) {
-                $article->depots = $article->depots->unique("id")->values();
+                $article->depots = $article->stocks->pluck("depot")->unique("id")->values();
                 $article->unites = ArticleController::getUnites($article->id);
                 return $article;
             });
@@ -76,17 +75,31 @@ class RequeteStockController extends Controller
      */
     public function store(RequestsRequeteStock $request)
     {
-        Log::info("Début d'insertion de la requete stock");
+        Log::debug("Début d'insertion de la requete stock", ["data" => $request->validated()]);
         try {
             DB::beginTransaction();
 
-            if (!StockDepot::firstWhere(["depot_id" => $request->depot_id, "article_id" => $request->article_id])) {
-                throw new Exception("L'article n'existe pas dans ce depot", 1);
+            $validated = $request->validated();
+
+            foreach ($validated['lignes'] as $ligne) {
+                $article = Article::firstWhere("id", $ligne["article_id"]);
+                $depot = Depot::firstWhere("id", $ligne["depot_id"]);
+
+                if (!StockDepot::firstWhere(["depot_id" => $ligne["depot_id"], "article_id" => $ligne["article_id"]])) {
+                    throw new Exception("L'article {$article->code_article}  n'existe pas dans le depot {$depot->libelle_depot}", 1);
+                }
+
+                RequeteStock::create([
+                    'article_id'      => $ligne['article_id'],
+                    'depot_id'        => $ligne['depot_id'],
+                    'unite_mesure_id' => $ligne['unite_mesure_id'],
+                    'quantite'        => $ligne['quantite'],
+                    'commentaire'     => $validated['commentaire'] ?? null,
+                ]);
             }
 
-            $requete = RequeteStock::create($request->validated());
             DB::commit();
-            Log::info("Requete de stock crée avec succès!", ["data" => $requete]);
+            Log::info("Requete de stock crée avec succès!");
             return redirect()
                 ->back()
                 ->with(["success" => "Requete de stock crée avec succès!"]);

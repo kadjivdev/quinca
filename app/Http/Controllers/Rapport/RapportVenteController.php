@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rapport;
 use App\Http\Controllers\Controller;
 use App\Models\Catalogue\{Article, FamilleArticle};
 use App\Models\Parametre\Agent;
+use App\Models\Parametre\Depot;
 use App\Models\Vente\{AcompteClient, FactureClient, SessionCaisse, ReglementClient, ReglementRevendeur};
 use App\Models\Vente\Client;
 use App\Models\Parametre\PointDeVente;
@@ -27,53 +28,60 @@ class RapportVenteController extends Controller
     public function ventesParArticle(Request $request)
     {
         $dateDebut = $request->get('date_debut', Carbon::now()->startOfMonth()->format('Y-m-d'));
-        $dateFin = $request->get('date_fin', Carbon::now()->format('Y-m-d'));
+        $dateFin   = $request->get('date_fin', Carbon::now()->format('Y-m-d'));
         $articleId = $request->get('article_id');
+        $depotId   = $request->filled('depot_id') ? $request->get('depot_id') : 1;
 
-        $query = Article::with(["stocks", "famille"])->orderBy('designation');
+        $depots = Depot::get(['id', 'code_depot', 'libelle_depot']);
 
-        if ($articleId) {
-            $query->where('id', $articleId);
-        }
+        $articles = Article::with([
+            'famille',
+            // on ne charge que les stocks du dépôt choisi
+            'stocks' => fn($q) => $q->where('depot_id', $depotId),
+        ])
+            ->whereHas('stocks', fn($q) => $q->where('depot_id', $depotId))
+            ->when($articleId, fn($q) => $q->where('id', $articleId))
+            ->orderBy('designation')
+            ->get()
+            // qteVendu est calculé une seule fois, pour le dépôt choisi
+            ->each(function ($article) use ($depotId) {
+                $article->qteTotalVendu = $article->qteVendu($depotId);
+            })
+            ->filter(fn($article) => $article->qteTotalVendu > 0)
+            ->values();
 
-        $articles = $query->whereHas("stocks") //articles existant au moins dans un stocks
-            ->get()->filter(function ($article) {
-                // Check if any stock for this article has qteVendu > 0
-                return $article->stocks->contains(function ($stock) use ($article) {
-                    return $article->qteVendu($stock->depot_id) > 0;
-                });
-            })->values(); // Use values() to re-index the collection after filtering
-
-        $articles->map(function ($article) {
-            $article->qteTotalVendu = 0;
+        $articles->each(function ($article) use ($depotId) {
+            $montant = $article->montantTotalsVendu($depotId);
             $article->qantiteBase = 0;
-            $article->stocks->map(function ($stock) use ($article) {
-                $article->qteTotalVendu += $article->qteVendu($stock->depot_id);
-                $stock->qteTotalVenduStock = $article->qteVendu($stock->depot_id);
-                $stock->montantTotalVendu = $article->montantTotalsVendu($stock->depot_id);
 
-                /**STOCK DE BASE */
-                $conversion = $this->serviceStockEntree
-                    ->rechercherConversion(
-                        $stock->unite_mesure_id,
-                        $stock->article->unite_mesure_id,
-                        $stock->article_id
-                    );
+            foreach ($article->stocks as $stock) {
+                $stock->qteTotalVenduStock = $article->qteTotalVendu;
+                $stock->montantTotalVendu  = $montant;
 
-                $article->qantiteBase += $conversion ? $this->serviceStockEntree
-                    ->convertirQuantite(
+                /** STOCK DE BASE */
+                $conversion = $this->serviceStockEntree->rechercherConversion(
+                    $stock->unite_mesure_id,
+                    $article->unite_mesure_id,
+                    $stock->article_id
+                );
+
+                if ($conversion) {
+                    $article->qantiteBase += $this->serviceStockEntree->convertirQuantite(
                         $stock->quantite_reelle,
                         $conversion,
                         $stock->unite_mesure_id
-                    ) : 00;
-            });
+                    );
+                }
+            }
         });
 
         return view('pages.rapports.ventes.vente-par-article', compact(
             'articles',
             'dateDebut',
             'dateFin',
-            'articleId'
+            'articleId',
+            'depotId',
+            'depots'
         ));
     }
 

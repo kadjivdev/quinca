@@ -86,6 +86,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-md-3">
             <div class="stats-card bg-white p-3">
                 <div class="d-flex justify-content-between align-items-center">
@@ -128,6 +129,19 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted">
+                        <i class="fas fa-box me-1"></i>Dépôts
+                    </label>
+                    <select name="depot_id" class="form-control select2">
+                        <option value="">Tous les dépôts</option>
+                        @foreach($depots as $depot)
+                        <option value="{{ $depot->id }}" {{ $depotId == $depot->id ? 'selected' : '' }}>
+                            {{ $depot->code_depot }} - {{ $depot->libelle_depot }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-filter me-1"></i>Filtrer
@@ -154,6 +168,7 @@
                         <th>Famille</th>
                         <th class="text-center">Quantité</th>
                         <th class="text-center">Unité</th>
+                        <th class="text-center">Montant</th>
                         <th class="text-center">Détails</th>
                     </tr>
                 </thead>
@@ -165,6 +180,7 @@
                         <td>{{ $article->famille->libelle_famille }}</td>
                         <td class="text-center">{{ number_format($article->qantiteBase,2,","," ") }}</td>
                         <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td>
+                        <td class="text-center">{{ number_format($article->montantTotalVendu,2,","," ") }}</td>
                         <td class="border p-1 m-0">
                             <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
                                 @forelse($article->stocks as $stock)

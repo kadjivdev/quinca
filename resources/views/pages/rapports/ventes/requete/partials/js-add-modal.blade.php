@@ -1,88 +1,109 @@
 <script>
     $(document).ready(function() {
-        // filtres
+        // filtres (inchangés)
         $('#filtre_depot_id').select2({
             width: '100%',
             placeholder: 'Sélectionner un depôt',
             allowClear: true
         });
-
-        let isInModal = $('#addRequeteModal').length;
-        let dropDownOrNot = (isInModal && {
-            dropdownParent: $('#addRequeteModal .modal-content')
-        })
-
-        $("#article_id").select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Sélectionner un article',
-            width: '100%',
-            ...dropDownOrNot
-        })
-
-        $("#depot_id").select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Sélectionner un dépôt',
-            width: '100%',
-            ...dropDownOrNot
-        })
-
-        $("#unite_mesure_id").select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Sélectionner une unité de mesure',
-            width: '100%',
-            ...dropDownOrNot
-        })
-
         $('#filtre_article_id').select2({
             width: '100%',
             placeholder: 'Sélectionner un article',
             allowClear: true
         });
 
+        const $modal = $('#addRequeteModal');
+        const $container = $('#lignesContainer');
+        const dropdownParent = $modal.length ? $modal.find('.modal-content') : null;
+        let ligneIndex = 0;
 
-        // 
-        let oldArticleId = "{{ old('depot_id',$requete->article_id??'') }}";
-        let oldDepotId = "{{ old('depot_id',$requete->depot_id??'') }}";
-        let oldMesureId = "{{ old('unite_mesure_id',$requete->unite_mesure_id??'') }}";
+        function initSelect2($select) {
+            const opts = {
+                theme: 'bootstrap-5',
+                placeholder: $select.data('placeholder'),
+                width: '100%'
+            };
+            if (dropdownParent) opts.dropdownParent = dropdownParent;
+            $select.select2(opts);
+        }
 
-        $('#article_id').on('select2:select', function(e) {
-            // alert("e.params.data.id"); // ou e.params.data.text selon ce que tu veux
-            const selected = $(this).find(':selected');
+        // Remplit dépôts + unité selon l'article sélectionné dans la ligne
+        function populateLigne($ligne, depotId = '', uniteId = '') {
+            const $selected = $ligne.find('.article-select option:selected');
+            const $depot = $ligne.find('.depot-select').empty();
+            const $unite = $ligne.find('.unite-select').empty();
 
-            const article = selected.data('article');
-            const unites = selected.data('unites');
-            const depots = selected.data('depots');
+            if (!$selected.val()) return;
 
-            // gestion du select des depots
-            $("#depot_id").empty()
-            let depotsOptions = '<option value="">Choisir le dépôt </option>'
-            depots.forEach(depot => {
-                let selected = (oldDepotId == depot.id) ? 'selected' : '';
-                depotsOptions += `<option value="${depot.id}" ${selected}>
-                            ${depot.libelle_depot }-(${depot.code_depot})
-                        </option>`
+            const article = $selected.data('article');
+            const depots = $selected.data('depots') || [];
+
+            console.log(`article selected :`, article)
+
+            $depot.append('<option value="">Choisir le dépôt</option>');
+            depots.forEach(d => {
+                $depot.append(new Option(`${d.libelle_depot}-(${d.code_depot})`, d.id, false, String(d.id) === String(depotId)));
             });
-            $("#depot_id").append(depotsOptions)
 
-            // gestion du select des unites
-            $("#unite_mesure_id").empty()
-            let unitesOptions = '<option value="">Choisir une unité </option>'
-            // unites.forEach(unite => {
-            //     let selected = (oldMesureId == unite.id) ? 'selected' : '';
-            //     unitesOptions += `<option value="${unite.id}" ${selected}>
-            //                 ${unite.text }
-            //             </option>`
-            // });
-            // $("#unite_mesure_id").append(unitesOptions)
-            let selectedUnite = (oldMesureId == article.unite_mesure.id) ? 'selected' : '';
-            $("#unite_mesure_id").append(`<option value="${article.unite_mesure.id}" ${selectedUnite}>
-                            ${article.unite_mesure.libelle_unite }
-                        </option>`)
+            if (article.unite_mesure) {
+                const u = article.unite_mesure;
+                $unite.append(new Option(u.libelle_unite, u.id, true, true));
+            }
 
+            $depot.trigger('change.select2');
+            $unite.trigger('change.select2');
+        }
 
-            // console
-            console.log(`L'article concernées : ${JSON.stringify(article)}`)
-            // console.log(`Les dépôts concernés : ${JSON.stringify(depots)}`)
+        function updateRemoveButtons() {
+            const only = $container.children('.ligne-requete').length === 1;
+            $container.find('.btn-remove-ligne').prop('disabled', only);
+        }
+
+        function addLigne(data = {}) {
+            const html = $('#ligneTemplate').html().replaceAll('__INDEX__', ligneIndex++);
+            const $ligne = $(html).appendTo($container);
+
+            $ligne.find('select').each(function() {
+                initSelect2($(this));
+            });
+
+            // Réhydratation après erreur de validation (old input)
+            if (data.article_id) {
+                $ligne.find('.article-select').val(data.article_id).trigger('change.select2');
+                populateLigne($ligne, data.depot_id, data.unite_mesure_id);
+                $ligne.find('.quantite-input').val(data.quantite ?? '');
+            }
+
+            updateRemoveButtons();
+        }
+
+        // Événements délégués (fonctionnent pour les lignes ajoutées dynamiquement)
+        $container.on('change', '.article-select', function() {
+            populateLigne($(this).closest('.ligne-requete'));
+        });
+
+        $container.on('click', '.btn-remove-ligne', function() {
+            $(this).closest('.ligne-requete').find('select').select2('destroy');
+            $(this).closest('.ligne-requete').remove();
+            updateRemoveButtons();
+        });
+
+        $('#btnAddLigne').on('click', () => addLigne());
+
+        // Initialisation : lignes old() ou une ligne vide
+        const oldLignes = @json(old('lignes', []));
+        if (Object.keys(oldLignes).length) {
+            Object.values(oldLignes).forEach(l => addLigne(l));
+        } else {
+            addLigne();
+        }
+
+        // Si tu veux repartir de zéro à chaque ouverture du modal
+        $modal.on('hidden.bs.modal', function() {
+            $container.find('select').select2('destroy');
+            $container.empty();
+            ligneIndex = 0;
+            addLigne();
         });
     });
 </script>

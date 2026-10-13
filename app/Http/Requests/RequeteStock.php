@@ -22,10 +22,11 @@ class RequeteStock extends FormRequest
     public function rules(): array
     {
         return [
-            'depot_id' => 'required|integer|exists:depots,id',
-            'article_id' => 'required|integer|exists:articles,id',
-            'unite_mesure_id' => 'required|integer|exists:unite_mesures,id',
-            'quantite' => 'required|numeric',
+            'lignes'                    => 'required|array|min:1',
+            'lignes.*.article_id'       => 'required|exists:articles,id',
+            'lignes.*.depot_id'         => 'required|exists:depots,id',
+            'lignes.*.unite_mesure_id'  => 'required|exists:unite_mesures,id',
+            'lignes.*.quantite'         => 'required|numeric',
             'commentaire' => 'nullable|string|max:1000',
             'preuve' => 'nullable|file|mimes:pdf,doc,docx,png,jpeg|max:2048',
         ];
@@ -35,26 +36,36 @@ class RequeteStock extends FormRequest
     public function messages(): array
     {
         return [
-            'depot_id.required' => 'Le dépôt est obligatoire.',
-            'depot_id.integer' => 'Le dépôt doit être un identifiant valide.',
-            'depot_id.exists' => 'Le dépôt sélectionné n\'existe pas.',
+            // Lignes
+            'lignes.required' => 'Veuillez ajouter au moins une ligne à la requête.',
+            'lignes.array'    => 'Le format des lignes est invalide.',
+            'lignes.min'      => 'Veuillez ajouter au moins une ligne à la requête.',
 
-            'article_id.required' => 'L\'article est obligatoire.',
-            'article_id.integer' => 'L\'article doit être un identifiant valide.',
-            'article_id.exists' => 'L\'article sélectionné n\'existe pas.',
+            // Article
+            'lignes.*.article_id.required' => 'Ligne :position : veuillez sélectionner un article.',
+            'lignes.*.article_id.exists'   => 'Ligne :position : l\'article sélectionné est introuvable.',
 
-            'unite_mesure_id.required' => 'L\'unité de mesure est obligatoire.',
-            'unite_mesure_id.integer' => 'L\'unité de mesure doit être valide.',
-            'unite_mesure_id.exists' => 'L\'unité de mesure sélectionnée n\'existe pas.',
+            // Dépôt
+            'lignes.*.depot_id.required' => 'Ligne :position : veuillez sélectionner un dépôt.',
+            'lignes.*.depot_id.exists'   => 'Ligne :position : le dépôt sélectionné est introuvable.',
 
-            'quantite.required' => 'La quantité est obligatoire.',
+            // Unité de mesure
+            'lignes.*.unite_mesure_id.required' => 'Ligne :position : veuillez sélectionner une unité de mesure.',
+            'lignes.*.unite_mesure_id.exists'   => 'Ligne :position : l\'unité de mesure sélectionnée est introuvable.',
 
-            'commentaire.string' => 'Le commentaire doit être un texte.',
-            'commentaire.max' => 'Le commentaire ne doit pas dépasser 1000 caractères.',
+            // Quantité
+            'lignes.*.quantite.required' => 'Ligne :position : la quantité est obligatoire.',
+            'lignes.*.quantite.numeric'  => 'Ligne :position : la quantité doit être un nombre.',
+            'lignes.*.quantite.gt'       => 'Ligne :position : la quantité doit être supérieure à 0.',
 
-            'preuve.file' => 'La preuve doit être un fichier valide.',
-            'preuve.mimes' => 'La preuve doit être un fichier de type : PDF,PNG,JPEG, DOC ou DOCX.',
-            'preuve.max' => 'La taille du fichier ne doit pas dépasser 2 Mo.',
+            // Commentaire
+            'commentaire.string' => 'Le commentaire doit être une chaîne de caractères.',
+            'commentaire.max'    => 'Le commentaire ne doit pas dépasser :max caractères.',
+
+            // Preuve
+            'preuve.file'  => 'La preuve justificative doit être un fichier valide.',
+            'preuve.mimes' => 'La preuve justificative doit être de type : pdf, doc, docx, png ou jpeg.',
+            'preuve.max'   => 'La preuve justificative ne doit pas dépasser 2 Mo.',
         ];
     }
 }

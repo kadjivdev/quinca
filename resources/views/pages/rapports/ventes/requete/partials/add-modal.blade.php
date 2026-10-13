@@ -15,85 +15,41 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form class="row p-3" action="{{route('requete_stock.store')}}" id="_addRequeteForm" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <form class="row p-3" action="{{ route('requete_stock.store') }}" id="_addRequeteForm" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                 @csrf
 
-                <!-- article -->
-                <div class="col-md-6 mb-3">
-                    <label for="article_id">Article</label>
-                    <select required name="article_id" id="article_id" class="select2 form-select">
-                        <option value="">Choisir l'article </option>
-                        @foreach ($articles as $article)
-                        <option value="{{ $article->id }}"
-                            data-article="{{$article}}"
-                            data-depots="{{$article->depots}}"
-                            data-unites="{{$article->unites}}"
-                            {{ old('article_id') == $article->id ? 'selected' : '' }}>
-                            {{ $article->code_article }}-({{$article->designation}})
-                        </option>
-                        @endforeach
-                    </select>
-
-                    @error('article_id')
-                    <span class="text-danger">{{$message}}</span>
-                    @enderror
-                </div>
-
-                <!-- Dépôts -->
-                <div class="col-md-6 mb-3">
-                    <label for="depot_id">Dépôt</label>
-                    <select required name="depot_id" id="depot_id" class="select2 form-select">
-                        <!-- -->
-                    </select>
-
-                    @error('depot_id')
-                    <span class="text-danger">{{$message}}</span>
-                    @enderror
-                </div>
-
-                <!-- Unités de mesure -->
-                <div class="col-md-6 mb-3">
-                    <label for="unite_mesure_id">Unités de mesure</label>
-                    <select required name="unite_mesure_id" id="unite_mesure_id" class="select2 form-select">
-                        <!--  -->
-                    </select>
-
-                    @error('unite_mesure_id')
-                    <span class="text-danger">{{$message}}</span>
-                    @enderror
-                </div>
-
-                <!-- Quantité -->
-                <div class="col-md-6 mb-3">
-                    <div class="">
-                        <label for="quantite">Quantité</label>
-                        <input type="text" step="any" required class="form-control" name="quantite" id="quantite" value="{{ old('quantite') }}">
+                @if ($errors->any())
+                <div class="col-12">
+                    <div class="alert alert-danger py-2 small">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
+                </div>
+                @endif
 
-                    @error('quantite')
-                    <span class="text-danger">{{$message}}</span>
-                    @enderror
+                {{-- Lignes de la requête --}}
+                <div class="col-12">
+                    <button type="button" id="btnAddLigne" class="btn btn-sm btn-primary mb-3">
+                        <i class="fas fa-plus me-1"></i> Ajouter une ligne
+                    </button>
+
+                    <div id="lignesContainer"></div>
                 </div>
 
                 <!-- Preuve -->
                 <div class="col-md-12 mb-3">
-                    <div class="">
-                        <label>Preuve justificative</label>
-                        <input type="file" class="form-control" name="preuve">
-                    </div>
-
-                    @error('preuve')
-                    <span class="text-danger">{{$message}}</span>
-                    @enderror
+                    <label>Preuve justificative</label>
+                    <input type="file" class="form-control" name="preuve">
+                    @error('preuve') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="col-12 mb-3">
                     <label for="commentaire">Commentaire</label>
-                    <textarea name="commentaire" id="commentaire" rows="2" class="form-control"></textarea>
-
-                    @error('commentaire')
-                    <span class="text-danger">{{$message}}</span>
-                    @enderror
+                    <textarea name="commentaire" id="commentaire" rows="2" class="form-control">{{ old('commentaire') }}</textarea>
+                    @error('commentaire') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="text-center">
@@ -104,6 +60,50 @@
         </div>
     </div>
 </div>
+
+<!-- template -->
+{{-- Modèle d'une ligne (non envoyé tant qu'il n'est pas cloné) --}}
+<template id="ligneTemplate">
+    <div class="ligne-requete border rounded p-2 mb-2">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label>Article</label>
+                <select required name="lignes[__INDEX__][article_id]" class="form-select article-select" data-placeholder="Sélectionner un article">
+                    <option value="">Choisir l'article</option>
+                    @foreach ($articles as $article)
+                    <option value="{{ $article->id }}"
+                        data-article="{{ $article }}"
+                        data-depots="{{ $article->depots }}">
+                        {{ $article->code_article }}-({{ $article->designation }})
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Dépôt</label>
+                <select required name="lignes[__INDEX__][depot_id]" class="form-select depot-select" data-placeholder="Sélectionner un dépôt"></select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Unité de mesure</label>
+                <select required name="lignes[__INDEX__][unite_mesure_id]" class="form-select unite-select" data-placeholder="Sélectionner une unité"></select>
+            </div>
+
+            <div class="col-md-2">
+                <label>Quantité</label>
+                <input type="number" step="any" required class="form-control quantite-input" name="lignes[__INDEX__][quantite]">
+            </div>
+
+            <div class="col-md-1 text-end">
+                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-ligne" title="Supprimer la ligne">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
 <link href="{{ asset('css/theme/modal.css') }}" rel="stylesheet">
 <style>
     .required:after {

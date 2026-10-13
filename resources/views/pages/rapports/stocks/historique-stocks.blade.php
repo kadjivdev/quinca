@@ -43,7 +43,9 @@
                         <th class="border-bottom-0">Vente</th>
                         <th class="border-bottom-0">Unité de vente</th>
                         <th class="border-bottom-0">Stock final</th>
-                        <th class="border-bottom-0">Unité</th>
+                        <th class="border-bottom-0">Unité Stock</th>
+                        <th class="border-bottom-0">Type tarification</th>
+                        <th class="border-bottom-0">Prix tarification</th>
                         <th class="border-bottom-0">Montant</th>
                     </tr>
                 </thead>
@@ -63,6 +65,10 @@
                         <td><span class="badge bg-light text-dark">{{$article->uniteMesure?->libelle_unite}}</span></td>
                         <td><span class="badge bg-light text-dark">{{number_format($article->resteStock,2,"."," ")}}</span></td>
                         <td><span class="badge bg-light text-dark">({{$article->uniteMesure?->libelle_unite}})</span></td>
+
+                        <td><span class="badge bg-light text-dark">{{$article->type_tarif}}</span></td>
+                        <td><span class="badge bg-light text-dark">{{$article->type_tarif_price}}</span></td>
+
                         <td><span class="badge bg-light text-dark">{{number_format($article->montant,2,"."," ")}}</span></td>
                     </tr>
                     @endforeach

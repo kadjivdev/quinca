@@ -31,7 +31,6 @@
         @endif
 
         <!-- end errors -->
-
         @include('pages.catalogues.article.partials.list')
     </div>
 </div>

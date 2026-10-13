@@ -62,6 +62,7 @@ class ArticleController extends Controller
         $articles->map(function ($article) {
             $article->stocks->map(function ($stock) use ($article) {
 
+                /** */
                 $conversion = $this->serviceStockEntree
                     ->rechercherConversion(
                         $stock->unite_mesure_id,
@@ -79,12 +80,6 @@ class ArticleController extends Controller
 
                 /**Qte de requete */
                 $stock->qantiteRequete = $stock->quantite_requete;
-                // $conversion ? $this->serviceStockEntree
-                //     ->convertirQuantite(
-                //         $stock->quantite_requete,
-                //         $conversion,
-                //         $stock->unite_mesure_id
-                //     ) : 00;
 
                 /**Qte Vendue */
                 $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
