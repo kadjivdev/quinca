@@ -58,9 +58,13 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $tarification = Tarification::where("article_id", 1);
+    $article = Article::firstWhere("code_article", "ART-868");
 
-    return $tarification->get();
+    return [
+        "id" => $article->id,
+        "code_article" => $article->code_article,
+        "montanTotal" => $article->montantTotalsVendu(1)
+    ];
 });
 
 /**DETELE A STOCK */
@@ -1051,6 +1055,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{facture}/print', [FactureRevendeurController::class, 'print'])->name('revendeur.facture.print');
             Route::put('/{facture}/update', [FactureRevendeurController::class, 'update'])->name('revendeur.facture.update');
         });
+
         Route::get('/validation', [FactureRevendeurController::class, 'dailyRapport'])->name('revendeur.normale.rapport');
         Route::put('/make-validation', [FactureRevendeurController::class, 'MakevalidationDaily'])->name('revendeur.normale.makevalidation');
 
@@ -1238,6 +1243,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/ventes-articles', [RapportVenteController::class, 'ventesParArticle'])
             ->name('rapports.ventes-articles');
+
+        Route::get('/achats-articles', [RapportAchatController::class, 'achatsParArticle'])
+            ->name('rapports.achat-articles');
 
         Route::get('/ventes-articles/export', [RapportVenteController::class, 'exportVentesArticles'])
             ->name('vente.rapports.ventes-articles.export');

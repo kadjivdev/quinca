@@ -5,12 +5,52 @@ namespace App\Http\Controllers\Rapport;
 use App\Http\Controllers\Controller;
 use App\Models\Achat\{ProgrammationAchat, BonCommande, FactureFournisseur, BonLivraisonFournisseur, ReglementFournisseur};
 use App\Models\Achat\Fournisseur;
+use App\Models\Catalogue\Article;
 use App\Models\Parametre\{PointDeVente, Depot};
 use Illuminate\Http\Request;
-use Illuminate\Http\DB;
+use Illuminate\Support\Carbon;
 
 class RapportAchatController extends Controller
 {
+    public function achatsParArticle(Request $request)
+    {
+        $dateDebut = $request->get('date_debut', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $dateFin   = $request->get('date_fin', Carbon::now()->format('Y-m-d'));
+        $articleId = $request->get('article_id');
+        $fournisseurId   = $request->get('fournisseur_id') ?? 1;
+
+        $fournisseurs = Fournisseur::get(['id', 'code_fournisseur', 'raison_sociale']);
+
+        $articles = Article::with([
+            'famille',
+            'uniteMesure',
+            'achats' => function ($query) use ($fournisseurId) {
+                $query->whereHas('facture', function ($q) use ($fournisseurId) {
+                    $q->where('fournisseur_id', $fournisseurId);
+                });
+            },
+            'achats.uniteMesure',
+            'achats.facture',
+        ])->get();
+
+        $articles->each(function ($article) {
+            $article->quantite = $article->achats->sum(fn($achat) => $achat->quantite);
+            $article->montant = $article->achats->sum(fn($achat) => $achat->montant_ttc);
+        });
+
+        $totalAchats = $articles->sum(fn($article) => $article->quantite);
+
+        return view('pages.rapports.achats.achat-par-article', compact(
+            'articles',
+            'dateDebut',
+            'dateFin',
+            'articleId',
+            'fournisseurId',
+            'fournisseurs',
+            "totalAchats"
+        ));
+    }
+
     public function rapportProgrammations(Request $request)
     {
         $query = ProgrammationAchat::with([

@@ -178,7 +178,7 @@
                         <td>{{ $article->code_article }}</td>
                         <td>{{ $article->designation }}</td>
                         <td>{{ $article->famille->libelle_famille }}</td>
-                        <td class="text-center">{{ number_format($article->qantiteBase,2,","," ") }}</td>
+                        <td class="text-center">{{ number_format($article->qteTotalVendu,2,","," ") }}</td>
                         <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td>
                         <td class="text-center">{{ number_format($article->montantTotalVendu,2,","," ") }}</td>
                         <td class="border p-1 m-0">

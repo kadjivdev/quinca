@@ -53,6 +53,7 @@ class RapportVenteController extends Controller
         $articles->each(function ($article) use ($depotId) {
             $montant = $article->montantTotalsVendu($depotId);
             $article->qantiteBase = 0;
+            $article->montantTotalVendu = $montant;
 
             foreach ($article->stocks as $stock) {
                 $stock->qteTotalVenduStock = $article->qteTotalVendu;

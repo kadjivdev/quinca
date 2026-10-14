@@ -2,6 +2,7 @@
 
 namespace App\Models\Catalogue;
 
+use App\Models\Achat\LigneFactureFournisseur;
 use App\Models\Achat\LigneProgrammationAchat;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
@@ -150,7 +151,8 @@ class Article extends Model
             "article_id" => $this->id,
             "type_tarif_id" => $typeTarifId,
             "statut" => true,
-            "point_vente_id" => $pvId
+            "point_vente_id" => $pvId,
+            "unite_mesure_id" => $this->id
         ]);
     }
 
@@ -270,6 +272,14 @@ class Article extends Model
         return $this->hasMany(LigneFacture::class, "article_id");
     }
 
+    /**
+     * Les achats attachées à cet article
+     */
+    function achats(): HasMany
+    {
+        return $this->hasMany(LigneFactureFournisseur::class, "article_id");
+    }
+
     // les ventes de cet article dans un depot donné
     public function ventesInDepot($depotId)
     {
@@ -303,6 +313,21 @@ class Article extends Model
         if (!is_null($depotId)) {
             $query->where("depot", $depotId);
         }
+
+        return $query->get();
+    }
+
+    function facturesAchat($fournisseurId = null)
+    {
+        $query = $this->hasMany(LigneFactureFournisseur::class, "article_id")
+            ->whereHas("facture", function ($q) use ($fournisseurId) {
+                $q
+                    ->whereNotNull("validated_by");
+                // Appliquer le filtre seulement si $fournisseurId existe
+                if (!is_null($fournisseurId)) {
+                    $q->where("fournisseur_id", $fournisseurId);
+                }
+            });
 
         return $query->get();
     }
@@ -491,7 +516,6 @@ class Article extends Model
             $totalAmount += $factureRevendeur->sum("montant_ttc") - $factureRevendeur->sum("montant_remise");
         }
 
-        // dd($totalAmount);
         return $totalAmount;
     }
 
