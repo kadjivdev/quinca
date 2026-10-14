@@ -152,7 +152,7 @@ class Article extends Model
             "type_tarif_id" => $typeTarifId,
             "statut" => true,
             "point_vente_id" => $pvId,
-            "unite_mesure_id" => $this->id
+            "unite_mesure_id" => $this->unite_mesure_id
         ]);
     }
 
