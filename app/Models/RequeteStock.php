@@ -101,19 +101,49 @@ class RequeteStock extends Model
     }
 
     // handle  preuve file
-    function getPreuveUrl()
+    public static function savePreuveFile($file)
+    {
+        if (!$file || !$file->isValid()) {
+            Log::warning('Aucune preuve valide fournie pour la requête stock.', [
+                'has_file' => (bool) $file,
+            ]);
+            return null;
+        }
+
+        $directory = public_path('stock_preuves');
+
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            Log::error('Impossible de créer le dossier de stockage des preuves.', ['directory' => $directory]);
+            return null;
+        }
+
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $originalName) ?: 'preuve';
+        $extension = strtolower($file->getClientOriginalExtension());
+        $filename = time() . '_' . $safeName . ($extension ? '.' . $extension : '');
+
+        try {
+            $file->move($directory, $filename);
+            return asset('stock_preuves/' . $filename);
+        } catch (\Throwable $e) {
+            Log::error('Erreur lors du déplacement de la preuve pour la requête stock.', [
+                'error' => $e->getMessage(),
+                'file' => $file->getClientOriginalName(),
+            ]);
+            return null;
+        }
+    }
+
+    public function getPreuveUrl()
     {
         Log::debug("getPreuveUrl is called ...");
 
-        $fileUrl = null;
-        if (request()->hasFile("preuve")) {
-            $file = request()->file("preuve");
-            $name = time() . "_" . $file->getClientOriginalName();
-            $file->move("stock_preuves", $name);
-            $fileUrl = asset("/stock_preuves/" . $name);
+        $file = request()->file('preuve');
+        if (!$file) {
+            return $this->preuve;
         }
 
-        return $fileUrl;
+        return self::savePreuveFile($file) ?? $this->preuve;
     }
 
     // boot
@@ -131,14 +161,18 @@ class RequeteStock extends Model
         // created
         static::created(function ($model) {
             $model->numero = "REQ-" . time() . "-STOCK";
-            $model->preuve = $model->getPreuveUrl();
+
+            if (empty($model->preuve) && request()->hasFile('preuve') && request()->file('preuve')->isValid()) {
+                $model->preuve = $model->getPreuveUrl();
+            }
+
             $model->saveQuietly();
         });
 
         // updating
         static::updating(function ($model) {
             Log::info("Updating .....");
-            if (request()->hasFile("preuve")) {
+            if (request()->hasFile('preuve') && request()->file('preuve')->isValid()) {
                 Log::info("Preuve existe .....");
                 $model->preuve = $model->getPreuveUrl();
                 $model->saveQuietly(); // VERY IMPORTANT

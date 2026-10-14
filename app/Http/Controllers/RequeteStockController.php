@@ -81,7 +81,7 @@ class RequeteStockController extends Controller
 
             $validated = $request->validated();
 
-            foreach ($validated['lignes'] as $ligne) {
+            foreach ($validated['lignes'] as $index => $ligne) {
                 $article = Article::firstWhere("id", $ligne["article_id"]);
                 $depot = Depot::firstWhere("id", $ligne["depot_id"]);
 
@@ -89,12 +89,22 @@ class RequeteStockController extends Controller
                     throw new Exception("L'article {$article->code_article}  n'existe pas dans le depot {$depot->libelle_depot}", 1);
                 }
 
+                $preuveUrl = null;
+                $lignePreuve = $request->file("lignes.$index.preuve");
+
+                if (!$lignePreuve || !$lignePreuve->isValid()) {
+                    throw new Exception("La ligne {$index} doit contenir une preuve valide.", 1);
+                }
+
+                $preuveUrl = RequeteStock::savePreuveFile($lignePreuve);
+
                 RequeteStock::create([
                     'article_id'      => $ligne['article_id'],
                     'depot_id'        => $ligne['depot_id'],
                     'unite_mesure_id' => $ligne['unite_mesure_id'],
                     'quantite'        => $ligne['quantite'],
                     'commentaire'     => $validated['commentaire'] ?? null,
+                    'preuve'          => $preuveUrl,
                 ]);
             }
 
@@ -111,7 +121,7 @@ class RequeteStockController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             Log::debug("Erreure d'exception lors de la création de la requete", ["error" => $e->getMessage()]);
-            return back()->withInput()->with("error", "Une erreure d'exception est survenue lors de la création de la requete");
+            return back()->withInput()->with("error", $e->getMessage());
         }
     }
 

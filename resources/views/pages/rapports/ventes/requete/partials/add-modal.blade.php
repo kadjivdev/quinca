@@ -1,5 +1,5 @@
 <div class="modal fade" id="addRequeteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content border-0 shadow-lg">
             {{-- Header du modal --}}
             <div class="modal-header bg-primary bg-opacity-10 border-bottom-0 py-3">
@@ -39,13 +39,6 @@
                     <div id="lignesContainer"></div>
                 </div>
 
-                <!-- Preuve -->
-                <div class="col-md-12 mb-3">
-                    <label>Preuve justificative</label>
-                    <input type="file" class="form-control" name="preuve">
-                    @error('preuve') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-
                 <div class="col-12 mb-3">
                     <label for="commentaire">Commentaire</label>
                     <textarea name="commentaire" id="commentaire" rows="2" class="form-control">{{ old('commentaire') }}</textarea>
@@ -65,8 +58,8 @@
 {{-- Modèle d'une ligne (non envoyé tant qu'il n'est pas cloné) --}}
 <template id="ligneTemplate">
     <div class="ligne-requete border rounded p-2 mb-2">
-        <div class="row g-2 align-items-end">
-            <div class="col-md-3">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-2">
                 <label>Article</label>
                 <select required name="lignes[__INDEX__][article_id]" class="form-select article-select" data-placeholder="Sélectionner un article">
                     <option value="">Choisir l'article</option>
@@ -80,12 +73,12 @@
                 </select>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label>Dépôt</label>
                 <select required name="lignes[__INDEX__][depot_id]" class="form-select depot-select" data-placeholder="Sélectionner un dépôt"></select>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label>Unité de mesure</label>
                 <select required name="lignes[__INDEX__][unite_mesure_id]" class="form-select unite-select" data-placeholder="Sélectionner une unité"></select>
             </div>
@@ -93,6 +86,11 @@
             <div class="col-md-2">
                 <label>Quantité</label>
                 <input type="number" step="any" required class="form-control quantite-input" name="lignes[__INDEX__][quantite]">
+            </div>
+
+            <div class="col-md-2">
+                <label>Preuve</label>
+                <input type="file" class="form-control" name="lignes[__INDEX__][preuve]" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
             </div>
 
             <div class="col-md-1 text-end">
