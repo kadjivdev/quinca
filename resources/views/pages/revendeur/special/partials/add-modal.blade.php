@@ -10,7 +10,8 @@
                     <div>
                         <h5 class="modal-title fw-bold mb-0">Nouvelle Facture</h5>
                         <p class="text-muted small mb-0">Remplissez les informations ci-dessous pour créer une nouvelle
-                            facture</p>
+                            facture
+                        </p>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -264,63 +265,6 @@
         </div>
     </div>
 </div>
-
-{{-- Template pour une nouvelle ligne --}}
-<!-- <template id="ligneFactureTemplate">
-    <tr class="ligne-facture">
-        <td>
-            <select class="form-select select2-articles" name="lignes[__INDEX__][article_id]" required>
-                <option value="">Sélectionner un article</option>
-            </select>
-            <div class="invalid-feedback">L'article est requis</div>
-        </td>
-        <td>
-            <input type="hidden" name="lignes[__INDEX__][depot_id]">
-            <input type="hidden" name="lignes[__INDEX__][depot_stock]">
-
-            <input type="text"
-                readonly
-                name="lignes[__INDEX__][depot_libelle]"
-                class="form-control"
-                required>
-            <div class="invalid-feedback">Le dépôt est requis</div>
-        </td>
-        <td>
-            <div class="input-group">
-                <input type="number" class="form-control text-end quantite-input" name="lignes[__INDEX__][quantite]"
-                    placeholder="0.00" required min="0.01" step="0.01">
-                <select class="form-select unite-select" name="lignes[__INDEX__][unite_vente_id]" hidden required>
-                    {{-- <option value="">Unité</option> --}}
-                </select>
-            </div>
-            <div class="invalid-feedback">La quantité est requise</div>
-        </td>
-        <td>
-            <input type="number"
-                class="form-control text-end select2-tarifs"
-                name="lignes[__INDEX__][tarification_id]"
-                placeholder="0.00"
-                required
-                min="0.01"
-                step="0.01">
-            <div class="invalid-feedback">Le prix est requis</div>
-        </td>
-        <td>
-            <input type="number" class="form-control text-end remise-input" name="lignes[__INDEX__][taux_remise]"
-                placeholder="0.00" min="0" max="100" step="0.01">
-        </td>
-        <td>
-            <div class="input-group">
-                <input type="text" class="form-control text-end total-ligne" readonly value="0">
-            </div>
-        </td>
-        <td class="text-center">
-            <button type="button" class="btn btn-outline-danger btn-sm remove-ligne">
-                <i class="fas fa-times"></i>
-            </button>
-        </td>
-    </tr>
-</template> -->
 
 @push("scripts")
 <script>

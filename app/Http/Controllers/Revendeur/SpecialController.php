@@ -27,14 +27,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\ServiceStockEntree;
 use Illuminate\Support\Facades\Auth;
 
-// use SimpleSoftwareIO\QrCode\Facades\QrCode;
-// use BaconQrCode\Renderer\ImageRenderer;
-// use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-// use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-// use BaconQrCode\Writer;
-// use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-// use Illuminate\Support\Facades\Auth;
-
 class SpecialController extends Controller
 {
     private $serviceStockSortie;

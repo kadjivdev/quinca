@@ -616,6 +616,7 @@ class FactureManager {
                 this.resetForm();
                 window.location.reload();
             } else {
+                console.log("Erreure de soumission :",data)
                 throw new Error(data.message || FactureMessages.errors.submission);
             }
 
