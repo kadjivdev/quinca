@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             icon: 'error',
             title: 'Erreur de connexion',
-            text: "{{ $errors->first() }}",
+            text: "{{ $errors->first() }} go error",
             confirmButtonText: 'OK',
             confirmButtonColor: '#ffc107',
             showClass: {
