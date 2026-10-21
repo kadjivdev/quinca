@@ -180,6 +180,7 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
+        Log::info("Début de connexion ....");
         try {
             $validator = Validator::make($request->all(), [
                 'username' => 'required',
@@ -187,6 +188,8 @@ class UserController extends Controller
             ]);
 
             if ($validator->fails()) {
+                Log::debug("Validation errors :", ["errors" => $validator->errors()]);
+
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Données invalides',
@@ -214,7 +217,7 @@ class UserController extends Controller
                 'message' => 'Identifiants incorrects'
             ], 401);
         } catch (\Exception $e) {
-            // dd($e->getMessage());
+            Log::debug("Erreure lors du login :", ["error" => $e->getMessage()]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Une erreur est survenue lors de la connexion',

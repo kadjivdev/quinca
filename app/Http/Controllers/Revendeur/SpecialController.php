@@ -285,7 +285,6 @@ class SpecialController extends Controller
                 }
             }
 
-
             DB::beginTransaction();
 
             try {
