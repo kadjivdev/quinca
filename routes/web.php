@@ -32,6 +32,7 @@ use App\Models\Achat\FactureFournisseur;
 use App\Models\Achat\FournisseurApprovisionnement;
 use App\Models\Achat\LigneBonLivraisonFournisseur;
 use App\Models\Achat\LigneFactureFournisseur;
+use App\Models\Achat\ReglementFournisseur;
 use App\Models\Achat\RequeteFournisseur;
 use App\Models\Catalogue\Article;
 use App\Models\Parametre\Depot;
@@ -59,12 +60,17 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $stockMouvements = StockMouvement::query()
-        ->where("depot_id", 4)  //magasin 2 Cotonou
-        ->whereBetween("created_at", [
-            Carbon::parse("2026-07-02")->startOfDay(),
-            Carbon::parse(now())->endOfDay(),
-        ]);
+    // $stockMouvements = StockMouvement::query()
+    //     ->where("depot_id", 4)  //magasin 2 Cotonou
+    //     ->whereBetween("created_at", [
+    //         Carbon::parse("2026-07-02")->startOfDay(),
+    //         Carbon::parse(now())->endOfDay(),
+    //     ]);
+
+    $REG26038332 = ReglementFournisseur::firstWhere("code", "REG26038332");
+    $REG26038332->update(["montant_reglement" => $REG26038332->montant_reglement - 135000]);
+    
+    return $REG26038332;
 });
 
 /**DETELE A STOCK */
