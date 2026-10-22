@@ -6,6 +6,7 @@ use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
@@ -22,10 +23,14 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 if ($request->expectsJson()) {
+                    Log::info("Déjà connecté.e");
                     return response()->json(['error' => 'Already authenticated.'], 200);
                 }
+
+                Log::info("Pas encore connecté.e");
                 return redirect(RouteServiceProvider::HOME);
             }
+            Log::info("Guard non connecté.e");
         }
 
         return $next($request);

@@ -4,7 +4,6 @@
 @endpush
 
 @section('content')
-
     <div class="content">
         {{-- En-tête de la page --}}
         @include('pages.achat.fournisseur.partials.header')
@@ -19,10 +18,6 @@
     @include('pages.achat.fournisseur.partials.add-modal')
     @include('pages.achat.fournisseur.partials.edit-modal')
     @include('pages.achat.fournisseur.partials.import-modal')
-
-    <!-- modals de details factures, acomptes, et reglements -->
-    <!-- include('pages.achat.fournisseur.partials.show-accomptes-modal') -->
-    <!-- include('pages.achat.fournisseur.partials.show-reglements-modal') -->
 @endsection
 
 @push('scripts')

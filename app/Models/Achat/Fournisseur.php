@@ -197,7 +197,7 @@ class Fournisseur extends Model
 
     function reste_solde()
     {
-        $appro_solde = $this->approvisionnements()->sum("montant");
+        // $appro_solde = $this->approvisionnements()->sum("montant");
 
         /** Les factures */
         $facturesAmount = $this->facture_fournisseurs

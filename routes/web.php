@@ -38,6 +38,7 @@ use App\Models\Parametre\Depot;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Revendeur\FactureRevendeur;
 use App\Models\Stock\StockDepot;
+use App\Models\Stock\StockMouvement;
 use App\Models\Tarification;
 use App\Models\Vente\FactureClient;
 use App\Models\Vente\LigneLivraisonDestockage;
@@ -58,13 +59,12 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $article = Article::firstWhere("code_article", "ART-868");
-
-    return [
-        "id" => $article->id,
-        "code_article" => $article->code_article,
-        "montanTotal" => $article->montantTotalsVendu(1)
-    ];
+    $stockMouvements = StockMouvement::query()
+        ->where("depot_id", 4)  //magasin 2 Cotonou
+        ->whereBetween("created_at", [
+            Carbon::parse("2026-07-02")->startOfDay(),
+            Carbon::parse(now())->endOfDay(),
+        ]);
 });
 
 /**DETELE A STOCK */

@@ -576,8 +576,10 @@ class BonLivraisonFournisseurController extends Controller
                         );
                 }
 
+                Log::debug("Quantité de ligne pour cette livraison :", ["data" => $ligne->quantite]);
+
                 $vraiQteLivree = $ligneFact->quantite_livree - $QteBaseSupplementaire;
-                Log::debug("Vraie qtelivrée :", ["data" => $vraiQteLivree]);
+                Log::debug("Vraie qtelivrée pour facture :", ["data" => $vraiQteLivree]);
 
                 if (($vraiQteLivree) > ($ligneFact->quantite_base ?? $ligneFact->quantite)) {
                     throw new \Exception("La quantité livrée {$vraiQteLivree} pour l'article {$ligneFact->article?->code_article} dépasse la quantité facturée {$ligneFact->quantite_base}.");
@@ -587,7 +589,7 @@ class BonLivraisonFournisseurController extends Controller
                     'depot_id' => $bonLivraison->depot_id,
                     'article_id' => $ligne->article_id,
                     'unite_mesure_id' => $ligne->unite_mesure_id,
-                    'quantite' => $vraiQteLivree, // $ligneFact->quantite_livree_simple, //$ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
+                    'quantite' => $ligne->quantite,// $vraiQteLivree, // $ligneFact->quantite_livree_simple, //$ligneFact->quantite_livree, //quantité precedement actualisé dans la boucle foreach precedente
                     'prix_unitaire' => $prixUnitaires[$ligne->article_id],
                     'date_mouvement' => $bonLivraison->date_livraison,
                     'reference_mouvement' => $bonLivraison->code,
