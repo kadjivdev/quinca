@@ -222,7 +222,6 @@
     //         ];
     //     });
 
-
     // // livraison client | qte à récupérer des stocks
     // LigneLivraisonClient::with("livraison", "livraison.depot", "article")
     //     ->whereHas("livraison", function ($query) {

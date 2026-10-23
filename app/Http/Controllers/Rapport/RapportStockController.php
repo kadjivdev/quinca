@@ -113,14 +113,14 @@ class RapportStockController extends Controller
 
         return "En cours de développement......";
 
-        $stocks = StockDepot::with(["article", "depot", "uniteMesure"])
-            ->get()
-            ->groupBy('article_id')
-            ->flatten();
+        // $stocks = StockDepot::with(["article", "depot", "uniteMesure"])
+        //     ->get()
+        //     ->groupBy('article_id')
+        //     ->flatten();
 
-        return $stocks;
+        // return $stocks;
 
-        return view('pages.rapports.stocks.resume-stocks', compact('stocks', 'depot', "depots", "date_ftr"));
+        // return view('pages.rapports.stocks.resume-stocks', compact('stocks', 'depot', "depots", "date_ftr"));
     }
 
     /**

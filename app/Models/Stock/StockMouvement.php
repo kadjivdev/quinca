@@ -2,12 +2,14 @@
 
 namespace App\Models\Stock;
 
+use App\Models\Achat\BonLivraisonFournisseur;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use App\Models\Catalogue\Article;
 use App\Models\Securite\User;
-use App\Models\Parametre\{UniteMesure,Depot};
+use App\Models\Parametre\{UniteMesure, Depot};
 use Exception;
 
 class StockMouvement extends Model
@@ -86,6 +88,11 @@ class StockMouvement extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function livraison(): MorphTo
+    {
+        return $this->morphTo(__FUNCTION__, 'document_type', 'document_id');
     }
 
     // Méthodes de validation
