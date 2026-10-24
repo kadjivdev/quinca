@@ -63,11 +63,13 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
+    $depotId = 6;
+
     // Mise à jour des mouvements
     $serviceEntree = new ServiceStockEntree();
     $mouvements = StockMouvement::query()
         ->with(["article", "livraison.lignes"])
-        ->where("depot_id", 4)                          // magasin 2 Cotonou
+        ->where("depot_id", $depotId)                          // magasin usine client
         ->where("type_mouvement", "ENTREE")
         ->whereNull("inventaire_id")
         ->where("document_type", "BON_LIVRAISON_FOURNISSEUR")
@@ -110,13 +112,6 @@ Route::get("/debug", function () {
             $mvt->quantite = $realQte;
             $mvt->save();
 
-            // // actualisation du stock
-            // $stock = StockDepot::firstWhere([
-            //     'depot_id' => 4,
-            //     'article_id' => $article->id,
-            //     // 'unite_mesure_id' => $unite_dest_id, //$donnees["unite_mesure_id"],
-            // ]);
-
             return [
                 "mvtId"    => $mvt->id,
                 "article"  => $article->code_article,
@@ -131,7 +126,7 @@ Route::get("/debug", function () {
     // Mise à jour des stocks
     // Capitulation des qte entrée dans le Magasin 2 Cotonou depuis le 28 Mars 2026 jusqu'à maintenant
     StockDepot::query()
-        ->where("depot_id", 4)
+        ->where("depot_id", $depotId)
         ->get()
         ->each(function ($stock) use ($serviceEntree) {
             $livraisonFournisseurLignes = LigneBonLivraisonFournisseur::query()
@@ -210,8 +205,8 @@ Route::get("/debug", function () {
     // retour des marchandises à ajouter aux stocks
     LigneMarchandise::with("marchandBack", "marchandBack.depot", "article")
         ->where("quantite", ">", 0)
-        ->whereHas("marchandBack", function ($query) {
-            $query->where("depot_id", 4)
+        ->whereHas("marchandBack", function ($query) use ($depotId) {
+            $query->where("depot_id", $depotId)
                 ->whereNotNull("validated_by")
                 ->whereBetween("created_at", [
                     Carbon::create(2026, 02, 28)->startOfDay(), // 28 Mars
@@ -278,8 +273,8 @@ Route::get("/debug", function () {
 
     // livraison client | qte à récupérer des stocks
     LigneLivraisonClient::with("livraison", "livraison.depot", "article")
-        ->whereHas("livraison", function ($query) {
-            $query->where("depot_dest_id", 4)
+        ->whereHas("livraison", function ($query) use ($depotId) {
+            $query->where("depot_dest_id", $depotId)
                 ->whereIn("numero", ["BL-260421-95b"]) /// les bons concernés
                 ->whereNotNull("validated_by")
                 ->whereBetween("created_at", [
@@ -348,7 +343,7 @@ Route::get("/debug", function () {
             ];
         });
 
-    return "Stock et mouvement regularisés avec succès";
+    return "Stock et mouvement regularisés avec succès du magasin usine client";
 });
 
 /**DETELE A STOCK */
