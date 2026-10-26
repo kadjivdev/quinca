@@ -64,11 +64,15 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $reglement = ReglementClient::with("compteClient.client")->findOrFail(4876);
-    if ($reglement) {
-        $reglement->delete();
+    $facture = FactureClient::firstWhere("numero", "FAC-20261024-0012");
+    if ($facture) {
+        $facture->update([
+            'date_validation' => null,
+            'validated_by' => null,
+            'statut' => 'brouillon'
+        ]);
     }
-    return $reglement;
+    return $facture;
 });
 
 /**DETELE A STOCK */
