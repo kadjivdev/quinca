@@ -14,7 +14,6 @@ use Exception;
 
 class ReglementClientController extends Controller
 {
-
     public function index(Request $request)
     {
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
@@ -25,7 +24,6 @@ class ReglementClientController extends Controller
             'createdBy',
             'validatedBy'
         ])->latest();
-
 
         // Application des filtres
         if ($request->filled('client_id')) {
@@ -299,6 +297,7 @@ class ReglementClientController extends Controller
         }
     }
 
+    // 
     public function validate_reglement($id)
     {
         try {
@@ -310,7 +309,6 @@ class ReglementClientController extends Controller
 
             $sessionCaisse = SessionCaisse::ouverte()
                 ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                // ->where('utilisateur_id', auth()->user()->id)
                 ->first();
 
             Log::info("La session :", ["session" => $sessionCaisse]);
