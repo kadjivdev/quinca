@@ -65,6 +65,7 @@ use Illuminate\Support\Facades\Log;
 // DEBUGING ROUTES
 Route::get("/debug", function () {
     $reglement = ReglementClient::with("compteClient.client")->find(4876);
+    $reglement->delete();
     return $reglement;
 });
 

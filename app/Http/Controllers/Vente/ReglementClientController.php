@@ -597,6 +597,18 @@ class ReglementClientController extends Controller
             // Sauvegarder les modifications
             $reglement->save();
 
+
+            // update reglement
+            $reglement->compteClient->delete();
+            
+            $reglement->compteClient()->create([
+                'date_op' => $reglement->date_reglement,
+                'montant_op' => $reglement->montant,
+                'client_id' => $reglement->facture->client_id,
+                'user_id' => Auth::user()->id,
+                'type_op' => 'REG_CLT',
+            ]);
+
             // Log de l'action
             Log::info('Règlement mis à jour', [
                 'reglement_id' => $reglement->id,
