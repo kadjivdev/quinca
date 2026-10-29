@@ -631,9 +631,9 @@ class FactureClientController extends Controller
 
                 // Création du règlement si nécessaire
                 if ($request->montant_regle > 0) {
-                    if ($request->montant_regle > $request->montant_ttc) {
-                        throw new Exception("Le montant de reglement ne doit pas depasser le montant TTC de la facture");
-                    }
+                    // if ($request->montant_regle > $request->montant_ttc) {
+                    //     throw new Exception("Le montant de reglement ne doit pas depasser le montant TTC de la facture");
+                    // }
                     $reglement = new ReglementClient([
                         'facture_client_id' => $facture->id,
                         'date_reglement' => Carbon::parse($request->date_facture),
@@ -932,9 +932,9 @@ class FactureClientController extends Controller
 
                 // Création du règlement si nécessaire
                 if ($request->montant_regle > 0) {
-                    if ($request->montant_regle > $request->montant_ttc) {
-                        throw new Exception("Le montant de reglement ne doit pas depasser le montant TTC de la facture");
-                    }
+                    // if ($request->montant_regle > $request->montant_ttc) {
+                    //     throw new Exception("Le montant de reglement ne doit pas depasser le montant TTC de la facture");
+                    // }
                     $reglement = new ReglementClient([
                         'facture_client_id' => $facture->id,
                         'date_reglement' => Carbon::parse($request->date_facture),
