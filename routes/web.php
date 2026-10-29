@@ -64,14 +64,7 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $facture = FactureClient::firstWhere("numero", "FAC-20261024-0012");
-    if ($facture) {
-        $facture->update([
-            'date_validation' => null,
-            'validated_by' => null,
-            'statut' => 'brouillon'
-        ]);
-    }
+    $facture = FactureClient::with(["compteClient","reglements.compteClient"])->firstWhere("numero", "FAC-20261028-0019");
     return $facture;
 });
 
