@@ -9,7 +9,7 @@ use App\Models\Parametre\Agent;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
 use App\Models\Parametre\PointDeVente;
-use App\Models\Vente\{FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
+use App\Models\Vente\{CompteClient, FactureClient, LigneFacture, PointVente, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
 use App\Models\Stock\StockDepot;
@@ -49,11 +49,11 @@ class FactureClientController extends Controller
 
             // Construction de la requête de base
             if ($request->debut && $request->fin) {
-                $query = FactureClient::with(['client', 'createdBy','lignes'])
+                $query = FactureClient::with(['client', 'createdBy', 'lignes'])
                     ->orderBy('created_at', 'desc')
                     ->whereBetween('created_at', [Carbon::parse($request->debut)->startOfDay(), Carbon::parse($request->fin)->endOfDay()]);
             } else {
-                $query = FactureClient::with(['client', 'createdBy','lignes'])
+                $query = FactureClient::with(['client', 'createdBy', 'lignes'])
                     ->orderBy('created_at', 'desc')
                     ->whereBetween('created_at', [Carbon::parse(now())->startOfMonth(), Carbon::parse(now())->endOfMonth()]);
             }
@@ -120,15 +120,15 @@ class FactureClientController extends Controller
                  */
                 $facture->state = "";
                 $facture->payement_state = "";
-                if ($facture->montant_regle==0) {
+                if ($facture->montant_regle == 0) {
                     $facture->payement_state = "non_payee";
                 }
 
-                if ($facture->montant_regle>0 && $facture->montant_regle<$facture->montant_ttc) {
+                if ($facture->montant_regle > 0 && $facture->montant_regle < $facture->montant_ttc) {
                     $facture->payement_state = "partiellement_payee";
                 }
 
-                if ($facture->montant_regle>0 && $facture->montant_regle>=$facture->montant_ttc) {
+                if ($facture->montant_regle > 0 && $facture->montant_regle >= $facture->montant_ttc) {
                     $facture->payement_state = "payee";
                 }
 
@@ -631,6 +631,9 @@ class FactureClientController extends Controller
 
                 // Création du règlement si nécessaire
                 if ($request->montant_regle > 0) {
+                    if ($request->montant_regle > $request->montant_ttc) {
+                        throw new Exception("Le montant de reglement ne doit pas depasser le montant TTC de la facture");
+                    }
                     $reglement = new ReglementClient([
                         'facture_client_id' => $facture->id,
                         'date_reglement' => Carbon::parse($request->date_facture),
@@ -920,11 +923,18 @@ class FactureClientController extends Controller
                 // Suppression des anciens règlements
                 $facture->reglements()->delete();
 
+                // suppression des anciens compte clients des reglements
+                CompteClient::whereIn("reglement_clt", $facture->reglements->pluck("id")->toArray())
+                    ->delete();
+
                 // Réinitialisation des totaux et suppression des anciennes lignes
                 $facture->lignes()->delete();
 
                 // Création du règlement si nécessaire
                 if ($request->montant_regle > 0) {
+                    if ($request->montant_regle > $request->montant_ttc) {
+                        throw new Exception("Le montant de reglement ne doit pas depasser le montant TTC de la facture");
+                    }
                     $reglement = new ReglementClient([
                         'facture_client_id' => $facture->id,
                         'date_reglement' => Carbon::parse($request->date_facture),
