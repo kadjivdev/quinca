@@ -100,6 +100,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-3">
+            <div class="stats-card bg-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{route('rapports.achat-articles')}}" type="submit" class="btn btn-success">
+                        <i class="fas fa-filter me-1"></i>Actualiser
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Filtres -->
@@ -116,11 +126,11 @@
                         <input type="date" name="date_fin" class="form-control" value="{{ $dateFin }}">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label text-muted">
                         <i class="fas fa-box me-1"></i>Article
                     </label>
-                    <select name="article_id" class="form-control select2">
+                    <select name="article_id" class="form-control border select2">
                         <option value="">Tous les articles</option>
                         @foreach($articles as $article)
                         <option value="{{ $article->id }}" {{ $articleId == $article->id ? 'selected' : '' }}>
@@ -129,7 +139,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label text-muted">
                         <i class="fas fa-box me-1"></i>Fournisseurs
                     </label>
@@ -141,7 +151,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-12">
+                <div class="col-2">
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-filter me-1"></i>Filtrer
                     </button>
@@ -158,13 +168,17 @@
                 <i class="fas fa-file-excel me-1"></i>Exporter
             </button>
         </div>
+
+        @php
+        $fournisseur = $fournisseurs->firstWhere("id",$fournisseurId)
+        @endphp
         <div class="table-responsive bg-white p-2 shadow-sm">
             <table class="table table-hover" id="example1">
                 <thead>
                     <tr>
                         <th>Code</th>
+                        <th>Fournisseur</th>
                         <th>Article</th>
-                        <th>Famille</th>
                         <th class="text-center">Quantité</th>
                         <th class="text-center">Unité</th>
                         <th class="text-center">Montant</th>
@@ -175,8 +189,8 @@
                     @foreach($articles as $article)
                     <tr>
                         <td>{{ $article->code_article }}</td>
+                        <td>{{ $fournisseur->raison_sociale??"--" }}</td>
                         <td>{{ $article->designation }}</td>
-                        <td>{{ $article->famille->libelle_famille }}</td>
                         <td class="text-center">{{ number_format($article->quantite,2,","," ") }}</td>
                         <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td>
                         <td class="text-center">{{ number_format($article->montant,2,","," ") }}</td>

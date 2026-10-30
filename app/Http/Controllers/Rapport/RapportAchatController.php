@@ -14,24 +14,33 @@ class RapportAchatController extends Controller
 {
     public function achatsParArticle(Request $request)
     {
-        $dateDebut = $request->get('date_debut', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $dateDebut = $request->get('date_debut');
         $dateFin   = $request->get('date_fin', Carbon::now()->format('Y-m-d'));
         $articleId = $request->get('article_id');
         $fournisseurId   = $request->get('fournisseur_id') ?? 1;
 
         $fournisseurs = Fournisseur::get(['id', 'code_fournisseur', 'raison_sociale']);
 
-        $articles = Article::with([
+        $achatQuery = function ($query) use ($fournisseurId, $dateDebut, $dateFin) {
+            $query->whereHas('facture', function ($q) use ($fournisseurId, $dateDebut, $dateFin) {
+                if ($dateDebut) {
+                    $q->whereDate('created_at', '>=', $dateDebut)
+                        ->whereDate('created_at', '<=', $dateFin);
+                }
+                $q->where('fournisseur_id', $fournisseurId);
+            });
+        };
+
+        $articleQuery = Article::with([
             'famille',
             'uniteMesure',
-            'achats' => function ($query) use ($fournisseurId) {
-                $query->whereHas('facture', function ($q) use ($fournisseurId) {
-                    $q->where('fournisseur_id', $fournisseurId);
-                });
-            },
+            'achats' => $achatQuery,
             'achats.uniteMesure',
             'achats.facture',
-        ])->get();
+        ]);
+
+        $articles = $articleId ?
+            $articleQuery->where("id", $articleId)->get() : $articleQuery->get();
 
         $articles->each(function ($article) {
             $article->quantite = $article->achats->sum(fn($achat) => $achat->quantite);

@@ -387,7 +387,7 @@
                 <ul class="dropdown-menu navbar-dropdown-caret">
                     @can('rapports.pre-commandes.view')
                     <li><a class="dropdown-item" href="{{ route('rapports.achat-articles') }}">
-                            <div class="dropdown-item-wrapper">Achat par Article</div>
+                            <div class="dropdown-item-wrapper">Achat par Article/Fournisseur</div>
                         </a></li>
                     <li><a class="dropdown-item" href="{{ route('rapports.pre-commandes') }}">
                             <div class="dropdown-item-wrapper">Pré-commandes</div>
