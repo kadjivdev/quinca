@@ -614,7 +614,6 @@ class BonCommandeController extends Controller
 
             $facture->save();
 
-            // return $bonCommande->lignes;
             // Création des lignes
             foreach ($bonCommande->lignes as $line) {
                 Log::info("La line", ["data" => $line]);
