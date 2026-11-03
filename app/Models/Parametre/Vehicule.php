@@ -2,7 +2,6 @@
 
 namespace App\Models\Parametre;
 
-use App\Models\Securite\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +12,8 @@ use Illuminate\Support\Carbon;
  *
  * @property int $id
  * @property string $matricule
+ * @property string $type
+ * @property bool $statut
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property Carbon|null $created_at
@@ -36,7 +37,7 @@ class Vehicule extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'matricule'
+        'matricule',"type","statut"
     ];
 
     /**
@@ -45,7 +46,7 @@ class Vehicule extends Model
      * @var array<string, string>
      */
     public static $rules = [
-        'matricule' => 'required|string|unique:vehicules,matricule'
+        'matricule' => 'required|string|unique:vehicules,matricule',
     ];
 
     /**

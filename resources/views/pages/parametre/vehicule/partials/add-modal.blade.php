@@ -15,12 +15,28 @@
                 <div class="modal-body p-4">
                     <div class="row g-4">
                         {{-- Nom --}}
-                        <div class="col-md-9">
+                        <div class="col-md-4">
                             <label class="form-label fw-semibold required">Matricule</label>
                             <input type="text" class="form-control" name="matricule" required minlength="6"
                                 maxlength="100" placeholder="Ex: AB 0000">
                             <div class="invalid-feedback">
                                 Le matricule est requis (3 à 100 caractères).
+                            </div>
+                        </div>
+
+                        {{-- Matricule --}}
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold required">Type de transport</label>
+                            <div class="input-group">
+                                <select class="form-select select2" name="type" id="type_transport"
+                                    required>
+                                    <option value="AUTRE" selected>AUTRE</option>
+                                    <option value="TRICYCLE">TRICYCLE</option>
+                                    <option value="CAMIONNETTE">CAMIONNETTE</option>
+                                    <option value="CAMION">CAMION</option>
+                                    <option value="VOITURE">VOITURE</option>
+                                    <option value="MOTO">MOTO</option>
+                                </select>
                             </div>
                         </div>
 

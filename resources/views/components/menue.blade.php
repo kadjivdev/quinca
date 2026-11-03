@@ -92,9 +92,9 @@
                     <li><a class="dropdown-item" href="{{ route('vehicule.index') }}">
                             <div class="dropdown-item-wrapper">Véhicules</div>
                         </a></li>
-                    <li><a class="dropdown-item" href="{{ route('transportation.index') }}">
+                    <!-- <li><a class="dropdown-item" href="{{ route('transportation.index') }}">
                             <div class="dropdown-item-wrapper">Moyen de transport</div>
-                        </a></li>
+                        </a></li> -->
                     @endcan
                 </ul>
             </li>

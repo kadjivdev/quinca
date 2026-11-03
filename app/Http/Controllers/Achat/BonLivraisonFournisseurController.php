@@ -101,6 +101,8 @@ class BonLivraisonFournisseurController extends Controller
      */
     public function store(Request $request)
     {
+        Log::debug("Les données entrantes :",["data"=>$request->all()]);
+        
         try {
             // Récupération du point de vente de l'utilisateur connecté
             $point_de_vente_id = Auth::user()->point_de_vente_id;
@@ -137,6 +139,7 @@ class BonLivraisonFournisseurController extends Controller
                 'vehicule_id' => 'required|exists:vehicules,id',
                 'chauffeur_id' => 'required|exists:chauffeurs,id',
                 'commentaire' => 'nullable|string',
+                'destination' => 'required|string',
                 'lignes' => 'required|array',
                 'lignes.*.article_id' => 'required|exists:articles,id',
                 'lignes.*.ligne_id' => 'required|exists:ligne_facture_fournisseurs,id',
@@ -180,6 +183,7 @@ class BonLivraisonFournisseurController extends Controller
                 'vehicule_id' => $validated['vehicule_id'],
                 'chauffeur_id' => $validated['chauffeur_id'],
                 'commentaire' => $validated['commentaire'],
+                'destination' => $validated['destination'],
                 'created_by' => Auth::id(),
                 "document" => $documentUrl
             ]);
@@ -351,20 +355,6 @@ class BonLivraisonFournisseurController extends Controller
         }
 
         try {
-            // $validated = $request->validate([
-            //     'date_livraison' => 'required|date',
-            //     'point_de_vente_id' => 'required|exists:point_de_ventes,id',
-            //     'depot_id' => 'required|exists:depots,id',
-            //     'vehicule_id' => 'nullable|exists:vehicules,id',
-            //     'chauffeur_id' => 'nullable|exists:chauffeurs,id',
-            //     'commentaire' => 'nullable|string',
-            //     'lignes' => 'required|array',
-            //     'lignes.*.article_id' => 'required|exists:articles,id',
-            //     'lignes.*.unite_mesure_id' => 'required|exists:unite_mesures,id',
-            //     'lignes.*.quantite' => 'required|numeric|min:0',
-            //     'lignes.*.quantite_supplementaire' => 'nullable|numeric|min:0',
-            //     'lignes.*.unite_id' => 'nullable|exists:unite_mesures,id'
-            // ]);
 
             // Récupération de la facture pour avoir le fournisseur_id
             $facture = FactureFournisseur::findOrFail($request->facture_id);
@@ -379,6 +369,7 @@ class BonLivraisonFournisseurController extends Controller
                 'vehicule_id' => 'required|exists:vehicules,id',
                 'chauffeur_id' => 'required|exists:chauffeurs,id',
                 'commentaire' => 'nullable|string',
+                'destination' => 'required|string',
                 'lignes' => 'required|array',
                 'lignes.*.article_id' => 'required|exists:articles,id',
                 'lignes.*.ligne_id' => 'required|exists:ligne_facture_fournisseurs,id',
@@ -413,7 +404,6 @@ class BonLivraisonFournisseurController extends Controller
                 'commentaire' => $validated['commentaire'],
                 'updated_by' => Auth::id()
             ]);
-
 
             // Supprimer les anciennes lignes
             $bonLivraison->lignes()->delete();

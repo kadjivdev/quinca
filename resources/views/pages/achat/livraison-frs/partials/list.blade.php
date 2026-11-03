@@ -16,7 +16,8 @@
                                 <th class="py-3 text-secondary small text-uppercase">Transport</th>
                                 <th class="py-3 text-secondary small text-uppercase">Articles</th>
                                 <th class="border-bottom-0">Document</th>
-
+                                <th class="border-bottom-0">Commentaire</th>
+                                <th class="border-bottom-0">Destination</th>
                                 <th class="py-3 text-secondary small text-uppercase text-center">Statut</th>
                                 <th class="pe-4 py-3 text-end" style="min-width: 150px;"></th>
                             </tr>
@@ -90,6 +91,13 @@
                                     ---
                                     @endif
                                 </td>
+                                <td>
+                                    <textarea readonly class="form-control rounded-3" rows="2" style="background-color: #f8f9fa;">{{ $livraison->commentaire?? '---' }}</textarea>
+                                </td>
+                                <td>
+                                    <textarea readonly class="form-control rounded-3" rows="2" style="background-color: #f8f9fa;">{{ $livraison->destination?? '---' }}</textarea>
+                                </td>
+
                                 <td class="py-3 text-center">
                                     @if ($livraison->validated_at)
                                     <span
@@ -120,8 +128,6 @@
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         @endcan
-
-                                        <!-- <a target="_blank" href="{{route('livraisons.validate',$livraison->id)}}">Valider</a> -->
 
                                         @can("livraisons.validate")
                                         <button class="btn btn-link btn-sm text-success p-2"
@@ -157,7 +163,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="10" class="text-center py-5">
+                                <td colspan="12" class="text-center py-5">
                                     <div class="empty-state">
                                         <div
                                             class="rounded-circle bg-warning bg-opacity-10 p-4 mx-auto mb-4 d-inline-flex">

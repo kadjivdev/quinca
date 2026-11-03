@@ -148,6 +148,14 @@
                                 placeholder="Saisissez un commentaire éventuel..."></textarea>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <label class="form-label small text-muted mb-2">Destination <span class="text-danger">*</span> </label>
+                            <textarea name="destination" required class="form-control rounded-3" rows="2"
+                                placeholder="Saisissez la destination de la livraison..."></textarea>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer border-0 py-3 bg-light rounded-bottom-4">

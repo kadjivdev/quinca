@@ -22,7 +22,6 @@ class TransportationController extends Controller
         ];
 
         $date = Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY');
-
         return view('pages.parametre.transportation.index', compact(
             'transportations',
             'stats',

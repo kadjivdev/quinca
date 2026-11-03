@@ -39,8 +39,9 @@ class VehiculeController extends Controller
     public function store(Request $request)
     {
         try {
-            $validated = $request->validate([
+            $request->validate([
                 'matricule' => 'required|string|min:6|max:100|unique:vehicules,matricule',
+                'type' => 'required|in:CAMION,CAMIONNETTE,VOITURE,TRYCICLE,MOTO,AUTRE',
                 'actif' => 'boolean'
             ]);
 
@@ -48,6 +49,7 @@ class VehiculeController extends Controller
 
             $vehicule = Vehicule::create([
                 'matricule' => $request->matricule,
+                'type' => $request->type,
                 'statut' => $request->input('actif') === '1',
                 'created_by' => Auth::id()
             ]);

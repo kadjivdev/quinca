@@ -109,6 +109,11 @@
                             <th>Unité</th>
                             <th class="text-end">Quantité</th>
                             <th class="text-end">Prix Unitaire</th>
+                            <th>Type livraion</th>
+                            <th>Livraison</th>
+                            <th>Facture/Montant</th>
+                            <th>Client</th>
+                            <th>Fournisseur</th>
                             <th>Document</th>
                             <th>Commentaire</th>
                             <th>Utilisateur</th>
@@ -145,6 +150,13 @@
                             <td>{{ $mouvement->article?->uniteMesure?->libelle_unite }}</td>
                             <td class="text-end"> {{ number_format($mouvement->quantite, 2, ',', ' ') }}</td>
                             <td class="text-end">{{ number_format($mouvement->prix_unitaire, 0, ',', ' ') }} FCFA
+
+                            <td class="text-end">{{ $mouvement->document_type }}
+                            <td class="text-end">{{ $mouvement->livraison?->numero??'---' }}
+                            <td class="text-end">{{ number_format($mouvement->montant, 0, ',', ' ') }} FCFA
+                            <td class="text-end">{{ $mouvement->client_name }}
+                            <td class="text-end">{{ $mouvement->fournisseur_name }}
+
                             <td>{{ $mouvement->document_type }} {{ $mouvement->document_id }}</td>
                             <td>
                                 <textarea class="form-control">{{$mouvement->notes?? '---'}}</textarea>

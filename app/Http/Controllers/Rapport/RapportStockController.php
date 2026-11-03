@@ -142,7 +142,6 @@ class RapportStockController extends Controller
                 session()->forget("date_ftr");
             }
 
-            // $date = $request->date_ftr;
             $date_ftr = session()->get("date_ftr");
 
             $stocks = StockDepot::with("article", "depot")
@@ -158,7 +157,6 @@ class RapportStockController extends Controller
                 /**
                  * Stocks de l'article dans le depot $depot
                  */
-
                 $articleStocks
                     ->map(function ($stock) use ($article) {
                         $conversion = $this->serviceEntree
@@ -174,20 +172,9 @@ class RapportStockController extends Controller
                                 $stock->quantite_reelle,
                                 $conversion,
                                 $stock->unite_mesure_id,
-                                // $article->unite_mesure_id
                             ) : 00;
 
-
-                        /**Qte de requete */
-                        // $stock->qantiteRequete = $requeteQuery
-                        //     ->get()
-                        //     ->sum("quantite");
-
                         $stock->qantiteRequete = $stock->quantite_requete;
-
-                        /**Qte Vendue */
-                        // $stock->qteTotalVendu = session()->get("date_ftr") ?
-                        //     $article->qteVenduAtDate($stock->depot_id, session()->get("date_ftr")) : $article->qteVendu($stock->depot_id);
 
                         $stock->qteTotalVendu = $article->qteVendu($stock->depot_id);
 
@@ -364,7 +351,7 @@ class RapportStockController extends Controller
 
     private function getMouvements(Request $request)
     {
-        $query = StockMouvement::with(['article', 'depot', 'uniteMesure', 'user'])
+        $query = StockMouvement::with(['article', 'depot', 'uniteMesure', 'user', "livraison.facture"])
             ->whereNull("inventaire_id") //seuls les stocks nont inventoriés sont considéres
             ->orderByDesc("id");
 
@@ -398,6 +385,17 @@ class RapportStockController extends Controller
                 $mouvement->stock_depot_updated_at = StockDepot::where('article_id', $mouvement->article_id)
                     ->where('depot_id', $mouvement->depot_id)
                     ->value('updated_at');
+
+                $mouvement->client_name = $mouvement->document_type === 'LIVRAISON_CLIENT' ?
+                    $mouvement->livraison?->facture?->client?->raison_sociale : "---";
+
+                $mouvement->fournisseur_name = $mouvement->document_type === 'BON_LIVRAISON_FOURNISSEUR' ?
+                    $mouvement->livraison?->facture?->fournisseur?->raison_sociale : "---";
+
+                $mouvement->montant = $mouvement->document_type === 'LIVRAISON_CLIENT'
+                    ? ($mouvement->livraison?->facture?->montant_ttc ?? 0)
+                    : ($mouvement->livraison?->facture?->montant_ht ?? 0);
+
                 return $mouvement;
             }));
     }

@@ -63,6 +63,7 @@ class BonLivraisonFournisseur extends Model
         'vehicule_id',
         'chauffeur_id',
         'commentaire',
+        'destination',
         'motif_rejet',
         'created_by',
         'updated_by',
