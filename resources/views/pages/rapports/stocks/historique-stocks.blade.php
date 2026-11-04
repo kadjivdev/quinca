@@ -7,7 +7,7 @@
     <div class="card p-3 border-0 shadow-sm">
         <div class="row justify-content-center">
             <div class="col-6">
-                <form action="" method="get">
+                <form action="" method="get" class="border rounded shadow-sm p-2">
                     <div class="mb-3">
                         <select name="depot_id" class="form-control" id="depot_select" required>
                             @foreach($depots as $dep)
@@ -15,17 +15,13 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="">
-                        <input type="date" name="date_ftr" class="form-control">
-                    </div>
-                    <br>
                     <button class="btn btn-success w-100">Rechercher....</button>
                 </form>
             </div>
         </div>
 
         <br>
-        <h4 class="">Historique du stock du dépôt : <span class="badge bg-light rounded borded text-success">{{$depot->libelle_depot}} | Montant total: {{number_format($montantTotal,2,','," ")}} FCFA @if($date_ftr) - Date filtrée : {{\Carbon\Carbon::parse($date_ftr)->format('d/m/Y')}} @endif </span> </h4>
+        <h4 class="">Historique du stock du dépôt : <span class="badge bg-light rounded borded text-success">Montant total: {{number_format($montantTotal,2,','," ")}} FCFA </span> </h4>
 
         <div class="table-responsive">
             <table id="example1" class="table table-hover align-middle mb-0" id="livraisonsTable">
@@ -94,7 +90,6 @@
     }
 </style>
 @endpush
-
 
 <!-- DATATABLES -->
 @push('scripts')

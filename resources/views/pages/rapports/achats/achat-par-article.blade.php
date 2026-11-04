@@ -146,7 +146,7 @@
                     <select name="fournisseur_id" class="form-control select2">
                         @foreach($fournisseurs as $fournisseur)
                         <option value="{{ $fournisseur->id }}" {{ $fournisseurId == $fournisseur->id ? 'selected' : '' }}>
-                            {{ $fournisseur->code_fournisseur }} - {{ $fournisseur->raison_sociale }}
+                            {{ $fournisseur->code_fournisseur }} - {{ $fournisseur->raison_sociale }} {{ $fournisseur->id }}
                         </option>
                         @endforeach
                     </select>
@@ -177,10 +177,10 @@
                 <thead>
                     <tr>
                         <th>Code</th>
-                        <th>Fournisseur</th>
+                        <th>Fournisseur {{$fournisseurId}}</th>
                         <th>Article</th>
                         <th class="text-center">Quantité</th>
-                        <th class="text-center">Unité</th>
+                        <!-- <th class="text-center">Unité</th> -->
                         <th class="text-center">Montant</th>
                         <th class="text-center">Détails</th>
                     </tr>
@@ -192,13 +192,15 @@
                         <td>{{ $fournisseur->raison_sociale??"--" }}</td>
                         <td>{{ $article->designation }}</td>
                         <td class="text-center">{{ number_format($article->quantite,2,","," ") }}</td>
-                        <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td>
+                        <!-- <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td> -->
                         <td class="text-center">{{ number_format($article->montant,2,","," ") }}</td>
                         <td class="border p-1 m-0">
                             <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
                                 @forelse($article->achats as $achat)
                                 <li class="bg-warning rounded p-2" style="list-style-type: none">
-                                    <h4 class="badge d-block text-dark border-bottom">Fournisseur: {{$achat->facture?->fournisseur?->raison_sociale}}</h4>
+                                    <span class="badge d-block d-flex text-dark">Fournisseur: {{$achat->facture?->fournisseur?->raison_sociale}}</span>
+                                    <span class="badge d-block d-flex text-dark">Date: {{$achat->facture?->created_at->format('d/m/Y')}}</span>
+                                    <span class="badge d-block d-flex text-dark">Code: {{$achat->facture?->code}}</span>
                                     <span class="badge d-block d-flex text-dark">Qte acheté: {{number_format($achat->quantite,2,'.','')}} ({{$achat->uniteMesure?->libelle_unite}})</span>
                                 </li>
                                 <hr>

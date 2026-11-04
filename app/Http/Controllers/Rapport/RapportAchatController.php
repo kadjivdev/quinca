@@ -17,9 +17,9 @@ class RapportAchatController extends Controller
         $dateDebut = $request->get('date_debut');
         $dateFin   = $request->get('date_fin', Carbon::now()->format('Y-m-d'));
         $articleId = $request->get('article_id');
-        $fournisseurId   = $request->get('fournisseur_id') ?? 1;
 
         $fournisseurs = Fournisseur::get(['id', 'code_fournisseur', 'raison_sociale']);
+        $fournisseurId   = $request->get('fournisseur_id') ?? $fournisseurs->first()?->id;
 
         $achatQuery = function ($query) use ($fournisseurId, $dateDebut, $dateFin) {
             $query->whereHas('facture', function ($q) use ($fournisseurId, $dateDebut, $dateFin) {

@@ -135,15 +135,6 @@ class RapportStockController extends Controller
                 $depot = Depot::find(1);
             }
 
-            // date de filtre
-            if ($request->date_ftr) {
-                session()->put("date_ftr", Carbon::parse($request->date_ftr));
-            } else {
-                session()->forget("date_ftr");
-            }
-
-            $date_ftr = session()->get("date_ftr");
-
             $stocks = StockDepot::with("article", "depot")
                 ->where("depot_id", $depot->id)
                 ->get();
@@ -156,7 +147,7 @@ class RapportStockController extends Controller
 
                 /**
                  * Stocks de l'article dans le depot $depot
-                 */
+                 **/
                 $articleStocks
                     ->map(function ($stock) use ($article) {
                         $conversion = $this->serviceEntree
@@ -203,7 +194,7 @@ class RapportStockController extends Controller
                 $article->inventaire_date = $lastInventaire?->inventaire?->created_at;
 
                 // qte approvisionnement
-                $article->qteAppro = ($article->stocks()?->firstWhere("depot_id", $depot->id)?->quantite_reelle ?? 0) - $article->qteDepart; // $articleStocks->sum("quantite_reelle") - $article->qteDepart;
+                $article->qteAppro = ($article->stocks()?->firstWhere("depot_id", $depot->id)?->quantite_reelle ?? 0) - $article->qteDepart;
 
                 //stock disponible
                 $article->stockDisponible = $article->qteAppro > 0 ? $article->qteAppro + $article->qteDepart : $article->qteDepart;
@@ -229,9 +220,9 @@ class RapportStockController extends Controller
             $depots = Depot::all();
             $montantTotal = array_sum($articles->pluck("montant")->toArray());
 
-            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "date_ftr", "montantTotal"));
+            return view('pages.rapports.stocks.historique-stocks', compact('articles', 'depot', "depots", "montantTotal"));
         } catch (\Exception $e) {
-            Log::debug("Une erreure est survenue lors du chargement du stock", ["error" => $e->getMessage()]);
+            Log::debug("Une erreure est survenue lors du chargement du stock", ["error" => $e->getMessage(), "ligne" => $e->getLine()]);
             return back()->with("error", "Une erreure est survenue lors du chargement du stock :" . $e->getMessage());
         }
     }
@@ -466,7 +457,7 @@ class RapportStockController extends Controller
             ->where('depot_id', $selectedDepot->id)
             // ->where('quantite_reelle', '>', 0)
             ->get()
-            ->map(function ($stock) use ($selectedDepot) {
+            ->map(function ($stock) {
                 $conversion = $this->serviceEntree
                     ->rechercherConversion(
                         $stock->unite_mesure_id,
@@ -483,18 +474,13 @@ class RapportStockController extends Controller
 
                 /**Qte de requete */
                 $stock->qantiteRequete = $stock->quantite_requete;
-                // $conversion ? $this->serviceEntree
-                //     ->convertirQuantite(
-                //         $stock->quantite_requete,
-                //         $conversion,
-                //         $stock->unite_mesure_id
-                //     ) : 00;
 
                 /**Qte Vendue */
                 $qteTotalVendu = $stock->article->qteVendu($stock->depot_id);
 
-                // $resteStock = $qantiteBase - $qteTotalVendu;
-                $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu; //$article->reste($stock->depot_id);
+                $qteAllVendue = ($qantiteBase + $stock->qantiteRequete) - $stock->article->qteVendu($stock->depot_id, true);
+
+                $resteStock = ($qantiteBase + $stock->qantiteRequete) - $qteTotalVendu;
 
                 $resteStockReel = ($qantiteBase + $stock->qantiteRequete) - $stock->article->getQteReelleVendue($stock->depot_id);
 
@@ -506,10 +492,11 @@ class RapportStockController extends Controller
                     ],
                     'unite_stock' => $stock->uniteMesure?->libelle_unite,
                     'depot' => $stock->depot->libelle_depot,
-                    'quantite_reelle' => $qantiteBase, //$stock->quantite_reelle,
+                    'quantite_reelle' => $qantiteBase,
                     'quantite_requete' => $stock->qantiteRequete,
-                    'quantite_reelle_disponible' => $resteStockReel, // $stock->article->reste($selectedDepot->id),
-                    'quantite_disponible' => $resteStock, // $stock->article->reste($selectedDepot->id),
+                    'quantite_disponible_after_vente' => $qteAllVendue,
+                    'quantite_disponible' => $resteStock,
+                    'quantite_reelle_disponible' => $resteStockReel,
                     'quantite_reservee' => $stock->quantite_reservee,
                     'prix_moyen' => $stock->prix_moyen,
                     'valeur_stock' => $stock->valeur_stock,
