@@ -64,15 +64,18 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    $BC2611069322 = BonCommande::with("factures")->firstWhere("code", "BC2611069322");
+    // $BC2611069322 = BonCommande::query()
+    //     ->with("factures")
+    //     ->where("code", "BC2611069322")
+    //     ->first();
 
-    $BC2611069322->update([
-        "validated_by" => null,
-        "validated_at" => null
-    ]);
+    // $BC2611069322->update([
+    //     "validated_by" => null,
+    //     "validated_at" => null
+    // ]);
 
-    $BC2611069322->refresh();
-    return $BC2611069322;
+    // $BC2611069322->refresh();
+    // return $BC2611069322;
 });
 
 /**DETELE A STOCK */
