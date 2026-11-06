@@ -237,7 +237,6 @@ class BonCommandeController extends Controller
                 }
                 $selectedArticles[$ligne['article_id']] = true; //on compte cet article comme déjà selectionné
 
-
                 // Trouver la ligne de programmation correspondante pour obtenir l'unite_mesure_id
                 $ligneProgrammation = $programmation->lignes
                     ->where('article_id', $ligne['article_id'])

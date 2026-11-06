@@ -65,6 +65,7 @@ use Illuminate\Support\Facades\Log;
 // DEBUGING ROUTES
 Route::get("/debug", function () {
     $BC2611069322 = BonCommande::with("factures")->firstWhere("code", "BC2611069322");
+    $FAC26111918 = FactureFournisseur::withTrashed()->firstWhere("code", "FAC26111918");
 
     // $BC2611069322->update([
     //     "validated_by" => null,
@@ -73,7 +74,10 @@ Route::get("/debug", function () {
 
     // $BC2611069322->refresh();
 
-    return $BC2611069322;
+    return [
+        "BC2611069322" => $BC2611069322,
+        "FAC26111918" => $FAC26111918
+    ];
 });
 
 /**DETELE A STOCK */
