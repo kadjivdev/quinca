@@ -27,54 +27,40 @@ class RapportVenteController extends Controller
 
     public function ventesParArticle(Request $request)
     {
-        $dateDebut = $request->get('date_debut', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $dateDebut = $request->get('date_debut');
         $dateFin   = $request->get('date_fin', Carbon::now()->format('Y-m-d'));
         $articleId = $request->get('article_id');
-        $depotId   = $request->filled('depot_id') ? $request->get('depot_id') : 1;
 
-        $depots = Depot::get(['id', 'code_depot', 'libelle_depot']);
+        $depots = Depot::orderBy('libelle_depot')->get(['id', 'code_depot', 'libelle_depot']);
+        $depotId = $request->get('depot_id') ?? $depots->first()?->id;
 
-        $articles = Article::with([
-            'famille',
-            // on ne charge que les stocks du dépôt choisi
-            'stocks' => fn($q) => $q->where('depot_id', $depotId),
-        ])
-            ->whereHas('stocks', fn($q) => $q->where('depot_id', $depotId))
-            ->when($articleId, fn($q) => $q->where('id', $articleId))
-            ->orderBy('designation')
-            ->get()
-            // qteVendu est calculé une seule fois, pour le dépôt choisi
-            ->each(function ($article) use ($depotId) {
-                $article->qteTotalVendu = $article->qteVendu($depotId);
-            })
-            ->filter(fn($article) => $article->qteTotalVendu > 0)
-            ->values();
-
-        $articles->each(function ($article) use ($depotId) {
-            $montant = $article->montantTotalsVendu($depotId);
-            $article->qantiteBase = 0;
-            $article->montantTotalVendu = $montant;
-
-            foreach ($article->stocks as $stock) {
-                $stock->qteTotalVenduStock = $article->qteTotalVendu;
-                $stock->montantTotalVendu  = $montant;
-
-                /** STOCK DE BASE */
-                $conversion = $this->serviceStockEntree->rechercherConversion(
-                    $stock->unite_mesure_id,
-                    $article->unite_mesure_id,
-                    $stock->article_id
-                );
-
-                if ($conversion) {
-                    $article->qantiteBase += $this->serviceStockEntree->convertirQuantite(
-                        $stock->quantite_reelle,
-                        $conversion,
-                        $stock->unite_mesure_id
-                    );
+        $venteQuery = function ($query) use ($depotId, $dateDebut, $dateFin) {
+            $query->whereHas('facture', function ($q) use ($depotId, $dateDebut, $dateFin) {
+                if ($dateDebut) {
+                    $q->whereDate('created_at', '>=', $dateDebut)
+                        ->whereDate('created_at', '<=', $dateFin);
                 }
-            }
+                $q->where('depot', $depotId);
+            });
+        };
+
+        $articleQuery = Article::with([
+            'famille',
+            'uniteMesure',
+            'ventes' => $venteQuery,
+            'ventes.uniteVente',
+            'ventes.facture',
+        ]);
+
+        $articles = $articleId ?
+            $articleQuery->where("id", $articleId)->get() : $articleQuery->get();
+
+        $articles->each(function ($article) {
+            $article->quantite = $article->ventes->sum(fn($vente) => $vente->quantite);
+            $article->montant = $article->ventes->sum(fn($vente) => $vente->montant_ttc);
         });
+
+        $totalVentes = $articles->sum(fn($article) => $article->quantite);
 
         return view('pages.rapports.ventes.vente-par-article', compact(
             'articles',
@@ -82,7 +68,8 @@ class RapportVenteController extends Controller
             'dateFin',
             'articleId',
             'depotId',
-            'depots'
+            'depots',
+            'totalVentes'
         ));
     }
 

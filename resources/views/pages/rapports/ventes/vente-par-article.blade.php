@@ -71,14 +71,13 @@
         </h2>
     </div>
 
-    <!-- Cartes statistiques -->
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="stats-card bg-white p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted mb-2">Total des ventes</h6>
-                        <h3 class="mb-0">{{ number_format($articles->sum('qteTotalVendu'), 0, ',', ' ') }} F</h3>
+                        <h6 class="text-muted mb-2">Quantité totale vendue</h6>
+                        <h3 class="mb-0">{{ number_format($totalVentes, 0, ',', ' ') }}</h3>
                     </div>
                     <div class="stats-icon bg-success bg-opacity-10 text-success">
                         <i class="fas fa-money-bill-wave fa-lg"></i>
@@ -100,9 +99,18 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-3">
+            <div class="stats-card bg-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ route('rapports.ventes-articles') }}" class="btn btn-success">
+                        <i class="fas fa-filter me-1"></i>Actualiser
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Filtres -->
     <div class="filter-card card mb-4">
         <div class="card-body">
             <form id="filterForm" class="row g-3">
@@ -116,33 +124,35 @@
                         <input type="date" name="date_fin" class="form-control" value="{{ $dateFin }}">
                     </div>
                 </div>
-                <div class="col-md-4">
+
+                <div class="col-md-3">
                     <label class="form-label text-muted">
                         <i class="fas fa-box me-1"></i>Article
                     </label>
-                    <select name="article_id" class="form-control select2">
+                    <select name="article_id" class="form-control border select2">
                         <option value="">Tous les articles</option>
                         @foreach($articles as $article)
-                        <option value="{{ $article->id }}" {{ $articleId == $article->id ? 'selected' : '' }}>
-                            {{ $article->code_article }} - {{ $article->designation }}
-                        </option>
+                            <option value="{{ $article->id }}" {{ $articleId == $article->id ? 'selected' : '' }}>
+                                {{ $article->code_article }} - {{ $article->designation }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+
+                <div class="col-md-3">
                     <label class="form-label text-muted">
-                        <i class="fas fa-box me-1"></i>Dépôts
+                        <i class="fas fa-warehouse me-1"></i>Dépôt
                     </label>
                     <select name="depot_id" class="form-control select2">
-                        <option value="">Tous les dépôts</option>
                         @foreach($depots as $depot)
-                        <option value="{{ $depot->id }}" {{ $depotId == $depot->id ? 'selected' : '' }}>
-                            {{ $depot->code_depot }} - {{ $depot->libelle_depot }}
-                        </option>
+                            <option value="{{ $depot->id }}" {{ (string) $depotId === (string) $depot->id ? 'selected' : '' }}>
+                                {{ $depot->code_depot }} - {{ $depot->libelle_depot }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-12">
+
+                <div class="col-2">
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-filter me-1"></i>Filtrer
                     </button>
@@ -151,7 +161,6 @@
         </div>
     </div>
 
-    <!-- Tableau des résultats -->
     <div class="table-container mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Détails des ventes</h5>
@@ -159,42 +168,52 @@
                 <i class="fas fa-file-excel me-1"></i>Exporter
             </button>
         </div>
+
+        @php
+            $depot = $depots->firstWhere('id', $depotId);
+        @endphp
+
         <div class="table-responsive bg-white p-2 shadow-sm">
             <table class="table table-hover" id="example1">
                 <thead>
                     <tr>
                         <th>Code</th>
+                        <th>Dépôt</th>
                         <th>Article</th>
-                        <th>Famille</th>
-                        <th class="text-center">Quantité</th>
                         <th class="text-center">Unité</th>
+                        <th class="text-center">Quantité</th>
                         <th class="text-center">Montant</th>
                         <th class="text-center">Détails</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($articles as $article)
-                    <tr>
-                        <td>{{ $article->code_article }}</td>
-                        <td>{{ $article->designation }}</td>
-                        <td>{{ $article->famille->libelle_famille }}</td>
-                        <td class="text-center">{{ number_format($article->qteTotalVendu,2,","," ") }}</td>
-                        <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td>
-                        <td class="text-center">{{ number_format($article->montantTotalVendu,2,","," ") }}</td>
-                        <td class="border p-1 m-0">
-                            <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
-                                @forelse($article->stocks as $stock)
-                                <li class="bg-warning rounded p-2" style="list-style-type: none">
-                                    <h4 class="badge d-block text-dark border-bottom">Dépôt: {{$stock->depot->libelle_depot}}</h4>
-                                    <span class="badge d-block d-flex text-dark">Qte vendue: {{number_format($stock->qteTotalVenduStock,2,'.','')}} ({{$stock->uniteMesure?->libelle_unite}})</span>
-                                </li>
-                                <hr>
-                                @empty
-                                <li class="text-center">Ce article n'est disponible dans aucun dépôt!</li>
-                                @endforelse
-                            </ul>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>{{ $article->code_article }}</td>
+                            <td>{{ $depot?->libelle_depot ?? '--' }}</td>
+                            <td>{{ $article->designation }}</td>
+                            <td class="text-center">{{ $article->uniteMesure?->libelle_unite ?? '--' }}</td>
+                            <td class="text-center">{{ number_format($article->quantite, 2, ',', ' ') }}</td>
+                            <td class="text-center">{{ number_format($article->montant, 2, ',', ' ') }}</td>
+                            <td class="border p-1 m-0">
+                                <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
+                                    @forelse($article->ventes as $vente)
+                                        <li class="bg-warning rounded p-2" style="list-style-type: none">
+                                            <span class="badge d-block d-flex text-dark">Client: {{ $vente->facture?->client?->raison_sociale ?? '--' }}</span>
+                                            <span class="badge d-block d-flex text-dark">Date: {{ $vente->facture?->date_facture?->format('d/m/Y') ?? $vente->facture?->created_at?->format('d/m/Y') ?? '--' }}</span>
+                                            <span class="badge d-block d-flex text-dark">Facture: {{ $vente->facture?->numero ?? $vente->facture?->id ?? '--' }}</span>
+                                            <span class="badge d-block d-flex text-dark">
+                                                Qté vendue: {{ number_format($vente->quantite, 2, ',', ' ') }}
+                                                ({{ $vente->uniteVente?->libelle_unite ?? '--' }})
+                                            </span>
+                                        </li>
+                                        <hr>
+                                    @empty
+                                        <li class="text-center">Ce article ne dispose d'aucune vente !</li>
+                                    @endforelse
+                                </ul>
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -208,7 +227,7 @@
     $(document).ready(function() {
         $('.select2').select2({
             theme: 'bootstrap4',
-            placeholder: 'Sélectionner un article',
+            // placeholder: 'Sélectionner un article',
             allowClear: true,
             width: '100%'
         });

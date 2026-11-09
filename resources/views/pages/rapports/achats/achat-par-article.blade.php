@@ -192,7 +192,6 @@
                         <td>{{ $fournisseur->raison_sociale??"--" }}</td>
                         <td>{{ $article->designation }}</td>
                         <td class="text-center">{{ number_format($article->quantite,2,","," ") }}</td>
-                        <!-- <td class="text-center">{{ $article->uniteMesure?->libelle_unite }}</td> -->
                         <td class="text-center">{{ number_format($article->montant,2,","," ") }}</td>
                         <td class="border p-1 m-0">
                             <ul class="mx-0" style="width:100%;height:100px!important;overflow-y:scroll;">
