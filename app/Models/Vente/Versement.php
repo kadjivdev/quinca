@@ -79,7 +79,6 @@ class Versement extends Model
         return $query->where('type_op', $type);
     }
 
-
     // Méthode pour générer automatiquement la référence
     public static function genererReference(): string
     {

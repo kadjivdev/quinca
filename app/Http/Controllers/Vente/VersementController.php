@@ -24,6 +24,11 @@ class VersementController extends Controller
 
         // Récupération des données avec 
         $versementsQuery = Versement::with(['client', 'createdBy', "accompteClient", "validatedBy", "extournedBy"]);
+        $userRoles = auth()->user()->roles->pluck('name');
+
+        if ($userRoles->contains("GERANT DEPOT")) {
+            $versementsQuery->where("created_by", auth()->id());
+        }
 
         // Application des filtres
         if ($request->filled('client_id')) {
@@ -31,14 +36,16 @@ class VersementController extends Controller
         }
 
         if ($request->filled('type_op')) {
-            $versementsQuery->parType($request->type_op);
+            $versementsQuery
+                ->parType($request->type_op);
         }
 
         if ($request->filled('date_debut') && $request->filled('date_fin')) {
-            $versementsQuery->whereBetween('date_op', [
-                Carbon::parse($request->date_debut)->startOfDay(),
-                Carbon::parse($request->date_fin)->endOfDay()
-            ]);
+            $versementsQuery
+                ->whereBetween('date_op', [
+                    Carbon::parse($request->date_debut)->startOfDay(),
+                    Carbon::parse($request->date_fin)->endOfDay()
+                ]);
         }
 
         if ($request->filled("status_op")) {
@@ -80,11 +87,19 @@ class VersementController extends Controller
                 ->sum('montant')
         ];
 
-        $clients = Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)
-            ->orderBy('raison_sociale')
+        $queryClient = Client::where('point_de_vente_id', Auth()->user()->point_de_vente_id)
+            ->orderBy('raison_sociale');
+
+        if ($userRoles->contains("GERANT DEPOT")) {
+            $queryClient->where('agent_id', Auth()->user()->agent_id);
+        }
+
+        $clients = $queryClient
             ->get(['id', 'raison_sociale', 'code_client']);
 
-        $versementMoisCount = $versements->whereBetween('date_op', [now()->startOfMonth(), now()->endOfMonth()])->count();
+        $versementMoisCount = $versements
+            ->whereBetween('date_op', [now()->startOfMonth(), now()->endOfMonth()])
+            ->count();
 
         return view('pages.ventes.versement.index', compact(
             'versements',
@@ -106,7 +121,6 @@ class VersementController extends Controller
             // Vérifications initiales
             $sessionCaisse = SessionCaisse::ouverte()
                 ->where('point_de_vente_id', auth()->user()->point_de_vente_id)
-                // ->where('utilisateur_id', auth()->user()->id)
                 ->first();
 
             if (!$sessionCaisse) {
@@ -130,7 +144,7 @@ class VersementController extends Controller
                 'observation' => $versement->comment,
                 'point_de_vente_id' => $sessionCaisse?->point_de_vente_id,
                 'session_caisse_id' => $sessionCaisse?->id,
-                'created_by' => Auth::id(),// integré le 14/07/2026
+                'created_by' => Auth::id(), // integré le 14/07/2026
             ]);
 
             DB::commit();

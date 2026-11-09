@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Revendeur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vente\Client;
-use App\Models\Catalogue\{Tarification, Article};
+use App\Models\Catalogue\{Article};
 use App\Models\Destockage;
 use App\Models\Parametre\ConversionUnite;
 use App\Models\Parametre\Depot;
-use App\Models\Parametre\PointDeVente;
 use App\Models\Vente\{FactureClient, LigneFacture, SessionCaisse, ReglementClient};
 use App\Models\Parametre\Societe;
 use App\Models\Parametre\UniteMesure;
@@ -43,7 +42,6 @@ class SpecialController extends Controller
     /**
      * Affiche la liste des factures
      */
-
     public function index(Request $request)
     {
         try {
