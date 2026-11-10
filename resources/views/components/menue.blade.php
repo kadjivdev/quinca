@@ -231,7 +231,8 @@
                     <!-- recouvrements -->
                     <li><a class="dropdown-item" href="{{ route('recouvrement.index') }}">
                             <div class="dropdown-item-wrapper">Recouvrement Clients</div>
-                        </a></li>
+                        </a>
+                    </li>
                     @endcan
 
                     @can("accompte.client")
@@ -239,12 +240,10 @@
                             <div class="dropdown-item-wrapper">Accomptes Clients</div>
                         </a></li>
 
-                    @if(Auth::id()!=6)
                     <!-- L'accès a été retiré à Mme Sandrine -->
                     <li><a class="dropdown-item" href="{{ route('versements.index') }}">
                             <div class="dropdown-item-wrapper">Chèque & MoMo</div>
                         </a></li>
-                    @endif
                     @endcan
 
                     @can("vehicule.view")
