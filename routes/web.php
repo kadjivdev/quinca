@@ -64,7 +64,11 @@ use Illuminate\Support\Facades\Log;
 
 // DEBUGING ROUTES
 Route::get("/debug", function () {
-    // 
+    $stock = StockDepot::firstWhere(["article_id"=>1839,"depot_id"=>4]);
+    // $stock->quantite_reelle +=242;
+    // $stock->save();
+
+    return $stock;
 });
 
 /**DETELE A STOCK */
